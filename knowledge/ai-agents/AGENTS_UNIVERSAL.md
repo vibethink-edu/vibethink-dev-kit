@@ -11,6 +11,12 @@
 > - `CANON-MULTI-AGENT-ORCHESTRATION.md` — handoff entre agentes y el humano: gates
 >   de máquina auto-vigilados, inbox por agente, escalación de juicio al humano,
 >   feed + interrupt (el humano no es el bus de mensajes).
+>
+> **Disciplina de decisiones (capa universal):**
+> - `../architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` — toda
+>   decisión de arquitectura/contrato/comportamiento se escribe (ADR + markers
+>   inline) en forma indexable por un knowledge-graph. Las decisiones son
+>   ciudadanos de primera clase del repo, no efímeras de la conversación.
 
 ---
 
