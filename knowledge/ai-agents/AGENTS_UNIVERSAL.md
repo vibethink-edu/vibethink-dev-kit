@@ -5,8 +5,12 @@
 > **Este archivo define las reglas GENÉRICAS que TODOS los repos heredan.**
 > Los proyectos específicos extienden estas reglas con su propio `AGENTS.md`.
 >
-> **Disciplina cross-agent (capa universal):** ver `CANON-CROSS-AGENT-CONTEXT-LAYERING.md`
-> — layering, presupuesto por agente más restrictivo, anti-contaminación, smoke test.
+> **Disciplina cross-agent (capa universal):**
+> - `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` — layering, presupuesto por agente más
+>   restrictivo, anti-contaminación, smoke test (cómo leen las reglas los agentes).
+> - `CANON-MULTI-AGENT-ORCHESTRATION.md` — handoff entre agentes y el humano: gates
+>   de máquina auto-vigilados, inbox por agente, escalación de juicio al humano,
+>   feed + interrupt (el humano no es el bus de mensajes).
 
 ---
 
