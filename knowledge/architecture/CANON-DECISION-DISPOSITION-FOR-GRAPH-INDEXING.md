@@ -98,7 +98,38 @@ explicit decision language ("we decided X because Y"), not descriptive language
   Only if decisions keep getting lost **despite** this norm is an automatic
   capture layer reconsidered.
 
-## 6. Per-repo binding
+## 6. Retrospective reconstruction (the past)
+
+This norm governs **forward** (mandatory from publication). The past is
+**partially reconstructible**, inheriting the established "retrospective
+reconstruction" pattern: when you start on an area that has history but no
+decision record, reconstruct it from available evidence in the same change.
+
+Past decisions fall into three buckets:
+
+| Bucket | Where it lives | Action |
+|--------|----------------|--------|
+| **Already indexable** | code, docstrings, canons, coordination messages | none — the indexer's next run takes it. Zero reconstruction. |
+| **Reconstructible** | git history (commits, PR descriptions), coordination messages — but no ADR | extract to an ADR tagged `[RECONSTRUCTED from <source>]` |
+| **Lost** | conversational, no trace in the repo | not recoverable |
+
+Strategy — **never big-bang**:
+
+1. **Index-first.** Run the indexer over existing canons / messages / code
+   *before* reconstructing anything — measure how much "why" is already written
+   and indexed for free.
+2. **Opportunistic (scout).** When you touch an area, reconstruct its decisions
+   to ADRs in the same change — same spirit as the testing scout rule.
+3. **High-value first.** Major architecture decisions are reconstructed first —
+   they are what every new agent needs.
+4. **The rest is deferred** — reconstructed when someone needs it.
+
+**Mandatory tag.** Every reconstructed decision carries
+`[RECONSTRUCTED from <source>]`, to distinguish direct evidence from retroactive
+inference — consistent with the indexer's confidence tagging (extracted vs
+inferred).
+
+## 7. Per-repo binding
 
 This neutral canon defines the **discipline**. Each inheriting repo binds it to
 its own stack — declared in that repo's own layer, never here:
@@ -109,8 +140,8 @@ its own stack — declared in that repo's own layer, never here:
 
 The discipline is universal; the indexer and its marker dialect are product-level.
 
-## 7. Inheritance
+## 8. Inheritance
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits
-this norm and binds it (§6). Anything specific to a product, a vendor, a tool, or
+this norm and binds it (§7). Anything specific to a product, a vendor, a tool, or
 a person stays in that repo's own layer — it never flows into this neutral core.
