@@ -1,0 +1,122 @@
+# ============================================================================
+# VIBETHINK PROJECT - AI AGENT CONFIGURATION
+# ============================================================================
+# This file contains the core configuration for AI agents (Cursor, Claude, etc.)
+# For detailed project-specific rules, see AGENTS.md
+# ============================================================================
+
+<identity>
+You are working on a VibeThink project. All critical rules, workflows, and project-specific instructions are defined in `AGENTS.md`, which serves as the single source of truth.
+
+This `.cursorrules` file provides basic configuration. For detailed guidance, **always refer to AGENTS.md first**.
+</identity>
+
+<user_information>
+The USER's OS version is Windows.
+The user has active workspaces defined in AGENTS.md.
+You are not allowed to access files not in active workspaces.
+</user_information>
+
+<tool_calling>
+Call tools as you normally would. The following list provides additional guidance:
+- **Absolute paths only**. When using tools that accept file path arguments, ALWAYS use the absolute file path.
+- Check AGENTS.md for project-specific tool usage patterns.
+</tool_calling>
+
+<communication_style>
+- **Formatting**: Use GitHub-style markdown for better readability.
+- **Proactiveness**: Be proactive in completing tasks, but avoid surprising the user.
+- **Helpfulness**: Explain your work clearly and acknowledge mistakes.
+- **Ask for clarification**: If unsure about the USER's intent, always ask.
+
+See AGENTS.md for project-specific communication guidelines.
+</communication_style>
+
+<user_rules>
+The following are user-defined rules that you MUST ALWAYS FOLLOW WITHOUT ANY EXCEPTION.
+
+## ⚠️ CRITICAL: Read AGENTS.md First
+
+**BEFORE doing ANYTHING in this project:**
+1. Read `AGENTS.md` in the project root
+2. Follow ALL rules defined there
+3. Refer to documentation linked in AGENTS.md
+
+`AGENTS.md` contains:
+- Project architecture and structure
+- Naming conventions
+- Best practices
+- Workflow guidelines
+- Scripts and tools
+- Troubleshooting guides
+- Stack-specific rules
+
+**AGENTS.md is the SINGLE SOURCE OF TRUTH for this project.**
+
+## Quick Links (See AGENTS.md for complete list)
+
+- **Architecture**: See AGENTS.md → Architecture section
+- **Naming Conventions**: See AGENTS.md → Naming Conventions section
+- **Best Practices**: See AGENTS.md → Best Practices section
+- **Workflows**: See AGENTS.md → Workflows section
+- **Scripts**: See AGENTS.md → Scripts section
+
+## Universal Rules (Apply to ALL VibeThink Projects)
+
+### 1. Code Quality
+- ✅ No hardcoded paths (use environment variables)
+- ✅ No secrets in code (use .env files)
+- ✅ All dependencies must be justified
+- ✅ Critical functions must have tests
+- ✅ No duplicate code between projects
+
+See `_vibethink-dev-kit/knowledge/QUALITY_RULES.md` for complete rules.
+
+### 2. Git Workflow
+- ✅ Verify no extra worktrees before major operations
+- ✅ Use conventional commits
+- ✅ Never commit to main directly (use branches)
+
+### 3. Documentation
+- ✅ Update CHANGELOG.md for significant changes
+- ✅ Document breaking changes
+- ✅ Keep AGENTS.md updated
+
+## Project-Specific Rules
+
+**See AGENTS.md for:**
+- Technology stack specifics
+- API integrations
+- Deployment procedures
+- Testing requirements
+- Performance guidelines
+
+</user_rules>
+
+<workflows>
+Workflows are defined in AGENTS.md and project-specific documentation.
+
+Common workflows:
+- Development workflow: See AGENTS.md
+- Deployment workflow: See AGENTS.md
+- Testing workflow: See AGENTS.md
+
+For turbo-enabled workflows, see AGENTS.md.
+</workflows>
+
+<ephemeral_message>
+There will be an <EPHEMERAL_MESSAGE> appearing in the conversation at times. This is not coming from the user, but instead injected by the system as important information to pay attention to.
+
+Do not respond to nor acknowledge those messages, but do follow them strictly.
+</ephemeral_message>
+
+# ============================================================================
+# REMEMBER: AGENTS.md is the SINGLE SOURCE OF TRUTH
+# ============================================================================
+# This .cursorrules file provides basic configuration only.
+# For ALL project-specific rules, workflows, and guidelines:
+# 
+# 📖 READ AGENTS.md FIRST
+#
+# AGENTS.md contains the complete "constitution" of this project.
+# ============================================================================

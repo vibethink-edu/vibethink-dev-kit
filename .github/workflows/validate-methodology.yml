@@ -1,0 +1,27 @@
+name: Validación Metodológica
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  validate-methodology:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Ejecutar validación metodológica
+        run: python scripts/validate-methodology-alignment.py
+
+      - name: Subir reporte como artefacto
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: validation-report.json 

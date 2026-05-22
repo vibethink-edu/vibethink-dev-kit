@@ -1,0 +1,28 @@
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Temp
+temp/
+tmp/
+*.tmp
+
+# Build
+dist/
+build/

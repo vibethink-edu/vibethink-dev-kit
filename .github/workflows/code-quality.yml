@@ -1,0 +1,42 @@
+name: Code Quality Check
+on: [push, pull_request]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Check for accents in code
+        run: |
+          echo "🔍 Verificando acentos en código..."
+          if grep -r "[áéíóúÁÉÍÓÚñÑ]" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx"; then
+            echo "❌ ERROR: Se encontraron acentos en el código"
+            echo "Por favor, elimina todos los acentos de variables, funciones y identificadores"
+            exit 1
+          fi
+          echo "✅ No se encontraron acentos en el código"
+          
+      - name: Run ESLint
+        run: npm run lint
+        
+      - name: Run TypeScript check
+        run: npm run type-check
+        
+      - name: Run spelling check
+        run: |
+          echo "🔍 Verificando ortografía en comunicaciones..."
+          node scripts/check-spelling.js
+          
+      - name: Run etiquette validation
+        run: |
+          echo "🔍 Validando reglas de etiqueta..."
+          node scripts/validate-etiquette.js 

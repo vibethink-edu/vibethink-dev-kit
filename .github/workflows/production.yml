@@ -1,0 +1,130 @@
+name: Production Pipeline
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  production-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Final security check
+        run: npm audit --audit-level=high
+      
+      - name: Run critical tests
+        run: npm run test:critical
+      
+      - name: Build for production
+        run: npm run build:production
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+      
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_PROD }}
+          vercel-args: '--prod'
+      
+      - name: Wait for deployment
+        run: sleep 30
+      
+      - name: Health check
+        run: npm run health:check:prod
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+      
+      - name: Run smoke tests
+        run: npm run test:smoke:prod
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+      
+      - name: Performance check
+        run: npm run performance:check:prod
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+      
+      - name: Notify stakeholders on success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#production-notifications'
+          text: |
+            🚀 Production deployment successful!
+            Version: ${{ github.event.release.tag_name }}
+            Environment: Production
+            URL: ${{ secrets.PROD_URL }}
+            Release Notes: ${{ github.event.release.body }}
+      
+      - name: Notify stakeholders on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#production-notifications'
+          text: |
+            🚨 Production deployment failed!
+            Version: ${{ github.event.release.tag_name }}
+            Environment: Production
+            Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **IMMEDIATE ACTION REQUIRED**
+
+  post-deployment-monitoring:
+    needs: production-deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Start monitoring
+        run: |
+          echo "Starting post-deployment monitoring..."
+          npm run monitoring:start
+      
+      - name: Monitor for 10 minutes
+        run: |
+          for i in {1..12}; do
+            echo "Monitoring check $i/12"
+            npm run health:check:prod
+            sleep 50
+          done
+      
+      - name: Final health check
+        run: npm run health:check:prod
+      
+      - name: Generate deployment report
+        run: npm run generate:deployment-report
+      
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-report-${{ github.event.release.tag_name }}
+          path: deployment-report.md
+      
+      - name: Notify monitoring complete
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#production-notifications'
+          text: |
+            ✅ Post-deployment monitoring completed
+            Version: ${{ github.event.release.tag_name }}
+            All systems operational
+            Monitoring will continue for 24 hours 

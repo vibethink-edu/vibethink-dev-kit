@@ -1,0 +1,11 @@
+{
+  "name": "@vibethink/eslint-config",
+  "version": "0.1.0",
+  "main": "index.js",
+  "dependencies": {
+    "eslint-config-next": "15.3.4"
+  },
+  "peerDependencies": {
+    "eslint": "^8.0.0"
+  }
+}

@@ -1,0 +1,179 @@
+name: 💰 GitHub Actions Cost Monitor
+
+on:
+  schedule:
+    # Runs every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      alert_threshold:
+        description: 'Alert threshold percentage (default: 80%)'
+        required: false
+        default: '80'
+        type: string
+      detailed_report:
+        description: 'Generate detailed breakdown report'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  monitor-usage:
+    name: 📊 Monitor GitHub Actions Usage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔄 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          npm install @octokit/rest chalk date-fns
+      
+      - name: 💰 Run Usage Monitor
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          node scripts/monitor-github-usage.js \
+            --alert-threshold=${{ github.event.inputs.alert_threshold || '80' }} \
+            ${{ github.event.inputs.detailed_report == 'true' && '--detailed' || '' }}
+      
+      - name: 📊 Generate Usage Report
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          echo "# 💰 GitHub Actions Usage Report" > usage-report.md
+          echo "" >> usage-report.md
+          echo "**Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> usage-report.md
+          echo "**Repository**: ${{ github.repository }}" >> usage-report.md
+          echo "**Alert Threshold**: ${{ github.event.inputs.alert_threshold || '80' }}%" >> usage-report.md
+          echo "" >> usage-report.md
+          echo "## Summary" >> usage-report.md
+          echo "" >> usage-report.md
+          
+          # Run monitor again and capture output for report
+          node scripts/monitor-github-usage.js \
+            --alert-threshold=${{ github.event.inputs.alert_threshold || '80' }} \
+            --detailed 2>&1 | sed 's/\x1b\[[0-9;]*m//g' >> usage-report.md || true
+      
+      - name: 📎 Upload Usage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-actions-usage-report
+          path: usage-report.md
+          retention-days: 30
+      
+      - name: 🚨 Check Usage Threshold
+        id: check_usage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get current usage percentage
+          USAGE_OUTPUT=$(node scripts/monitor-github-usage.js --alert-threshold=${{ github.event.inputs.alert_threshold || '80' }} 2>&1 || echo "error")
+          
+          if echo "$USAGE_OUTPUT" | grep -q "ALERT: Usage is at"; then
+            echo "high_usage=true" >> $GITHUB_OUTPUT
+            echo "usage_output<<EOF" >> $GITHUB_OUTPUT
+            echo "$USAGE_OUTPUT" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "high_usage=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📧 Send High Usage Alert
+        if: steps.check_usage.outputs.high_usage == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 GitHub Actions Usage Alert';
+            const body = `
+            ## 🚨 High GitHub Actions Usage Detected
+            
+            **Repository**: ${{ github.repository }}
+            **Date**: ${new Date().toISOString()}
+            **Threshold**: ${{ github.event.inputs.alert_threshold || '80' }}%
+            
+            ### Usage Details
+            \`\`\`
+            ${{ steps.check_usage.outputs.usage_output }}
+            \`\`\`
+            
+            ### Recommended Actions
+            1. Review current workflow runs and cancel unnecessary ones
+            2. Consider optimizing workflows to reduce runtime
+            3. Implement cost optimization strategies:
+               - Use draft PRs for development
+               - Add more aggressive caching
+               - Use conditional jobs
+               - Parallelize workflows
+            4. Consider upgrading GitHub plan if consistently hitting limits
+            
+            ### Resources
+            - [GitHub Actions Usage Dashboard](https://github.com/settings/billing)
+            - [Cost Optimization Guide](./docs/PROJECT/08_TOOLCHAIN_AND_SETUP/GITHUB_ACTIONS_TOKENS_CONSUMPTION_GUIDE.md)
+            - [Workflow Optimization Best Practices](./docs/VTK_METHODOLOGY/05_BEST_PRACTICES/TESTING_BEST_PRACTICES.md)
+            `;
+            
+            // Create an issue for high usage
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['cost-monitoring', 'github-actions', 'alert']
+            });
+      
+      - name: 💬 Comment on Recent PRs (if high usage)
+        if: steps.check_usage.outputs.high_usage == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get recent PRs
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              sort: 'updated',
+              per_page: 5
+            });
+            
+            const comment = `
+            ## 💰 GitHub Actions Usage Notice
+            
+            Our GitHub Actions usage is currently high (${{ github.event.inputs.alert_threshold || '80' }}%+ of monthly limit).
+            
+            **For this PR**, please consider:
+            - Converting to draft while developing to use optimized workflow
+            - Minimizing force pushes and unnecessary commits
+            - Running tests locally before pushing
+            
+            See our [Cost Optimization Guide](./docs/PROJECT/08_TOOLCHAIN_AND_SETUP/GITHUB_ACTIONS_TOKENS_CONSUMPTION_GUIDE.md) for more details.
+            `;
+            
+            // Comment on recent PRs
+            for (const pr of prs.data.slice(0, 3)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: comment
+              });
+            }
+      
+      - name: ✅ Usage Monitor Complete
+        run: |
+          echo "📊 GitHub Actions usage monitoring complete"
+          echo "🔍 Check artifacts for detailed report"
+          echo "💰 Current status: ${{ steps.check_usage.outputs.high_usage == 'true' && 'HIGH USAGE DETECTED' || 'Usage within limits' }}"

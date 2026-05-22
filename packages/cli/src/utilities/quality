@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+"""Script para verificar calidad de código"""
+import subprocess
+import sys
+
+def check_quality():
+    subprocess.run([sys.executable, "-m", "flake8", "src.old/backend"])
+    subprocess.run([sys.executable, "-m", "black", "--check", "src.old/backend"])
+
+if __name__ == "__main__":
+    check_quality()

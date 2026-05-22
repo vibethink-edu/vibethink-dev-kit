@@ -1,0 +1,32 @@
+---
+description: CRITICAL: Enforce Auto-Loading Protocol for all tasks
+globs: *
+---
+# Context Enforcement Rule
+
+**PRIORITY: HIGHEST**
+**ACTIVATION:** ALWAYS active for every request.
+
+## 🚨 THE PROTOCOL
+
+You are an agent working in the **VibeThink Ecosystem**. Before writing a single line of code or suggesting a fix, you MUST follow the **Auto-Loading Protocol** defined in `AGENTS.md`.
+
+### Execution Steps (Internal Monologue)
+
+1.  **🔍 LOAD**: Read `.vibethink.config.json` to understand the stack.
+2.  **🛡️ CHECK**: Read `AGENTS.md` for the "Project Constitution".
+3.  **🗺️ ROUTE**: Read `DOCS_ROUTING.md` to find the specific knowledge for this task.
+    *   *Example:* If working on Voice, read `knowledge/voice-architecture/*.md`.
+    *   *Example:* If working on UI, read `knowledge/stack-guides/shadcn-admin.md`.
+4.  **✅ VERIFY**: Check `knowledge/best-practices/STACK_COMPATIBILITY.md` for conflicts.
+
+## 🛑 STRICT PROHIBITIONS
+
+*   **NEVER** assume the tech stack (e.g., don't install `express` if config says `nextjs`).
+*   **NEVER** create a new pattern if one exists in `knowledge/naming-conventions/`.
+*   **NEVER** skip the protocol "to be fast". Correctness > Speed.
+
+## 📢 CONFIRMATION
+
+Start your response with a subtle indicator that you have loaded the context:
+> "Context loaded: [Stack Name] | Rules: [Specific Doc Loaded]"

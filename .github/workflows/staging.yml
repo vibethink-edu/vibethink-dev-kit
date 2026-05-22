@@ -1,0 +1,192 @@
+name: Staging Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  full-test-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint code
+        run: npm run lint
+      
+      - name: Format check
+        run: npm run format:check
+      
+      - name: Run all tests
+        run: npm run test:all
+      
+      - name: Run E2E tests
+        run: npm run test:e2e
+      
+      - name: Build production
+        run: npm run build:production
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_STAGING }}
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: staging
+          name: staging-coverage
+
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+      
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+      
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  performance-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run performance tests
+        run: npm run test:performance
+      
+      - name: Generate performance report
+        run: npm run performance:report
+
+  deploy-staging:
+    needs: [full-test-suite, security-audit, performance-test]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build for staging
+        run: npm run build:production
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_STAGING }}
+      
+      - name: Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+          vercel-args: '--prod'
+      
+      - name: Run smoke tests
+        run: npm run test:smoke
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_STAGING }}
+      
+      - name: Health check
+        run: npm run health:check:staging
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_STAGING }}
+      
+      - name: Notify QA team
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#qa-notifications'
+          text: |
+            ✅ Staging deployment ready for QA!
+            Environment: Staging
+            Commit: ${{ github.sha }}
+            URL: ${{ secrets.STAGING_URL }}
+            Performance Report: Available in artifacts
+      
+      - name: Create deployment summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `
+            ## Staging Deployment Summary
+            
+            **Environment**: Staging
+            **Commit**: ${context.sha}
+            **Deployed by**: ${context.actor}
+            **Timestamp**: ${new Date().toISOString()}
+            
+            ### Test Results
+            - ✅ All tests passed
+            - ✅ Security audit passed
+            - ✅ Performance tests passed
+            - ✅ Smoke tests passed
+            
+            ### Next Steps
+            1. QA team to perform manual testing
+            2. Stakeholder review
+            3. Production deployment approval
+            
+            ### Rollback
+            If issues are found, rollback can be triggered via:
+            \`\`\`bash
+            npm run rollback:staging
+            \`\`\`
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            }); 

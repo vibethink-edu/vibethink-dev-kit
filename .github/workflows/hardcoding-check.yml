@@ -1,0 +1,295 @@
+name: Hardcoding Detection CI/CD
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  hardcoding-check:
+    name: Hardcoding Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run hardcoding detection
+      id: hardcoding-check
+      run: |
+        echo "🔍 Ejecutando detección de hardcoding..."
+        npm run check-hardcoding-all
+        
+        # Guardar el resultado para usar en comentarios
+        if [ $? -eq 0 ]; then
+          echo "result=success" >> $GITHUB_OUTPUT
+        else
+          echo "result=failure" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Upload hardcoding report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: hardcoding-report
+        path: hardcoding-report.json
+        retention-days: 30
+        
+    - name: Comment PR with violations
+      if: github.event_name == 'pull_request' && steps.hardcoding-check.outputs.result == 'failure'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const report = JSON.parse(fs.readFileSync('hardcoding-report.json', 'utf8'));
+            
+            let commentBody = `## 🚨 Violaciones de Hardcoding Detectadas
+            
+            **Este PR no puede ser mergeado hasta que se corrijan las violaciones críticas de hardcoding.**
+            
+            ### 📊 Resumen
+            - 🚨 **Críticas**: ${report.summary.critical} (bloquean merge)
+            - ⚠️ **Altas**: ${report.summary.high}
+            - 📝 **Medias**: ${report.summary.medium}
+            - 💡 **Bajas**: ${report.summary.low}
+            
+            ### 🚨 Violaciones Críticas (Deben corregirse)
+            `;
+            
+            if (report.violations.critical.length > 0) {
+              report.violations.critical.forEach((v, index) => {
+                commentBody += `
+                **${index + 1}. ${v.file}:${v.line}**
+                - Tipo: ${v.type}
+                - Mensaje: ${v.message}
+                - Código: \`${v.code}\`
+                - Sugerencia: ${v.suggestion}
+                `;
+              });
+            } else {
+              commentBody += `No hay violaciones críticas.`;
+            }
+            
+            commentBody += `
+            ### ⚠️ Violaciones Altas (Considerar corrección)
+            `;
+            
+            if (report.violations.high.length > 0) {
+              report.violations.high.slice(0, 5).forEach((v, index) => {
+                commentBody += `
+                **${index + 1}. ${v.file}:${v.line}**
+                - Tipo: ${v.type}
+                - Mensaje: ${v.message}
+                `;
+              });
+              
+              if (report.violations.high.length > 5) {
+                commentBody += `
+                *... y ${report.violations.high.length - 5} más*
+                `;
+              }
+            } else {
+              commentBody += `No hay violaciones altas.`;
+            }
+            
+            commentBody += `
+            ### 💡 Recomendaciones
+            - Usa variables de entorno para configuraciones
+            - Parametriza por país/industria
+            - Evita entidades específicas hardcodeadas
+            - Documenta cualquier excepción temporal
+            
+            ### 🔧 Cómo corregir
+            1. Lee el [Sistema de Prevención de Hardcoding](https://github.com/your-repo/docs/architecture/HARDCODING_PREVENTION_SYSTEM.md)
+            2. Aplica las correcciones sugeridas
+            3. Ejecuta \`npm run check-hardcoding\` localmente
+            4. Actualiza este PR
+            
+            ---
+            *Detectado automáticamente por AI Pair Hardcoding Detector*
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+            
+          } catch (error) {
+            console.error('Error al procesar el reporte:', error);
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ Error en Detección de Hardcoding
+              
+              No se pudo procesar el reporte de hardcoding. Por favor, ejecuta \`npm run check-hardcoding\` localmente y corrige cualquier violación antes de continuar.
+              
+              ---
+              *Error: ${error.message}*
+              `
+            });
+          }
+          
+    - name: Comment PR with success
+      if: github.event_name == 'pull_request' && steps.hardcoding-check.outputs.result == 'success'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const report = JSON.parse(fs.readFileSync('hardcoding-report.json', 'utf8'));
+            
+            let commentBody = `## ✅ Verificación de Hardcoding Completada
+            
+            **¡Excelente! No se detectaron violaciones críticas de hardcoding.**
+            
+            ### 📊 Resumen
+            - ✅ **Críticas**: ${report.summary.critical}
+            - ⚠️ **Altas**: ${report.summary.high}
+            - 📝 **Medias**: ${report.summary.medium}
+            - 💡 **Bajas**: ${report.summary.low}
+            `;
+            
+            if (report.summary.high > 0 || report.summary.medium > 0) {
+              commentBody += `
+              ### 💡 Sugerencias de Mejora
+              `;
+              
+              if (report.summary.high > 0) {
+                commentBody += `- Considera corregir las ${report.summary.high} violaciones altas para mejorar la calidad del código
+                `;
+              }
+              
+              if (report.summary.medium > 0) {
+                commentBody += `- Considera parametrizar las ${report.summary.medium} violaciones medias para mayor universalidad
+                `;
+              }
+            } else {
+              commentBody += `
+              ### 🎉 ¡Perfecto!
+              No se detectaron violaciones que requieran atención inmediata.
+              `;
+            }
+            
+            commentBody += `
+            ---
+            *Verificado automáticamente por AI Pair Hardcoding Detector*
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+            
+          } catch (error) {
+            console.error('Error al procesar el reporte de éxito:', error);
+          }
+          
+    - name: Fail on critical violations
+      if: steps.hardcoding-check.outputs.result == 'failure'
+      run: |
+        echo "❌ VIOLACIONES CRÍTICAS DETECTADAS"
+        echo "🚨 Este PR no puede ser mergeado hasta que se corrijan las violaciones críticas de hardcoding."
+        echo "📋 Revisa los comentarios del PR para más detalles."
+        exit 1
+        
+    - name: Notify architect on critical violations
+      if: steps.hardcoding-check.outputs.result == 'failure'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const report = JSON.parse(fs.readFileSync('hardcoding-report.json', 'utf8'));
+            
+            if (report.summary.critical > 0) {
+              // Crear issue para notificar al arquitecto
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Violaciones Críticas de Hardcoding - PR #${context.issue.number}`,
+                body: `## 🚨 Violaciones Críticas de Hardcoding Detectadas
+                
+                **PR**: #${context.issue.number}
+                **Autor**: @${context.payload.pull_request.user.login}
+                **Archivo**: ${context.payload.pull_request.head.ref}
+                
+                ### 📊 Resumen
+                - 🚨 **Críticas**: ${report.summary.critical}
+                - ⚠️ **Altas**: ${report.summary.high}
+                - 📝 **Medias**: ${report.summary.medium}
+                - 💡 **Bajas**: ${report.summary.low}
+                
+                ### 🚨 Violaciones Críticas
+                ${report.violations.critical.map((v, index) => `
+                **${index + 1}. ${v.file}:${v.line}**
+                - Tipo: ${v.type}
+                - Mensaje: ${v.message}
+                - Código: \`${v.code}\`
+                `).join('')}
+                
+                ### 🔧 Acción Requerida
+                - [ ] Revisar violaciones críticas
+                - [ ] Guiar al desarrollador en las correcciones
+                - [ ] Validar que las correcciones siguen los principios de AI Pair
+                - [ ] Aprobar el PR una vez corregido
+                
+                ---
+                *Notificación automática del Sistema de Prevención de Hardcoding*
+                `,
+                labels: ['hardcoding', 'critical', 'architect-review'],
+                assignees: ['marcelo'] // Reemplazar con el username del arquitecto
+              });
+            }
+            
+          } catch (error) {
+            console.error('Error al notificar al arquitecto:', error);
+          }
+          
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: hardcoding-check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level moderate
+      
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high 

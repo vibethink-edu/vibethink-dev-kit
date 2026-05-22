@@ -1,0 +1,41 @@
+name: "🧠 Lección Aprendida / Knowledge Gap"
+description: "Documentar un nuevo aprendizaje para el Knowledge Base"
+title: "[LESSON]: "
+labels: ["knowledge", "docs"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: ¿Qué estabas intentando hacer?
+      placeholder: "Estaba configurando Auth.js v5 con Next.js 15..."
+    validations:
+      required: true
+  - type: textarea
+    id: learning
+    attributes:
+      label: El Aprendizaje
+      description: ¿Qué descubriste? ¿Qué salió mal o qué funcionó mejor?
+      placeholder: "Descubrí que el middleware de Auth.js choca con..."
+    validations:
+      required: true
+  - type: dropdown
+    id: capability
+    attributes:
+      label: Capacidad Relacionada
+      options:
+        - architecture
+        - ai-agents
+        - security-privacy
+        - automation-workflows
+        - engineering-standards
+        - voice-ai
+    validations:
+      required: true
+  - type: checkboxes
+    id: actions
+    attributes:
+      label: Acciones Pro-activas
+      options:
+        - label: ¿Deberíamos agregar un guardrail en conflicts.json?
+        - label: ¿Deberíamos actualizar un template?

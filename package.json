@@ -1,0 +1,36 @@
+{
+  "name": "vibethink-dev-kit",
+  "version": "1.0.0",
+  "description": "Development kit for VibeThink projects",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "check": "biome check .",
+    "lint:python": "ruff check .",
+    "format:python": "ruff format .",
+    "commit": "cz",
+    "validate:names": "ls-lint",
+    "check:agent-context": "node tools/check-agent-context.mjs"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": ["biome check --write --no-errors-on-unmatched"],
+    "*.{py,pyi}": ["ruff check --fix", "ruff format"]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@ls-lint/ls-lint": "^2.2.3",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11"
+  }
+}

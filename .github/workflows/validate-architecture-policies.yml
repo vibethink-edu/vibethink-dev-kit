@@ -1,0 +1,27 @@
+name: Validar políticas arquitectónicas centralizadas
+
+on:
+  pull_request:
+    paths:
+      - 'docs/architecture/**'
+      - 'docs/project/architecture-rules/**'
+      - 'scripts/validate-architecture-policies.cjs'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/architecture/**'
+      - 'docs/project/architecture-rules/**'
+      - 'scripts/validate-architecture-policies.cjs'
+
+jobs:
+  validate-architecture-policies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run validation script
+        run: node scripts/validate-architecture-policies.cjs 

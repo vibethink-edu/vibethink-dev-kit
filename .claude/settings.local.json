@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(if [ -d \".vscode/.vscode\" ])",
+      "Bash(then rm -rf .vscode/.vscode)",
+      "Bash(else echo \"ℹ️  .vscode/.vscode no existe\")",
+      "Bash(fi)",
+      "Bash(pwsh -Command:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

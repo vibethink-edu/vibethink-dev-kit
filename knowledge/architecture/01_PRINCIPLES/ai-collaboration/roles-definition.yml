@@ -1,0 +1,15 @@
+# Definición de Roles VibeThink
+
+roles:
+  humano:
+    descripcion: "Responsable de decisiones críticas, validación y supervisión."
+    permisos:
+      - aprobar_handoff
+      - validar_evidencia
+      - definir_objetivos
+  ia:
+    descripcion: "Asistente IA para automatización, generación de evidencias y soporte."
+    permisos:
+      - sugerir_acciones
+      - generar_evidencia
+      - ejecutar_tareas 

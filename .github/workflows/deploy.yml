@@ -1,0 +1,233 @@
+name: 🚀 Production Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  NODE_VERSION: '18'
+  CACHE_DEPENDENCY_PATH: package-lock.json
+
+jobs:
+  # 🔍 Pre-deployment Validation
+  validate:
+    name: 🔍 Pre-deployment Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Security audit
+        run: npm audit --audit-level moderate
+
+      - name: 🧪 Run critical tests
+        run: npm run test:ci
+
+      - name: 🏗️ Build validation
+        run: npm run build
+
+      - name: 📊 Bundle analysis
+        run: npm run analyze
+
+  # 🚀 Staging Deployment
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment: staging
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build for staging
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          VITE_ENVIRONMENT: staging
+
+      - name: 🐳 Build Docker image
+        run: |
+          docker build -t vibethink-orchestrator:staging .
+          docker tag vibethink-orchestrator:staging ${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:staging
+
+      - name: 🔐 Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 🚀 Push Docker image
+        run: docker push ${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:staging
+
+      - name: 🚀 Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          # Kubernetes deployment
+          kubectl set image deployment/vibethink-orchestrator-staging \
+            app=${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:staging
+          kubectl rollout status deployment/vibethink-orchestrator-staging
+
+      - name: 🧪 Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests on staging..."
+          npm run test:smoke -- --base-url=${{ secrets.STAGING_URL }}
+
+      - name: 📊 Performance test
+        run: |
+          echo "📊 Running performance tests..."
+          npm run test:performance -- --url=${{ secrets.STAGING_URL }}
+
+  # 🚀 Production Deployment
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate, deploy-staging]
+    if: github.ref == 'refs/heads/main' && github.event.inputs.environment == 'production'
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build for production
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+          VITE_ENVIRONMENT: production
+
+      - name: 🐳 Build Docker image
+        run: |
+          docker build -t vibethink-orchestrator:production .
+          docker tag vibethink-orchestrator:production ${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:production
+
+      - name: 🔐 Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 🚀 Push Docker image
+        run: docker push ${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:production
+
+      - name: 🚀 Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          # Blue-green deployment
+          kubectl set image deployment/vibethink-orchestrator-blue \
+            app=${{ secrets.DOCKER_REGISTRY }}/vibethink-orchestrator:production
+          kubectl rollout status deployment/vibethink-orchestrator-blue
+          
+          # Switch traffic
+          kubectl patch service vibethink-orchestrator-service \
+            -p '{"spec":{"selector":{"deployment":"vibethink-orchestrator-blue"}}}'
+
+      - name: 🧪 Run production tests
+        run: |
+          echo "🧪 Running production tests..."
+          npm run test:smoke -- --base-url=${{ secrets.PRODUCTION_URL }}
+
+      - name: 📊 Monitor deployment
+        run: |
+          echo "📊 Monitoring deployment health..."
+          npm run monitor:deployment -- --url=${{ secrets.PRODUCTION_URL }}
+
+  # 📊 Post-deployment Monitoring
+  monitor:
+    name: 📊 Post-deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📊 Health check
+        run: |
+          echo "📊 Running health checks..."
+          npm run health:check
+
+      - name: 📈 Performance monitoring
+        run: |
+          echo "📈 Monitoring performance metrics..."
+          npm run monitor:performance
+
+      - name: 🔔 Send notifications
+        run: |
+          echo "🔔 Sending deployment notifications..."
+          npm run notify:deployment
+
+  # 🔄 Rollback (if needed)
+  rollback:
+    name: 🔄 Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: failure()
+    
+    steps:
+      - name: 🔄 Rollback to previous version
+        run: |
+          echo "🔄 Rolling back deployment..."
+          kubectl rollout undo deployment/vibethink-orchestrator-staging
+          kubectl rollout undo deployment/vibethink-orchestrator-production
+
+      - name: 🔔 Send rollback notification
+        run: |
+          echo "🔔 Sending rollback notification..."
+          npm run notify:rollback 

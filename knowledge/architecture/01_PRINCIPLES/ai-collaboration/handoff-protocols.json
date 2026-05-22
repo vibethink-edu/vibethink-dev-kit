@@ -1,0 +1,18 @@
+{
+  "protocolos": [
+    {
+      "nombre": "handoff-inicial",
+      "de": "humano",
+      "a": "ia",
+      "descripcion": "El humano solicita a la IA la generación de evidencia automática tras completar una tarea crítica.",
+      "puntos_control": ["validación humana", "registro en log"]
+    },
+    {
+      "nombre": "handoff-validacion",
+      "de": "ia",
+      "a": "humano",
+      "descripcion": "La IA notifica al humano que la evidencia está lista para revisión y aprobación.",
+      "puntos_control": ["aprobación humana", "registro en log"]
+    }
+  ]
+}

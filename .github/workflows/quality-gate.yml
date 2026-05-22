@@ -1,0 +1,57 @@
+name: Quality Gate
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run test:unit
+      - run: npm audit
+      - run: npm run check-hardcoding
+
+      # Notificación por Slack/Mattermost (pendiente de activar)
+      # - name: Notificar por Slack
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     fields: repo,commit,author,ref,workflow,job,took
+      #     text: |
+      #       :rotating_light: *Build ${{ job.status }}*
+      #       *Repo:* ${{ github.repository }}
+      #       *Branch:* ${{ github.ref }}
+      #       *Commit:* ${{ github.sha }}
+      #       *Autor:* ${{ github.actor }}
+      #       *Workflow:* ${{ github.workflow }}
+      #       *Job:* ${{ github.job }}
+      #       *Duración:* ${{ job.took }}
+      #       *Mensaje:* Revisa los logs y corrige los errores reportados. Si eres AI, consulta la documentación de CI/CD y los criterios de aceptación.
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # - name: Notificar por Mattermost
+      #   uses: mattermost/action-mattermost-notify@v1
+      #   with:
+      #     webhook-url: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+      #     text: |
+      #       :rotating_light: *Build ${{ job.status }}*
+      #       *Repo:* ${{ github.repository }}
+      #       *Branch:* ${{ github.ref }}
+      #       *Commit:* ${{ github.sha }}
+      #       *Autor:* ${{ github.actor }}
+      #       *Workflow:* ${{ github.workflow }}
+      #       *Job:* ${{ github.job }}
+      #       *Duración:* ${{ job.took }}
+      #       *Mensaje:* Revisa los logs y corrige los errores reportados. Si eres AI, consulta la documentación de CI/CD y los criterios de aceptación.
+
+# NOTA:
+# Para activar notificaciones, configura los webhooks y descomenta los bloques correspondientes.
+# Documentación Slack: https://github.com/8398a7/action-slack
+# Documentación Mattermost: https://github.com/mattermost/action-mattermost-notify
+# El mensaje estándar incluye toda la información relevante para que cualquier desarrollador humano o AI pueda atender el incidente rápidamente. 

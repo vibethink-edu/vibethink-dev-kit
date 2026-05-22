@@ -1,0 +1,202 @@
+name: 🔍 Third-Party Monitoring
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      component_name:
+        description: 'Specific component to check (optional)'
+        required: false
+        type: string
+      force_evaluation:
+        description: 'Force evaluation even if no changes detected'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  monitor-third-party:
+    runs-on: ubuntu-latest
+    name: Monitor Third-Party Components
+    
+    steps:
+    - name: 🔄 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 📥 Install Dependencies
+      run: npm ci
+
+    - name: 🔍 Run Third-Party Monitoring
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        COMPONENT_NAME: ${{ github.event.inputs.component_name }}
+        FORCE_EVALUATION: ${{ github.event.inputs.force_evaluation }}
+      run: |
+        if [ -n "$COMPONENT_NAME" ]; then
+          echo "🎯 Monitoring specific component: $COMPONENT_NAME"
+          node scripts/monitor-third-party.js --component="$COMPONENT_NAME"
+        else
+          echo "🔍 Running full monitoring scan"
+          node scripts/monitor-third-party.js
+        fi
+
+    - name: 📊 Generate Monitoring Report
+      if: always()
+      run: |
+        echo "## 🔍 Third-Party Monitoring Report" >> $GITHUB_STEP_SUMMARY
+        echo "**Date**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "**Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Count evaluations generated
+        EVAL_COUNT=$(find docs/PROJECT/02_ARCHITECTURE/UNIVERSAL_EVALUATIONS -name "eval-*$(date +%Y-%m-%d)*" -type f | wc -l)
+        echo "📋 **Evaluations Generated**: $EVAL_COUNT" >> $GITHUB_STEP_SUMMARY
+        
+        # Count pending decisions
+        DECISION_COUNT=$(find docs/PROJECT/02_ARCHITECTURE/THIRD_PARTY_DECISIONS -name "decision-*" -type f | wc -l)
+        echo "⏳ **Pending Decisions**: $DECISION_COUNT" >> $GITHUB_STEP_SUMMARY
+        
+        # List any new evaluation files
+        if [ $EVAL_COUNT -gt 0 ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 New Evaluations" >> $GITHUB_STEP_SUMMARY
+          find docs/PROJECT/02_ARCHITECTURE/UNIVERSAL_EVALUATIONS -name "eval-*$(date +%Y-%m-%d)*" -type f -exec basename {} \; | head -5 >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: 💾 Commit Evaluation Results
+      if: always()
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Add any new evaluation files
+        git add docs/PROJECT/02_ARCHITECTURE/UNIVERSAL_EVALUATIONS/
+        git add docs/PROJECT/02_ARCHITECTURE/THIRD_PARTY_DECISIONS/
+        git add config/monitored-components.json
+        
+        # Commit if there are changes
+        if ! git diff --staged --quiet; then
+          git commit -m "🔍 Third-party monitoring: $(date +%Y-%m-%d) 
+          
+          - Generated evaluations for component updates
+          - Created decision records for review
+          - Updated monitoring timestamps
+          
+          [skip ci]"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+
+    - name: 🚨 Create Issues for High-Priority Updates
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Find decision files created today
+          const decisionsDir = 'docs/PROJECT/02_ARCHITECTURE/THIRD_PARTY_DECISIONS';
+          const today = new Date().toISOString().split('T')[0];
+          
+          if (fs.existsSync(decisionsDir)) {
+            const files = fs.readdirSync(decisionsDir)
+              .filter(f => f.includes(today) && f.endsWith('.json'));
+            
+            for (const file of files) {
+              const filePath = path.join(decisionsDir, file);
+              const decision = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+              
+              // Create issue for high-priority updates
+              if (decision.evaluation.risk === 'high' || 
+                  decision.change.type === 'security' ||
+                  decision.evaluation.score >= 8) {
+                
+                const title = `🔄 UPDATE DECISION: ${decision.component} ${decision.change.from} → ${decision.change.to}`;
+                const body = `## 📊 Universal Evaluation Report
+                
+**Component**: ${decision.repo}
+**Version Change**: \`${decision.change.from}\` → \`${decision.change.to}\`
+**Change Type**: ${decision.change.type}
+**Risk Level**: ${decision.evaluation.risk}
+**Overall Score**: ${decision.evaluation.score}/10
+
+### 🎯 Recommendation
+${decision.evaluation.recommendation}
+
+### ⚡ Required Action
+- [ ] **ACCEPT**: Integrate update (create PR)
+- [ ] **DEFER**: Schedule for future sprint with justification  
+- [ ] **REJECT**: Explicit rejection with documented reasoning
+
+**Decision Deadline**: ${decision.decision_deadline}
+
+---
+*Generated by Third-Party Monitoring System*`;
+
+                const labels = ['third-party-update', 'needs-decision', decision.component];
+                if (decision.change.type === 'security') labels.push('security');
+                if (decision.evaluation.risk === 'high') labels.push('high-priority');
+
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: title,
+                  body: body,
+                  labels: labels,
+                  assignees: ['tech-leads'] // Adjust as needed
+                });
+              }
+            }
+          }
+
+    - name: 📈 Update Monitoring Dashboard
+      if: always()
+      run: |
+        # Generate simple monitoring dashboard
+        echo "# 🔍 Third-Party Monitoring Dashboard" > MONITORING_DASHBOARD.md
+        echo "" >> MONITORING_DASHBOARD.md
+        echo "**Last Updated**: $(date)" >> MONITORING_DASHBOARD.md
+        echo "" >> MONITORING_DASHBOARD.md
+        
+        # Component status
+        echo "## 📊 Component Status" >> MONITORING_DASHBOARD.md
+        echo "" >> MONITORING_DASHBOARD.md
+        echo "| Component | Current Version | Status | Last Check |" >> MONITORING_DASHBOARD.md
+        echo "|-----------|----------------|--------|------------|" >> MONITORING_DASHBOARD.md
+        
+        # Parse monitored components
+        node -e "
+          const config = require('./config/monitored-components.json');
+          config.components.forEach(comp => {
+            const lastCheck = comp.last_check ? new Date(comp.last_check).toLocaleDateString() : 'Never';
+            console.log('| ' + comp.name + ' | ' + comp.current_version + ' | ' + comp.status + ' | ' + lastCheck + ' |');
+          });
+        " >> MONITORING_DASHBOARD.md
+        
+        echo "" >> MONITORING_DASHBOARD.md
+        echo "## 🚨 Recent Alerts" >> MONITORING_DASHBOARD.md
+        echo "" >> MONITORING_DASHBOARD.md
+        
+        # Count recent evaluations
+        RECENT_EVALS=$(find docs/PROJECT/02_ARCHITECTURE/UNIVERSAL_EVALUATIONS -name "eval-*" -mtime -7 | wc -l)
+        echo "- **Evaluations (Last 7 days)**: $RECENT_EVALS" >> MONITORING_DASHBOARD.md
+        
+        PENDING_DECISIONS=$(find docs/PROJECT/02_ARCHITECTURE/THIRD_PARTY_DECISIONS -name "decision-*" -type f | wc -l)
+        echo "- **Pending Decisions**: $PENDING_DECISIONS" >> MONITORING_DASHBOARD.md
+        
+        # Move to docs if we want to keep it
+        mv MONITORING_DASHBOARD.md docs/PROJECT/02_ARCHITECTURE/MONITORING_DASHBOARD.md

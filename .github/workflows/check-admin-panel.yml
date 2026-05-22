@@ -1,0 +1,20 @@
+name: Check admin-panel exclusion
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+
+jobs:
+  check-admin-panel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Check for admin-panel changes
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...${{ github.sha }} | grep -q 'admin-panel/'; then
+            if ! grep -iq '\[admin-allowed\]' <<< "${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}"; then
+              echo '❌ Está prohibido modificar admin-panel salvo instrucción explícita ([admin-allowed]).';
+              exit 1
+            fi
+          fi 

@@ -1,0 +1,219 @@
+name: 🚀 Optimized CI - Cost Efficient
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'package*.json'
+      - '.github/workflows/**'
+      # Exclude docs to avoid unnecessary runs
+      - '!docs/**'
+      - '!README.md'
+      - '!**/*.md'
+  
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'package*.json'
+      
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Scope of testing to run'
+        required: true
+        default: 'fast'
+        type: choice
+        options:
+        - fast      # ~2-3 minutes
+        - standard  # ~10-15 minutes  
+        - complete  # ~45-60 minutes
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # 🏃‍♂️ Fast validation (always runs)
+  fast-validation:
+    name: 🏃‍♂️ Fast Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Lint check
+        run: npm run lint
+
+      - name: 🎨 Format check  
+        run: npm run format:check
+
+      - name: 📊 TypeScript check
+        run: npm run type-check
+
+      - name: 🏆 VTK Compliance (quick)
+        run: node scripts/validate-simple.js
+
+      - name: 🧪 Unit tests (fast)
+        run: npm run test:unit
+        
+    # This job should complete in ~2-3 minutes
+
+  # 📊 Standard testing (conditional)
+  standard-testing:
+    name: 📊 Standard Testing
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    if: |
+      github.event.inputs.test_scope == 'standard' || 
+      github.event.inputs.test_scope == 'complete' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      github.event_name == 'pull_request'
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔗 Integration tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
+
+      - name: 🧪 API tests (Newman)
+        run: |
+          npm install -g newman
+          newman run docs/PROJECT/04_TESTING/postman/AI-Pair-Orchestrator-Pro.postman_collection.json \
+            --environment docs/PROJECT/04_TESTING/postman/environments/development.json \
+            --reporters cli
+
+      - name: 🎭 E2E tests (Chromium only)
+        run: |
+          npx playwright install chromium
+          npx playwright test --project=chromium
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+    # This job should complete in ~10-15 minutes
+
+  # 🏆 Complete testing (only for main branch or manual)
+  complete-testing:
+    name: 🏆 Complete Testing
+    runs-on: ubuntu-latest
+    needs: [fast-validation, standard-testing]
+    if: |
+      github.event.inputs.test_scope == 'complete' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js  
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install ${{ matrix.browser }}
+
+      - name: 🌐 Cross-browser E2E tests
+        run: npx playwright test --project=${{ matrix.browser }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: 📊 Performance tests (main branch only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          k6 run src/tests/performance/load-test.js
+
+    # This job should complete in ~45-60 minutes (parallel browsers)
+
+  # 📈 Cost Report
+  cost-report:
+    name: 📈 Cost Report
+    runs-on: ubuntu-latest
+    needs: [fast-validation, standard-testing, complete-testing]
+    if: always()
+    
+    steps:
+      - name: 📊 Calculate estimated cost
+        run: |
+          echo "# 💰 GitHub Actions Cost Report" >> cost-report.md
+          echo "" >> cost-report.md
+          echo "**Branch**: ${{ github.ref_name }}" >> cost-report.md
+          echo "**Trigger**: ${{ github.event_name }}" >> cost-report.md
+          echo "**Scope**: ${{ github.event.inputs.test_scope || 'auto' }}" >> cost-report.md
+          echo "" >> cost-report.md
+          
+          if [[ "${{ needs.fast-validation.result }}" == "success" ]]; then
+            echo "✅ Fast Validation: ~3 minutes" >> cost-report.md
+          fi
+          
+          if [[ "${{ needs.standard-testing.result }}" == "success" ]]; then
+            echo "✅ Standard Testing: ~15 minutes" >> cost-report.md
+          fi
+          
+          if [[ "${{ needs.complete-testing.result }}" == "success" ]]; then
+            echo "✅ Complete Testing: ~45 minutes" >> cost-report.md
+          fi
+          
+          echo "" >> cost-report.md
+          echo "💡 **Cost Optimization Tips:**" >> cost-report.md
+          echo "- Use 'fast' scope for quick validation" >> cost-report.md
+          echo "- Use 'standard' scope for feature testing" >> cost-report.md  
+          echo "- Use 'complete' scope only for releases" >> cost-report.md
+          
+          cat cost-report.md
+
+      - name: 📄 Upload cost report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cost-report
+          path: cost-report.md

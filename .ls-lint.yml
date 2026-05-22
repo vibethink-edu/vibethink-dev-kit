@@ -1,0 +1,17 @@
+ls:
+  .js: kebab-case
+  .ts: camelCase | kebab-case
+  .tsx: PascalCase
+  .json: kebab-case
+  .yml: kebab-case
+  .yaml: kebab-case
+  .md: regex:^[A-Z][A-Z0-9_]*$ | snake_case | kebab-case | PascalCase | regex:^METHODOLOGY_.*
+  .ps1: kebab-case | snake_case
+
+ignore:
+  - node_modules
+  - .git
+  - .vibethink
+  - dist
+  - coverage
+  - .husky

@@ -1,0 +1,21 @@
+# Ruff Configuration
+# See https://docs.astral.sh/ruff/configuration/
+
+target-version = "py312"
+line-length = 100
+indent-width = 4
+
+[lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+select = ["E4", "E7", "E9", "F", "I", "N", "UP", "B", "A", "C4", "PT", "SIM", "ARG", "PTH"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"

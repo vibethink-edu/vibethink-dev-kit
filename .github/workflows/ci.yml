@@ -1,0 +1,281 @@
+name: 🚀 CI/CD Pipeline - AI Pair Orchestrator Pro
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  CACHE_DEPENDENCY_PATH: package-lock.json
+
+jobs:
+  # 🔍 Code Quality & Security
+  quality-check:
+    name: 🔍 Code Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 ESLint check
+        run: npm run lint
+
+      - name: 🎨 Prettier check
+        run: npm run format:check
+
+      - name: 🔐 Security audit
+        run: npm audit --audit-level moderate
+
+      - name: 📊 TypeScript check
+        run: npm run type-check
+
+  # 🧪 Unit & Integration Tests
+  test:
+    name: 🧪 Unit & Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run unit tests
+        run: npm run test:unit
+        env:
+          VITE_SUPABASE_URL: http://localhost:54321
+          VITE_SUPABASE_ANON_KEY: test-key
+
+      - name: 🔗 Run integration tests
+        run: npm run test:integration
+        env:
+          VITE_SUPABASE_URL: http://localhost:54321
+          VITE_SUPABASE_ANON_KEY: test-key
+
+      - name: 📊 Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # 🌐 E2E Tests
+  e2e-test:
+    name: 🌐 E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: 🌐 Run E2E tests
+        run: npm run test:e2e
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: 📸 Upload E2E screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: test-results/
+
+  # 🏗️ Build & Deploy
+  build-and-deploy:
+    name: 🏗️ Build & Deploy
+    runs-on: ubuntu-latest
+    needs: [quality-check, test, e2e-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build for production
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: 📊 Analyze bundle size
+        run: npm run analyze
+
+      - name: 🚀 Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          # Add your deployment commands here
+          
+      - name: 🧪 Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests on staging..."
+          # Add smoke test commands here
+
+  # 📋 API Documentation
+  api-docs:
+    name: 📋 Update API Documentation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📋 Generate API docs
+        run: |
+          echo "📋 Generating OpenAPI documentation..."
+          # Add API doc generation commands here
+
+      - name: 🌐 Deploy API docs
+        run: |
+          echo "🌐 Deploying API documentation..."
+          # Add API docs deployment commands here
+
+  # 🧪 Postman Collection Tests
+  postman-tests:
+    name: 🧪 API Tests (Postman)
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧪 Install Newman
+        run: npm install -g newman
+
+      - name: 🧪 Run Postman collection
+        run: |
+          newman run docs/postman/AI-Pair-Orchestrator-Pro.postman_collection.json \
+            --environment docs/postman/environments/production.json \
+            --reporters cli,json \
+            --reporter-json-export postman-results.json
+        env:
+          SUPABASE_ANON_KEY_PROD: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          PROD_TEST_EMAIL: ${{ secrets.PROD_TEST_EMAIL }}
+          PROD_TEST_PASSWORD: ${{ secrets.PROD_TEST_PASSWORD }}
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-results
+          path: postman-results.json
+
+  # 📊 Performance Testing
+  performance-test:
+    name: 📊 Performance Testing
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: 📊 Run performance tests
+        run: k6 run tests/performance/load-test.js
+        env:
+          BASE_URL: ${{ secrets.STAGING_URL }}
+
+      - name: 🔐 Run security tests
+        run: k6 run tests/security/security-test.js
+        env:
+          BASE_URL: ${{ secrets.STAGING_URL }}
+
+  # 🔔 Notifications
+  notify:
+    name: 🔔 Notify Results
+    runs-on: ubuntu-latest
+    needs: [quality-check, test, e2e-test, build-and-deploy, postman-tests, performance-test]
+    if: always()
+    
+    steps:
+      - name: 🔔 Success notification
+        if: ${{ contains(needs.*.result, 'success') && !contains(needs.*.result, 'failure') }}
+        run: |
+          echo "✅ All CI/CD pipeline steps completed successfully!"
+          echo "🚀 Deployment ready for production!"
+
+      - name: ⚠️ Failure notification
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo "❌ CI/CD pipeline failed!"
+          echo "🔍 Please check the failed jobs above."
+          exit 1 

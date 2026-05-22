@@ -1,0 +1,98 @@
+name: Update Route Documentation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/App.tsx'
+      - 'src/routes/**'
+      - 'src/pages/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/App.tsx'
+      - 'src/routes/**'
+      - 'src/pages/**'
+
+jobs:
+  update-route-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate route documentation
+        run: npm run generate:route-map
+        
+      - name: Validate routes
+        run: npm run validate:routes
+        
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet docs/ROUTE_MAP.md docs/ROUTE_TREE.md docs/routes.json; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit and push changes
+        if: steps.changes.outputs.no_changes == 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/ROUTE_MAP.md docs/ROUTE_TREE.md docs/routes.json
+          git commit -m "docs: Update route documentation [skip ci]"
+          git push
+          
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## 🗺️ Route Documentation Update\n\n';
+            
+            if (fs.existsSync('docs/ROUTE_MAP.md')) {
+              const content = fs.readFileSync('docs/ROUTE_MAP.md', 'utf8');
+              const routeCount = (content.match(/\| `[^`]+` \|/g) || []).length;
+              comment += `📊 **Total routes**: ${routeCount}\n\n`;
+            }
+            
+            if (fs.existsSync('docs/route-validation-report.json')) {
+              const report = JSON.parse(fs.readFileSync('docs/route-validation-report.json', 'utf8'));
+              comment += `✅ **Validation**: ${report.errors} errors, ${report.warnings} warnings\n\n`;
+            }
+            
+            comment += '📄 [View Route Map](https://github.com/${{ github.repository }}/blob/main/docs/ROUTE_MAP.md)\n';
+            comment += '🌳 [View Route Tree](https://github.com/${{ github.repository }}/blob/main/docs/ROUTE_TREE.md)';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+      - name: Notify on errors
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#dev-notifications'
+          text: |
+            🚨 Route documentation update failed!
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} 

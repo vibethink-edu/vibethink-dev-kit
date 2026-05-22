@@ -1,0 +1,14 @@
+[
+  {
+    "key": "ctrl+e",
+    "mac": "cmd+e",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "sideBarFocus"
+  },
+  {
+    "key": "ctrl+e",
+    "mac": "cmd+e",
+    "command": "workbench.action.focusSideBar",
+    "when": "editorTextFocus"
+  }
+]
