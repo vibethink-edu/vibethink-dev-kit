@@ -1,0 +1,20 @@
+[
+  {
+    "id": "example",
+    "title": "EXAMPLE REMINDER — replace this file with your repo's own rules.",
+    "patterns": ["\\bexample-keyword\\b", { "re": "\\bACRONYM\\b", "flags": "" }],
+    "message": [
+      "This is the vendor-neutral example for tools/keyword-reminder.mjs.",
+      "",
+      "Each rule fires when any of its patterns matches the user prompt, and",
+      "prepends this message to the conversation as a reminder.",
+      "",
+      "Pattern strings default to case-insensitive; use the {\"re\", \"flags\"} form",
+      "to override (e.g. \"flags\": \"\" for a case-sensitive acronym).",
+      "",
+      "Copy the engine into your repo, drop a real keyword-reminders.json next to",
+      "it, and wire it as a UserPromptSubmit hook. Add reminders by editing the",
+      "JSON, never the engine."
+    ]
+  }
+]
