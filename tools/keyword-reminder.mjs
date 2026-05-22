@@ -9,9 +9,8 @@
  * additional context). Add or change reminders by editing the JSON — never the
  * code.
  *
- * This replaces the per-topic hooks (xms-keyword-reminder, crm-antipattern-
- * reminder), which were the same mechanism hardcoded to one subject. The engine
- * is vendor-neutral and reusable across repos; only the rules file is project-
+ * This replaces the anti-pattern of one hardcoded hook per topic: the engine is
+ * vendor-neutral and reusable across repos; only the rules file is project-
  * specific.
  *
  * Hook contract: read the prompt payload from stdin, emit context to stdout,
