@@ -1,0 +1,22 @@
+# Normalize text to LF in the repository.
+* text=auto eol=lf
+
+# Shell scripts MUST stay LF so they run on macOS/Linux (e.g. tools/mount-devkit.sh).
+# Without this, a Windows checkout/commit with autocrlf can ship CRLF and break the
+# script on a real Mac ("$'\r': command not found", "syntax error near 'elif'").
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# Windows-native scripts stay CRLF.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Common binaries — never normalize.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
