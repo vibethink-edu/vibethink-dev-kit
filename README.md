@@ -55,7 +55,7 @@ knowledge/ai-agents/        # the cross-agent canons + adapters + methodology + 
 knowledge/architecture/     # CANON-DECISION-DISPOSITION (decisions as graph nodes)
 knowledge/PORT_ASSIGNMENT_GLOBAL.md
 tools/                      # engines: check-agent-context, inbox, feed (+ configs + tests)
-setup/                      # ADOPT runbook + templates
+setup/                      # ADOPT runbook (adopt / validate / activate)
 doc/                        # build roadmap, review threads, ADRs
 .github/workflows/          # agent-context.yml (the only current workflow)
 ```

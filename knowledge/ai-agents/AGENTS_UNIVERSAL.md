@@ -433,8 +433,7 @@ project-specific/                             ← a fork (level 3)
 
 A fork's `AGENTS.md` declares its mission, what it inherits from the kit, its
 quick-operations table, its stack, and its extra rules. A ready-to-fill template
-and a fully-worked example live in the kit's `setup/templates/`. The concrete
-org template (with stack/script names) lives in the **methodology layer (level 2)**.
+(with stack/script names) lives in the **methodology layer (level 2)**.
 
 ---
 

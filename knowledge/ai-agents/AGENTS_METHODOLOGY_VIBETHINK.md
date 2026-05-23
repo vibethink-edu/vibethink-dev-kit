@@ -150,9 +150,6 @@ project-specific/
 [Additional rules]
 ```
 
-A ready-to-fill template also lives in `setup/templates/AGENTS.md.template` and a
-fully-worked example in `setup/templates/AGENTS_GOLDEN.example.md`.
-
 ---
 
 **Maintained by:** the dev-kit (supra-repo upstream).
