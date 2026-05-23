@@ -63,7 +63,7 @@ just prose a human must read:
 |-------|---------|
 | `from` | author agent |
 | `to_agent` | **canonical** normalized recipient token (one known agent, or `any`) — what routing depends on |
-| `to` | human-readable recipient prose (`codex-dev`, `claude-DKS-dev`, `Codex (...)`) — a known agent token is extracted from it only as a fallback when `to_agent` is absent |
+| `to` | human-readable recipient prose (`<agent-token>-dev`, `<agent-token>-<role>`, `<Agent> (...)`) — a known agent token is extracted from it only as a fallback when `to_agent` is absent |
 | `status` | `open` \| `closed` |
 | `re` | the message this threads from |
 | `priority` | ordering hint |

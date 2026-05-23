@@ -155,7 +155,8 @@ This neutral canon defines the **discipline**. Each inheriting repo binds it to
 its own stack — declared in that repo's own layer, never here:
 
 - which indexer consumes the written decisions,
-- the exact inline-marker syntax that indexer extracts,
+- the exact inline-marker syntax a dedicated extractor would consume — **if/when
+  one exists** (today inline markers are advisory; the indexable binding is the ADR, §3.2),
 - the decisions folder path (`doc/decisions/` vs `docs/adr/`).
 
 The discipline is universal; the indexer and its marker dialect are product-level.
