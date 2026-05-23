@@ -19,11 +19,8 @@
   "maxAdapterBytes": 6144,
   "nonAdapterAgentFiles": ["AI_AGENT_COMPATIBILITY.md"],
   "agentFilePattern": "^(CLAUDE|CODEX|COPILOT_INSTRUCTIONS|WINDSURFRULES|GEMINI|AGENTS|AGENTS_GOLDEN)\\.md$",
-  "agentFileAllowlist": [
-    "knowledge/capabilities/ai-agents/AGENTS.md",
-    "knowledge/voice-ai/GEMINI.md"
-  ],
-  "_agentFileAllowlistNote": "Repo-wide paths whose basename matches agentFilePattern but which are NOT agent-rules constitutions: a generated project-constitution example (capabilities/) and Gemini *integration* technical docs (voice-ai/). Check #6 scans the whole repo (finding #2): the root authority (rootRulesFile) + declared adapters are auto-legit; everything else matching the pattern must be allowlisted here or it is flagged as a parallel constitution.",
+  "agentFileAllowlist": [],
+  "_agentFileAllowlistNote": "Repo-wide paths whose basename matches agentFilePattern but which are NOT agent-rules constitutions (templates, examples, integration docs). Empty after the 2026-05-23 legacy reap removed the two former entries (a generated v1 project-constitution and Gemini integration docs). Check #6 scans the whole repo (finding #2): the root authority (rootRulesFile) + declared adapters are auto-legit; everything else matching the pattern must be allowlisted here or it is flagged as a parallel constitution.",
   "requiredAnchorsInRoot": ["CANON-CROSS-AGENT-CONTEXT-LAYERING"],
   "agentConfigs": [],
   "_agentConfigsNote": "Empty on purpose (criterion #8): the root authority is under the strictest budget (32 KiB) natively, so no per-agent override is required for this kit. A fork whose root exceeds a strict agent's budget MUST declare its tracked override file here (e.g. .codex/config.toml).",

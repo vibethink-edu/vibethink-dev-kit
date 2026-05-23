@@ -60,7 +60,8 @@ versions.* The VibeThink known-bad combinations:
 # ❌ NEVER create .npmrc or .env.example inside apps/
 ```
 
-See `STACK_COMPATIBILITY.md` / `knowledge/QUALITY_RULES.md` for the full conflict list.
+The full version-pin / conflict list is the org's stack-compatibility record (kept in
+the org/product repo, not in this neutral-adjacent layer).
 
 ## 4. Multi-tenant data access (concrete DB example)
 

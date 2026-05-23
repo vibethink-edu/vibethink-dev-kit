@@ -1,274 +1,67 @@
-# 🚀 VibeThink Dev Kit
+# VibeThink Dev-Kit — cross-agent governance (supra-repo)
 
 [![AGENTS.md](https://img.shields.io/badge/AGENTS-md-blue)](https://agents.md)
-[![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/vibethink/dev-kit)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![agent-context](https://github.com/vibethink-edu/vibethink-dev-kit/actions/workflows/agent-context.yml/badge.svg)](.github/workflows/agent-context.yml)
 
-**The world's most complete AI-aware development kit**
+The **single control point** for how multiple AI agents (and a human) collaborate
+across VibeThink repos. Each consuming repo **inherits** this governance — it does
+**not** copy the engine.
 
-Prevent architectural conflicts automatically, work with multiple editors, and inherit best practices from 16+ leading projects.
-
----
-
-## ✨ Features
-
-- ✅ **Stack Detection** - Automatically detects your tech stack
-- ✅ **Conflict Prevention** - Validates dependencies before installation
-- ✅ **Multi-Editor** - Works with Cursor, VS Code, Claude Code, Antigravity
-- ✅ **Knowledge Harvest** - Extracts best practices from your projects
-- ✅ **AI-Aware** - Optimized for AI coding assistants
-- ✅ **Standards Compliant** - Follows AGENTS.md, Cursor Best Practices
+> **History note:** this repo previously held a v1 "Dev Kit" (stack-detection CLI,
+> product UI packages, generated constitutions). That layer was reaped on 2026-05-23
+> to leave a focused governance supra-repo; the old content remains in git history,
+> and tools/evaluations live in `vibethink-asset-library`.
 
 ---
 
-## 💡 Real-World Problems Solved
+## What's inside
 
-### **Problem 1: AI installs incompatible dependencies**
+**Canons (the principles — neutral, vendor-agnostic):**
+- [`AGENTS_UNIVERSAL.md`](knowledge/ai-agents/AGENTS_UNIVERSAL.md) — the neutral root authority (level 1).
+- [`CANON-CROSS-AGENT-CONTEXT-LAYERING.md`](knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md) — how agents read rules (layering + the smoke test).
+- [`CANON-MULTI-AGENT-ORCHESTRATION.md`](knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md) — handoff between agents + the human (inbox/feed, review-call discipline).
+- [`CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md`](knowledge/architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md) — decisions as first-class, indexable citizens.
+- [`REVIEW-CALL-CHECKLIST.md`](knowledge/ai-agents/REVIEW-CALL-CHECKLIST.md) — what an advisor architect validates before a seal.
+- [`AGENTS_METHODOLOGY_VIBETHINK.md`](knowledge/ai-agents/AGENTS_METHODOLOGY_VIBETHINK.md) — the org/methodology layer (level 2: concrete ports/stack/tooling).
 
-**Without this kit:**
-```
-You: "Add Refine.dev for admin panel"
-AI: *installs @refinedev/core*
-You: *project breaks because you already use Prisma*
-Result: Hours debugging why Refine doesn't work
-```
+**Engines (the runtime — pure Node, no deps):**
+- [`tools/check-agent-context.mjs`](tools/check-agent-context.mjs) — the layering smoke test.
+- [`tools/inbox.mjs`](tools/inbox.mjs) / [`tools/feed.mjs`](tools/feed.mjs) — read-only views over the shared comms channel.
+- Per-agent adapters: `CLAUDE.md`, `CODEX.md`, `COPILOT_INSTRUCTIONS.md`, `WINDSURFRULES.md` (pointers to the root).
 
-**With this kit:**
-```
-You: "Add Refine.dev for admin panel"
-AI: *reads .vibethink.config.json*
-AI: "⚠️ Detected: You use Prisma. Prisma + Refine are incompatible."
-AI: "Solution: Use Drizzle ORM instead, or use Prisma without Refine."
-Result: Problem prevented before it happens ✅
-```
+**Enforcement:**
+- [`.github/workflows/agent-context.yml`](.github/workflows/agent-context.yml) — runs the smoke + tests here; reusable (`workflow_call`) so forks gate themselves without copying the engine.
 
 ---
 
-### **Problem 2: Production breaks after "harmless" update**
+## Quick start
 
-**Without this kit:**
-```
-AI: "Express 5 is available, updating to latest version..."
-You: *deploys to DigitalOcean*
-Result: 500 errors, production down, 2 AM emergency 🚨
-```
+**Adopt / validate / activate in your repo** — follow the runbook:
+👉 [`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`](setup/ADOPT-CROSS-AGENT-GOVERNANCE.md)
 
-**With this kit:**
-```
-AI: *attempts to suggest Express 5*
-vibe-doctor: ❌ "Express 5.x prohibited - known issues in DigitalOcean"
-AI: "Keeping Express 4.21.2 (stable and tested)"
-Result: Production stays stable ✅
+**Validate this repo locally:**
+```bash
+npm run validate:agent-context   # = check:agent-context + test:agent-context
+# expect: GREEN — cross-agent layering holds  ·  inbox + feed tests pass
 ```
 
 ---
 
-### **Problem 3: Repeating mistakes across projects**
+## Structure
 
-**Without this kit:**
 ```
-Project 1: Waste 2 hours debugging Vite + Next.js conflict
-Project 2: Same mistake again (forgot about the issue)
-Project 3: Same mistake AGAIN (different team member)
-```
-
-**With this kit:**
-```
-Project 1: Encounter issue → add to rules/conflicts.json
-Project 2: vibe-doctor prevents it automatically
-Project 3: Never happens
-Result: Learn once, benefit forever ✅
+knowledge/ai-agents/        # the cross-agent canons + adapters + methodology + review checklist
+knowledge/architecture/     # CANON-DECISION-DISPOSITION (decisions as graph nodes)
+knowledge/PORT_ASSIGNMENT_GLOBAL.md
+tools/                      # engines: check-agent-context, inbox, feed (+ configs + tests)
+setup/                      # ADOPT runbook + templates
+doc/                        # build roadmap, review threads, ADRs
+.github/workflows/          # agent-context.yml (the only current workflow)
 ```
 
 ---
 
-### **Problem 4: Working across multiple projects**
+## License
 
-**Without this kit:**
-```
-Each project has different rules, different setup
-You forget which project uses what
-AI suggests solutions that worked in Project A but break Project B
-```
-
-**With this kit:**
-```
-One dev-kit, one source of truth
-Copy to any project, automatic stack detection
-Accumulated knowledge from all 4 projects benefits all future work
-Result: Consistency + accumulated wisdom ✅
-```
-
----
-
-## 🤖 How Multiple IAs Read This Kit
-
-**The REAL superpower:** This kit ensures **multiple AIs work together** without contradicting each other.
-
-### **The Problem:**
-```
-Monday - Cursor AI: Adds Express backend
-Tuesday - Claude: Suggests upgrading to Express 5
-Wednesday - You: 💥 Production breaks
-```
-
-### **The Solution:**
-```
-All AIs read the same source of truth:
-✅ AGENTS.md - Project constitution (OpenAI standard)
-✅ .vibethink.config.json - Detected stack
-✅ rules/conflicts.json - What NOT to do
-
-Result: Coherent suggestions across all AIs
-```
-
-### **Compatibility Matrix:**
-
-| AI | Reads AGENTS.md | Reads .cursorrules | Reads config.json |
-|----|----------------|--------------------| ------------------|
-| **Cursor** | ✅ | ✅ (primary) | ⚠️ If asked |
-| **Claude** | ✅ | ⚠️ If asked | ✅ |
-| **ChatGPT** | ✅ | ❌ | ⚠️ If asked |
-| **Copilot** | ⚠️ Partial | ⚠️ Partial | ❌ |
-
-**Best Practice:** Always start with: *"Read AGENTS.md and .vibethink.config.json first"*
-
-**Full Guide:** [docs/MULTI_IA_GUIDE.md](docs/MULTI_IA_GUIDE.md)
-
----
-
-## 🚀 Quick Start
-
-> **⚠️ IMPORTANT:** The files `AGENTS.md` and `.vibethink.config.json` are **AUTO-GENERATED** by `setup-project.ps1`
->
-> They don't exist in this kit repo. They are created in YOUR project when you run the setup script.
->
-> See `templates/` folder for examples of what gets generated.
-
-```powershell
-# 1. Copy dev-kit to your project
-Copy-Item "_vibethink-dev-kit\*" "your-project\" -Recurse
-
-# 2. Run setup (MANDATORY - generates AGENTS.md and .vibethink.config.json)
-#    Automatically organizes kit into .vibethink/ folder
-.\scripts\setup-project.ps1
-
-# 3. Run health check (note: scripts are now in .vibethink/)
-.\vibethink\scripts\vibe-doctor.ps1
-```
-
-> **📁 Structure:** After setup, the kit is organized in `.vibethink/` folder (isolated from your project), while `AGENTS.md` and `.vibethink.config.json` remain in root (standard for AI agents).
-
----
-
-## 📊 Stats
-
-- **36 files** - Complete development kit
-- **11,000+ lines** - Code and documentation
-- **27 sources analyzed** - 16 projects + 6 experts + 4 own + 1 internal
-- **8+ unique features** - Not found anywhere else
-
----
-
-## 🎯 What Makes It Unique
-
-**No other kit has ALL of these:**
-
-1. ✅ Stack detection + autodetection
-2. ✅ Architectural conflict validation (Prisma vs Refine, etc.)
-3. ✅ Multi-editor support from single source
-4. ✅ Knowledge harvesting between projects
-5. ✅ Executable policies (not just docs)
-
----
-
-## 📚 Documentation
-
-**Core Guides:**
-- [Quick Start](NEXT_STEPS.md) - Get started in 5 minutes
-- [Adopt Cross-Agent Governance](setup/ADOPT-CROSS-AGENT-GOVERNANCE.md) - ⭐ Step-by-step: how a repo **adopts / validates / activates** the layering smoke, inbox/feed, CI gate, and review checklist
-- [Multi-IA Guide](docs/MULTI_IA_GUIDE.md) - ⭐ How multiple AIs work together
-- [When to Use](docs/WHEN_TO_USE.md) - Decision guides (Prisma vs Supabase, Zustand vs Redux, etc.)
-- [Sync Guide](docs/SYNC_GUIDE.md) - Keep projects updated
-
-**Templates (see what gets auto-generated):**
-- [templates/AGENTS.md.example](templates/AGENTS.md.example) - Example of auto-generated AGENTS.md
-- [templates/.vibethink.config.json.example](templates/.vibethink.config.json.example) - Example of auto-generated config
-
-**Reference:**
-- [ROADMAP](ROADMAP.md) - v2.0 features and timeline
-- [Stack Compatibility](STACK_COMPATIBILITY.md) - Known conflicts
-- [Knowledge Inheritance](KNOWLEDGE_INHERITANCE.md) - 27 sources analyzed
-- [Tools & Stack](TOOLS_AND_STACK.md) - Recommended tools
-
----
-
-## 🛠️ Commands
-
-```powershell
-# Setup new project
-.\scripts\setup-project.ps1
-
-# Health check
-.\scripts\vibe-doctor.ps1
-
-# Sync from central kit (update rules)
-.\scripts\sync-from-kit.ps1
-
-# Validate dependencies
-.\scripts\hooks\pre-install.ps1 <package-name>
-
-# Validate configuration
-.\scripts\validate-rules.ps1          # Validate conflicts.json
-.\scripts\validate-agents.ps1         # Validate AGENTS.md structure
-.\scripts\validate-multi-ia.ps1       # Validate Multi-IA coherence
-
-# Harvest knowledge
-.\tools\harvest-knowledge.ps1
-```
-
----
-
-## 🎓 Inspired By
-
-- **Spec Kit** (GitHub) - CLI and phases
-- **Claude Code Development Kit** - Auto-loading protocol
-- **Cursor.directory** - Community rules
-- **T3 Stack** - Modularity
-- **AGENTS.md** (OpenAI) - Standard format
-- **Cursor Best Practices** - Rule structure
-
----
-
-## 📅 Version History
-
-- **v1.0.0** (2025-12-12) - Initial release with conflict prevention, stack detection, and 27 sources analyzed
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
-## 📄 License
-
-MIT License - See [LICENSE](LICENSE)
-
----
-
-## 🙏 Acknowledgments
-
-Created by analyzing and inheriting best practices from 16 leading projects.
-
-Special thanks to:
-- Peter Krueck (Claude Code Development Kit)
-- GitHub (Spec Kit)
-- OpenAI (AGENTS.md)
-- Cursor Community
-- T3 Stack Team
-
----
-
-**Made with ❤️ by VibeThink Team**
+MIT — see [LICENSE](LICENSE).

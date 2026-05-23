@@ -1,1 +1,0 @@
-﻿# VTK Methodology
