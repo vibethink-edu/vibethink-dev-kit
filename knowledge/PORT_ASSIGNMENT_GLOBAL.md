@@ -1,179 +1,102 @@
-# Asignación Global de Puertos - VibeThink Projects
+# Política Global de Puertos — VibeThink (capa metodología · level 2)
 
-> **Versión:** 2.0
-> **Última actualización:** 2026-04-06
-> **Propósito:** Definir puertos fijos globales para todos los proyectos VibeThink
-> **Alcance:** Todos los proyectos que heredan de `_vibethink-dev-kit`
+> **Versión:** 3.0
+> **Última actualización:** 2026-05-23
+> **Propósito:** Definir el **sistema** de puertos que heredan todos los proyectos VibeThink.
+> **Alcance:** capa metodología (level 2). Esto define el **esquema y las reglas**, no
+> los puertos de un producto concreto.
 
 ---
 
-## 🎯 Principio Fundamental
+## 🎯 Principio
 
-**Cada puerto tiene un propósito único y fijo.**
-Los puertos asignados aquí son **estándar global** para todos los proyectos VibeThink.
+> **El kit define el sistema; cada repo registra los suyos.**
 
-### Regla de Split Producción / Revisión (v2.0)
+Esta política fija los **rangos** y las **reglas**. **Cada repo consumidor mantiene su
+propio registro de puertos** como única fuente de verdad (p. ej. un `ports.json` en su
+raíz) y asigna sus apps **dentro** de estos rangos. El kit **no** dicta qué app va en
+qué puerto — eso es contenido de cada producto (level 3), no del supra-repo.
+
+**Nunca** se hardcodea un puerto sin registrarlo primero en el registro del repo.
+
+---
+
+## 📋 Esquema de rangos (el estándar org)
 
 | Rango | Propósito |
 |-------|-----------|
-| `< 5000` | **Producción / Canonical** — puertos estables del monorepo |
+| **3000–3049** | Aplicaciones principales (producción / canonical) |
+| **3050–3099** | Referencias y demos externas |
+| **3100–3399** | Testing y desarrollo temporal / ad-hoc |
+| **4000–4999** | Documentación y servicios auxiliares (p. ej. Starlight 4321) |
+| **5000–5999** | Review / Worktree / Branch lane (ver split más abajo) |
+| **8000+** | Backends y servicios GPU (p. ej. Whisper WS) |
+| **54321–54329** | Sandboxes locales de DB (p. ej. Supabase local) |
+
+Cada proyecto **reclama un bloque** (típicamente de 10) dentro del rango que le
+corresponde y lo documenta en su propio registro.
+
+## 🔀 Regla de split Producción / Review (v2.0+)
+
+| Rango | Propósito |
+|-------|-----------|
+| `< 5000` | **Producción / Canonical** — puertos estables del repo en `main` |
 | `>= 5000` | **Review / Dev / Branch** — worktrees y branches de revisión |
 
-**Patrón review:** `review_port = prod_port + 2000`
-Ejemplos: Dashboard 3005 → review 5005, Admin 3010 → review 5010, Twin Studio 3031 → review 5031.
+- **Patrón:** `review_port = prod_port + 2000` cuando aplica (ej. prod 3005 → review 5005).
+- **NUNCA** usar puertos `>= 5000` para la app canónica en `main`. Solo worktrees/branches.
+
+## 🔒 Puertos SAGRADOS
+
+Un repo puede marcar puertos canónicos como **SAGRADO / NEVER CHANGE** en su registro
+(p. ej. el dashboard principal). Cambiarlos rompe enlaces, fixtures y bookmarks — el
+registro del repo es quien los declara, y esta política solo establece que el concepto
+existe.
 
 ---
 
-## 📋 Estrategia de Asignación Global
+## 🧭 Cómo lo interpreta un repo consumidor (cualquiera, no solo uno)
 
-### **Rango 3000-3049: Aplicaciones Principales (Producción)**
-Puertos para aplicaciones de producción y desarrollo de proyectos VibeThink.
+Cuando un repo hereda esta política — **sea cual sea** — la aplica así:
 
-### **Rango 3050-3099: Referencias y Demos Externas**
-Puertos fijos para proyectos de referencia, demos de productos externos y documentación visual.
+1. **Reclama tu bloque** dentro de los rangos de arriba (apps en `3000–3049`,
+   referencias en `3050–3099`, etc.).
+2. **Registra tus puertos en TU repo**, en una única fuente de verdad. El esquema
+   recomendado es un `ports.json` en la raíz (ver el ejemplo vivo abajo): cada puerto
+   con `app`, `name`, `status`, `package`, y `sacred: true` si es intocable.
+3. **Aplica el split:** producción `< 5000`, review `>= 5000` (`prod + 2000`).
+4. **No hardcodees** un puerto sin registrarlo; idealmente tu CI valida los scripts de
+   `package.json` contra tu `ports.json`.
+5. **Las asignaciones concretas son tuyas (level 3), no del kit.** Dos repos distintos
+   pueden usar el mismo número para apps distintas — cada uno es dueño de su espacio de
+   puertos; esta política solo garantiza que ambos hablan el mismo *esquema* (rangos +
+   split), no que compartan asignaciones.
 
-### **Rango 4000-4999: Servicios y Documentación**
-Documentación (Starlight 4321), servicios auxiliares.
-
-### **Rango 5000-5999: Review / Worktree / Branch Lane**
-Puertos de revisión de Marcelo. Patrón `prod + 2000`. NUNCA usarlos para apps canónicas.
-
-### **Rango 8000+: Backends y GPU Services**
-Servicios backend, servidores GPU, proxies. Ej: Whisper Server (8765).
-
-### **Rango 3100+: Testing y Desarrollo Temporal**
-Puertos para pruebas temporales, experimentación y desarrollo ad-hoc.
-
----
-
-## 🚀 Puertos Fijos Globales
-
-### Aplicaciones Principales (Producción — < 5000)
-
-#### **VibeThink Orchestrator** (3000-3099)
-| Puerto | Aplicación | Estado | Notas |
-|--------|------------|--------|-------|
-| **3005** | Dashboard | SAGRADO | NEVER CHANGE |
-| **3007** | Portal (tenant-web) | Activo | |
-| **3010** | Admin / Control Tower | SAGRADO | NEVER CHANGE |
-| **3031** | Twin Studio | Activo | |
-| **3040** | Collab Server (Hocuspocus) | Activo | |
-| **3050** | LABs Host | Activo | |
-| **3060** | Viewer | Activo | |
-| **4321** | Docs (Starlight) | Activo | |
-| **5173** | FreeCut / Media Studio | Activo | Vite default, keep as-is |
-| **8765** | Whisper Server (GPU, Python WS) | Activo | Backend only |
-
-#### **Otros Proyectos VibeThink** (3010+)
-| Puerto | Proyecto | Aplicación | Notas |
-|--------|----------|------------|-------|
-| **3010-3019** | Admin / Control Tower | Frontend/API | Ver tabla arriba |
-| **3020-3029** | Mobile App | Dev Server | Reservado |
-| **3030-3039** | Otros proyectos | - | Disponible |
-
-> **📌 Regla v2.0:** Producción < 5000. Review >= 5000 (patrón prod+2000).
+> **Ejemplo vivo:** el registro de VibeThink Orchestrator (ViTo) —
+> `ports.json` con `"$schema": "VIBETHINK_PORT_REGISTRY_V2"` — es la implementación de
+> referencia de esta política: declara su split rule, sus rangos y sus apps (Dashboard
+> 3005 `sacred`, etc.). Otro repo haría su propio `ports.json` igual, con sus apps.
 
 ---
 
-### Referencias y Demos Externas (3050-3099)
+## 📝 Convenciones de nomenclatura
 
-#### **Productos de Referencia Estándar**
+- **Variables de entorno:** `PORT_{PRODUCTO}` (p. ej. `PORT_DASHBOARD=3005`).
+- **Scripts de referencia (en el repo consumidor):** `start-{nombre}-reference.ps1`,
+  con el puerto en una variable `$PORT` al inicio. (Convención para proyectos; estos
+  scripts viven en cada repo, no en el supra-repo.)
 
-| Puerto | Producto | Tipo | Ubicación |
-|--------|----------|------|-----------|
-| **3050** | **Bundui Premium** | Dashboard Kit | external reference codebase (lives in `vibethink-asset-library/codebases/`) |
-| **3051** | **Shadcn UI Oficial** | Component Library | external reference codebase (`vibethink-asset-library/codebases/`) |
-| **3052** | **React Flow** | Node-based UI | external reference codebase (`vibethink-asset-library/codebases/`) |
-| **3053-3099** | **Disponibles** | Nuevas referencias | - |
+## ✅ Checklist — al crear un proyecto / agregar una referencia
 
-> The reference-server start scripts live in each consuming project, not in this
-> supra-repo. The reference codebases themselves live in `vibethink-asset-library`.
+- [ ] Reclamar un bloque dentro del rango correcto.
+- [ ] Registrarlo en el `ports.json` (o equivalente) del repo.
+- [ ] Aplicar el split prod/review.
+- [ ] Marcar `sacred` los canónicos intocables.
+- [ ] Verificar que no hay conflicto **dentro de tu repo**.
 
-> **🔒 Puertos Fijos:** Estos puertos están **bloqueados globalmente** para estos productos específicos.
-> **No cambiar** sin actualizar este documento y todos los scripts afectados.
-
----
-
-### Testing y Desarrollo Temporal (3100+)
-
-| Rango | Propósito | Uso |
-|-------|-----------|-----|
-| **3100-3199** | Testing temporal | Pruebas rápidas, experimentación |
-| **3200-3299** | Desarrollo ad-hoc | Prototipos, POCs |
-| **3300+** | Libre | Cualquier uso temporal |
-
-### Review / Worktree / Branch Lane (5000-5999)
-
-Los puertos de revisión siguen el patrón `prod_port + 2000`:
-
-| Puerto Review | Puerto Prod | Módulo |
-|---------------|-------------|--------|
-| **5005** | 3005 | Dashboard review |
-| **5007** | 3007 | Portal review |
-| **5010** | 3010 | Admin review |
-| **5031** | 3031 | Twin Studio review |
-| **5050** | 3050 | LABs Host review |
-| **5060** | 3060 | Viewer review |
-| **5009** | — | Email Studio review |
-| **5021** | — | Documents (Expedientes) review |
-| **5023** | — | Meeting Companion review |
-| **5025** | — | Correspondencia review (NEW) |
-| **5173** | — | FreeCut review (Vite default) |
-
-**Regla:** NUNCA usar puertos >= 5000 para la app canónica en `main`. Solo para worktrees y branches de revisión.
-
-### Backends y GPU Services (8000+)
-
-| Puerto | Servicio | Notas |
-|--------|----------|-------|
-| **8765** | Whisper Server (Python WebSocket) | GPU backend para transcripción |
-
----
-
-## 🔄 Migración desde Puertos Antiguos
-
-### Cambios Requeridos
-
-Si tu proyecto usa puertos antiguos, migra a los nuevos:
-
-| Puerto Antiguo | Puerto Nuevo | Producto |
-|----------------|--------------|----------|
-| 3006 | **3050** | Bundui Premium |
-| 3007 | **3051** | Shadcn UI Oficial |
-| 3008 | **3052** | React Flow |
-| 8766 (erróneo) | **8765** | Whisper Server (bug fix offscreen.js) |
-
-### Script de Migración
+## 🛠️ Verificar puertos en uso (Windows)
 
 ```powershell
-# Actualizar scripts de referencia
-# Reemplazar en todos los scripts:
-# $PORT = 3006 → $PORT = 3050
-# $PORT = 3007 → $PORT = 3051
-# $PORT = 3008 → $PORT = 3052
-```
-
----
-
-## 📝 Convenciones de Nomenclatura
-
-### Scripts de Referencia
-- **Formato:** `start-{nombre}-reference.ps1`
-- **Ubicación:** `scripts/` en cada proyecto
-- **Puerto:** Variable `$PORT` definida al inicio (usar puertos 3050+)
-
-### Variables de Entorno
-- **Formato:** `PORT_{PRODUCTO}` (ej: `PORT_BUNDUI=3050`)
-- **Ubicación:** `.env.example` en cada proyecto
-
----
-
-## 🛠️ Herramientas de Gestión
-
-### Verificar Puertos en Uso
-
-```powershell
-# Ver todos los puertos VibeThink (3000-3100)
 Get-NetTCPConnection -State Listen |
     Where-Object { $_.LocalPort -ge 3000 -and $_.LocalPort -le 3100 } |
     Select-Object LocalPort, @{Name='Process';Expression={(Get-Process -Id $_.OwningProcess).ProcessName}}, State |
@@ -182,96 +105,15 @@ Get-NetTCPConnection -State Listen |
 
 ---
 
-## ✅ Checklist para Nuevos Proyectos
+## 🔗 Referencias
 
-Al crear un nuevo proyecto VibeThink:
-
-- [ ] Asignar bloque de 10 puertos (ej: 3040-3049)
-- [ ] Documentar en `AGENTS.md` del proyecto
-- [ ] Crear scripts con puertos fijos
-- [ ] Actualizar este documento global
-- [ ] Verificar que no hay conflictos
+- **Methodology layer:** `knowledge/ai-agents/AGENTS_METHODOLOGY_VIBETHINK.md` §2 — cita esta política como capa org (level 2).
+- **AI Agents:** `knowledge/ai-agents/AGENTS_UNIVERSAL.md` — el principio agnóstico ("los puertos vienen de un registro, nunca se adivinan").
 
 ---
 
-## 📋 Checklist para Nuevas Referencias
-
-Al agregar una nueva referencia externa:
-
-- [ ] Asignar puerto en rango 3050-3099
-- [ ] Crear script `start-{nombre}-reference.ps1`
-- [ ] Crear script `stop-{nombre}-reference.ps1`
-- [ ] Actualizar `AGENTS.md` del proyecto
-- [ ] Actualizar este documento global
-- [ ] Verificar que no hay conflictos
-
----
-
-## 🔗 Referencias Relacionadas
-
-### En Dev-Kit
-- **Methodology layer:** `knowledge/ai-agents/AGENTS_METHODOLOGY_VIBETHINK.md` §2 - cita este mapa de puertos como capa org (level 2)
-- **AI Agents:** `knowledge/ai-agents/AGENTS_UNIVERSAL.md` - Reglas universales para AI agents
-
-### En Proyectos
-- `AGENTS.md` - Reglas específicas del proyecto (debe heredar este documento)
-- `scripts/*.ps1` - Scripts de gestión de puertos (deben usar Port Manager)
-
----
-
-## 📊 Tabla de Resumen Rápido
-
-```
-┌─────────────────────────────────────────────────────────┐
-│ ASIGNACIÓN GLOBAL DE PUERTOS - VIBETHINK v2.0           │
-├─────────────────────────────────────────────────────────┤
-│ REGLA: Producción < 5000  |  Review >= 5000 (prod+2000) │
-├─────────────────────────────────────────────────────────┤
-│ 3000-3099: Aplicaciones Canónicas (Producción)         │
-│   ├─ 3005: Dashboard  [SAGRADO]                        │
-│   ├─ 3007: Portal                                      │
-│   ├─ 3010: Admin/Control Tower  [SAGRADO]              │
-│   ├─ 3031: Twin Studio                                 │
-│   ├─ 3040: Collab Server                               │
-│   ├─ 3050: LABs Host                                   │
-│   └─ 3060: Viewer                                      │
-├─────────────────────────────────────────────────────────┤
-│ 4000-4999: Docs y Servicios                            │
-│   └─ 4321: Docs (Starlight)                            │
-├─────────────────────────────────────────────────────────┤
-│ 5000-5999: Review / Worktree / Branch Lane             │
-│   ├─ 5005: Dashboard review                            │
-│   ├─ 5010: Admin review                                │
-│   ├─ 5031: Twin Studio review                          │
-│   └─ ...  (patrón: prod_port + 2000)                   │
-├─────────────────────────────────────────────────────────┤
-│ 5173: FreeCut / Media Studio (Vite default)            │
-├─────────────────────────────────────────────────────────┤
-│ 8000+: Backends y GPU Services                         │
-│   └─ 8765: Whisper Server (Python WebSocket)           │
-├─────────────────────────────────────────────────────────┤
-│ 3100+: Testing y Desarrollo Temporal                   │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚨 Conflictos Conocidos y Soluciones
-
-### Problema: Puerto en Uso
-**Solución:** Usar scripts oficiales que verifican disponibilidad antes de iniciar.
-
-### Problema: Múltiples Proyectos
-**Solución:** Cada proyecto tiene su bloque de 10 puertos asignado.
-
-### Problema: Referencias Manuales
-**Solución:** Siempre usar scripts oficiales, nunca iniciar manualmente.
-
----
-
-**Mantenedor:** VibeThink Team
-**Versión:** 2.0
-**Última revisión:** 2026-04-06
-**Heredado por:** Todos los proyectos VibeThink
-**Cambios v2.0:** Split rule prod<5000 / review>=5000. Tabla VTO completa. Whisper 8765 registrado. Patrón prod+2000 documentado.
-
+**Mantenedor:** the dev-kit (supra-repo upstream).
+**Cambios v3.0 (2026-05-23):** la política pasó de "mapa de puertos de ViTo" (level-3
+duplicado de su `ports.json`) a **esquema + reglas agnósticos** (level 2). Las
+asignaciones por-app de cada producto viven en el `ports.json` de ese repo, no acá.
+Removidas las refs muertas al PortManager v1 y a scripts inexistentes.
