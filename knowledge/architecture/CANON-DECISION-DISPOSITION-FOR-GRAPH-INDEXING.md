@@ -4,6 +4,9 @@
 > Vendor-neutral, product-neutral, tool-neutral.
 > **Status:** approved by the architect for supra-repo integration (fire-test
 > passed: no product, vendor, tool, or person name appears here).
+> **Amended 2026-05-22:** §3.2 / golden rules — inline code markers are
+> **advisory-only** (a real indexer does not harvest them); **Markdown/ADR is the
+> strong indexable binding**. Corrected on empirical verification, not assumption.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** supra-repo discipline, together with **Cross-Repo Artifact
 > Isolation** (`CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §4). Same discipline set.
@@ -56,7 +59,7 @@ What changes. What becomes easier / harder.
 Link to the PR, message, issue, or conversation that originated the decision.
 ```
 
-### 3.2 Local code decision → an inline marker the indexer extracts
+### 3.2 Local code decision → an inline marker (advisory) + an ADR if it must be indexed
 
 ```
 # WHY: <reason this approach was chosen over the obvious alternative>
@@ -65,8 +68,18 @@ Link to the PR, message, issue, or conversation that originated the decision.
 # NOTE: <a non-obvious constraint a future reader must respect>
 ```
 
-If the local decision has an ADR, the comment **links to it** (`see ADR-xxxx`) so
-the indexer connects the nodes.
+> **Amended 2026-05-22 (empirical verification).** A real knowledge-graph indexer
+> was run against real code. It harvests decisions from **Markdown headings / ADRs**
+> at full confidence, but does **NOT** harvest **inline code comments** as graph
+> nodes (it indexes the function, not the comment). Therefore:
+>
+> - **The strong, indexable binding is Markdown/ADR** (§3.1 / §3.3). A decision that
+>   **must be indexable** is written there.
+> - **Inline markers are advisory-only** — valuable for the human reading the code,
+>   but not a substitute for an ADR, and **not a strong requirement** of this norm
+>   until a dedicated inline-marker extractor exists.
+> - If a local decision matters enough to index, write the ADR and let the inline
+>   comment **link to it** (`see ADR-xxxx`).
 
 ### 3.3 Domain decision → design rationale in the domain doc
 
@@ -76,10 +89,13 @@ explicit decision language ("we decided X because Y"), not descriptive language
 
 ## 4. Golden rules
 
-1. **Explicit, not implicit.** The indexer extracts only what is stated directly.
-   "We decided to use X because Y" indexes better than "the system uses X".
-2. **One decision = one canonical place.** Architecture → ADR. Local → comment.
-   Do not duplicate; link.
+1. **Explicit, and in Markdown/ADR.** The indexer extracts only what is stated
+   directly — and (verified 2026-05-22) only from Markdown/ADR, not from inline code
+   comments. A decision that must be indexable lives in an ADR or canon, not only in
+   a code comment; the inline comment complements the human, it does not replace the
+   ADR for indexing.
+2. **One decision = one canonical place.** Architecture / must-be-indexable → ADR or
+   canon; the inline comment links to it. Do not duplicate.
 3. **Every decision carries the *why* + the rejected alternatives.** The value to
    a future agent is knowing what **not** to do, and why.
 4. **After deciding in conversation, write it before closing.** The conversational
