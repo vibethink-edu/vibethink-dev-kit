@@ -22,10 +22,14 @@ knowledge-graph indexer can extract.**
 
 ## 2. Why (this is not bureaucracy)
 
-A repo's indexing layer extracts the *why* that is **written** — inline decision
-comments, docstrings, and design rationale in docs — and turns it into graph
-nodes. What it cannot index is what was never written. This norm closes that gap
-**without adding any tool**: write the decision where the indexer already looks.
+A repo's indexing layer extracts the *why* that is **written in Markdown / ADRs**
+— design rationale in docs and canons — and turns it into graph nodes. (Verified
+2026-05-22: a real indexer harvests Markdown/ADR headings, but does **not** harvest
+inline code comments as nodes — it indexes the function, not the comment; see §3.2.)
+What it cannot index is what was never written. This norm closes that gap
+**without adding any tool**: write the decision where the indexer already looks —
+in an ADR or canon. Inline markers are advisory for the human reading the code, not
+the indexable binding.
 
 ## 3. Canonical disposition of a decision
 
@@ -151,7 +155,8 @@ This neutral canon defines the **discipline**. Each inheriting repo binds it to
 its own stack — declared in that repo's own layer, never here:
 
 - which indexer consumes the written decisions,
-- the exact inline-marker syntax that indexer extracts,
+- the exact inline-marker syntax a dedicated extractor would consume — **if/when
+  one exists** (today inline markers are advisory; the indexable binding is the ADR, §3.2),
 - the decisions folder path (`doc/decisions/` vs `docs/adr/`).
 
 The discipline is universal; the indexer and its marker dialect are product-level.

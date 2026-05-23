@@ -14,10 +14,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseFrontMatter } from "./inbox.mjs";
+import { normalizeRecipient, parseCommMeta } from "./inbox.mjs";
 
 /** Read a lane directory into a chronological (newest-first) activity feed. */
-export function collectFeed(laneDir, { limit } = {}) {
+export function collectFeed(laneDir, { limit, agents } = {}) {
   let files;
   try {
     files = fs.readdirSync(laneDir).filter((f) => f.endsWith(".md"));
@@ -28,15 +28,17 @@ export function collectFeed(laneDir, { limit } = {}) {
   for (const file of files) {
     let fm;
     try {
-      fm = parseFrontMatter(fs.readFileSync(path.join(laneDir, file), "utf8"));
+      fm = parseCommMeta(fs.readFileSync(path.join(laneDir, file), "utf8"));
     } catch {
       continue;
     }
+    // Use the SAME normalizer as inbox; fall back to the raw prose `to:` only for
+    // display when no routable token exists (e.g. a message addressed to a human).
     items.push({
       file,
       date: fm.date ?? "",
       from: fm.from ?? "?",
-      to: fm.to_agent ?? fm.to ?? "?",
+      to: normalizeRecipient(fm, { agents }) || String(fm.to ?? "?"),
       status: String(fm.status ?? "open").toLowerCase(),
       needs: fm.needs ?? "",
       title: fm.re ?? file.replace(/\.md$/, ""),
@@ -58,16 +60,20 @@ if (isMain()) {
   const asJson = args.includes("--json");
 
   let laneDir = laneArg;
-  if (!laneDir) {
+  let agents;
+  {
     const cfgPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "inbox.config.json");
     try {
-      laneDir = JSON.parse(fs.readFileSync(cfgPath, "utf8")).lanePath;
+      const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
+      if (!laneDir && cfg.lanePath) laneDir = cfg.lanePath;
+      if (Array.isArray(cfg.agents) && cfg.agents.length) agents = cfg.agents;
     } catch {
-      laneDir = "docs/ai-coordination/comms";
+      /* no config — fall back to defaults */
     }
   }
+  if (!laneDir) laneDir = "docs/ai-coordination/comms";
 
-  const items = collectFeed(laneDir, { limit: limitArg });
+  const items = collectFeed(laneDir, { limit: limitArg, agents });
   if (asJson) {
     console.log(JSON.stringify(items, null, 2));
     process.exit(0);

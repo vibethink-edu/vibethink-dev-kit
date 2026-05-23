@@ -75,5 +75,23 @@ test("collectFeed: limit caps the result (failure-mode guard)", () => {
 test("collectFeed: missing lane dir returns empty, no throw", () =>
   assert.deepEqual(collectFeed("/no/such/dir/xyz"), []));
 
+// ── shared normalizer: feed shows the same routing token inbox uses (finding #1)
+test("collectFeed: normalizes prose to: and bold-label body, human falls back", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "feed-real-"));
+  fs.writeFileSync(path.join(dir, "a.md"), "---\nto: codex-dev\ndate: 2026-05-20\nre: a\n---");
+  fs.writeFileSync(path.join(dir, "b.md"), "# T\n\n**To**: claude-DKS-dev\n**Date**: 2026-05-19\n");
+  fs.writeFileSync(path.join(dir, "c.md"), "# T\n\n**To**: Marcelo (Principal Architect)\n");
+  const items = collectFeed(dir);
+  const byFile = Object.fromEntries(items.map((i) => [i.file, i]));
+  assert.equal(byFile["a.md"].to, "codex", "YAML prose to: codex-dev → codex");
+  assert.equal(byFile["b.md"].to, "claude", "body **To**: claude-DKS-dev → claude");
+  assert.equal(
+    byFile["c.md"].to,
+    "Marcelo (Principal Architect)",
+    "no token → raw prose for display"
+  );
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 console.log(`\n${pass} passed, ${fail} failed\n`);
 process.exit(fail === 0 ? 0 : 1);
