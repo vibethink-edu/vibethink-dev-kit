@@ -113,3 +113,6 @@ this protocol. Routing tokens, channel location, inbox/feed tooling, and the set
 of known agents are declared per repo; the principles here never change. Anything
 specific to a product, a vendor, or a methodology stays in that repo's own layer —
 it never flows into this neutral core.
+
+The step-by-step procedure for a repo to **adopt / validate / activate** this
+governance lives in the kit's `setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`.

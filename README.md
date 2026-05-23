@@ -186,6 +186,7 @@ Copy-Item "_vibethink-dev-kit\*" "your-project\" -Recurse
 
 **Core Guides:**
 - [Quick Start](NEXT_STEPS.md) - Get started in 5 minutes
+- [Adopt Cross-Agent Governance](setup/ADOPT-CROSS-AGENT-GOVERNANCE.md) - ⭐ Step-by-step: how a repo **adopts / validates / activates** the layering smoke, inbox/feed, CI gate, and review checklist
 - [Multi-IA Guide](docs/MULTI_IA_GUIDE.md) - ⭐ How multiple AIs work together
 - [When to Use](docs/WHEN_TO_USE.md) - Decision guides (Prisma vs Supabase, Zustand vs Redux, etc.)
 - [Sync Guide](docs/SYNC_GUIDE.md) - Keep projects updated
