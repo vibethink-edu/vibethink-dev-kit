@@ -110,6 +110,10 @@ test("normalizeRecipient: no known token returns empty (failure mode)", () =>
   assert.equal(normalizeRecipient({ to: "Marcelo (Principal Architect)" }), ""));
 test("normalizeRecipient: re: fallback when to: is absent", () =>
   assert.equal(normalizeRecipient({ re: "thread owned by gemini" }), "gemini"));
+test("normalizeRecipient: to: outranks a token in re: (landmine — to/re not concatenated)", () =>
+  assert.equal(normalizeRecipient({ to: "gemini-dev", re: "TASK about codex work" }), "gemini"));
+test("normalizeRecipient: to: any outranks a token in re:", () =>
+  assert.equal(normalizeRecipient({ to: "any", re: "codex thread" }), "any"));
 test("normalizeRecipient: custom agents list overrides defaults", () =>
   assert.equal(normalizeRecipient({ to: "athena-dev" }, { agents: ["athena"] }), "athena"));
 

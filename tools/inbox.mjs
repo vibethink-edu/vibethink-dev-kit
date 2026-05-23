@@ -115,26 +115,34 @@ export function isOpen(fm) {
   return String(fm.status ?? "open").toLowerCase() !== "closed";
 }
 
+/** First known agent token (or "any") found as a whole word in a prose string. */
+function tokenFromProse(value, agents = KNOWN_AGENTS) {
+  const t = String(value ?? "").toLowerCase();
+  if (!t.trim()) return "";
+  if (/\bany\b/.test(t)) return "any";
+  for (const a of agents) if (new RegExp(`\\b${a}\\b`).test(t)) return a;
+  return "";
+}
+
 /**
  * Normalize a recipient to a clean routing token. Precedence:
  *   1. explicit `to_agent` (already a clean token) — used verbatim;
- *   2. else best-effort: the first known agent token (or "any") found in the
- *      prose `to:` / `re:` ("codex-dev" → codex, "claude-DKS-dev" → claude).
- * Returns "" when nothing routable is present (e.g. `to: Marcelo (...)`).
- * Shared by inbox and feed so they never disagree on routing.
+ *   2. else the first known agent token (or "any") in the prose `to:`
+ *      ("codex-dev" → codex, "claude-DKS-dev" → claude);
+ *   3. else, only if `to:` carried no token, fall back to the thread `re:`.
+ * `to:` and `re:` are resolved SEPARATELY, never concatenated — a token that
+ * merely appears in the thread `re:` must not outrank the explicit `to:`
+ * recipient. Otherwise `to: gemini-dev` + `re: …codex…` would mis-route to codex,
+ * because list order would let an earlier-listed token in `re` win. List order
+ * only breaks ties WITHIN a single field. Returns "" when nothing routable is
+ * present (e.g. `to: Marcelo (...)`). Shared by inbox and feed.
  */
 export function normalizeRecipient(fm, { agents = KNOWN_AGENTS } = {}) {
   const explicit = String(fm.to_agent ?? "")
     .trim()
     .toLowerCase();
   if (explicit) return explicit;
-  const prose = `${fm.to ?? ""} ${fm.re ?? ""}`.toLowerCase();
-  if (!prose.trim()) return "";
-  if (/\bany\b/.test(prose)) return "any";
-  for (const a of agents) {
-    if (new RegExp(`\\b${a}\\b`).test(prose)) return a;
-  }
-  return "";
+  return tokenFromProse(fm.to, agents) || tokenFromProse(fm.re, agents);
 }
 
 /** Does message `fm` belong in `recipient`'s inbox? */
