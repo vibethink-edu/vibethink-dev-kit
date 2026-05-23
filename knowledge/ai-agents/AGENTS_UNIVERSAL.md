@@ -110,6 +110,30 @@ server, read the project's port registry and use the assigned block.
 # ❌ NEVER create .md files for every analysis - do analysis in response, only create .md for significant reports
 ```
 
+### 🧰 Dev Tooling Baseline — RTK + Graphify (RECOMMENDED · non-blocking)
+
+> **Status: BASELINE — always provisioned (owner standard of care). A quality/performance
+> enhancement, NEVER a correctness dependency. Non-blocking: no gate, no CI failure, no error
+> if absent.**
+>
+> **Mental model: a database index.** A query runs correctly without the index — just slower;
+> you always add it because the gain is worth it. Same here: provision these by default in every
+> dev environment. Their absence DEGRADES the experience (more tokens, blind grep); it does NOT
+> fail anything.
+
+- **RTK** (token economy): wrap noisy/verbose command output (listings, builds, tests, logs,
+  `status`, `find`) with `rtk`. Skip already-compact output (e.g. `git log --oneline`).
+- **Graphify** (code navigation): use for orientation (hubs, what-defines-what, dead-code,
+  "what touches X") BEFORE blind grep. On-demand, no permanent runtime; index the subdir you
+  work in (not the whole monorepo); gitignore `graphify-out/`. Graphify ORIENTS — verify
+  authoritative dependencies with `git grep`.
+- **Provisioning is owner standard; absence is safe.** A repo / agent / CI without them works
+  fully — just less optimal. Keep this status **explicitly non-blocking**; do NOT let it harden
+  into a required gate over time.
+- **Not adopted (settled — do not reconsider here):** Engram, agentmemory.
+- Tool **versions + install lifecycle** are governed **per-repo** (e.g. an EXTERNAL-TOOLS
+  registry), not in this universal layer. This layer only declares the *use* baseline.
+
 ### 📁 File Organization Rule (CRITICAL)
 
 **REGLA FUNDAMENTAL:** ❌ **NUNCA** crear archivos de trabajo/reportes/validaciones en la raíz del proyecto.
