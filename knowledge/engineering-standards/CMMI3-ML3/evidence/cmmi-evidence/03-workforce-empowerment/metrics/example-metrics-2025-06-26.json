@@ -1,8 +1,0 @@
-{
-  "fecha": "2025-06-26",
-  "metrica": "handoff_efficiency",
-  "valor": 4.5,
-  "unidad": "minutos",
-  "descripcion": "Tiempo promedio de handoff humano-IA en la última semana.",
-  "fuente": "logs XTP"
-}
