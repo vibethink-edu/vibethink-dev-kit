@@ -39,13 +39,17 @@ writing code; if absent, stop and request access.* The VibeThink binding:
 ## 2. Port assignment (global standard)
 
 Neutral principle (level 1): *ports come from a project-wide registry, never
-guessed.* The VibeThink global map:
+guessed.* The VibeThink **scheme** (each repo registers its own apps within these
+ranges — the kit defines the system, not the per-app assignments):
 
-- **3000–3049:** main applications (each project gets a block of 10)
-- **3050–3099:** external references / demos (Bundui = 3050, Shadcn = 3051, ReactFlow = 3052)
+- **3000–3049:** main applications (each project claims a block)
+- **3050–3099:** external references / demos
 - **3100+:** testing and temporary development
+- **5000–5999:** review / worktree lane (split rule: prod `< 5000`, review `>= 5000`, `prod + 2000`)
 
-**Full reference:** `_vibethink-dev-kit/knowledge/PORT_ASSIGNMENT_GLOBAL.md`
+Each consuming repo keeps its own port registry (e.g. a root `ports.json`); ViTo's
+is the reference implementation. **Full policy:**
+`_vibethink-dev-kit/knowledge/PORT_ASSIGNMENT_GLOBAL.md`
 
 ## 3. Stack constraints (concrete version pins & known-bad combos)
 
