@@ -73,6 +73,10 @@ state (root rules skeleton + adapters + smoke test) and declares its inherited v
 The kit evolves; repos re-sync. Rules specific to a product, a vendor, or a methodology stay
 in their own layer — they never flow into this neutral core.
 
+The step-by-step procedure for a repo to **adopt / validate / activate** this governance
+(declare the config, run the smoke, wire the CI gate and the inbox) lives in the kit's
+`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`.
+
 ## 8. Levels (what belongs where)
 
 Keep three levels distinct; do not let a lower level leak into a higher one:
