@@ -1,0 +1,90 @@
+name: agent-context
+
+# Makes the cross-agent layering norms BITE (review finding backlog: "Add CI that
+# runs check-agent-context + the tests, or the norms stay written but not biting").
+#
+# Two scopes, one file:
+#   - This kit (supra-repo): runs the smoke against its OWN config + tests the engine
+#     once, here at its source.
+#   - A consuming fork: calls this as a REUSABLE workflow
+#       jobs:
+#         agent-context:
+#           uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@main
+#           with:
+#             config-path: tools/agent-context.config.json   # the fork's config
+#     The fork does NOT copy the engine: this workflow fetches the kit's tools and
+#     runs the smoke against the fork's checked-out files. The engine is tested only
+#     here (forks consume identical code — re-testing it N times is waste).
+
+on:
+  push:
+  pull_request:
+  workflow_call:
+    inputs:
+      config-path:
+        description: Path (in the repo being validated) to the agent-context config.
+        type: string
+        default: tools/agent-context.config.json
+      devkit-ref:
+        description: Ref of the dev-kit whose tools a fork should run.
+        type: string
+        default: main
+
+env:
+  KIT_REPO: vibethink-edu/vibethink-dev-kit
+
+jobs:
+  smoke:
+    name: cross-agent layering smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo under validation
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # A fork has no engine of its own — fetch the kit's tools. The kit's own run
+      # uses its local (branch) tools, so a PR is validated by the code it changes.
+      - name: Fetch dev-kit tools (forks only)
+        if: github.repository != 'vibethink-edu/vibethink-dev-kit'
+        uses: actions/checkout@v4
+        with:
+          repository: vibethink-edu/vibethink-dev-kit
+          ref: ${{ inputs.devkit-ref || 'main' }}
+          path: _devkit
+
+      - name: Resolve tools dir
+        id: tools
+        shell: bash
+        run: |
+          if [ "${{ github.repository }}" = "vibethink-edu/vibethink-dev-kit" ]; then
+            echo "dir=tools" >> "$GITHUB_OUTPUT"
+          else
+            echo "dir=_devkit/tools" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: check-agent-context (smoke)
+        run: node ${{ steps.tools.outputs.dir }}/check-agent-context.mjs "${{ inputs.config-path || 'tools/agent-context.config.json' }}"
+
+  engine-tests:
+    name: inbox / feed engine tests
+    # The engine is tested once, at its source. Forks consume it; they don't re-test it.
+    if: github.repository == 'vibethink-edu/vibethink-dev-kit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: inbox tests
+        run: node tools/inbox.test.mjs
+
+      - name: feed tests
+        run: node tools/feed.test.mjs
