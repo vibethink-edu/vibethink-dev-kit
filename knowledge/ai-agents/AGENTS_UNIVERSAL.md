@@ -14,9 +14,11 @@
 >
 > **Disciplina de decisiones (capa universal):**
 > - `../architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` — toda
->   decisión de arquitectura/contrato/comportamiento se escribe (ADR + markers
->   inline) en forma indexable por un knowledge-graph. Las decisiones son
->   ciudadanos de primera clase del repo, no efímeras de la conversación.
+>   decisión de arquitectura/contrato/comportamiento se escribe en **Markdown/ADR**
+>   (el binding indexable por un knowledge-graph). Los markers inline son
+>   *advisory* para el lector humano y enlazan al ADR; no lo reemplazan para
+>   indexación. Las decisiones son ciudadanos de primera clase del repo, no
+>   efímeras de la conversación.
 
 ---
 
@@ -46,17 +48,16 @@ glob_search "*.sh"               # Shell scripts (Unix)
 
 ### 🚨 Protocol: "NO BRAIN, NO WORK"
 
-**ANTES** de escribir código, verifica acceso a `_vibethink-dev-kit`:
+**Before writing code, verify you have access to the project's shared knowledge
+base** (the kit / "brain" that holds the standards). If you cannot find it, do
+**not** guess standards — **stop and request access**:
 
-1. **Workspace Mode:** Ves la carpeta `_vibethink-dev-kit` en el IDE
-2. **Symlink Mode:** Ves `.vibethink-core/` en la raíz
+> ⚠️ ALERT: I don't have access to the project's knowledge base (the standards "brain").
+> ❌ Risk: generating code outside the project standard.
+> 🛠️ Fix: add the knowledge base to the workspace, or run the project's mount script.
 
-**SI NO ENCUENTRAS NINGUNO:**
-```
-⚠️ ALERTA: No tengo acceso al _vibethink-dev-kit (Cerebro del Proyecto).
-❌ Riesgo: Generar código fuera de estándar.
-🛠️ Solución: Agregar _vibethink-dev-kit al Workspace o ejecutar mount-devkit.ps1
-```
+> The concrete folder names, symlink path, mount script, and IDE steps are
+> org-specific — see the **methodology layer (level 2)**.
 
 ### 🛡️ Quick Operations Reference
 
@@ -71,31 +72,28 @@ glob_search "*.sh"               # Shell scripts (Unix)
 
 **NEVER use generic commands when project scripts exist.**
 
-### 🚦 Port Assignment (Global Standard)
+### 🚦 Port Assignment
 
-**Puertos fijos globales para todos los proyectos del kit:**
+**Ports come from a project-wide registry — never guessed.** Before starting any
+server, read the project's port registry and use the assigned block.
 
-- **3000-3049:** Aplicaciones principales (cada proyecto tiene bloque de 10)
-- **3050-3099:** Referencias y demos externas (Bundui=3050, Shadcn=3051, ReactFlow=3052)
-- **3100+:** Testing y desarrollo temporal
+**NEVER guess port numbers — check the project's port registry first.**
 
-**Referencia completa:** `_vibethink-dev-kit/knowledge/PORT_ASSIGNMENT_GLOBAL.md`
-
-**NEVER guess port numbers - check global assignment first.**
+> The concrete global port map (ranges, reserved demos) is org-specific — see the
+> **methodology layer (level 2)**.
 
 ### ❌ Never Do (Universal)
 
 ```bash
-# ❌ NEVER install Express 5 (use 4.21.2)
-# ❌ NEVER mix Vite + Webpack in same project
-# ❌ NEVER install `next` in Vite project (or vice versa)
-# ❌ NEVER use caret versions (^) in dependencies
+# ❌ NEVER mix incompatible build tools / bundlers in one project
+# ❌ NEVER install a framework into a project built on a different one
+# ❌ NEVER use floating / caret (^) version ranges — pin exact versions
 # ❌ NEVER install dependencies in both root and app folders
-# ❌ NEVER create .npmrc or .env.example in apps/
 # ❌ NEVER guess operational commands - find project scripts first
 # ❌ NEVER expose API keys in frontend code
 # ❌ NEVER create reports/validations/work files in project root
 # ❌ NEVER leave temporary files unorganized
+# (concrete version pins & known-bad stack combos: see the methodology layer)
 ```
 
 ### ✅ Always Do (Universal)
@@ -364,8 +362,8 @@ git add -A && git commit -m "session: descripción" && git push
 ```
 project-root/
 ├── apps/                     # Applications
-│   ├── dashboard/
-│   ├── admin/
+│   ├── [app-a]/
+│   ├── [app-b]/
 │   └── [other-apps]/
 ├── packages/                # Shared packages
 │   ├── ui/                  # UI components
@@ -396,22 +394,20 @@ project-root/
 
 ### Security Rules
 
-```typescript
-// ✅ ALWAYS filter by company_id (multi-tenant)
-const data = await supabase
-  .from('users')
-  .select('*')
-  .eq('company_id', user.company_id);
+- **ALWAYS** scope every data query by its tenant key (multi-tenant isolation).
+- **NEVER** query a shared table without a tenant filter.
+- **NEVER** expose provider API keys or secrets to the client.
 
-// ❌ NEVER query without tenant isolation
-const data = await supabase.from('users').select('*');
-```
+> Concrete client/ORM snippets and the tenant-key field name are org/product-specific
+> — see the **methodology layer (level 2)** and the product repo.
 
 ### Branding / methodology layer
 
-- Org brand and house-methodology terms live in the **methodology layer (level 2)**, not in
-  this neutral core.
-- This core stays vendor- and methodology-neutral. See `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §8.
+- Org brand, house-methodology terms, concrete stack/ports/tooling, and DB
+  examples live in the **methodology layer (level 2)** — not in this neutral core.
+- This core stays vendor- and methodology-neutral. **Fire-test:** it must read
+  clean of any product name, vendor brand, or methodology name. If one appears, it
+  is a leak from level 2/3 — move it down. See `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §8.
 
 ---
 
@@ -420,64 +416,45 @@ const data = await supabase.from('users').select('*');
 ### How Projects Inherit
 
 ```
-_vibethink-dev-kit/
+<the-kit>/                                    ← the supra-repo upstream
 ├── knowledge/ai-agents/
-│   ├── AGENTS_UNIVERSAL.md                  ← THIS FILE (single authority)
+│   ├── AGENTS_UNIVERSAL.md                   ← THIS FILE (neutral core, level 1)
 │   ├── CANON-CROSS-AGENT-CONTEXT-LAYERING.md ← layering canon (companion)
-│   ├── CODEX.md / CLAUDE.md / ...           ← per-agent adapters (pointers)
-│   └── .cursorrules                         ← Template cursorrules
+│   ├── <one adapter per agent>               ← per-agent adapters (pointers)
+│   └── <methodology layer>                   ← org bindings (level 2)
 │
-project-specific/
+project-specific/                             ← a fork (level 3)
 ├── AGENTS.md                    ← Inherits + Extends
-├── .cursorrules                 ← Inherits + Customizes
+├── <per-agent adapter files>    ← Inherits + Customizes
 └── [project-specific-docs]
 ```
 
-### AGENTS.md Template for Projects
+### AGENTS.md template for projects
 
-```markdown
-# Project Mission
-[Project-specific mission]
-
-# Inherits From
-- `_vibethink-dev-kit/knowledge/ai-agents/AGENTS_UNIVERSAL.md`
-- `_vibethink-dev-kit/knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md`
-
-# Quick Operations (Project-Specific)
-| Action | Command |
-|--------|---------|
-| Start dev | `.\scripts\start-dashboard.ps1` |
-| Stop all | `.\scripts\stop-dashboard.ps1` |
-| Build | `npm run build:dashboard` |
-
-# Tech Stack (Project-Specific)
-[Stack details]
-
-# Project-Specific Rules
-[Additional rules]
-```
+A fork's `AGENTS.md` declares its mission, what it inherits from the kit, its
+quick-operations table, its stack, and its extra rules. A ready-to-fill template
+and a fully-worked example live in the kit's `setup/templates/`. The concrete
+org template (with stack/script names) lives in the **methodology layer (level 2)**.
 
 ---
 
 ## 📋 Validation Commands
 
-```bash
-# BEFORE changes
-npm run validate:quick
+**Run the project's validation scripts before and after changes.** Each project
+declares the exact script names (a "quick" check before, fuller checks after).
 
-# AFTER changes
-npm run validate:universal
-npm run validate:architecture
-npm run validate:branding
-```
+> Concrete command names are org-specific — see the **methodology layer (level 2)**.
 
 ---
 
 ## 🎯 AI Capability Detection
 
-**Cursor IDE → FULL PROTOCOL** (terminal access)
-**Claude Code → FULL PROTOCOL** (terminal access)
-**GPT Web → LITE PROTOCOL** (limited access - declare limitations)
+- **Agents with terminal / tool access → FULL PROTOCOL** (run scripts, git, build).
+- **Agents without terminal access → LITE PROTOCOL** (declare limitations; ask the
+  user to run commands).
+
+> The mapping of specific agent products to FULL / LITE is org-specific — see the
+> **methodology layer (level 2)**.
 
 ---
 
@@ -686,10 +663,14 @@ npm run validate:branding
 
 ---
 
-**Last Updated:** 2025-01-XX
-**Version:** 1.2
-**Maintained by:** VibeThink Dev-Kit
+**Last Updated:** 2026-05-22
+**Version:** 1.3
+**Maintained by:** the dev-kit (supra-repo upstream)
 **Changelog:**
-- v1.2 (2025-01-XX): Added Universal Crisis Protocols (migrated from VITA historical documentation)
+- v1.3 (2026-05-22): Restored level-1 vendor-neutrality (review finding #3) — moved
+  concrete kit-access, ports, stack pins, DB example, validation commands, AI
+  capability mapping, and the inheritance paths/template to the methodology layer
+  (level 2). The neutral core now keeps only agnostic principles + pointers.
+- v1.2 (2025-01-XX): Added Universal Crisis Protocols (migrated from historical documentation)
 - v1.1 (2025-12-18): Added Git Safety Protocol to prevent work loss from incorrect GitHub synchronization
 

@@ -139,7 +139,8 @@ Este documento es el **mapa de navegación** para que la IA sepa qué documentos
 **Documentos a leer:**
 1. `knowledge/naming-conventions/NAMING_STANDARDS.md` → Guía de nombres (Scripts, Git, Components)
 2. `knowledge/best-practices/VERSIONING_POLICY.md` → Política de versiones y monorepo
-3. `AGENTS.md` (o `AGENTS_GOLDEN.md`) → Reglas generales
+3. `knowledge/ai-agents/AGENTS_UNIVERSAL.md` → Reglas generales (núcleo neutral, nivel 1)
+   · ejemplo completo: `setup/templates/AGENTS_GOLDEN.example.md`
 
 **Ejemplo:**
 ```bash

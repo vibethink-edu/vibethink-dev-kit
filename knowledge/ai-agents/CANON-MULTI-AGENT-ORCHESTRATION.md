@@ -62,17 +62,23 @@ just prose a human must read:
 | Field | Purpose |
 |-------|---------|
 | `from` | author agent |
-| `to` | normalized recipient token (one of the known agents, or `any`) |
+| `to_agent` | **canonical** normalized recipient token (one known agent, or `any`) — what routing depends on |
+| `to` | human-readable recipient prose (`codex-dev`, `claude-DKS-dev`, `Codex (...)`) — a known agent token is extracted from it only as a fallback when `to_agent` is absent |
 | `status` | `open` \| `closed` |
 | `re` | the message this threads from |
 | `priority` | ordering hint |
 | `needs` | `human` when a judgment gate is reached, else absent |
 
-- An agent's **inbox** = messages where `to:` is itself (or `any`) and `status: open`.
+- An agent's **inbox** = messages whose normalized recipient is itself (or `any`)
+  and `status: open`.
 - The **human's inbox** = messages where `needs: human`. The human pulls one
   place instead of being polled across every window.
-- A prose `to:`/description may accompany the normalized field for humans, but the
-  normalized field is what routing depends on.
+- `to_agent` is the clean token routing depends on; the prose `to:` (and a
+  bold-label `**To**:` body header, which predates the YAML convention) is the
+  human label. The router prefers `to_agent` and falls back to extracting a known
+  agent token from the prose only when `to_agent` is absent — so legacy messages
+  still route while new ones use the canonical field. inbox and feed share **one**
+  normalizer so they can never disagree on who a message is for.
 
 ## 6. Red-gate discipline
 

@@ -1,0 +1,5 @@
+{
+  "_about": "Per-repo config for tools/inbox.mjs + tools/feed.mjs (CANON-MULTI-AGENT-ORCHESTRATION §5/§7). A consuming repo edits this to point at its own comms lane and declare the agent tokens its router should recognize in a prose `to:`. The engines fall back to these defaults and to docs/ai-coordination/comms when this file is absent.",
+  "lanePath": "docs/ai-coordination/comms",
+  "agents": ["claude", "codex", "gemini", "copilot", "windsurf", "cursor"]
+}

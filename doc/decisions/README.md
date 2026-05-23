@@ -5,5 +5,6 @@ This is this repo's decisions folder, per
 
 Every architecture / contract / behavior decision is written here as an ADR so a
 knowledge-graph indexer can extract the *why*. Filename: `ADR-YYYYMMDD-slug.md`.
-Local code decisions use inline `# WHY:` / `# DECISION:` markers instead and link
-back to the relevant ADR.
+The ADR is the indexable binding. Local code decisions may carry advisory inline
+`# WHY:` / `# DECISION:` markers that link back to the relevant ADR — the markers
+help the human reading the code, but do not replace the ADR for indexing (§3.2).

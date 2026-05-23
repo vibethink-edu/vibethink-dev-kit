@@ -8,7 +8,8 @@ import { execFileSync } from "node:child_process";
  * tools/agent-context.config.json (canon §7: that file declares which file is
  * the source authority vs which are derived adapters).
  *
- * Usage:  node tools/check-agent-context.mjs [path/to/config.json]
+ * Usage:  node tools/check-agent-context.mjs [path/to/config.json] [--include-untracked]
+ *   --include-untracked : also scan untracked working-tree files in the secret scan
  * Exit:   0 = all checks pass (green seal) · 1 = at least one check failed
  *
  * No dependencies — pure Node + git.
@@ -25,7 +26,9 @@ function repoRoot() {
 }
 
 const ROOT = repoRoot();
-const configArg = process.argv[2] || "tools/agent-context.config.json";
+const argv = process.argv.slice(2);
+const includeUntracked = argv.includes("--include-untracked");
+const configArg = argv.find((a) => !a.startsWith("--")) || "tools/agent-context.config.json";
 const configPath = path.isAbsolute(configArg) ? configArg : path.join(ROOT, configArg);
 
 if (!fs.existsSync(configPath)) {
@@ -167,34 +170,47 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
 })();
 
 // ── Check 6: no parallel constitution (undeclared agent rules tree) ─────────
+// Scans the WHOLE repo, not just agentsDir (finding #2): a stray CLAUDE.md /
+// AGENTS.md anywhere is exactly what a "parallel constitution" looks like. The
+// root authority + declared adapters are auto-legit; every other pattern-matching
+// file must be allowlisted (templates, examples, integration docs) or it fails.
 (() => {
-  const dir = cfg.agentsDir;
-  if (!dir || !exists(dir)) return skip("6 no-parallel", "no agentsDir to scan");
-  const re = new RegExp(cfg.agentFilePattern || "^(CLAUDE|CODEX|GEMINI|AGENTS)\\.md$");
-  const declared = new Set((cfg.adapters || []).map((a) => path.basename(a.file)));
-  const allowed = new Set(cfg.nonAdapterAgentFiles || []);
-  const max = cfg.maxAdapterBytes || 8192;
+  const re = new RegExp(
+    cfg.agentFilePattern ||
+      "^(CLAUDE|CODEX|COPILOT_INSTRUCTIONS|WINDSURFRULES|GEMINI|AGENTS|AGENTS_GOLDEN)\\.md$"
+  );
+  if (tracked.size === 0)
+    return skip("6 no-parallel", "not a git repo — cannot enumerate tracked files repo-wide");
+  const norm = (p) => p.replace(/\\/g, "/");
+  const legit = new Set();
+  if (cfg.rootRulesFile) legit.add(norm(cfg.rootRulesFile));
+  for (const a of cfg.adapters || []) legit.add(norm(a.file));
+  for (const p of cfg.agentFileAllowlist || []) legit.add(norm(p));
+  const allowedBasenames = new Set(cfg.nonAdapterAgentFiles || []); // legacy basename allowlist
   const problems = [];
-  for (const name of fs.readdirSync(abs(dir))) {
-    if (!re.test(name)) continue;
-    if (allowed.has(name)) continue;
-    if (!declared.has(name)) {
-      problems.push(
-        `${name} is an agent rules file but is not a declared adapter (parallel constitution)`
-      );
-      continue;
-    }
-    const s = size(path.join(dir, name));
-    if (s > max) problems.push(`${name} = ${s} B > ${max} B (diverging copy, not a pointer)`);
+  let scanned = 0;
+  for (const rel of tracked) {
+    const base = path.basename(rel);
+    if (!re.test(base)) continue;
+    scanned++;
+    if (legit.has(rel) || allowedBasenames.has(base)) continue;
+    problems.push(
+      `${rel} matches the agent-rules pattern but is neither the declared root authority, a declared adapter, nor allowlisted (parallel constitution — declare it or allowlist it)`
+    );
   }
-  if (problems.length === 0) pass("6 no-parallel", `no parallel constitution in ${dir}`);
+  if (problems.length === 0)
+    pass("6 no-parallel", `scanned repo-wide; ${scanned} agent-pattern file(s) all accounted for`);
   else fail("6 no-parallel", problems.join("; "));
 })();
 
-// ── Check 7: no secret values committed (checked before any push) ───────────
+// ── Check 7: basic secret pattern scan (heuristic, NOT a full secret scanner) ─
+// Honest scope (finding #5): this matches known provider key SHAPES in tracked
+// text files. A clean result means "no matches for the configured patterns" — it
+// does NOT prove the absence of secrets. By default it scans tracked files only;
+// pass --include-untracked to also scan untracked working-tree files before a push.
 (() => {
   const patterns = (cfg.secretPatterns || []).map((p) => new RegExp(p));
-  if (patterns.length === 0) return skip("7 no-secrets", "no secret patterns declared");
+  if (patterns.length === 0) return skip("7 secret-scan", "no secret patterns declared");
   const exts = new Set(
     cfg.secretScanExtensions || [
       ".md",
@@ -209,7 +225,23 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
     ]
   );
   const excl = cfg.secretExcludeContains || [];
-  const scanList = tracked.size ? [...tracked] : [];
+  const scanSet = new Set(tracked);
+  if (includeUntracked) {
+    try {
+      const others = execFileSync("git", ["ls-files", "--others", "--exclude-standard"], {
+        cwd: ROOT,
+        encoding: "utf8",
+        maxBuffer: 64 * 1024 * 1024,
+      })
+        .split("\n")
+        .map((s) => s.trim().replace(/\\/g, "/"))
+        .filter(Boolean);
+      for (const s of others) scanSet.add(s);
+    } catch {
+      /* not a git repo — nothing extra to add */
+    }
+  }
+  const scanList = [...scanSet];
   const hits = [];
   for (const rel of scanList) {
     if (excl.some((x) => rel.includes(x))) continue;
@@ -225,19 +257,23 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
     }
     if (!st.isFile() || st.size > 2 * 1024 * 1024) continue;
     const lines = fs.readFileSync(full, "utf8").split("\n");
-    lines.forEach((line, i) => {
+    for (let i = 0; i < lines.length; i++) {
       for (const re of patterns)
-        if (re.test(line)) {
+        if (re.test(lines[i])) {
           hits.push(`${rel}:${i + 1}`);
           break;
         }
-    });
+    }
   }
+  const scope = includeUntracked ? "tracked + untracked" : "tracked";
   if (hits.length === 0)
-    pass("7 no-secrets", `scanned ${scanList.length} tracked files, no live secrets`);
+    pass(
+      "7 secret-scan",
+      `scanned ${scanList.length} ${scope} file(s); no matches for the basic secret patterns (heuristic — not a full secret scanner)`
+    );
   else
     fail(
-      "7 no-secrets",
+      "7 secret-scan",
       `possible secrets at: ${hits.slice(0, 20).join(", ")}${hits.length > 20 ? ` (+${hits.length - 20} more)` : ""}`
     );
 })();
