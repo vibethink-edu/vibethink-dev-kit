@@ -79,14 +79,15 @@ Puertos para pruebas temporales, experimentación y desarrollo ad-hoc.
 
 #### **Productos de Referencia Estándar**
 
-| Puerto | Producto | Tipo | Ubicación | Script |
-|--------|----------|------|-----------|--------|
-| **3050** | **Bundui Premium** | Dashboard Kit | `C:\IA Marcelo Labs\bundui\shadcn-ui-kit-dashboard` | `.\scripts\start-bundui-reference.ps1` |
-| **3051** | **Shadcn UI Oficial** | Component Library | `C:\IA Marcelo Labs\shadcn-ui\ui\apps\v4` | `.\scripts\start-shadcn-reference.ps1` |
-| **3052** | **React Flow** | Node-based UI | `C:\IA Marcelo Labs\xyflow\xyflow\examples\react` | `.\scripts\start-reactflow-reference.ps1` |
-| **3053** | **Reservado** | Futuras referencias | - | - |
-| **3054** | **Reservado** | Futuras referencias | - | - |
-| **3055-3099** | **Disponibles** | Nuevas referencias | - | - |
+| Puerto | Producto | Tipo | Ubicación |
+|--------|----------|------|-----------|
+| **3050** | **Bundui Premium** | Dashboard Kit | external reference codebase (lives in `vibethink-asset-library/codebases/`) |
+| **3051** | **Shadcn UI Oficial** | Component Library | external reference codebase (`vibethink-asset-library/codebases/`) |
+| **3052** | **React Flow** | Node-based UI | external reference codebase (`vibethink-asset-library/codebases/`) |
+| **3053-3099** | **Disponibles** | Nuevas referencias | - |
+
+> The reference-server start scripts live in each consuming project, not in this
+> supra-repo. The reference codebases themselves live in `vibethink-asset-library`.
 
 > **🔒 Puertos Fijos:** Estos puertos están **bloqueados globalmente** para estos productos específicos.
 > **No cambiar** sin actualizar este documento y todos los scripts afectados.
@@ -169,28 +170,6 @@ Si tu proyecto usa puertos antiguos, migra a los nuevos:
 
 ## 🛠️ Herramientas de Gestión
 
-### Port Manager Module
-
-**Módulo PowerShell para usar en scripts start/stop:**
-
-```powershell
-# Importar módulo
-$DevKitPath = "C:\IA Marcelo Labs\_vibethink-dev-kit"
-$PortManagerPath = Join-Path $DevKitPath "packages\tools\powershell-modules\PortManager\PortManager.psm1"
-Import-Module $PortManagerPath -Force
-
-# Obtener puerto asignado
-$PORT = Get-ReferencePort -ReferenceName "bundui"  # Returns: 3050
-
-# Validar puerto
-Test-PortAssignment -Port 3050 -ReferenceName "bundui"  # Returns: $true
-
-# Mostrar asignación completa
-Show-PortAssignment
-```
-
-**Documentación completa:** `knowledge/guides/PORT_MANAGER_INTEGRATION.md`
-
 ### Verificar Puertos en Uso
 
 ```powershell
@@ -231,9 +210,7 @@ Al agregar una nueva referencia externa:
 ## 🔗 Referencias Relacionadas
 
 ### En Dev-Kit
-- **Port Manager Module:** `packages/tools/powershell-modules/PortManager/` - Módulo PowerShell para scripts
-- **Guía de Integración:** `knowledge/guides/PORT_MANAGER_INTEGRATION.md` - Cómo usar el módulo
-- **Estándar Técnico:** `knowledge/engineering-standards/PORT_MANAGEMENT_STANDARD.md` - Estándar técnico de gestión
+- **Methodology layer:** `knowledge/ai-agents/AGENTS_METHODOLOGY_VIBETHINK.md` §2 - cita este mapa de puertos como capa org (level 2)
 - **AI Agents:** `knowledge/ai-agents/AGENTS_UNIVERSAL.md` - Reglas universales para AI agents
 
 ### En Proyectos
