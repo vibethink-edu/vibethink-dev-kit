@@ -92,7 +92,21 @@ A red machine gate is **read, not assumed**, before any decision:
 - Escalate to the human only a **real blocker that needs judgment** — never an
   unread red, and never a flake.
 
-## 7. Inheritance
+## 7. Review-call discipline
+
+When work is handed to a second architect (an **advisor**) before it is sealed, the
+advisor validates **what the author can prove, not what the author asserts** —
+against real data, with negative cases, distinguishing *"passes today"* from
+*"correct by design"*. The advisor returns **GO** (with the evidence it actually
+ran) or **BLOCKED** (with the specific failing control + file/line) — never an
+unread green.
+
+The living, operational checklist of concrete controls (reality over fixtures,
+recall *and* precision, gates that bite, boundaries grepped not asserted, enforcement
+not authorship, honest close, …) lives in `REVIEW-CALL-CHECKLIST.md` and grows as new
+failure modes are found. This principle stays stable.
+
+## 8. Inheritance
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits
 this protocol. Routing tokens, channel location, inbox/feed tooling, and the set
