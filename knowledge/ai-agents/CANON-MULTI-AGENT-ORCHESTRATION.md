@@ -62,6 +62,29 @@ preemptively.
 - If you cannot name the machine check that confirms a condition, it is a
   judgment gate — escalate it, do not assume it.
 
+## 3.1 Learn before you automate
+
+A capability is automated only after the manual practice has **learned** it — not
+merely repeated it. Doing the work by hand (a human + an agent in a working session)
+is the **learning phase**: it reveals the pattern, what varies, and **where judgment
+lives**. Automation then encodes that understanding.
+
+> **It is not adapting a practice — it is learning, so that automation becomes
+> possible.** You earn the right to automate by learning.
+
+- **Automating what is not yet learned reproduces a misunderstanding at machine
+  speed** — worse than no automation. Don't translate an unlearned practice into a
+  worker; learn it first.
+- **Repeated pain carries two signals:** "this is worth automating" *and* "this has
+  been done enough times to be understood." Until the second is true, keep it manual
+  (§3). This is why building only on real pain is safe — the pain is the proof of
+  learning.
+- **The manual session and the automation are two stages of one model, not two
+  systems.** The session learns it; the automation runs the learned,
+  machine-verifiable part; judgment still escalates to a human (§2–§3). The
+  automation layer **expresses** this protocol — it never forks it, and it never
+  becomes a parallel coordination system.
+
 ## 4. Visibility & interrupt (non-negotiable)
 
 Removing the human from **transport** must never remove the human from
