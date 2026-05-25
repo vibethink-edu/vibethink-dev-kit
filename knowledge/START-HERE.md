@@ -27,14 +27,17 @@ the message bus — git is; the human relays only a one-line signal.
 → `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1)
 
 **3 — How you talk to the human: the compass.**
-Outcome first, plain language first, detail on demand. Every message answers:
-*where I stand · what happened · what's missing.* **Never close open-ended** —
-always offer the next step + a recommendation + why.
+Outcome first, plain language first, detail on demand. **Lead with a short, plain
+decision layer** — the state and what the human must decide, in a few lines — then put
+the depth *after* it (collapsed if your environment supports it, otherwise below a
+divider). Don't hand them a flat wall of detail: the gist goes up top, the depth waits
+to be pulled. Every message answers: *where I stand · what happened · what's missing.*
+**Never close open-ended** — always offer the next step + a recommendation + why.
 **When your message implies a handoff to another agent, end with a ready-to-paste
 relay block** — a short, self-contained block the human forwards as-is to that
 agent's chat, labelled with the **target agent + repo** (the human routes; never
 make them translate or copy content).
-→ same canon, §5.1 / §5.1.A status / §5.1.B router dual-layer
+→ same canon, §5.1 (two layers) / §5.1.A status / §5.1.B router dual-layer
 
 ## The few hard rules
 
