@@ -13,6 +13,40 @@ VibeThink Method is governance-driven: *canon comes first* — no code without a
 governing source, no spec without canon alignment, no decision without capture. It
 is the L1 process skeleton instantiated the VibeThink way.
 
+## How VT-Method works — read this first
+
+You have something to build. VT-Method is the path from idea to a verified result,
+in six steps:
+
+1. **Slice it** — cut the work into the smallest piece that ships and stands on its own.
+2. **Decision gate** — measure impact and risk: trivial or heavy? That decides how
+   much ceremony the work needs (from "just do it" to "full spec"). Present it and
+   wait for GO — never self-clear it.
+3. **Specify** — write the contract at the chosen weight: a short briefing, or a
+   full spec. Heavier risk → heavier spec. Never quietly skip a level.
+4. **Execute, governed** — the author gives exact orders + a checklist; the builder
+   implements and raises blockers; the author verifies against the checklist.
+5. **Leave the trail** — the lifecycle artifacts (requirements, readiness plan,
+   append-only log, roadmap, changelog) so the next person understands without asking.
+6. **Findings** — see something off outside your scope? Record it as a finding —
+   never fix it silently, never lose it.
+
+> **Golden rule:** governance first — canon beats everything, and nothing is built
+> without passing the gate.
+
+### The same thing, as a restaurant
+
+- **Research** — visiting other restaurants to study menus and trends. Intelligence, not rules.
+- **Strategy** — "we'll open a French bistro for the lunch crowd." Direction.
+- **Canon** — the health code, the fire marshal, the permits. Non-negotiable.
+- **Decision gate** — "repaint a wall (just do it)" vs. "redo the kitchen with new gas lines (blueprints + inspections)."
+- **Specification** — the blueprints: precise, measurable.
+- **Briefing** — the work order, with a checklist.
+- **Implementation** — the contractor builds and flags blockers.
+- **Verification** — the inspector checks the build against the blueprints.
+
+The key insight: the research never became the health code — it *informed* it.
+
 ## The L1 pillars, VibeThink-bound
 
 | L1 pillar | VT-Method binding |
