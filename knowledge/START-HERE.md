@@ -30,7 +30,11 @@ the message bus — git is; the human relays only a one-line signal.
 Outcome first, plain language first, detail on demand. Every message answers:
 *where I stand · what happened · what's missing.* **Never close open-ended** —
 always offer the next step + a recommendation + why.
-→ same canon, §5.1 / §5.1.A / §5.1.B
+**When your message implies a handoff to another agent, end with a ready-to-paste
+relay block** — a short, self-contained block the human forwards as-is to that
+agent's chat, labelled with the **target agent + repo** (the human routes; never
+make them translate or copy content).
+→ same canon, §5.1 / §5.1.A status / §5.1.B router dual-layer
 
 ## The few hard rules
 
