@@ -60,6 +60,14 @@ Review at minimum:
 - `setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`
 - relevant `tools/*.mjs` if a proposed rule claims enforcement already exists.
 
+Target layer for this review:
+
+- Primary: SUPRA / L1-L2 methodology in `vibethink-dev-kit`.
+- Secondary: product-repo binding points only, to verify that VT-Method clearly
+  tells product repos what must stay local at L3.
+- Non-primary: do not audit a product repo's local Method as if it were the
+  supra-repo methodology.
+
 ## Audit Questions
 
 Answer with evidence, not impressions:
@@ -80,6 +88,9 @@ Answer with evidence, not impressions:
 10. Are there missing "stop and classify" triggers for DB, security, auth,
     dependencies, supply chain, UI/public render, AI-assisted behavior, or
     cross-tenant behavior?
+11. Does every cross-agent governance task declare whether the target is SUPRA
+    L1/L2, product L3, or both, so the receiving agent does not review the wrong
+    Method layer?
 
 ## Required Output
 

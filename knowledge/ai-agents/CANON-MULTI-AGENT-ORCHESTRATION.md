@@ -38,6 +38,10 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
   working directory and branch. If they point elsewhere, switch to the target repo
   or explicitly report that it cannot access it. Do not perform the work in the
   repo where the inbox item happened to be noticed.
+- A methodology/governance task must also declare the target layer: SUPRA/L1-L2
+  (dev-kit), product/L3 (the product repo's local method binding), or both. The
+  recipient audits the declared layer first. Product-specific method bindings are
+  real and must not be mistaken for the supra-repo methodology itself.
 - "I'll wait for it to go green and tell you when" is wrong. It becomes: *the
   blocked agent watches the gate itself and continues when green* — no relay.
 - A fact one agent knows and another needs is **written to the shared channel**
