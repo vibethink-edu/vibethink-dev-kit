@@ -214,6 +214,20 @@ parser that does not know them ignores them, so v1 messages keep working.
 `project` and `repo` are **per-repo data supplied by the consuming repo's config —
 never product vocabulary baked into this neutral core.**
 
+### Comm authoring rules (machine-parseable — Schema v2)
+
+Real failure modes that make a comm silently invisible (2026-05-24 field report):
+
+- **Front-matter is the first line.** A leading HTML comment or blank line before the
+  `---` block breaks the parser → the comm appears in no inbox.
+- **Address the base agent token** (`codex`, not `codex-rev`). A role suffix written
+  verbatim to `to_agent` is invisible to the base inbox the operator queries; the role
+  is metadata (see Routing of roles, below).
+- **Fields are flat** (`ref_pr`, not a nested `ref:` map) — the front-matter parser
+  is flat (Backing fields, above).
+- **Self-describing across repos:** carry `project` / `repo` / `ref_*` / `tldr` so a
+  human skimming a mixed inbox, or a fresh agent, can orient without opening the file.
+
 ### Routing of roles
 
 A role suffix (`-arq`, `-dev`, `-rev`) is a **hint about which hat to wear, not a
@@ -269,6 +283,27 @@ wall-of-bullets with no outcome and no next step.
 **Enforcement:** referenced from the agent bootstrap so every agent loads it (not
 per-agent taste). A lightweight status-message lint is **deferred until the manual
 review burden is real** (build-on-pain).
+
+## 5.1.B Agent→router message (dual layer)
+
+When the human acts as a **router** between agents (the operator model, §2.1), the
+agent's message MUST carry **two layers**:
+
+- **(A) Human layer** — plain context the human reads to *decide*: what happened,
+  what's missing, recommendation + why. This is §5.1's shape.
+- **(B) Agent layer** — a **paste-able block, ready to forward as-is** to the other
+  agent, with no translation or re-typing by the human.
+
+Rules:
+- Block (B) is **self-contained** — the receiving agent understands it without extra
+  context — and uses the **base agent token** for routing (see Routing of roles).
+- If a handoff is pending and (B) is missing, the message is **incomplete**.
+- The human **decides and forwards**; the human never *translates* content (that would
+  make the human the message bus, §1). The router relays the block; the channel
+  carries the content.
+
+*(Validated live, 2026-05-24: an operator described the dual-layer message as
+making the router role low-friction — "me encanta cómo está cambiando".)*
 
 ## 6. Red-gate discipline
 

@@ -71,11 +71,19 @@ session or agent:
 
 - a **requirements record** (what + why),
 - a **deployment / readiness plan**,
+- a **decision record (ADR)** — the *why* behind each architecture / contract /
+  behaviour decision (context · decision · alternatives · consequences) **and the
+  check that enforces it (§3.1)** so the decision cannot silently drift,
 - an **append-only log** of decisions over time,
 - a **status roadmap**,
 - a **per-unit changelog** (touch a unit → update its changelog in the same change).
 
-Missing artifacts are reconstructed from history rather than left blank.
+Missing artifacts are reconstructed from history rather than left blank. **A decision
+is registered as an ADR** (`ADR-YYYYMMDD-slug`); the *why* is the indexable part, and
+code links back with inline `# WHY:` / `# DECISION:` markers. By layer: an
+agnostic / cross-product decision registers in the supra-repo's decision store, a
+product-specific one in that product's store. (Disposition + indexing rules live in
+the decision-disposition canon.)
 
 ## 6. Findings
 
