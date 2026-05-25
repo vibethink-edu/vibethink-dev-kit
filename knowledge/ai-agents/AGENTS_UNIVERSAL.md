@@ -2,6 +2,8 @@
 
 [![AGENTS.md](https://img.shields.io/badge/AGENTS-UNIVERSAL-blue)](https://agents.md)
 
+> **🚪 ¿Primera vez? Leé `knowledge/START-HERE.md` primero** (la puerta de 2 minutos), después esto.
+>
 > **Este archivo define las reglas GENÉRICAS que TODOS los repos heredan.**
 > Los proyectos específicos extienden estas reglas con su propio `AGENTS.md`.
 >
