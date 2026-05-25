@@ -24,11 +24,14 @@ source; no decision without capture.
    capability contracts, and sealed decisions. Tiered: **sealed** (immutable) →
    **firm** (amend with evidence) → **draft** (not for build). A single named
    authority approves; there is no alternative approver.
-2. **Decision gate** — before each *unit of work* (a **slice** — the smallest
-   change that ships and stands on its own), a gate measures structural impact and
-   author clarity, then selects how much specification ceremony the work warrants.
-   The gate is **presented and waits for an explicit GO** — never self-cleared. A
-   security modifier raises the bar when sensitive surfaces are touched.
+2. **Slice, then gate.** Work is first cut into **slices** — a slice is the smallest
+   change that *ships and stands on its own*: one boundary, one owner, independently
+   verifiable, delivering value by itself. (Too big hides risk inside one gate; too
+   small fragments the trail. The slice is the unit the gate, the spec, and the
+   artifacts all attach to.) Then, before each slice, a **decision gate** measures
+   structural impact and author clarity and selects how much specification ceremony
+   the work warrants — **presented and waiting for an explicit GO**, never
+   self-cleared. A security modifier raises the bar when sensitive surfaces are touched.
 3. **Specification pipeline** — the chosen ceremony produces the contract: a
    **structured spec** for complex or uncertain work, or a lighter **briefing +
    verification matrix** when the author already has full clarity. Match ceremony
@@ -56,8 +59,9 @@ authority has clarity, but a research artifact never changes tier.
 ## 4. How the layers compose
 
 ```
-research (optional) → strategy (optional) → canon (required) → decision gate
-(required) → specification (required) → briefing → implementation → verification
+research (optional) → strategy (optional) → canon (required) → slice (required) →
+decision gate (required) → specification (required) → briefing → implementation →
+verification
 ```
 
 Not every unit traverses all layers: a trivial change may go
