@@ -4,24 +4,27 @@
  *
  * Dev-kit canonical source (inherited by consuming repos as a verbatim copy, per
  * ADR-20260524-supra-repo-inheritance-mechanism). One command for an operator who
- * works across machines / multiple per-repo agent chats: it pulls origin, shows the
- * inbox, and WARNS about (a) local work that has not left this machine
- * (committed-but-unpushed commits, or untracked/uncommitted comm files) and
- * (b) the **wrong-chat guard**: comms in this inbox whose `repo` ≠ the repo this
- * session is in (i.e. "you pasted a comm into the chat of the wrong repo").
+ * works across machines / multiple per-repo agent chats. It:
+ *   1. pulls origin into this machine;
+ *   2. shows a FILTERED inbox — recency hard gate + top-N, so old/low-priority comms
+ *      don't drown the current ones (priority is NOT a freshness signal);
+ *   3. WARNS about (a) the wrong-chat guard (comms whose `repo` ≠ this session's repo)
+ *      and (b) local work that hasn't left this machine (unpushed commits / untracked
+ *      comm files).
  *
- * It does NOT add workstation/host metadata: once pushed the machine of origin is
- * irrelevant (git is the bus) and git log records the committer.
+ * The recency/top-N filter lives here (consumer side); the inbox engine (inbox.mjs)
+ * stays raw so it remains byte-identical across repos.
  *
- * Usage: node tools/comms-sync.mjs <agent|human>
+ * Usage: node tools/comms-sync.mjs <agent|human> [--recency <days>] [--top <N>]
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { matchesInbox, parseCommMeta } from "./inbox.mjs";
+import { collectInbox, matchesInbox, parseCommMeta } from "./inbox.mjs";
 
 const TOOLS = dirname(fileURLToPath(import.meta.url));
+const ARGV = process.argv.slice(2);
 
 function git(args) {
   try {
@@ -43,11 +46,20 @@ function readConfig() {
   }
 }
 
+function flag(name, fallback) {
+  const i = ARGV.indexOf(name);
+  return i !== -1 && ARGV[i + 1] ? ARGV[i + 1] : fallback;
+}
+
 const cfg = readConfig();
-const recipient = process.argv.slice(2).find((a) => !a.startsWith("--")) || "human";
+const recipient = ARGV.find((a) => !a.startsWith("--")) || "human";
 const lane = cfg.lanePath || "docs/ai-coordination/comms";
 const root = git(["rev-parse", "--show-toplevel"]) || process.cwd();
+const laneDir = join(root, lane);
 const currentRepo = cfg.repo || basename(root);
+const agents = Array.isArray(cfg.agents) && cfg.agents.length ? cfg.agents : undefined;
+const RECENCY_DAYS = Number(flag("--recency", 21)) || 21;
+const TOP_N = Number(flag("--top", 12)) || 12;
 
 // 1. PULL — bring origin into this machine.
 console.log("⟳ comms:sync — pulling origin…");
@@ -64,19 +76,37 @@ try {
   );
 }
 
-// 2. INBOX — show what this recipient has open.
+// 2. INBOX — recency hard gate + top-N (old / low-prio don't drown the current ones).
+let items = [];
 try {
-  process.stdout.write(
-    execFileSync("node", [join(TOOLS, "inbox.mjs"), recipient], { encoding: "utf8" })
-  );
+  items = collectInbox(laneDir, recipient, agents ? { agents } : undefined);
 } catch {
-  console.log(`(could not read inbox for "${recipient}")`);
+  /* lane missing */
 }
+const withinRecency = (d) => {
+  if (!d) return false;
+  const days = (Date.now() - Date.parse(`${d}T00:00:00Z`)) / 86400000;
+  return Number.isFinite(days) && days >= 0 && days <= RECENCY_DAYS;
+};
+const recent = items.filter((it) => withinRecency(it.date));
+const shown = recent.slice(0, TOP_N);
+const hidden = items.length - shown.length;
+const moreNote = hidden > 0 ? ` · +${hidden} older/low-prio hidden` : "";
+console.log(
+  `inbox: ${recipient} · ${shown.length} of ${items.length} (recency ${RECENCY_DAYS}d, top ${TOP_N})${moreNote}\n`
+);
+for (const it of shown) {
+  const tag = it.needs === "human" ? "[needs:human] " : "";
+  console.log(
+    `  • ${String(it.priority).padEnd(8)} ${String(it.date).padEnd(10)} ${tag}${it.title}`
+  );
+  console.log(`    from ${it.from} — ${it.file}`);
+}
+console.log(shown.length === 0 ? "  (nothing recent)\n" : "");
 
 // 2b. WRONG-CHAT GUARD — comms in THIS inbox whose `repo` ≠ the repo we're in.
 const mismatched = [];
 try {
-  const laneDir = join(root, lane);
   for (const f of readdirSync(laneDir)) {
     if (!f.endsWith(".md")) continue;
     let fm;
@@ -92,7 +122,7 @@ try {
   /* lane dir missing — nothing to check */
 }
 
-// 3. SYNC STATUS — warn about work that hasn't left this machine + wrong-repo comms.
+// 3. SYNC STATUS — wrong-repo comms + work that hasn't left this machine.
 const branch = git(["branch", "--show-current"]) || "(detached)";
 const ahead = git(["log", "--oneline", "@{u}..HEAD"]); // committed but unpushed
 const dirtyComms = git(["status", "--porcelain", "--", lane]); // untracked/uncommitted in the lane
@@ -106,7 +136,7 @@ if (mismatched.length) {
   );
   for (const m of mismatched) console.log(`      [${m.repo}] ${m.f}`);
   console.log(
-    `    → you are in "${currentRepo}". If it was meant for another repo, act in THAT repo's chat.`
+    `    → you are in "${currentRepo}". If meant for another repo, act in THAT repo's chat.`
   );
 }
 if (ahead) {
