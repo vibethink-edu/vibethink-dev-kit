@@ -55,7 +55,8 @@ The key insight: the research never became the health code — it *informed* it.
 | **Decision gate** | the **3-Gate Preflight**: structural-impact questions (SI count) + author clarity + a security-surface modifier → methodology choice |
 | **Specification pipeline** | **Direct Execution** (default — briefing + V-xx matrix) · **structured spec-kit** (complex discovery) · **interchange-spec** (laboratory) |
 | **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel |
-| **Lifecycle artifacts** | PRD · deployment/readiness plan · append-only log · roadmap · **per-package** changelog |
+| **Lifecycle artifacts** | PRD · deployment/readiness plan · **decision record (ADR)** · append-only log · roadmap · **per-package** changelog |
+| **Decision registration** | ADRs register by layer: agnostic/cross-product → dev-kit `doc/decisions/` (graph-indexed per `CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING`); product-specific → the product's decision store (e.g. a capture-protocol canon + inline `DM-xxx`). Each ADR names its enforcement check (§3.1). |
 | **Findings** | typed finding files in the shared channel (category · location · why · action); security findings escalate immediately |
 
 ## Document authority hierarchy (VibeThink)
