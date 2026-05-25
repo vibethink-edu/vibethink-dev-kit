@@ -14,7 +14,10 @@
     "validate:names": "ls-lint",
     "check:agent-context": "node tools/check-agent-context.mjs",
     "test:agent-context": "node tools/inbox.test.mjs && node tools/feed.test.mjs",
-    "validate:agent-context": "npm run check:agent-context && npm run test:agent-context"
+    "validate:agent-context": "npm run check:agent-context && npm run test:agent-context",
+    "comms:send": "node tools/comms-send.mjs",
+    "comms:security": "node tools/comms-security-gate.mjs",
+    "inbox": "node tools/inbox.mjs"
   },
   "lint-staged": {
     "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": ["biome check --write --no-errors-on-unmatched"],
