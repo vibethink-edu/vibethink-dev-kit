@@ -16,6 +16,13 @@ is to **validate what the author can prove, not what the author asserts** — ag
 real data, with negative cases, distinguishing *"passes today"* from *"correct by
 design"*.
 
+When the decision gate shows high-judgment risk, use the strongest suitable reviewer
+capability available for that risk. In a repo that has access to Opus/Sonnet-class
+reasoning, that capability is appropriate for strategic critique, edge cases, and
+acceptance criteria. The advisor does **not** become the implementer, the source of
+truth, or the final authority; it sharpens the question so the implementer can prove
+reality and the human can decide.
+
 The advisor returns one of two verdicts, each with evidence:
 
 - **GO** — every applicable control below was checked, with the evidence the advisor

@@ -48,6 +48,11 @@ make them translate or copy content).
 - **Learn before you automate.** Do it by hand until you *understand* it; automate only
   the learned, mechanical part — judgment stays with the human. → §3.1
 - **Build on real pain.** Don't add machinery — or canon — ahead of demonstrated need.
+- **Use model strengths deliberately.** When the decision gate shows high-judgment
+  risk, route a review call to the strongest available reviewer capability (for
+  example an Opus/Sonnet-class model) to challenge the frame before implementation.
+  The implementer still proves reality in the repo, and the human still owns the
+  decision.
 - **Per-product specifics** live in that product's own `AGENTS.md`, never here.
 
 ## Your first task (prove you've got it)

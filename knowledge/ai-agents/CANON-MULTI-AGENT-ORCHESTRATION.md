@@ -331,6 +331,12 @@ recall *and* precision, gates that bite, boundaries grepped not asserted, enforc
 not authorship, honest close, …) lives in `REVIEW-CALL-CHECKLIST.md` and grows as new
 failure modes are found. This principle stays stable.
 
+When a repo has access to models with different strengths, use them deliberately:
+the strongest available reviewer capability may challenge the frame, risks, and
+acceptance criteria; the implementation agent still proves reality against the
+repo's data/runtime; the human still decides judgment gates. Capability routing is
+allowed. Authority transfer is not.
+
 ## 8. Inheritance
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits

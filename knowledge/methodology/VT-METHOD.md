@@ -26,6 +26,10 @@ in six steps:
    full spec. Heavier risk → heavier spec. Never quietly skip a level.
 4. **Execute, governed** — the author gives exact orders + a checklist; the builder
    implements and raises blockers; the author verifies against the checklist.
+   When the risk is judgment-heavy, insert the **model-strength dance** before or
+   during execution: a strong advisor model challenges the frame and acceptance
+   criteria; the implementer turns that into a small verified change; the human
+   decides. Do not let the advisor become the implementer or the authority.
 5. **Leave the trail** — the lifecycle artifacts (requirements, readiness plan,
    append-only log, roadmap, changelog) so the next person understands without asking.
 6. **Findings** — see something off outside your scope? Record it as a finding —
@@ -55,6 +59,7 @@ The key insight: the research never became the health code — it *informed* it.
 | **Decision gate** | the **3-Gate Preflight**: structural-impact questions (SI count) + author clarity + a security-surface modifier → methodology choice |
 | **Specification pipeline** | **Direct Execution** (default — briefing + V-xx matrix) · **structured spec-kit** (complex discovery) · **interchange-spec** (laboratory) |
 | **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel |
+| **Model-strength dance** | strongest suitable advisor model for critique → implementer verifies against repo/data/runtime → human decides; model names are per-repo capability choices, not methodology law |
 | **Lifecycle artifacts** | PRD · deployment/readiness plan · **decision record (ADR)** · append-only log · roadmap · **per-package** changelog |
 | **Decision registration** | ADRs register by layer: agnostic/cross-product → dev-kit `doc/decisions/` (graph-indexed per `CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING`); product-specific → the product's decision store (e.g. a capture-protocol canon + inline `DM-xxx`). Each ADR names its enforcement check (§3.1). |
 | **Findings** | typed finding files in the shared channel (category · location · why · action); security findings escalate immediately |
