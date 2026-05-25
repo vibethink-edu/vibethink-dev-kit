@@ -19,7 +19,9 @@ findings. Governance first (canon precedes code).
 
 **2 — How you get & hand off work: the dance.**
 Check your inbox at session start **and on demand** (`inbox <you>`); send through the
-channel. The human is **not** the message bus — git is; the human relays only a
+channel with **`comms:send`** (one governed command: scans for secret values, then
+commits + pushes — so the comm actually travels via git, not just sits as a local
+file). The human is **not** the message bus — git is; the human relays only a
 one-line signal.
 → `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1)
 
