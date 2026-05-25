@@ -19,6 +19,8 @@ fallback that extracts a known agent token — see `CANON-MULTI-AGENT-ORCHESTRAT
 |------|------|-------|
 | 1 | `tools/inbox.mjs` — filtered view for one recipient (agent inbox = recipient self/any + open; human inbox = needs:human + open). Shared `normalizeRecipient` reads `to_agent`, falls back to a known token in the prose `to:` / `**To**:` body header | 32/32 |
 | 2 | `tools/feed.mjs` — chronological river of the whole channel (open AND closed); reuses the shared normalizer | 6/6 |
+| 3a | `tools/comms-send.mjs` — governed send path: secret scan, create-only comm write, commit + push, repo field, and fail-closed governance fields for task/review/audit (`target_layer`, `ref_branch`, `Recipient Self-Check`) | via `npm run check` + dry-run probes |
+| 3b | `tools/comms-sync.mjs` — pull origin, show recipient inbox, and warn about local-only comms / unpushed work on this machine | via dogfood |
 | 4 | `tools/inbox.config.json` — per-repo `lanePath` + known agent tokens (engines fall back to defaults when absent) | — |
 
 Pure Node, no deps, core logic exported + unit-tested. Engines are vendor-neutral
@@ -26,9 +28,14 @@ Pure Node, no deps, core logic exported + unit-tested. Engines are vendor-neutra
 
 ## Next — in logical order
 
-3. **Field lint (advisory).** A non-blocking check that warns when a comm lacks
-   `to_agent`/`status`, or has `needs` without a recipient. Advisory only — it
-   nudges the convention, never blocks. Ship with tests.
+3. **Field lint (advisory + targeted hardening).** Keep the current fail-closed
+   governance checks in `comms-send`, then add focused hardening only where pain
+   was observed:
+   - warn on `TASK-*` docs that have no dispatched comm;
+   - audit routing fields beyond manual inspection;
+   - strengthen `Recipient Self-Check` validation so an empty heading cannot pass;
+   - preserve all-caps acronyms in `comms-send` commit subjects (`PR`, `ADR`).
+   Tracked in issue #23.
 4. ~~**Per-repo config.**~~ ✅ Done — `tools/inbox.config.json` declares `lanePath`
    + known agent tokens; engines fall back to defaults + `--lane` when absent.
 5. **Activation = wiring + seed.** Copy the engines + config into each consuming
@@ -39,10 +46,10 @@ Pure Node, no deps, core logic exported + unit-tested. Engines are vendor-neutra
 
 ## Bigger roadmap (queued, separate efforts)
 
-- **OPUS VT-Method exhaustive audit.** Open task:
-  `doc/TASK-OPUS-VT-METHOD-EXHAUSTIVE-AUDIT-2026-05-25.md`. Review whether the
-  methodology still has holes where rules rely on human memory instead of
-  agent-triggered detection, artifacts, and checks.
+- **Governance enforcement hardening.** Follow-up issue #23 tracks the remaining
+  non-blocking notes from PR #21: decision-capture check, dispatch/routing lint,
+  Self-Check content validation, and commit-subject acronym preservation. Build
+  only when the manual gap hurts or as a focused enforcement slice.
 - **Agents-off hygiene window** — the safe execution moment for reaping paused
   work. See `doc/decisions/ADR-20260522-paused-work-lifecycle.md`.
 
@@ -51,3 +58,4 @@ Pure Node, no deps, core logic exported + unit-tested. Engines are vendor-neutra
 - `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (the model)
 - `knowledge/architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md`
 - `doc/decisions/ADR-20260522-paused-work-lifecycle.md`
+- GitHub issue #23 — follow-up enforcement notes from PR #21
