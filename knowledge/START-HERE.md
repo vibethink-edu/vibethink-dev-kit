@@ -21,8 +21,9 @@ findings. Governance first (canon precedes code).
 Check your inbox at session start **and on demand** (`inbox <you>`); send through the
 channel with **`comms:send`** (one governed command: scans for secret values, then
 commits + pushes — so the comm actually travels via git, not just sits as a local
-file). The human is **not** the message bus — git is; the human relays only a
-one-line signal.
+file). On a new or second machine, **`comms:sync <you>`** pulls origin + shows your
+inbox + warns if this machine has work that hasn't been pushed. The human is **not**
+the message bus — git is; the human relays only a one-line signal.
 → `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1)
 
 **3 — How you talk to the human: the compass.**

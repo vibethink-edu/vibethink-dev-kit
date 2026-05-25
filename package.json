@@ -17,6 +17,7 @@
     "validate:agent-context": "npm run check:agent-context && npm run test:agent-context",
     "comms:send": "node tools/comms-send.mjs",
     "comms:security": "node tools/comms-security-gate.mjs",
+    "comms:sync": "node tools/comms-sync.mjs",
     "inbox": "node tools/inbox.mjs"
   },
   "lint-staged": {
