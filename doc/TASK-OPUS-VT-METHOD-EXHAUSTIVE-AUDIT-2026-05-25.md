@@ -6,6 +6,8 @@ priority: high
 date: 2026-05-25
 from: Marcelo via codex-arq
 repo: vibethink-dev-kit
+target_layer: SUPRA-L1L2
+ref_branch: codex/docs-decision-trigger-enforcement-2026-05-25
 
 ## Mission
 
@@ -20,6 +22,7 @@ Before reviewing anything, verify you are in the correct repo:
 - Target repo: `vibethink-dev-kit`
 - Target path: `C:/IA Marcelo Labs/_vibethink-dev-kit`
 - Target branch: `codex/docs-decision-trigger-enforcement-2026-05-25`
+- Target layer: `SUPRA-L1L2`
 
 If you picked this up from a product repo inbox, switch to the dev-kit repo and
 branch first. Do not audit the ViTo product repo as the primary target. ViTo is

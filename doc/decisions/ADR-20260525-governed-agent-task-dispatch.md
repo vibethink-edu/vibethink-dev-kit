@@ -39,13 +39,19 @@ local doc.
 When receiving work from an inbox item, the recipient agent must self-check the
 target before acting:
 
-1. Read `repo`, `ref_branch`, `ref_doc`, `ref_pr`, and any explicit path in the
-   comm body.
-2. Compare those fields to the current working directory and branch.
-3. If they do not match, switch to the target repo/branch before acting, or report
-   that the target is inaccessible.
+1. Read `repo`, `target_layer`, `ref_branch`, `ref_doc`, `ref_pr`, and any
+   explicit path in the comm body.
+2. Compare those fields to the current working directory, branch, and methodology
+   layer.
+3. If they do not match, switch to the target repo/branch/layer before acting, or
+   report that the target is inaccessible.
 4. Never perform the task in the repo where the comm was merely noticed unless
    that repo is the target.
+
+Governance `task`, `review`, and `audit` comms must include `target_layer:`
+(`SUPRA-L1L2`, `product-L3`, or `both`), `ref_branch:`, and a body section titled
+`Recipient Self-Check` that repeats the repo, branch, layer, and primary paths in
+plain language for the recipient.
 
 ## Alternatives rejected
 

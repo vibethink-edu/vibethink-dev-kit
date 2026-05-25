@@ -22,9 +22,10 @@
 >   (el binding indexable por un knowledge-graph). Los markers inline son
 >   *advisory* para el lector humano y enlazan al ADR; no lo reemplazan para
 >   indexación. Antes de implementar una dependencia, runtime, CDN/font/render
->   source, contrato o boundary cross-tenant, clasificá si requiere ADR/canon y
->   escribilo primero. Las decisiones son ciudadanos de primera clase del repo, no
->   efímeras de la conversación.
+>   source, contrato, boundary cross-tenant, o comportamiento AI-assisted /
+>   model-driven (worker, assistant flow, extracción, acción elegida por modelo),
+>   clasificá si requiere ADR/canon y escribilo primero. Las decisiones son
+>   ciudadanos de primera clase del repo, no efímeras de la conversación.
 
 ---
 

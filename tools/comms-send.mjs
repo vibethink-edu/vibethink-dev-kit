@@ -13,7 +13,8 @@
  *      writing anything. Uses the SAME patterns as the pre-commit gate
  *      (tools/comms-security-gate.mjs) so there is zero drift.
  *   2. GOVERNED with criteria — validate frontmatter (to_agent/status/date/from/re),
- *      lane-scoped writes only, create-only (never overwrite a comm), known type.
+ *      require target_layer/ref_branch for governance tasks, lane-scoped writes
+ *      only, create-only (never overwrite a comm), known type.
  *   3. AUTOMATIC, not damaged — still ONE command; criteria run silently on the
  *      happy path. Safety may block the automatic; governance adds no friction.
  *
@@ -23,6 +24,7 @@
  * Usage:
  *   node tools/comms-send.mjs --to <agent|human> --type <task|finding|...> \
  *     --re "<subject>" [--priority high] [--from <id>] [--status open] \
+ *     [--target-layer SUPRA-L1L2|product-L3|both] [--ref-branch <branch>] \
  *     [--summary "<1-line>"] (--body "<text>" | --body-file <path>) [--dry-run] [--no-push]
  *
  * Exit codes: 0 ok · 1 SAFETY block (secret) · 2 governance/validation error ·
@@ -82,6 +84,8 @@ export const KNOWN_TYPES = [
   "guide",
   "audit",
 ];
+export const GOVERNANCE_TYPES = new Set(["task", "review", "audit"]);
+export const TARGET_LAYERS = new Set(["SUPRA-L1L2", "product-L3", "both"]);
 
 /** SAFETY: secret VALUES in the comm content (shared patterns — no drift). */
 export function scanSecrets(content) {
@@ -115,14 +119,27 @@ export function buildFilename(type, re, date) {
 }
 
 /** GOVERNANCE: returns an array of error strings ([] = valid). */
-export function validate({ to, type, re, body }) {
+export function validate({ to, type, re, body, targetLayer, refBranch }) {
   const errors = [];
+  const normalizedType = String(type ?? "").toLowerCase();
   if (!to || !String(to).trim()) errors.push('--to is required (agent token or "human")');
   if (!type || !String(type).trim()) errors.push("--type is required");
-  else if (!KNOWN_TYPES.includes(String(type).toLowerCase()))
+  else if (!KNOWN_TYPES.includes(normalizedType))
     errors.push(`--type "${type}" is not known (${KNOWN_TYPES.join(", ")})`);
   if (!re || !String(re).trim()) errors.push('--re "<subject>" is required');
   if (!body || !String(body).trim()) errors.push("a body is required (--body or --body-file)");
+  if (GOVERNANCE_TYPES.has(normalizedType)) {
+    if (!targetLayer || !String(targetLayer).trim())
+      errors.push(`--target-layer is required for ${normalizedType} comms`);
+    else if (!TARGET_LAYERS.has(String(targetLayer)))
+      errors.push(`--target-layer must be one of: ${[...TARGET_LAYERS].join(", ")}`);
+    if (!refBranch || !String(refBranch).trim())
+      errors.push(`--ref-branch is required for ${normalizedType} comms`);
+    if (!/^## Recipient Self-Check\b/m.test(String(body)))
+      errors.push(
+        `body must include a "## Recipient Self-Check" section for ${normalizedType} comms`
+      );
+  }
   return errors;
 }
 
@@ -138,6 +155,8 @@ export function buildComm({
   date = today(),
   summary = "",
   repo = REPO,
+  targetLayer = "",
+  refBranch = "",
 }) {
   const toAgent = String(to).toLowerCase();
   const needs = toAgent === "human" ? "human" : "agent";
@@ -150,6 +169,8 @@ export function buildComm({
     // The repo this comm pertains to / where to act — lets a recipient detect a
     // mismatch with the repo it is actually in (comms:sync warns; the wrong-chat guard).
     ...(repo && String(repo).trim() ? [`repo: ${repo}`] : []),
+    ...(targetLayer && String(targetLayer).trim() ? [`target_layer: ${targetLayer}`] : []),
+    ...(refBranch && String(refBranch).trim() ? [`ref_branch: ${refBranch}`] : []),
     `status: ${status}`,
     `needs: ${needs}`,
     `priority: ${priority}`,
@@ -191,6 +212,8 @@ function parseArgs(argv) {
     status: get("--status") || "open",
     summary: get("--summary") || "",
     repo: get("--repo"), // override the target repo; defaults to this repo (REPO)
+    targetLayer: get("--target-layer"),
+    refBranch: get("--ref-branch"),
     body,
     dryRun: argv.includes("--dry-run"),
     noPush: argv.includes("--no-push"),

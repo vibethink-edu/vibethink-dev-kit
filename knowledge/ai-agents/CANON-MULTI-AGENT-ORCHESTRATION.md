@@ -34,14 +34,16 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
   manually create the comm in the shared channel with valid front matter, then
   commit, push, and verify routing. The human must not be the reminder.
 - A receiving agent must self-orient before acting on any inbox item: compare the
-  comm's `repo` / `ref_branch` / `ref_doc` / `ref_pr` fields against its current
-  working directory and branch. If they point elsewhere, switch to the target repo
-  or explicitly report that it cannot access it. Do not perform the work in the
-  repo where the inbox item happened to be noticed.
-- A methodology/governance task must also declare the target layer: SUPRA/L1-L2
-  (dev-kit), product/L3 (the product repo's local method binding), or both. The
-  recipient audits the declared layer first. Product-specific method bindings are
-  real and must not be mistaken for the supra-repo methodology itself.
+  comm's `repo` / `ref_branch` / `ref_doc` / `ref_pr` / `target_layer` fields
+  against its current working directory, branch, and methodology layer. If they
+  point elsewhere, switch to the target repo/branch/layer or explicitly report
+  that it cannot access them. Do not perform the work in the repo where the inbox
+  item happened to be noticed.
+- A methodology/governance `task`, `review`, or `audit` must declare
+  `target_layer:` (`SUPRA-L1L2`, `product-L3`, or `both`) and `ref_branch:` as
+  required front-matter fields, and must include a **Recipient Self-Check** block.
+  The recipient audits the declared layer first. Product-specific method bindings
+  are real and must not be mistaken for the supra-repo methodology itself.
 - "I'll wait for it to go green and tell you when" is wrong. It becomes: *the
   blocked agent watches the gate itself and continues when green* — no relay.
 - A fact one agent knows and another needs is **written to the shared channel**
@@ -224,7 +226,8 @@ parser that does not know them ignores them, so v1 messages keep working.
 | `tldr` | HAPPENED | one jargon-free line |
 | `reversible` | HEADS-UP | `yes` \| `no` — whether a wrong choice can be undone |
 | `on_no_reply` | HEADS-UP | what happens if the human stays silent (proceeds / blocks / expires + when) |
-| `ref_pr` / `ref_branch` / `ref_doc` / `ref_spec` | FULL | **flat keys** — the front-matter parser is flat; nested maps are not supported |
+| `target_layer` | WHERE | required for governance `task` / `review` / `audit`: `SUPRA-L1L2`, `product-L3`, or `both` |
+| `ref_pr` / `ref_branch` / `ref_doc` / `ref_spec` | FULL | **flat keys** — `ref_branch` is required for governance `task` / `review` / `audit`; nested maps are not supported |
 | `protocol` | — | schema version marker (e.g. `cross-agent-comm/v2`) |
 
 `project` and `repo` are **per-repo data supplied by the consuming repo's config —
@@ -243,6 +246,10 @@ Real failure modes that make a comm silently invisible (2026-05-24 field report)
   is flat (Backing fields, above).
 - **Self-describing across repos:** carry `project` / `repo` / `ref_*` / `tldr` so a
   human skimming a mixed inbox, or a fresh agent, can orient without opening the file.
+- **Governance task self-check:** every governance `task`, `review`, or `audit`
+  carries `target_layer`, `ref_branch`, and a body section titled
+  `Recipient Self-Check` that names the repo, branch, layer, and primary paths to
+  verify before acting.
 
 ### Routing of roles
 

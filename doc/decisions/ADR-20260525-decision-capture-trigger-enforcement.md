@@ -6,9 +6,9 @@
 
 ## Decision
 
-Every inherited repo must treat architecture, contract, behavior, dependency,
-runtime, and supply-chain decisions as capture-triggering events before
-implementation proceeds.
+Every inherited repo must treat architecture, contract, behavior, AI-assisted /
+model-driven behavior, dependency, runtime, and supply-chain decisions as
+capture-triggering events before implementation proceeds.
 
 ## Why
 
@@ -33,6 +33,8 @@ classify whether an ADR or canon update is required:
 - contract shape or schema;
 - cross-tenant behavior;
 - security, data, auth, or privacy boundary;
+- AI-assisted / model-driven behavior, including a worker, assistant flow,
+  extraction flow, or model-chosen action;
 - behavior standard that future agents must remember.
 
 If the answer is yes, the agent writes the decision record first, in the
@@ -53,6 +55,9 @@ appropriate repo/layer, and only then continues.
 - Product repos inherit the reflex and bind it to their local ADR/canon store.
 - Governance gates can later detect dependency/runtime diffs without an ADR
   reference.
+- Product repos can bind this supra trigger to their own checks; ViTo's
+  `ADR-031` #3 is the product-side binding for the future governance validation
+  check.
 - A finding may still be used for anomalies, but it does not replace a decision
   record when a rule or architecture choice is being made.
 
