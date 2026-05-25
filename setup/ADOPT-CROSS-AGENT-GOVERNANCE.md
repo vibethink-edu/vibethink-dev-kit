@@ -143,4 +143,6 @@ node <kit>/tools/inbox.mjs <agent> --lane docs/ai-coordination/comms
 | Review checklist | `REVIEW-CALL-CHECKLIST.md` | — (inherited) |
 
 **Canon:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (§6 smoke, §7 inheritance) ·
-`CANON-MULTI-AGENT-ORCHESTRATION.md` (§5 routing, §7 review-call, §8 inheritance).
+`CANON-MULTI-AGENT-ORCHESTRATION.md` (§2.1 pull modes, §3.1 learn-before-automate,
+§5 routing, §5.1 human-actionable shape + §5.1.A status / §5.1.B router message,
+§7 review-call, §8 inheritance).
