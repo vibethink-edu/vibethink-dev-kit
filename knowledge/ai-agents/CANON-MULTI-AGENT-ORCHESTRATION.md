@@ -207,6 +207,46 @@ no engine change. Rendering the card in the inbox/feed listing, and normalizing
 role suffixes, are engine changes — made **test-first** in this kit, then inherited
 verbatim by every repo (§8). No repo forks the engine.
 
+## 5.1.A Agent→human status-message contract (enforceable profile of §5.1)
+
+This is the **chat** profile of §5.1 (§2.1: operators read in long-lived chats), with
+teeth. A status message is read by a human who may hold **zero prior context**; one
+read must answer *what happened, what it RESULTED IN, and what to do next.*
+
+> **Outcome before activity.** "I did X" without the outcome of X is non-compliant.
+> An analysis reports its verdict; code reports what now works or changed.
+
+It uses §5.1's two layers (plain first, complete on demand). Required order:
+
+1. **Lede (1 line)** — what happened + what you need from the human.
+2. **Result / verdict** — the *outcome*, not "done" (the conclusion: verdict, score,
+   pass/fail; or what now works/changed). This is §5.1's `HAPPENED`, sharpened to the
+   outcome.
+3. **Where** — PR / branch / files / artifact (§5.1 `WHERE`).
+4. **What's next + the ask** — the explicit next action and the decision needed
+   (GO / review / merge / ping X), or "no action needed" (§5.1 `DO` + decision aids).
+5. **Detail** — everything else, below the fold (§5.1 `FULL`).
+
+**MUST / MUST NOT (testable):**
+- MUST lead with outcome, not activity.
+- MUST state the verdict/result of any analysis or evaluation delivered.
+- MUST end the top block with an explicit ask or "no action needed".
+- MUST NOT assume prior context — name the thing ("the same one as before" = fail).
+- MUST be two-layer (plain first, depth on demand) — never a flat dump.
+- SHOULD keep the lede ≤2 lines; the top block scannable in <10 seconds.
+
+**Failure modes (a `*-rev` agent MAY reject and ask for a re-issue):** activity-only
+with the result missing · buried lede / no ask · context-assuming references ·
+wall-of-bullets with no outcome and no next step.
+
+**Self-check (run before sending):** (1) first line = outcome + what I need ·
+(2) verdict/result explicit, not "done" · (3) next action + ask present (or "none") ·
+(4) a zero-context reader understands it · (5) plain-first, detail-below.
+
+**Enforcement:** referenced from the agent bootstrap so every agent loads it (not
+per-agent taste). A lightweight status-message lint is **deferred until the manual
+review burden is real** (build-on-pain).
+
 ## 6. Red-gate discipline
 
 A red machine gate is **read, not assumed**, before any decision:
