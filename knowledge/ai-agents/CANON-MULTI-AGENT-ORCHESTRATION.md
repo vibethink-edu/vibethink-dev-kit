@@ -125,9 +125,31 @@ them** — do not lead with technical detail and bury the decision.
 ```
 🧭 WHERE     <project> · <repo>   ·   state: <waiting-you | blocked | fyi | done>
 📋 HAPPENED  <one line, no jargon — what this is>
-🎯 DO        <imperative action>   →   <literal next step, paste-able>
-📄 FULL      <link / fold to the complete layer>   (only when more is needed)
+🎯 DO        choose: A (recommended) / B / C   →   <literal next step, paste-able>
+⚖️ HEADS-UP  if you choose wrong: <reversible | irreversible>  ·  if you don't reply: <what happens>
+📄 FULL      <link / fold to the complete layer>   (cost · confidence · thread live here)
 ```
+
+### Decision aids (when the message is a decision gate)
+
+A decision gate is neither a bare command nor a neutral menu. When a human must
+choose, the plain layer carries three aids so the human decides **fast and safe**:
+
+1. **Options + a recommendation with its reason.** Present the real choices, say
+   which one you recommend, and why — in one line. Never a bare imperative; never
+   options laid out neutrally with no recommendation. The author already did the
+   thinking; surface it.
+2. **Consequence of silence.** State what happens if the human does not respond —
+   auto-proceeds, blocks, or expires (and when). Silence is a valid input only when
+   its effect is known.
+3. **Reversibility.** Say whether a wrong choice can be undone. Reversible → the
+   human can decide quickly; irreversible → the human is told to slow down. This is
+   the safety boundary (§3) made visible to the decider.
+
+Keep these **folded into the existing lines — plug, do not stack.** The card must
+stay glanceable; the moment it becomes a form, the human is an investigator again.
+Secondary context (effort/cost, the agent's confidence + evidence, the prior thread
+this continues) lives in the **complete layer**, never on the plain card.
 
 ### Backing fields (machine layer — extends §5, additive & backward-compatible)
 
@@ -140,6 +162,8 @@ parser that does not know them ignores them, so v1 messages keep working.
 | `repo` | WHERE | git repo to act in; auto-resolved from config |
 | `action` | DO | one of `decide` \| `review` \| `implement` \| `handoff` \| `fyi` |
 | `tldr` | HAPPENED | one jargon-free line |
+| `reversible` | HEADS-UP | `yes` \| `no` — whether a wrong choice can be undone |
+| `on_no_reply` | HEADS-UP | what happens if the human stays silent (proceeds / blocks / expires + when) |
 | `ref_pr` / `ref_branch` / `ref_doc` / `ref_spec` | FULL | **flat keys** — the front-matter parser is flat; nested maps are not supported |
 | `protocol` | — | schema version marker (e.g. `cross-agent-comm/v2`) |
 
