@@ -228,7 +228,11 @@ if (isMain()) {
   writeFileSync(absPath, content, "utf8");
   try {
     execFileSync("git", ["add", "--", relPath], { cwd: root, stdio: "pipe" });
-    execFileSync("git", ["commit", "-m", `comms: ${String(args.type).toUpperCase()} ${args.re}`], {
+    // Conventional-commit message (type docs, scope comms) with a lowercased subject,
+    // so it passes commitlint anywhere — not a custom "comms:" type (which the
+    // standard config-conventional enum rejects).
+    const subject = `${args.re.charAt(0).toLowerCase()}${args.re.slice(1)}`;
+    execFileSync("git", ["commit", "-m", `docs(comms): ${subject}`], {
       cwd: root,
       stdio: "pipe",
     });
