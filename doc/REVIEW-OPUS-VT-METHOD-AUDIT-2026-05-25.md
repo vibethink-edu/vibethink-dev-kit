@@ -97,4 +97,24 @@ NO-BRAIN-NO-WORK · "read AGENTS.md before task" · status-message §5.1.A (lint
 ## 8. Non-scope honored
 No product ViTo/XMS fix implemented. Methodology not rewritten. Nothing sealed (Marcelo seals). No heavy tooling added — every check is *proposed* with a justified gap, deferred to a pain signal per build-on-pain. ViTo audited only as incident context / L3 boundary check, not as primary Method. Branch left as found.
 
-**END OF REVIEW — `PASS-WITH-FINDINGS` (branch may merge; F3 + F9 recommended as same-branch patches; F1/F2 as named follow-ups)**
+## 9. Re-review — commit `57c3bef` (codex closed F3 + F9)
+
+Verified **empirically on the branch**, not by reading alone:
+
+- **F3 ✅** — "AI-assisted / model-driven behavior" present in all 3 homes (VT-METHOD §2, DECISION-DISPOSITION #6, AGENTS_UNIVERSAL).
+- **F9 ✅ — and it BITES.** `comms-send` now enforces governance fields for `task`/`review`/`audit`. Known-bad / known-good run:
+  - task without `target_layer` → rejected, **exit 2** (`--target-layer is required`, `--ref-branch is required`, `body must include "## Recipient Self-Check"`).
+  - invalid `target_layer=WRONG` → rejected (`must be one of: SUPRA-L1L2, product-L3, both`).
+  - valid governance task → passes field validation.
+  - non-governance `delivery` → **exit 0** (not over-eager).
+  - *Beyond the ask:* the Recipient Self-Check is now an **enforced body requirement**, not just prose.
+- **Cross-ref ✅** — trigger ADR references ViTo `ADR-031` #3 as the product binding (closes the F1 drift seam).
+- `npm run check` PASS (codex) + this empirical gate test.
+
+**Updated verdict: `READY-MERGE`.** The branch may merge as-is; no further patches are needed in it.
+
+**One follow-up joins F2 (NOT blocking):** the new `comms-send` governance validation has **no automated regression test** — same class as F2 (a gate that bites today but isn't guarded against silently regressing). I bit it by hand; it should get a negative-fixture test in the **F2 follow-up**, not in this branch.
+
+---
+
+**END OF REVIEW — re-review verdict `READY-MERGE` (57c3bef closes F3 + F9, verified; F1/F2 + the F9 regression test remain named follow-ups, none blocking)**
