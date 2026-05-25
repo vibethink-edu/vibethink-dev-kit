@@ -36,6 +36,17 @@ If the send tool is unavailable, manually create the shared-channel comm with
 valid front matter, commit it, push it, and verify inbox routing. Do not stop at a
 local doc.
 
+When receiving work from an inbox item, the recipient agent must self-check the
+target before acting:
+
+1. Read `repo`, `ref_branch`, `ref_doc`, `ref_pr`, and any explicit path in the
+   comm body.
+2. Compare those fields to the current working directory and branch.
+3. If they do not match, switch to the target repo/branch before acting, or report
+   that the target is inaccessible.
+4. Never perform the task in the repo where the comm was merely noticed unless
+   that repo is the target.
+
 ## Alternatives rejected
 
 - **Local task file only** - indexable, but not delivered to the recipient inbox.
@@ -46,6 +57,8 @@ local doc.
 
 - Any future agent can identify whether a task was actually dispatched by looking
   for the shared-channel comm.
+- Any receiving agent can identify the correct repo/branch without relying on the
+  human to redirect it.
 - Long-form task docs remain allowed, but they are references, not dispatch.
 - The recipient's inbox becomes the source of truth for open assigned work.
 - Tooling can later lint for `TASK-*` docs that have no matching comms dispatch.

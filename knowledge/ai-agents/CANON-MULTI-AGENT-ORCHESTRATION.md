@@ -33,6 +33,11 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
   recipient inbox (`node tools/inbox.mjs <agent>`). If the command is unavailable,
   manually create the comm in the shared channel with valid front matter, then
   commit, push, and verify routing. The human must not be the reminder.
+- A receiving agent must self-orient before acting on any inbox item: compare the
+  comm's `repo` / `ref_branch` / `ref_doc` / `ref_pr` fields against its current
+  working directory and branch. If they point elsewhere, switch to the target repo
+  or explicitly report that it cannot access it. Do not perform the work in the
+  repo where the inbox item happened to be noticed.
 - "I'll wait for it to go green and tell you when" is wrong. It becomes: *the
   blocked agent watches the gate itself and continues when green* — no relay.
 - A fact one agent knows and another needs is **written to the shared channel**

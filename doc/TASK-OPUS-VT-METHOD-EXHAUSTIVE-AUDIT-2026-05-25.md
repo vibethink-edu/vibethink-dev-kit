@@ -13,6 +13,18 @@ Run an exhaustive, auditable review of VT-Method and the supra-repo governance
 spine. The goal is to find methodological holes before they become product drift.
 This review must strengthen VT-Method, not merely approve the current documents.
 
+## Recipient Self-Check
+
+Before reviewing anything, verify you are in the correct repo:
+
+- Target repo: `vibethink-dev-kit`
+- Target path: `C:/IA Marcelo Labs/_vibethink-dev-kit`
+- Target branch: `codex/docs-decision-trigger-enforcement-2026-05-25`
+
+If you picked this up from a product repo inbox, switch to the dev-kit repo and
+branch first. Do not audit the ViTo product repo as the primary target. ViTo is
+only the incident context that exposed the methodology gap.
+
 ## Trigger / Background
 
 During XMS Ovitality Framer Motion work in the product repo, Marcelo identified a
