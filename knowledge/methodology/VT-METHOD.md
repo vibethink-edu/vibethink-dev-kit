@@ -22,6 +22,10 @@ in six steps:
 2. **Decision gate** — measure impact and risk: trivial or heavy? That decides how
    much ceremony the work needs (from "just do it" to "full spec"). Present it and
    wait for GO — never self-clear it.
+   If the work introduces or expands an architecture, contract, behavior standard,
+   production dependency, runtime framework, CDN/font/render source, or cross-tenant
+   boundary, stop and classify the decision first. If it needs an ADR/canon update,
+   write that record before implementation; do not wait for the human to request it.
 3. **Specify** — write the contract at the chosen weight: a short briefing, or a
    full spec. Heavier risk → heavier spec. Never quietly skip a level.
 4. **Execute, governed** — the author gives exact orders + a checklist; the builder
