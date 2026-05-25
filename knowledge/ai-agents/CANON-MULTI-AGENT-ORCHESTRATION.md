@@ -80,6 +80,88 @@ just prose a human must read:
   still route while new ones use the canonical field. inbox and feed share **one**
   normalizer so they can never disagree on who a message is for.
 
+## 5.1 Human-actionable shape — the orientation contract
+
+§5 routes messages for *machines*. This section makes the same messages
+**actionable for a human** — so a human reading an inbox that mixes projects and
+repos can act **without opening the thread, reconstructing context, or asking
+"what does this even mean?"**
+
+> **The human is the navigator, not the investigator.**
+> A message must orient the human; it must never force the human to dig to
+> understand it.
+
+### The compass (every human-facing message answers three questions)
+
+A human who is lost must be able to ask for — and always receive — the same three
+orientation answers. This triad is the compass:
+
+| Compass question | Answered by |
+|------------------|-------------|
+| **Where do I stand?** | `project` · `repo` · current `state` |
+| **What has happened?** | a one-line, jargon-free summary (`tldr`) |
+| **What is missing / what do I do?** | the `action` + the literal next step |
+
+These three are the floor. A message that cannot answer them is not ready to send
+to a human. "Tell me where I'm standing, what happened, and what's missing" is a
+request any agent must be able to satisfy on demand, for any piece of work.
+
+### Two layers (plain first, complete on demand)
+
+Every human-facing message carries **two layers**:
+
+1. **Plain layer (always visible)** — the compass answers + the one action, in
+   non-technical language. Short. No vendor, tool, or implementation jargon. This
+   is what a tired human reads at a glance to decide.
+2. **Complete layer (on demand)** — everything: references (PR/branch/doc),
+   technical detail, links. Folded or linked, never forced. The human opens it
+   only if they choose to.
+
+The plain layer is the contract; the complete layer is the backup. **Never invert
+them** — do not lead with technical detail and bury the decision.
+
+### The card (plain-layer shape)
+
+```
+🧭 WHERE     <project> · <repo>   ·   state: <waiting-you | blocked | fyi | done>
+📋 HAPPENED  <one line, no jargon — what this is>
+🎯 DO        <imperative action>   →   <literal next step, paste-able>
+📄 FULL      <link / fold to the complete layer>   (only when more is needed)
+```
+
+### Backing fields (machine layer — extends §5, additive & backward-compatible)
+
+The card is rendered from front-matter fields. New fields are **additive**: a
+parser that does not know them ignores them, so v1 messages keep working.
+
+| Field | Feeds | Notes |
+|-------|-------|-------|
+| `project` | WHERE | human project name; **auto-resolved** from the repo's inbox config, not typed per message |
+| `repo` | WHERE | git repo to act in; auto-resolved from config |
+| `action` | DO | one of `decide` \| `review` \| `implement` \| `handoff` \| `fyi` |
+| `tldr` | HAPPENED | one jargon-free line |
+| `ref_pr` / `ref_branch` / `ref_doc` / `ref_spec` | FULL | **flat keys** — the front-matter parser is flat; nested maps are not supported |
+| `protocol` | — | schema version marker (e.g. `cross-agent-comm/v2`) |
+
+`project` and `repo` are **per-repo data supplied by the consuming repo's config —
+never product vocabulary baked into this neutral core.**
+
+### Routing of roles
+
+A role suffix (`-arq`, `-dev`, `-rev`) is a **hint about which hat to wear, not a
+separate inbox.** Routing normalizes a role-suffixed recipient token to its base
+agent token (`codex-rev` → `codex`) so a role-addressed message still reaches the
+agent's base inbox; the role travels as displayed metadata. An agent picks up its
+inbox regardless of the hat it is asked to wear.
+
+### Implementation note (contract vs engine)
+
+This section is the **contract**. Authoring the fields (the consuming repo's send
+tool fills `project`/`repo` from its config) is the zero-risk first step and needs
+no engine change. Rendering the card in the inbox/feed listing, and normalizing
+role suffixes, are engine changes — made **test-first** in this kit, then inherited
+verbatim by every repo (§8). No repo forks the engine.
+
 ## 6. Red-gate discipline
 
 A red machine gate is **read, not assumed**, before any decision:
