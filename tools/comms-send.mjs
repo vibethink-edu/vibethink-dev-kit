@@ -30,7 +30,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { HIGH_CONFIDENCE_PATTERNS } from "./comms-security-gate.mjs";
 
@@ -47,6 +47,27 @@ function resolveLane() {
 }
 
 export const LANE = resolveLane();
+
+/** This repo's canonical name — written to the comm's `repo` field (the routing/guard
+ *  target, so a recipient can tell it's reading a comm meant for a different repo). */
+function resolveRepo() {
+  try {
+    const cfgPath = join(dirname(fileURLToPath(import.meta.url)), "inbox.config.json");
+    const cfg = JSON.parse(readFileSync(cfgPath, "utf8"));
+    if (cfg.repo) return cfg.repo;
+  } catch {
+    /* fall through to git */
+  }
+  try {
+    const top = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
+    if (top) return basename(top);
+  } catch {
+    /* no git — leave empty */
+  }
+  return "";
+}
+
+export const REPO = resolveRepo();
 export const KNOWN_TYPES = [
   "task",
   "finding",
@@ -116,6 +137,7 @@ export function buildComm({
   status = "open",
   date = today(),
   summary = "",
+  repo = REPO,
 }) {
   const toAgent = String(to).toLowerCase();
   const needs = toAgent === "human" ? "human" : "agent";
@@ -125,6 +147,9 @@ export function buildComm({
     `from: ${from}`,
     `to_agent: ${toAgent}`,
     `to: ${to}`,
+    // The repo this comm pertains to / where to act — lets a recipient detect a
+    // mismatch with the repo it is actually in (comms:sync warns; the wrong-chat guard).
+    ...(repo && String(repo).trim() ? [`repo: ${repo}`] : []),
     `status: ${status}`,
     `needs: ${needs}`,
     `priority: ${priority}`,
@@ -165,6 +190,7 @@ function parseArgs(argv) {
     priority: get("--priority") || "normal",
     status: get("--status") || "open",
     summary: get("--summary") || "",
+    repo: get("--repo"), // override the target repo; defaults to this repo (REPO)
     body,
     dryRun: argv.includes("--dry-run"),
     noPush: argv.includes("--no-push"),
