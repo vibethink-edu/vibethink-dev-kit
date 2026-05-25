@@ -23,13 +23,34 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
 | Transition | Resolved by | Human role |
 |------------|-------------|------------|
 | **Machine-verifiable gate** (CI, tests, build, lint, a deploy state) | the **blocked agent watches the source of truth itself** and proceeds when the condition is met | none |
-| **Agent → agent handoff** | an **addressed message in the shared channel**; the recipient pulls its inbox at session start | none (it appears in the feed) |
+| **Agent → agent handoff** | an **addressed message in the shared channel**; the recipient pulls its inbox at session start **and on demand** (§2.1) | none (it appears in the feed) |
 | **Judgment gate** (approval, scope change, conflict between agents, prioritization, "is this worth doing", a blocker only a human can clear) | a **typed escalation signal** routed to the human's single inbox | **decides** |
 
 - "I'll wait for it to go green and tell you when" is wrong. It becomes: *the
   blocked agent watches the gate itself and continues when green* — no relay.
 - A fact one agent knows and another needs is **written to the shared channel**
   (a status entry), or both agents check the same source. Never hand-carried.
+
+## 2.1 Pull modes — persistent vs fresh sessions
+
+The handoff row above says "pulls its inbox at session start." That is necessary
+but not sufficient: **operators run long-lived sessions, not one session per task.**
+A startup pull is a one-time snapshot — it does not keep a running session current,
+so messages that land after it began will not surface on their own. The inbox is
+therefore pulled two ways:
+
+- **Startup check** — a one-time view when a session begins (where the harness
+  supports it). A snapshot, not a live feed.
+- **In-session refresh** — an idempotent command a running agent executes **on
+  demand** to see what arrived since. This is the **floor, not a fallback**: in a
+  long-lived session it is the primary way work is picked up.
+
+A human relaying a one-line "check your inbox" is an acceptable **wake signal** — it
+does not make the human the message bus (§1), because the content still travels
+through the channel; only the *signal* is relayed. A live poll or push notification
+(so a running agent detects new items without the human signal) is **deferred until
+the manual signal demonstrably hurts** — coordination machinery is not built
+preemptively.
 
 ## 3. The safety boundary
 
