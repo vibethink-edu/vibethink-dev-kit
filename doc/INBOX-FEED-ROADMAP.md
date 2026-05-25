@@ -39,9 +39,10 @@ Pure Node, no deps, core logic exported + unit-tested. Engines are vendor-neutra
 
 ## Bigger roadmap (queued, separate efforts)
 
-- **Protocol review of this kit** — is the cross-agent discipline right? (the
-  layering, orchestration, and decision-disposition canons + the new
-  paused-work ADR). Best done with a second architect's empirical review.
+- **OPUS VT-Method exhaustive audit.** Open task:
+  `doc/TASK-OPUS-VT-METHOD-EXHAUSTIVE-AUDIT-2026-05-25.md`. Review whether the
+  methodology still has holes where rules rely on human memory instead of
+  agent-triggered detection, artifacts, and checks.
 - **Agents-off hygiene window** — the safe execution moment for reaping paused
   work. See `doc/decisions/ADR-20260522-paused-work-lifecycle.md`.
 

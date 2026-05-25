@@ -106,6 +106,12 @@ explicit decision language ("we decided X because Y"), not descriptive language
    decision becomes a declared, indexable one in the same flow.
 5. **Cross-repo.** This is supra-repo discipline; it applies to every repo that
    inherits this kit.
+6. **Trigger before implementation.** When work introduces or expands an
+   architecture, contract, behavior standard, AI-assisted / model-driven behavior
+   (worker, assistant flow, extraction, or model-chosen action), production
+   dependency, runtime framework, CDN/font/render source, or cross-tenant boundary,
+   classify the decision before implementing. If it must be remembered by future
+   agents, write the ADR/canon first; do not rely on the human to ask for it.
 
 ## 5. What this norm does NOT do
 

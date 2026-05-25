@@ -12,15 +12,20 @@
 >   restrictivo, anti-contaminación, smoke test (cómo leen las reglas los agentes).
 > - `CANON-MULTI-AGENT-ORCHESTRATION.md` — handoff entre agentes y el humano: gates
 >   de máquina auto-vigilados, inbox por agente, escalación de juicio al humano,
->   feed + interrupt (el humano no es el bus de mensajes).
+>   feed + interrupt (el humano no es el bus de mensajes). Si asignás una tarea a
+>   otro agente, no basta escribir un `TASK-*`: enviá el handoff por el shared
+>   channel con `comms:send`, commit/push, y verificá el inbox del destinatario.
 >
 > **Disciplina de decisiones (capa universal):**
 > - `../architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` — toda
 >   decisión de arquitectura/contrato/comportamiento se escribe en **Markdown/ADR**
 >   (el binding indexable por un knowledge-graph). Los markers inline son
 >   *advisory* para el lector humano y enlazan al ADR; no lo reemplazan para
->   indexación. Las decisiones son ciudadanos de primera clase del repo, no
->   efímeras de la conversación.
+>   indexación. Antes de implementar una dependencia, runtime, CDN/font/render
+>   source, contrato, boundary cross-tenant, o comportamiento AI-assisted /
+>   model-driven (worker, assistant flow, extracción, acción elegida por modelo),
+>   clasificá si requiere ADR/canon y escribilo primero. Las decisiones son
+>   ciudadanos de primera clase del repo, no efímeras de la conversación.
 
 ---
 
@@ -698,4 +703,3 @@ declares the exact script names (a "quick" check before, fuller checks after).
   (level 2). The neutral core now keeps only agnostic principles + pointers.
 - v1.2 (2025-01-XX): Added Universal Crisis Protocols (migrated from historical documentation)
 - v1.1 (2025-12-18): Added Git Safety Protocol to prevent work loss from incorrect GitHub synchronization
-
