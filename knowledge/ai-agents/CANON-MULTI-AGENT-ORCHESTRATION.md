@@ -26,6 +26,13 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
 | **Agent → agent handoff** | an **addressed message in the shared channel**; the recipient pulls its inbox at session start **and on demand** (§2.1) | none (it appears in the feed) |
 | **Judgment gate** (approval, scope change, conflict between agents, prioritization, "is this worth doing", a blocker only a human can clear) | a **typed escalation signal** routed to the human's single inbox | **decides** |
 
+- Assigning a task to another agent is an **agent → agent handoff**. A local
+  `TASK-*` file, roadmap line, or note is only a reference; it is not sent until a
+  shared-channel comm exists and is committed/pushed. Use the repo's governed send
+  command (`comms:send`, e.g. `node tools/comms-send.mjs ...`) and verify the
+  recipient inbox (`node tools/inbox.mjs <agent>`). If the command is unavailable,
+  manually create the comm in the shared channel with valid front matter, then
+  commit, push, and verify routing. The human must not be the reminder.
 - "I'll wait for it to go green and tell you when" is wrong. It becomes: *the
   blocked agent watches the gate itself and continues when green* — no relay.
 - A fact one agent knows and another needs is **written to the shared channel**

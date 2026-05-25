@@ -12,7 +12,9 @@
 >   restrictivo, anti-contaminación, smoke test (cómo leen las reglas los agentes).
 > - `CANON-MULTI-AGENT-ORCHESTRATION.md` — handoff entre agentes y el humano: gates
 >   de máquina auto-vigilados, inbox por agente, escalación de juicio al humano,
->   feed + interrupt (el humano no es el bus de mensajes).
+>   feed + interrupt (el humano no es el bus de mensajes). Si asignás una tarea a
+>   otro agente, no basta escribir un `TASK-*`: enviá el handoff por el shared
+>   channel con `comms:send`, commit/push, y verificá el inbox del destinatario.
 >
 > **Disciplina de decisiones (capa universal):**
 > - `../architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` — toda
