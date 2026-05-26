@@ -47,8 +47,7 @@ ranges — the kit defines the system, not the per-app assignments):
 - **3100+:** testing and temporary development
 - **5000–5999:** review / worktree lane (split rule: prod `< 5000`, review `>= 5000`, `prod + 2000`)
 
-Each consuming repo keeps its own port registry (e.g. a root `ports.json`); ViTo's
-is the reference implementation. **Full policy:**
+Each consuming repo keeps its own port registry (e.g. a root `ports.json`). **Full policy:**
 `_vibethink-dev-kit/knowledge/PORT_ASSIGNMENT_GLOBAL.md`
 
 ## 3. Stack constraints (concrete version pins & known-bad combos)

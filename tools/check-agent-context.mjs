@@ -278,6 +278,46 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
     );
 })();
 
+// ── Check 8: L1 neutrality fire-test (canon §8 — no brand in neutral cores) ──
+// Finding F1 (Gemini) + F2 (Opus): a brand / product / org name committed into a
+// neutral L1 file would otherwise pass GREEN. Word-boundary + case-insensitive
+// match over the configured neutralL1Files. Org/methodology names are fine in
+// L2/portal docs; these neutral cores must stay brand-free.
+(() => {
+  const brands = cfg.brandExclusionPatterns || [];
+  const l1Files = cfg.neutralL1Files || [];
+  if (brands.length === 0 || l1Files.length === 0)
+    return skip("8 l1-neutrality", "no brandExclusionPatterns / neutralL1Files declared");
+  const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const compiled = brands.map((b) => ({ b, re: new RegExp(`\\b${escape(b)}\\b`, "i") }));
+  const hits = [];
+  for (const f of l1Files) {
+    if (!exists(f)) {
+      hits.push(`${f} (missing)`);
+      continue;
+    }
+    const lines = read(f).split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      for (const { b, re } of compiled) {
+        if (re.test(lines[i])) {
+          hits.push(`${f}:${i + 1} (${b})`);
+          break;
+        }
+      }
+    }
+  }
+  if (hits.length === 0)
+    pass(
+      "8 l1-neutrality",
+      `${l1Files.length} neutral L1 file(s) clean of ${brands.length} brand pattern(s)`
+    );
+  else
+    fail(
+      "8 l1-neutrality",
+      `brand/product name(s) in neutral L1: ${hits.slice(0, 20).join(", ")}${hits.length > 20 ? ` (+${hits.length - 20} more)` : ""}`
+    );
+})();
+
 // ── Report ──────────────────────────────────────────────────────────────────
 console.log(`\ncheck-agent-context · ${path.relative(process.cwd(), configPath) || configPath}`);
 console.log(`repo: ${ROOT}\n`);
