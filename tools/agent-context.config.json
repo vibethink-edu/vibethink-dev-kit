@@ -65,5 +65,9 @@
     ".cursorrules",
     ".template"
   ],
-  "secretExcludeContains": ["tools/agent-context.config.json", "tools/check-agent-context.mjs"]
+  "secretExcludeContains": [
+    "tools/agent-context.config.json",
+    "tools/check-agent-context.mjs",
+    "tools/check-agent-context.test.mjs"
+  ]
 }
