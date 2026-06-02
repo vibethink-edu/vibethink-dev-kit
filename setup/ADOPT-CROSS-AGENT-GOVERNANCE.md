@@ -121,6 +121,28 @@ node <kit>/tools/inbox.mjs <agent> --lane docs/ai-coordination/comms
 > `SessionStart` wiring is the activation step and depends on each agent's harness.
 > See `doc/INBOX-FEED-ROADMAP.md` step 5 for the wiring pattern.
 
+## Step 6 — Session-start hygiene scan (early detection of stale WIP)
+
+The closeout protocol (`CANON-MULTI-AGENT-ORCHESTRATION.md` §2.2) requires every
+branch / worktree touched in a session to end in one of `PUSHED` / `READY-PR` /
+`DISCARDED`. **The scan is the detection side:** at session start, a
+non-mutating sweep flags any registered worktree with uncommitted **or** unpushed
+work older than today — so the operator notices fragile WIP before it ages
+further.
+
+```bash
+node <kit>/tools/session-hygiene-scan.mjs
+# exit 0 = all worktrees in a declared state; exit 1 = stale WIP reported (no mutation)
+```
+
+Expose it locally as `pnpm session:start` (or your equivalent), running it
+alongside the inbox pull (Step 5). The scan **never mutates** — it reports.
+The operator decides what to rescue, push, or discard.
+
+> **Honest scope:** this is early detection, not a cron job. A daemon /
+> watcher / live monitor is **deferred until the manual scan is shown to be
+> insufficient** (build-on-pain). One scan per session start is the floor.
+
 ---
 
 ## Done when
@@ -130,6 +152,7 @@ node <kit>/tools/inbox.mjs <agent> --lane docs/ai-coordination/comms
 - [ ] CI calls the kit's reusable workflow (you did **not** copy the engine).
 - [ ] (Activate) at least one agent surfaces its inbox at session start.
 - [ ] Reviewers use the inherited `REVIEW-CALL-CHECKLIST.md` before any seal.
+- [ ] (Hygiene) `session-hygiene-scan.mjs` runs at session start and reports cleanly (exit 0); operators address any flagged worktrees before working (§2.2 closeout).
 
 ## Where it all lives (single control point)
 
@@ -141,8 +164,9 @@ node <kit>/tools/inbox.mjs <agent> --lane docs/ai-coordination/comms
 | Layering config | (template) | `tools/agent-context.config.json` |
 | Comms config | (template) | `tools/inbox.config.json` |
 | Review checklist | `REVIEW-CALL-CHECKLIST.md` | — (inherited) |
+| Session hygiene scan | `tools/session-hygiene-scan.mjs` | — (inherited; expose as `pnpm session:start`) |
 
 **Canon:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (§6 smoke, §7 inheritance) ·
-`CANON-MULTI-AGENT-ORCHESTRATION.md` (§2.1 pull modes, §3.1 learn-before-automate,
+`CANON-MULTI-AGENT-ORCHESTRATION.md` (§2.1 pull modes, §2.2 session closeout, §3.1 learn-before-automate,
 §5 routing, §5.1 human-actionable shape + §5.1.A status / §5.1.B router message,
 §7 review-call, §8 inheritance).

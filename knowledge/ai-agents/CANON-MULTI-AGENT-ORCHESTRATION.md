@@ -70,6 +70,37 @@ through the channel; only the *signal* is relayed. A live poll or push notificat
 the manual signal demonstrably hurts** — coordination machinery is not built
 preemptively.
 
+## 2.2 Session closeout — exit states (no fragile WIP)
+
+A session is the inverse of a startup pull (§2.1): you arrive by reading what is
+already in the channel; you leave by ensuring no work depends on **this session's
+local state alone**. Every active branch / worktree touched during the session
+must end in exactly **one intentional, declared state**:
+
+| State | Meaning | Required action |
+|-------|---------|-----------------|
+| `PUSHED` | Committed and pushed; no uncommitted changes | nothing further this session |
+| `READY-PR` | Pushed and a pull request exists (or is being opened) | the PR link travels in the closeout signal |
+| `DISCARDED` | The branch / worktree is intentionally abandoned; nothing of value is lost | the branch is removed or explicitly marked, never silently left |
+
+- **Local-only WIP older than the current session is the failure class.** A
+  rescue branch, a long-lived uncommitted change, or a stale stash that only the
+  local agent can see breaks the §1 principle (the human is not the message bus)
+  and breaks the durability assumption (the machine is not the backup). If work
+  matters, it lives in `origin`.
+- **No silent ambiguity.** A branch left "in progress" with no declared state is
+  treated by anyone else as `DISCARDED` — i.e. *cannot* be relied on. Only the
+  agent who left it can later promote it.
+- The session-end signal (the relay block §5.1.B, and the §5.1.A status shape)
+  **names the closing state of each branch the agent touched**. Closing without
+  naming the state is a closure bug — fix it in the same message.
+- **Detection, not enforcement.** A non-mutating session-start scan (see the
+  adoption runbook) flags any registered worktree with uncommitted or unpushed
+  work older than today. It reports; the operator decides what to rescue, push,
+  or discard. A stricter automation (daemon, watcher, auto-rescue) is
+  **deferred until the manual scan is shown to be insufficient** — build-on-pain
+  applies here too (§3.1).
+
 ## 3. The safety boundary
 
 > **Automate where the condition is verifiable by a machine. Escalate where it
