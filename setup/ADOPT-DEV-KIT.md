@@ -370,6 +370,60 @@ verifica · Layer**.
 > runnable-by-copy artifacts is **not yet wired** — that gap travels with this
 > piece. See `doc/AUDIT-DEVKIT-CLEANUP-2026-06-03.md` finding F4.
 
+### 13 — Naming conventions (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-NAMING-CONVENTIONS-001.md`.
+
+- **Qué:** the 8 universal naming patterns (branches `{author}/{type}-{description}`, Conventional Commits, file naming with date-when-temporal, ADR `ADR-YYYYMMDD-slug`, canon `CANON-{DOMAIN}-{TOPIC}-NNN`, DB tables with timestamp + tenant key, env vars `UPPER_SNAKE_CASE`, package.json scripts `verb:scope`). Includes the universal "never" list (mechanical violations a CI can enforce).
+- **Cómo:**
+  - **Docs by reference** — your `AGENTS.md` points to the canon; declare per-repo binding (the recognized agent tokens, Conventional Commits scopes valid in this repo, date format, etc.).
+  - Optionally wire mechanical enforcement: `commitlint` for Conventional Commits, branch-naming pre-commit hook for `{author}/{type}-{description}`, etc.
+- **Verificar:**
+  - A recent batch of branches follows `{author}/{type}-{description}` (or repo's declared variant).
+  - Recent commits pass `commitlint` (when wired).
+  - ADRs in `docs/decisions/` follow `ADR-YYYYMMDD-slug` (or repo's declared variant).
+
+### 14 — Visual bug triage (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-VISUAL-BUG-TRIAGE-001.md`.
+
+- **Qué:** the four-step triage discipline (DIFF FIRST → client-side check → build/runtime hygiene → ONLY THEN touch code) that gates entry to code modification when a visual bug appears after a state change (restore, checkout, deploy, branch switch, session restart). "It looks like a bug" is not evidence; a diff is.
+- **Cómo:**
+  - Docs by reference — your `AGENTS.md` cites the canon for visual bug discipline.
+  - Per-repo binding: which cache directories to clear, which restart command is canonical, which review port the team uses for verification.
+- **Verificar:** a recent visual-bug investigation in the comms lane (or PR descriptions) cites the diff-first check before code changes. Reviewers reject "fixes" that skipped Step 1.
+
+### 15 — Testing minimum bar (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-TESTING-MINIMUM-BAR-001.md`.
+
+- **Qué:** the floor — every new function with conditional logic ships with 1 happy-path + 1 failure-mode test in the same change. Scout rule: touch a function → add ≥1 test in the same PR. Pre-GO 60-second check: name the testable unit, the failure mode, and where the test goes. Integration modules ship with a self-test endpoint returning `{passed, failed, total}`.
+- **Cómo:**
+  - Docs by reference — your `AGENTS.md` cites the canon.
+  - Per-repo binding: which directories the rule applies to (typically `services/`, `lib/`, library `src/`); which are exempt (routes, components, types, config); the testing framework + command; the self-test endpoint pattern for integration modules; whether currently advisory or CI-blocking.
+- **Verificar:**
+  - A recent function with conditional logic in scope has ≥1 happy + ≥1 failure test.
+  - Integration modules expose `GET /<service>/selftest` (or equivalent) returning `{passed, failed, total}`.
+
+### 16 — Versioning (state-of-the-art universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-VERSIONING-001.md`.
+
+- **Qué:** the 5-type artifact model — **code packages** (SemVer 2.0 + Changesets), **deployed apps** (CalVer or SemVer with `/healthz` version exposure), **canon docs** (sequential NNN + lifecycle DRAFT→PROPOSED→ACCEPTED→SEALED→AMENDED→SUPERSEDED-BY|DEPRECATED), **ADRs** (immutable filename `ADR-YYYYMMDD-slug` + status transitions PROPOSED→ACCEPTED→SUPERSEDED-BY|DEPRECATED, body immutable after ACCEPTED), **tools/scripts** (SemVer-lite `MAJOR.MINOR`). Universal driver: Conventional Commits with mandatory `!` for breaking changes.
+- **Cómo:**
+  - Docs by reference — your `AGENTS.md` points to the canon.
+  - Per-repo binding declared in a single file (e.g. `.versioning.yaml`) with: packages model + manager, apps model + pattern, canons numbering + approver, ADRs folder + pattern + immutability flag, tools model.
+  - Optional CI enforcement: `commitlint`, changeset bot, canon header validation, ADR immutability gate, changelog mandatory, health-endpoint version check.
+- **Verificar:**
+  - The per-repo binding file exists and declares each artifact type's model.
+  - A recent breaking change in a publishable package carries `!` in its commit message.
+  - A recent ADR with status change to `SUPERSEDED-BY` has a body diff of zero lines (only status header touched).
+  - The deployed app's `/healthz` (or equivalent) returns version + commit hash.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`

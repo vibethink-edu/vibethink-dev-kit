@@ -26,6 +26,10 @@
   "brandExclusionPatterns": ["ViTo", "XMS", "Cantor", "Ovitality", "VibeThink", "Marcelo"],
   "neutralL1Files": [
     "knowledge/methodology/CANON-DEVELOPMENT-PROCESS.md",
+    "knowledge/methodology/CANON-NAMING-CONVENTIONS-001.md",
+    "knowledge/methodology/CANON-VISUAL-BUG-TRIAGE-001.md",
+    "knowledge/methodology/CANON-TESTING-MINIMUM-BAR-001.md",
+    "knowledge/methodology/CANON-VERSIONING-001.md",
     "knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md",
     "knowledge/ai-agents/AGENTS_UNIVERSAL.md"
   ],
