@@ -14,6 +14,7 @@
     "validate:names": "ls-lint",
     "check:agent-context": "node tools/check-agent-context.mjs",
     "session:hygiene": "node tools/session-hygiene-scan.mjs",
+    "session:start": "npm run session:hygiene && node tools/inbox.mjs claude",
     "test:agent-context": "node tools/inbox.test.mjs && node tools/feed.test.mjs && node tools/check-agent-context.test.mjs && node tools/session-hygiene-scan.test.mjs",
     "validate:agent-context": "npm run check:agent-context && npm run test:agent-context",
     "comms:send": "node tools/comms-send.mjs",
