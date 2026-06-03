@@ -165,6 +165,21 @@ verifica · Layer**.
     and confirm it gates).
   - Your closeout signals (§5.1.B router block) name the closing state of each
     touched branch.
+- **Platform variants are allowed (and may pre-date this engine).** A
+  consuming repo MAY use a richer platform-specific hygiene gate alongside
+  (or instead of) the `.mjs` engine — for example a PowerShell
+  `scripts/git-hygiene.ps1` that additionally inspects open PRs, `[gone]`
+  upstream branches, hidden agent worktree directories, or
+  `delete_branch_on_merge` flags. Coexistence is fine as long as:
+  - the canon §2.2 closeout rule (`PUSHED` / `READY-PR` / `DISCARDED`) is
+    declared from the consuming repo's root rules, regardless of which engine
+    enforces it;
+  - the variant runs **at least at session start** (the floor — same as the
+    `.mjs` engine);
+  - the variant **never mutates** without the operator's instruction
+    (detection-only, same boundary as the `.mjs` engine).
+  This is the build-on-pain version of Piece #4: if your platform-specific
+  gate is already richer for your context, do not replace it for symmetry.
 
 ### 5 — Decision disposition (ADRs as graph nodes)
 
