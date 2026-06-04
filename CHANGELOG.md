@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-06-03
+
+### Added
+
+- `CANON-MULTI-AGENT-ORCHESTRATION.md` §2.3 — **Producer-side routing**: the
+  producer half of the inbox loop. Actionable knowledge a consumer must act on is
+  delivered only when it lands where that consumer reads (channel / canon / ops of
+  the consumer's repo), never a personal notebook, chat, or memory namespace.
+  Carries the routing test ("who has to ACT on this, and will they find it where I
+  put it?") and is named as the explicit mirror of §2.1 (consumer pull). Corollary
+  of `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §4.
+- `START-HERE.md` — the dance now states the producer-routing test and points to
+  §2.1 (consumer) / §2.3 (producer).
+
 ## 2026-05-25
 
 ### Added

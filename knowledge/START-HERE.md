@@ -24,7 +24,10 @@ commits + pushes — so the comm actually travels via git, not just sits as a lo
 file). On a new or second machine, **`comms:sync <you>`** pulls origin + shows your
 inbox + warns if this machine has work that hasn't been pushed. The human is **not**
 the message bus — git is; the human relays only a one-line signal.
-→ `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1)
+**Producing something another agent must act on? Route it where *they* read** (their
+repo's channel / canon / ops), never a personal log — and before you call it
+"documented", ask: *who has to ACT on this, and will they find it where I put it?*
+→ `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1 consumer · §2.3 producer)
 
 **3 — How you talk to the human: the compass.**
 Outcome first, plain language first, detail on demand. **Lead with a short, plain

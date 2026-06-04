@@ -101,6 +101,39 @@ must end in exactly **one intentional, declared state**:
   **deferred until the manual scan is shown to be insufficient** — build-on-pain
   applies here too (§3.1).
 
+## 2.3 Producer-side routing — actionable knowledge lands where the consumer reads
+
+§2.1 is the **consumer** half of the loop: how a recipient *reads* its inbox. This
+section is the **producer** half. When an agent produces knowledge another agent (or
+a human) must **act on**, it routes that knowledge to where the consumer actually
+reads — the shared channel / canon / ops state of the repo where the consumer works
+— **not** to a personal notebook, a chat window, or the producer's own memory
+namespace.
+
+> **The producer hunts the routing gap. The human must never be the one who
+> discovers that the consumer can't see it.**
+
+- A personal log, a research notebook outside the consumer's repo, a chat message,
+  or an agent's private memory are **not delivery** — they are where actionable
+  knowledge dies unseen. It is delivered only once it lands in the channel that
+  consumer's inbox watches (§2, §2.1).
+- **The routing test (run before claiming "documented"):** *who has to ACT on this,
+  and will they find it where I put it?* If the consumer is an agent → it goes to
+  that agent's repo (channel / canon / ops), never anywhere that agent does not read.
+- This is the **mirror of §2.1.** The consumer pulls its inbox; the producer is
+  obligated to write where that inbox looks. A loop with only the consumer half
+  still lets the producer drop actionable knowledge somewhere no inbox watches — and
+  the human ends up hand-carrying it, which is the §1 failure mode.
+- **Corollary** of `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §4 (cross-repo artifact
+  isolation): intelligence a consumer must act on lives **committed in the
+  consumer's own repo**, never only in another repo, a chat, or a memory namespace
+  bound elsewhere. Personal notebooks and agent memory may hold a **pointer** to it,
+  never be its source.
+
+*(2026-06-02 field report: actionable research left in a producer-side personal log,
+outside the consuming agent's repo, never reached that agent; the human had to hunt
+the routing gap by hand — the failure this section closes.)*
+
 ## 3. The safety boundary
 
 > **Automate where the condition is verifiable by a machine. Escalate where it
