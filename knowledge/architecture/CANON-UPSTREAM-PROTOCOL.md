@@ -211,7 +211,7 @@ These rules apply to every ongoing-update touchpoint. They are **NOT negotiable*
 
 1. **Upstream claims ≠ product truth.** What the upstream documents is not what your consuming repo has. Verify against the actual local code, not the upstream README.
 2. **Every skip is documented.** "Did not look" ≠ "decided not to update". Only *"I looked and decided to skip because X"* is a valid skip — and X is recorded in the baseline doc.
-3. **Security patches are obligatory.** Without negotiation. Without convenient timing.
+3. **Security patches are obligatory.** Without negotiation. Without convenient timing. **Severity policy:** Critical/High CVE → update **same day** (override every other rule). Medium → within **one week**. Low → at next **monthly review**.
 4. **One update per PR.** Never mix updates of multiple upstream repos in a single PR. Bundling defeats reviewability.
 5. **Build + test before merge.** No upstream update merges without a green build and a passing test suite.
 6. **Baseline is truth.** The baseline-versions doc (§6.2) is updated in the same PR as the update. Pin drift without a baseline update is a finding.
@@ -234,7 +234,35 @@ The consuming repo's L3 binding documents the concrete commands (which package m
 
 ---
 
-## §13 — What this canon does NOT do
+## §13 — Risk tiers (orthogonal to §4 taxonomy)
+
+§4 classifies upstreams by **kind** (fork-adapted, pinned dep, runtime, design-system, AI/model provider, CLI personal). This section classifies them by **risk / criticality** — an **orthogonal axis**. A given upstream has *both* a kind and a tier (e.g., a primary render framework is `runtime × Tier 1`; a calendar engine is `fork-adapted × Tier 2`; a UUID lib is `pinned dep × Tier 3`).
+
+| Tier | Definition | Examples (by category, not specific package) |
+|---|---|---|
+| **Tier 1 — Platform Core** | A breaking change here takes down the entire product/platform | Language runtime, primary framework, type system, package manager, database client |
+| **Tier 2 — Feature Critical** | A breaking change breaks **that feature**, not the platform | A specific UI engine (editor, whiteboard, calendar, drag-and-drop), an AI/model SDK powering a feature |
+| **Tier 3 — Utility / Low Risk** | Updates rarely break anything user-visible | Tiny utilities (date math, classnames, UUIDs, schema validators), dev tools (lint, format, build helpers) |
+
+The consuming repo's L3 binding **names the actual packages** in each tier (per §7) — this canon defines the **classification framework**, not the inventory.
+
+---
+
+## §14 — Automation policy per tier
+
+| Tier | Pin shape | Auto-update | Who decides | Cadence |
+|---|---|---|---|---|
+| **1 — Platform Core** | **Exact** (e.g. `"19.1.0"`, no caret) | **Never** auto-update | Architect / human authority of the consuming repo | Quarterly review, or security-driven |
+| **2 — Feature Critical** | **Caret** (e.g. `"^0.18.0"`) | Bot PR allowed; **no auto-merge** (Dependabot/Renovate file the PR; human reviews) | Feature owner | Monthly review |
+| **3 — Utility** | **Caret** | **Patch auto-merge** allowed; minor/major requires human review | CI for patch, owner for minor/major | Continuous for patches; monthly for minor |
+
+The **bot/CI tool** (Dependabot, Renovate, or equivalent) and its config file are **L3 binding** — the consuming repo declares which tool it uses and how its tier groups are expressed in that tool's config. This canon defines the **policy**; the L3 binding defines the **mechanics**.
+
+This pairing of §13 + §14 with §10 (ongoing-update Q1/Q2/Q3) means: every upstream change is first classified by **kind** (§4) and **tier** (§13), then handled by the **automation policy** for that tier (§14), and the **decision per change** runs through §10's Q1/Q2/Q3.
+
+---
+
+## §15 — What this canon does NOT do
 
 - It does **NOT** prescribe specific tools (commit hooks, dependency scanners, drift CI). The consuming repo picks its tooling.
 - It does **NOT** prescribe specific licenses to accept or reject. The consuming repo's authority decides license posture.
@@ -252,4 +280,6 @@ This canon was lifted from two product-side (ViTo) canons that had the agnostic 
 
 The product-specific content (the actual inventory, baseline file path, stack checks, incident records, vocabulary overlay) **remains at L3** in the consuming repo and binds to this spine. Once this canon is sealed, the two ViTo canons restructure to point at this spine and keep only their L3 content.
 
-**Amendment 2026-05-25 (same DRAFT cycle, per Marcelo's directive *"no se quede atrapada en ViTo lo que puede ser agnóstico"*):** §10 (ongoing-update decisions Q1/Q2/Q3), §11 (operating constitutional rules), and §12 (sync execution shape) were lifted from `CANON-UPSTREAM-GOVERNANCE-001` (ViTo §§5, 6, 7, 9) where they had been trapped at L3 despite being agnostic. The ViTo canon retains only the inventory, the npm baseline reference, the soldier/cadence assignments, the SpecKit-specific binding, and product-specific overlays.
+**Amendment 2026-05-25 (a) (same DRAFT cycle, per Marcelo's directive *"no se quede atrapada en ViTo lo que puede ser agnóstico"*):** §10 (ongoing-update decisions Q1/Q2/Q3), §11 (operating constitutional rules), and §12 (sync execution shape) were lifted from `CANON-UPSTREAM-GOVERNANCE-001` (ViTo §§5, 6, 7, 9) where they had been trapped at L3 despite being agnostic. The ViTo canon retains only the inventory, the npm baseline reference, the soldier/cadence assignments, the SpecKit-specific binding, and product-specific overlays.
+
+**Amendment 2026-05-25 (b) (same DRAFT cycle, paso 3 reconciliation):** §13 (Risk tiers as orthogonal axis to §4), §14 (Automation policy per tier), and the CVE severity policy folded into §11 rule 3 were lifted from `CANON-OSS-UPDATE-METHODOLOGY-001` (ViTo DRAFT) to resolve the overlap diagnosed during paso 3 scan. The ViTo canon refactors to a thin L3 binding (the actual package lists per tier, the `.github/dependabot.yml` config, ViTo file paths, ViTo-specific examples).
