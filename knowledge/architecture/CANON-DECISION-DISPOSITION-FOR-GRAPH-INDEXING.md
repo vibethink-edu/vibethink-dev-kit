@@ -91,6 +91,70 @@ Decisions that live in canons / specs are already indexable **if** they use
 explicit decision language ("we decided X because Y"), not descriptive language
 ("X is this way").
 
+### 3.4 Extended ADR template (for SEALED / CONSTITUTIONAL decisions)
+
+For decisions that go beyond architecture/contract into **constitutional** territory (canon updates, policy decisions, decisions that bind future agents), the §3.1 template extends with three additional sections that appear **after `## Consequences` and before `## Evidence`**:
+
+```markdown
+## What this decision does NOT change
+Negative scope: what stays the same. Prevents the decision from being read as
+broader than intended. Required for SEALED decisions; optional otherwise.
+
+## Reactivation conditions
+The strict, accumulative conditions under which this decision can be revisited.
+Required when the decision is SEALED-with-reactivation-allowed; omit if the
+decision is permanent.
+
+## Cross-references
+- Related ADRs / canons that this decision interacts with.
+- Decisions superseded by this one (if any).
+- Decisions that supersede this one (back-link, when applicable).
+```
+
+The minimal §3.1 template stays for routine ADRs. The extended template is required for SEALED-track and constitutional decisions because they must remain reviewable and traversable years later.
+
+### 3.5 Status lifecycle of a decision
+
+A decision moves through a small state machine. The `Status:` header field declares the current state:
+
+| State | Meaning | Transitions from |
+|-------|---------|------------------|
+| `DRAFT` | Being formulated; not yet authoritative | — |
+| `CANDIDATE` | Complete and ready for review; under consideration | `DRAFT` |
+| `ACCEPTED` | Approved for use; binding but not yet constitutional | `CANDIDATE` |
+| `SEALED` | Constitutionally binding; reactivation conditions apply | `ACCEPTED` (by named authority) |
+| `SUPERSEDED-BY ADR-xxxx` | Replaced by a newer decision; original retained for historical context | `ACCEPTED` / `SEALED` |
+| `DEPRECATED` | No longer in use; not replaced (the decision is simply no longer applicable) | `ACCEPTED` / `SEALED` |
+| `REACTIVATED` | Previously SUPERSEDED or DEPRECATED and now active again — rare; requires evidence the reactivation conditions are met | `SUPERSEDED` / `DEPRECATED` |
+
+The consuming repo's L3 binding may add gates for transitioning between states (e.g., who can promote `CANDIDATE` → `SEALED`, what evidence is required, who can REACTIVATE a SUPERSEDED decision).
+
+### 3.6 Activation triggers (when this norm fires automatically)
+
+The norm activates when the work touches:
+
+1. **Technology evaluation** — evaluating an external tool or platform for adoption.
+2. **Architectural decision** — choosing between approaches (build vs. buy, native vs. external, sync vs. async, etc.).
+3. **Gap analysis** — identifying missing capabilities vs. an external benchmark or industry standard.
+4. **Feature design** — significant new feature design where the shape of the system changes.
+5. **End of long architectural conversation** — when a long-form conversation (>20 substantive messages) is closing and decisions exist that would otherwise be lost.
+
+This complements §4 Golden Rule 6 (*trigger before implementation*) which activates on dependency / runtime / CDN / font / render-source / contract / cross-tenant changes. §3.6 covers the **conversational / evaluative** half; Golden Rule 6 covers the **implementation** half.
+
+When a trigger fires, the agent **explicitly surfaces** it to the human authority — *"this is a §3.6 trigger; should I write the ADR before continuing?"* — rather than silently proceeding.
+
+### 3.7 Anti-patterns of decision capture
+
+Five universal failure modes:
+
+1. **"I'll document it later."** Never gets documented. **Solution:** capture **during** or **immediately after** the conversation, while context is fresh.
+2. **"Just a quick note in chat."** Chat is ephemeral, no discoverability, no versioning. **Solution:** write the ADR in the repo; link to it *from* chat, not the other way.
+3. **"Too much effort to document."** Knowledge lost, work repeated. **Solution:** the cost of the protocol is small; the cost of not capturing is large.
+4. **"The agent already knows this."** Agent memory is volatile; new sessions and new agents lose it. **Solution:** the repo is the only persistent memory (per `CANON-AGENT-COLLABORATION` §1).
+5. **"Documenting after the fact."** Details forgotten, nuance lost, reconstruction incomplete. **Solution:** capture **during** or **immediately after** — not weeks later.
+
+---
+
 ## 4. Golden rules
 
 1. **Explicit, and in Markdown/ADR.** The indexer extracts only what is stated
