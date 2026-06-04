@@ -15,6 +15,10 @@
 >   feed + interrupt (el humano no es el bus de mensajes). Si asignás una tarea a
 >   otro agente, no basta escribir un `TASK-*`: enviá el handoff por el shared
 >   channel con `comms:send`, commit/push, y verificá el inbox del destinatario.
+> - `REVIEW-READINESS-PROTOCOL.md` — ciclo de readiness antes de pedir review:
+>   probá en la capa que da la señal verdadera, declarala, adjuntá evidencia,
+>   vigilá gates de máquina sin usar al humano como relay, y dejá los adaptadores
+>   concretos en el repo consumidor.
 >
 > **Disciplina de decisiones (capa universal):**
 > - `../architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` — toda
