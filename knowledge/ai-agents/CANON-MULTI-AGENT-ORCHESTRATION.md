@@ -385,7 +385,134 @@ recall *and* precision, gates that bite, boundaries grepped not asserted, enforc
 not authorship, honest close, …) lives in `REVIEW-CALL-CHECKLIST.md` and grows as new
 failure modes are found. This principle stays stable.
 
-## 8. Inheritance
+## 8. Message types — the six artifacts the dance produces
+
+A multi-agent dance produces six recurring artifact types. Each has a clear sender, purpose, and required sections.
+
+| Type | Sender | Purpose | Required sections |
+|------|--------|---------|--------------------|
+| `briefing` | Architect role | Implementation spec for executor | Objective, branch + base, constraints, file list, verification checklist (V-01..V-xx), worktree if isolated |
+| `delivery` | Executor role | Implementation report | Current branch, files touched, V-xx results, notes/blockers |
+| `verification` | Architect role | Post-review checks | Merge target, PR number, checks to run, expected results |
+| `response` | Any role | Answer to a question or verification | Reference to the original question, answers |
+| `question` | Executor (pre-impl) | BLOCKER, SUGGESTION, or OBJECTION **before implementing** | Severity tag (`[BLOCKER]` / `[SUGGESTION]` / `[OBJECTION]`), specific question, proposed resolution if applicable |
+| `correction` | Architect role | Fix required after review | What failed, what to fix, updated V-xx |
+
+These types are universal at the **protocol level**. The consuming repo's L3 binding decides the file-naming convention that carries them (sprint letters, ticket numbers, free-form, equivalent).
+
+---
+
+## 9. Workflow pattern — Architect ↔ Executor dance
+
+The dance for any non-trivial implementation task:
+
+```
+ARCHITECT                                EXECUTOR
+    |                                        |
+    +--- briefing -------------------------->|
+    |                                        |  ← Phase 0: full pre-read
+    |                                        |    If BLOCKER / SUGGESTION found:
+    |<-- question [BLOCKER/SUGGESTION] ------+    sends question, STOPS, waits
+    |                                        |
+    +--- response --------------------------->|  ← Architect resolves (max 1 round)
+    |                                        |
+    |    (executor implements)               |  ← Phase 1: implementation
+    |                                        |
+    |<------------------- delivery ----------+
+    |                                        |
+    |    (architect reviews)                 |
+    +--- correction (if needed) ------------>|  ← repeat until PASS
+    |                                        |
+    |<------------------- delivery ----------+
+    |                                        |
+    |    (architect commits/pushes/PRs)      |
+    +--- verification ---------------------->|  ← post-merge closure + feedback
+    |                                        |
+    |<------------------- response ----------+  ← executor feedback closes the thread
+    +----------------------------------------+
+```
+
+### 9.1 Pre-read (Phase 0, mandatory for the executor)
+
+Before writing any code, the executor reads the full briefing and verifies it has execution rights for this front. If the briefing has a:
+
+- **BLOCKER** (missing info, contradictions, missing dependency, security/data-integrity concern) → file a `question` tagged `[BLOCKER]` and **stop**.
+- **SUGGESTION** (better approach, optimization, non-blocking concern) → file `[SUGGESTION]` with a proposed resolution and **wait** for response.
+- **OBJECTION** (a current rule does not fit the case) → file `[OBJECTION]` rather than silently violating it.
+
+### 9.2 Anti-loop rule — one question round per thread
+
+The executor gets **one round** of questions per thread. After the architect responds, the executor implements based on that response. **No second question round** — any remaining concerns go in the delivery file, not as new questions.
+
+This rule exists because question loops compound: each round invites the next, and the front never gets done. One round is enough to resolve genuine blockers; more is design churn.
+
+### 9.3 Correction loop (post-review)
+
+If the delivery does not pass review, the architect sends a `correction` with what failed and what to fix. The executor sends a new `delivery`. Repeat until PASS. There is **no question round inside the correction loop** — only `correction` ↔ `delivery`.
+
+### 9.4 Post-merge closure
+
+After merge, the architect sends a `verification` containing: independent V-xx results, defects found and how they were fixed, merge confirmation, and a feedback request. The executor sends a `response` with feedback on briefing clarity, checklist appropriateness, and correction fairness. **This closes the thread** and forms a learning loop for future briefings.
+
+---
+
+## 10. Universal collaboration rules
+
+These rules apply to every agent in every dance — independent of tooling.
+
+### 10.1 For all agents
+
+1. **Read the full thread before responding.** Check every artifact bound to the same thread.
+2. **Never edit another agent's file.** Write your own response file.
+3. **Every message header declares identity** — sender (platform), acting-as (task), execution rights, branch, worktree if isolated. The consuming repo's L3 binding names the full required header.
+4. **Reference canon documents by their canonical name**, never by transient comm file paths.
+5. **Opinion is not decision.** Discussion comments, including those from the human authority, are treated as opinion until an explicit final decision is recorded (§11).
+6. **Silence is not approval.** No agent may treat lack of response as permission to cross a pending boundary.
+7. **Decision authority is deterministic.** It may not be reassigned for convenience, load balancing, or impatience. Only the named decider may reassign it.
+8. **Constitutional compliance is mandatory during disagreement.** Agents may object, request review, or propose amendment; they may not stop complying with the current rule while review is pending.
+9. **Agents solve what is already solved.** If an issue fits an existing rule, pattern, or clearly delegated local authority, resolve it without escalating.
+10. **Escalations carry a recommendation.** When a case must reach the human authority, bring the current rule context, the gap or contradiction, the recommended option, and the concrete decision requested.
+11. **The human is for unresolved definition, not routine execution.** Escalate for architectural knots, authority conflicts, canon contradictions, new front openings, or gaps the room cannot close within existing rules.
+12. **Do not escalate low-level execution noise.** Copy, translation, layout adjustments, and pattern-consistent wiring resolve inside the workstream unless they create a constitutional, architectural, or authority conflict.
+13. **When sources disagree** (canon/spec vs real git state vs operational status doc vs informal notes), resolve by precedence: **canon/spec > real git state > operational status doc > informal notes**. Update stale artifacts after reality is verified.
+
+### 10.2 For the architect role
+
+14. **Before opening a new front, run the consuming repo's preflight** (audit of stale threads, decision-gate questions, isolated worktree creation, methodology verification). The consuming repo's L3 binding names these commands.
+15. **Every briefing declares its full context** — objective, branch, base branch, constraints, file list, verification checklist (V-01..V-xx), worktree if isolated.
+16. **When a `BLOCKER` arrives, respond before anything else.** The executor is stopped and waiting.
+17. **Review every delivery before commit.** The architect owns the commit.
+18. **Attribute co-authorship** in the commit message for every agent that contributed.
+19. **Send the post-merge verification** after merge — with independent V-xx results and a feedback request — to close the thread and create the learning loop (§9.4).
+
+### 10.3 For the executor role
+
+20. **Verify worktree isolation as the first step.** The consuming repo's L3 binding names the isolation rules.
+21. **Read the full briefing before writing a single line of code.**
+22. **If you do not have execution rights for this front, observe but do not implement.**
+23. **Resolve known classes of issues without escalation.** Local, reversible, pattern-consistent issues fix in-place and get reported in the delivery, not as escalations.
+24. **When escalation is required, bring a proposed resolution.** Summarize what you checked, why existing rules were insufficient, which option you recommend, and what exact decision is needed.
+
+---
+
+## 11. Decision status markers
+
+To prevent accidental authority leakage, every decision-bearing message declares a status marker:
+
+| Marker | Meaning |
+|--------|---------|
+| **`OPINION`** | Discussion, not authorization. Does **not** authorize crossing a pending boundary. |
+| **`FINAL_DECISION`** | Closes the uncertainty for that case. |
+| **`PENDING_REVIEW`** | Discussion may continue, but the current constitutional rule remains in force. |
+| **`COUNCIL_DECISION`** | Used only after a council/tribunal concludes **and** the human authority adopts the outcome. |
+
+**Default if absent: `OPINION`.** Agents do **not** infer `FINAL_DECISION` from context.
+
+These markers complement §10.1 rule 5 (*"opinion is not decision"*) by giving every message an explicit status.
+
+---
+
+## 12. Inheritance
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits
 this protocol. Routing tokens, channel location, inbox/feed tooling, and the set
