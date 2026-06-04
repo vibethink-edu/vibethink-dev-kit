@@ -34,6 +34,26 @@ The consuming repo's agent-context file(s) — whatever the local mix is (`.curs
 - modifying files unrelated to the declared task,
 - leaving temporary scripts, debug dumps, or build artifacts uncommitted.
 
+### 2.4 No forced hook bypass
+
+`--no-verify` (and equivalents like `--no-gpg-sign`, skipping hook plumbing, disabling commit-msg hooks) **MUST NOT** be used to silence a failing hook. Hooks exist to keep secrets, syntax errors, and policy violations out of history. If a hook fails, fix the root cause; do not silence it.
+
+**The only legitimate exceptions:**
+- Pushing a comm to the shared lane when the worktree carries unrelated dirty state the comm tool cannot itself govern (the comm send tool already ran the security gate twice; only the dirty-worktree hygiene check is being bypassed).
+- An explicit, documented exception declared in the L3 binding's override clause (§6) — never silent.
+
+Any other use of `--no-verify` is a forbidden pattern (§4).
+
+### 2.5 Clean Floor — root write prohibition
+
+Scripts, tools, and agents **MUST NOT** write temporary files to the repository root. The root is for configuration and entry points only; clutter at root hides real issues and routinely leaks into commits.
+
+- ❌ Forbidden: `node build.js > build.log` (writes `build.log` at root).
+- ✅ Allowed: `node build.js > ./logs/build.log` (or any designated dir).
+- ✅ Allowed: write to `./tmp/`, `./logs/`, `./.cache/` (gitignored by default in the consuming repo's L3 binding).
+
+The consuming repo's L3 binding names the designated temp directories.
+
 ---
 
 ## §3 — Agent workflow (4 steps, every session)
@@ -52,6 +72,12 @@ Regardless of which agent or runtime:
 - **Zombie files.** Committing files that are in `.gitignore`. Fix: `git rm --cached <path>`.
 - **EOL war.** Committing CRLF line endings into a collaborative repo (overrides `.gitattributes` normalization). Fix: `git add --renormalize .`.
 - **Scope creep.** Modifying styling, formatting, or unrelated logic in files outside the current task's scope. This is silent drift that compounds across sessions and is the single most common source of merge conflicts on cross-agent work.
+- **Force-push to the default branch.** Destructive to shared history; rewrites the timeline every other contributor depends on. Forbidden without explicit, documented exception.
+- **Rebase of published commits.** Once a commit is pushed and visible to other contributors / CI, rebasing it breaks every downstream branch and pipeline that built on it.
+- **Overnight rebase / merge / cherry-pick in progress.** An intermediate git state (rebase or merge in progress) left across sessions blocks everyone who pulls the repo and is itself a §1 "dirty start" violation. Finish or abort before stepping away.
+- **Committing commented-out code.** Use version control to recover deleted code; commented-out blocks are debt that rots and confuses future readers.
+- **Silent `--no-verify`.** Bypassing hooks without declaring the reason (§2.4) is forbidden; the dirty-worktree exception is allowed *only* through the comm-send tool, never by hand.
+- **Writing at root.** Scripts/agents emitting `*.log`, `*.txt`, debug files at the repo root (§2.5). Use `./tmp/`, `./logs/`, or the consuming repo's designated dirs.
 
 ---
 
@@ -84,7 +110,44 @@ The L3 binding does **NOT** re-write the golden rule, the workflow, or the anti-
 
 ---
 
-## §7 — What this canon does NOT do
+## §7 — Governance: all changes via PR
+
+For any consuming repo with two or more contributors — human or agent — **every change merged to the default branch MUST go through a Pull Request** (or its equivalent: merge request, change set, code review with sign-off). This explicitly includes:
+
+- documentation changes,
+- developer-tooling changes,
+- "trivial" fixes,
+- agent-generated automations.
+
+> **Perceived lack of impact is NOT a valid excuse to bypass this rule.**
+
+**Rationale.** Uniform process prevents "death by a thousand cuts" — small unreviewed changes that, taken together, drift the system beyond what any one reviewer could spot in isolation. PR review is the cheapest place to catch architectural drift; it costs minutes there, days to reverse later.
+
+**Exception:** the **comm lane** of the consuming repo (the shared mailbox for cross-agent communication) is **create-only** and may be pushed directly to the default branch by the governed comm-send tool, because the artifact is append-only by design and the tool runs its own gates. Every other path goes through PR.
+
+The consuming repo's L3 binding documents its specific PR tooling (GitHub PR, GitLab MR, Phabricator diff, equivalent) and any local addenda (required reviewers, CI gates, label conventions).
+
+---
+
+## §8 — L3 binding override clause (when a consuming repo needs to deviate)
+
+Sometimes a consuming repo needs to deviate from one of this canon's rules for legitimate local reasons (e.g., a constrained CI environment that forbids hooks, a solo-operator personal repo that does not need PRs, a corporate compliance posture that requires `--no-verify` in a specific automated path).
+
+The override mechanism is **explicit and documented**, never silent:
+
+1. The L3 binding declares an **`## Overrides`** section that names:
+   - the specific rule(s) being overridden (with section number from this spine),
+   - the local replacement rule,
+   - the **reason** (local constraint, compliance, environment, etc.),
+   - whether the override is **temporary** (with target close date) or **permanent**.
+2. The override is a **finding** to this canon's maintainer: it signals that either (a) the spine is missing a case that should be supported, or (b) the consuming repo carries unique constraints that don't apply broadly. Either way, the maintainer reviews and decides whether to amend the spine.
+3. **Silent deviation is forbidden** and counts as drift. A consuming repo whose practice differs from the spine without a declared override is in violation of this canon.
+
+This override pattern applies to **every Dev-Kit spine canon**, not only this one — `CANON-AGENT-COLLABORATION`, `CANON-UPSTREAM-PROTOCOL`, etc. all carry the same contract with their L3 bindings.
+
+---
+
+## §9 — What this canon does NOT do
 
 - It does **NOT** prescribe the specific scripting language, runner, or shell of the preflight. The consuming repo picks.
 - It does **NOT** enforce automatic clean-up. An agent that auto-cleans without confirmation can lose work. *Pause-and-decide* is the discipline.
@@ -95,3 +158,7 @@ The L3 binding does **NOT** re-write the golden rule, the workflow, or the anti-
 ## Provenance
 
 This canon was lifted from ViTo `docs/canon/processes/GIT_HYGIENE_PROTOCOL.md` (status ACTIVE) where the principle and workflow were already written agnostic of any specific tool but trapped at L3 by being filed inside a product repo. The ViTo doc refactors to a thin L3 binding (the specific preflight script path, the dev command, the agent-context files) and points at this spine.
+
+**Amendment 2026-05-25 (Cluster C-4 reconciliation):** §2.4 (No forced hook bypass), §2.5 (Clean Floor / root write prohibition), four new entries in §4 anti-patterns (force-push to main, rebase published commits, overnight rebase, commented-out code, silent `--no-verify`, root write), §7 (All changes via PR governance rule), and §8 (L3 binding override clause — applies to every Dev-Kit spine canon) were lifted from ViTo `CANON-REPO-HYGIENE-001.md` (status ACTIVE) where they had been trapped at L3 despite being agnostic. The ViTo `CANON-REPO-HYGIENE-001.md` was consolidated into `processes/GIT_HYGIENE_PROTOCOL.md` (the existing L3 binding) and superseded — the two duplicate ViTo hygiene canons collapsed into one L3 binding pointing at this spine.
+
+The **§8 override clause** is the meta-mechanism for handling exceptions across all spine canons — defined here once because git-hygiene is the most foundational, but applicable to every L3 binding.
