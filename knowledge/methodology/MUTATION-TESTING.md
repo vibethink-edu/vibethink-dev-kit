@@ -37,7 +37,23 @@ test-passing regression is expensive or dangerous:
   or when a bug slipped past a green suite (the suite had a blind spot — find the
   rest). Not on every commit.
 
-## 3. When NOT to apply it
+## 3. Who decides, and where the criterion lives
+
+Applying mutation testing is a **developer judgment call** — not an automated step and
+not a CI gate. The developer (a human, or an agent in a dev role) decides in the
+moment, per file, with the gut check: *if this code broke silently and the tests still
+passed green, would it hurt?*
+
+- **The criterion lives in this supra-repo** — agnostic, available to any project as
+  reference. It is not bound to any single product, orchestrator, or task system; a
+  developer reasons about it directly from here.
+- **It is not an orchestration / automation flow.** Routing this decision through an
+  automation layer is deliberately out of scope until the promotion gate (§7) is met.
+  Today is the manual-judgment phase — exactly what learn-before-automate prescribes
+  (`CANON-MULTI-AGENT-ORCHESTRATION.md` §3.1): learn the pattern by hand first;
+  automate only the learned, machine-verifiable part later, if a real need appears.
+
+## 4. When NOT to apply it
 
 - **Not a universal gate.** It never blocks CI for the whole repo, and it is not a
   per-file requirement. Forcing it everywhere produces noise and slow runs, and earns
@@ -47,7 +63,7 @@ test-passing regression is expensive or dangerous:
 - **Not preemptively adopted** as a dependency in each repo. The harness is invoked
   standalone (next section); it is not installed per-project.
 
-## 4. Invocation (verified pattern)
+## 5. Invocation (verified pattern)
 
 The harness lives as a **neutral sibling** to the product repos (alongside them, not
 inside any one of them), holding the runner and its dependencies so no target repo
@@ -68,7 +84,7 @@ command-runner against the repo's own tests):
 Keep the run **narrow** — a handful of critical files, their focused tests — so it
 finishes fast and the output is actionable.
 
-## 5. Status of the tooling (honest)
+## 6. Status of the tooling (honest)
 
 The harness is **built and ready to invoke, but not yet validated against real code.**
 The first smoke attempt was blocked by an unrelated dependency-graph problem in the
@@ -76,7 +92,7 @@ target repo (a stale worktree symlink), not by the tool. Any TypeScript project 
 healthy dependencies is a valid first smoke target. Treat the tool as *available and
 opt-in*, not *proven*, until a green run against real code exists (see the gate below).
 
-## 6. Promotion to canonical hosting (deferred — watchlist)
+## 7. Promotion to canonical hosting (deferred — watchlist)
 
 Today the dev-kit **references** this practice and points to the sibling harness
 (reference-and-pointer). Moving the harness *into* the kit under a canonical
