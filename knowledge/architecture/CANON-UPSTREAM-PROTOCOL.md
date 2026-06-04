@@ -174,7 +174,67 @@ The reverse is also true: if a future agent sees an upstream in the inventory **
 
 ---
 
-## §10 — What this canon does NOT do
+## §10 — Ongoing-update decisions (when an upstream has new code)
+
+§3 governs **initial adoption**. This section governs **ongoing updates**, once an upstream is already in the inventory.
+
+For each new upstream change, answer these three questions in order:
+
+### Q1 — Is it a security issue?
+
+If **yes** → UPDATE is mandatory. No negotiation. Branch immediately, fix forward. (Linkage: §11 rule 3.)
+
+### Q2 — What kind of change is it?
+
+| Type | Action |
+|---|---|
+| Security patch | UPDATE always |
+| Bug fix that affects something the consuming repo uses | UPDATE |
+| New feature the consuming repo can use | EVALUATE (continue to Q3) |
+| Breaking change | EVALUATE cost/benefit + ADR (decision-capture trigger) |
+| New feature the consuming repo does NOT use | SKIP + document |
+| Deprecation of something we use | PLAN migration |
+
+### Q3 — Is the sync cost worth it now?
+
+- **Cost:** merge time + testing + regression risk.
+- **Benefit:** product improvement, security, DX.
+- **Timing:** if there is active work in that module right now, sync now (lower coordination cost than later).
+
+If **cost > benefit** → SKIP this version. **Document the skip** in the baseline-versions doc (§6.2) with: package, upstream-latest version, pinned version, decision, date, reason. A skipped version *without* documentation is a finding (§11 rule 2).
+
+---
+
+## §11 — Operating constitutional rules
+
+These rules apply to every ongoing-update touchpoint. They are **NOT negotiable** on a per-update basis.
+
+1. **Upstream claims ≠ product truth.** What the upstream documents is not what your consuming repo has. Verify against the actual local code, not the upstream README.
+2. **Every skip is documented.** "Did not look" ≠ "decided not to update". Only *"I looked and decided to skip because X"* is a valid skip — and X is recorded in the baseline doc.
+3. **Security patches are obligatory.** Without negotiation. Without convenient timing.
+4. **One update per PR.** Never mix updates of multiple upstream repos in a single PR. Bundling defeats reviewability.
+5. **Build + test before merge.** No upstream update merges without a green build and a passing test suite.
+6. **Baseline is truth.** The baseline-versions doc (§6.2) is updated in the same PR as the update. Pin drift without a baseline update is a finding.
+
+These rules complement §2 (the constitutional adoption rule). §2 governs whether to adopt at all; §11 governs how every subsequent touchpoint operates.
+
+---
+
+## §12 — Sync execution shape (pattern, not commands)
+
+The shape for executing a sync is the same for any upstream type. The exact tooling (`pnpm`, `cargo`, `pip`, `npm`, `bundle`, etc.) is **L3 binding**; the steps and gates are agnostic.
+
+1. **Dedicated branch:** `{agent}/{type}-upstream-{name}-{version}` (one upstream per branch; §11 rule 4).
+2. **Fetch + selective integration:** fetch from the upstream remote (if configured) or cherry-pick from a download. **Never** blind-merge — always review the diff first.
+3. **Build + test:** the consuming repo's full build and test suite must pass before any review (§11 rule 5).
+4. **PR body — comparison table:** documents what changed by category (security / bug fixes / new features adopted / breaking changes resolved / features ignored), with the *why* for each ignored item.
+5. **Baseline update in the same PR:** §6.2 is updated as part of the same merge, never as a separate "I'll do it later" PR (§11 rule 6).
+
+The consuming repo's L3 binding documents the concrete commands (which package manager, which branch-naming convention exactly, which CI gate names); the shape above is the spine.
+
+---
+
+## §13 — What this canon does NOT do
 
 - It does **NOT** prescribe specific tools (commit hooks, dependency scanners, drift CI). The consuming repo picks its tooling.
 - It does **NOT** prescribe specific licenses to accept or reject. The consuming repo's authority decides license posture.
@@ -191,3 +251,5 @@ This canon was lifted from two product-side (ViTo) canons that had the agnostic 
 - ViTo `CANON-THIRD-PARTY-ADOPTION-PROTOCOL-001` (DRAFT) — the 6-step protocol, the constitutional rule, originating from the SurveyJS adoption incident (2026-04-14).
 
 The product-specific content (the actual inventory, baseline file path, stack checks, incident records, vocabulary overlay) **remains at L3** in the consuming repo and binds to this spine. Once this canon is sealed, the two ViTo canons restructure to point at this spine and keep only their L3 content.
+
+**Amendment 2026-05-25 (same DRAFT cycle, per Marcelo's directive *"no se quede atrapada en ViTo lo que puede ser agnóstico"*):** §10 (ongoing-update decisions Q1/Q2/Q3), §11 (operating constitutional rules), and §12 (sync execution shape) were lifted from `CANON-UPSTREAM-GOVERNANCE-001` (ViTo §§5, 6, 7, 9) where they had been trapped at L3 despite being agnostic. The ViTo canon retains only the inventory, the npm baseline reference, the soldier/cadence assignments, the SpecKit-specific binding, and product-specific overlays.
