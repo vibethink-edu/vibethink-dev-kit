@@ -262,7 +262,98 @@ This pairing of §13 + §14 with §10 (ongoing-update Q1/Q2/Q3) means: every ups
 
 ---
 
-## §15 — What this canon does NOT do
+## §15 — Runtime-location typology (third orthogonal axis)
+
+§4 classifies upstreams by **kind** (fork-adapted, pinned dep, runtime, design-system, AI provider, CLI personal). §13 classifies them by **risk tier** (Platform Core / Feature Critical / Utility). This section adds a **third orthogonal axis**: where the upstream **runs** relative to the consuming repo's host process.
+
+| Typology | Definition | Mechanism | Examples (by category) |
+|---|---|---|---|
+| **A — Host component** | Code that runs **inside** the consuming repo's host runtime. Inherits its privileges, crash risk, and version constraints. | `import`, `require`, `package.json` dep | UI libs, utility libs, embedded AI SDKs running in-process, build-time plugins |
+| **B — Service component** | Code that runs **alongside** the host as an isolated runtime; communicates via defined contracts. **Exempt** from host runtime version constraints (a sidecar can run a different language/version). | Docker container, sidecar process; HTTP / WebSocket / gRPC | A separate inference service, an indexing engine, a queue worker, a ML pipeline |
+| **C — External peer** | Autonomous system running **outside** the consuming repo's infrastructure control. | API call (REST / GraphQL) over public or private network | An LLM provider API, a payment processor, an analytics SaaS, a legacy ERP |
+
+### §15.1 — The "Import vs Curl" Litmus Test (heuristic)
+
+> **Do you `import` it?** → **Typology A (Host).** It runs in your process. Even if marketed as an "agent" or "microservice," if you import it, it is a library — it inherits your privileges and your crash risk.
+>
+> **Do you `curl` it?** → **Typology B or C.** Differentiator: **do we deploy it?** Yes → B. No → C.
+
+This test prevents the common architectural confusion where a vendor labels a Library as an "Agent" or a Service. The test is mechanical and unambiguous.
+
+### §15.2 — Using the three axes together
+
+| Typology | Common kinds (§4) | Typical risk tiers (§13) |
+|---|---|---|
+| A — Host | fork-adapted, pinned dep, runtime, design-system | Tier 1 or 2 (in-process = higher blast radius) |
+| B — Service | runtime, AI/model provider, design-system kit (rare) | Tier 1 (platform sidecar) or Tier 2 (feature-specific) |
+| C — External | AI/model provider, payment processor, observability | Variable (vendor risk independent of in-process risk) |
+
+The full classification of an upstream is the triple **(kind, tier, typology)** — together they determine its handling end-to-end.
+
+### §15.3 — Typology-specific gates (L3 binding)
+
+Each typology activates additional constraints the consuming repo's L3 binding defines:
+
+- **A (Host):** physical-admission gate (codebase placement, no import leaks), UI-contract gate (CSS isolation, token bridging), license compatibility with the host's distribution model.
+- **B (Service):** container / OCI isolation (must run in a codified container), **no shared memory** with host, explicit CPU / RAM limits, contract definition (OpenAPI / gRPC schema), separate observability.
+- **C (External):** adapter pattern between consuming code and the external API, rate-limit policy, key/secret management (no values in repo), fail-soft on outage.
+
+The consuming repo names the actual gate documents in its L3 binding; this canon names the gate **categories**.
+
+---
+
+## §16 — Intake & Outcome templates (the artifacts §3 produces)
+
+§3 governs the 6-step adoption protocol. This section provides the **templates** for the artifacts that protocol produces — the Sponsor's declared Intent at the start, and the sealed Outcome at decision.
+
+### §16.1 — Intake (the Sponsor declares Intent before any technical work)
+
+Every adoption proposal opens with a Sponsor block. **Without this block, the proposal does not advance through §3.** Fail-closed by design.
+
+```markdown
+## 3P Intake
+
+**Name:** [Component name]
+**Source / Vendor:** [URL / repo]
+**Typology (§15):** [A / B / C] (justify with the Litmus Test §15.1)
+**Risk tier (§13):** [1 / 2 / 3]
+**Kind (§4):** [fork-adapted / pinned dep / runtime / design-system / AI provider / CLI]
+**Data impact:** [read-only / writes user data / writes system core]
+**Privileges:** [what access does it need?]
+**Alternatives considered (at least 1):** [name + why rejected; default per §5: extract-pattern]
+**Exit criteria:** [how do we remove it if it fails?]
+```
+
+### §16.2 — Outcome (the sealed block at decision — the ADR)
+
+Every adoption evaluation closes with a sealed Outcome block. This **is** the ADR that §3 step 6 + §9 (decision-capture linkage) require.
+
+```markdown
+## 3P Evaluation Outcome
+
+**Status:** [ADOPTED | FORKED | EXTRACT-PATTERN | REJECTED | DEFERRED]
+**Scope (typology, §15):** [A — Host | B — Service | C — External]
+**Risk tier (§13):** [1 / 2 / 3]
+**Rationale:**
+[Concise architectural + business + license justification]
+
+**Evidence:**
+- [link to assessment / shootout]
+- [link to proof of concept, if any]
+
+**Owner:** [@handle of the responsible engineer or agent]
+**Next review:** [YYYY-MM-DD or event trigger]
+```
+
+The Outcome block is the **decision record**. The consuming repo's L3 binding declares where these files live (e.g., `docs/decisions/`, `doc/adr/`, equivalent).
+
+### §16.3 — Anti-duplication clause
+
+These templates are the spine's SoT for the **structure** of Intake and Outcome. The **content** of specific evaluations (criteria sets, vendor-evaluation policies, licensing checklists, UI-adapter standards) lives in domain-specific docs the consuming repo names in its L3 binding (§7).
+
+---
+
+## §17 — What this canon does NOT do
 
 - It does **NOT** prescribe specific tools (commit hooks, dependency scanners, drift CI). The consuming repo picks its tooling.
 - It does **NOT** prescribe specific licenses to accept or reject. The consuming repo's authority decides license posture.
@@ -281,5 +372,9 @@ This canon was lifted from two product-side (ViTo) canons that had the agnostic 
 The product-specific content (the actual inventory, baseline file path, stack checks, incident records, vocabulary overlay) **remains at L3** in the consuming repo and binds to this spine. Once this canon is sealed, the two ViTo canons restructure to point at this spine and keep only their L3 content.
 
 **Amendment 2026-05-25 (a) (same DRAFT cycle, per Marcelo's directive *"no se quede atrapada en ViTo lo que puede ser agnóstico"*):** §10 (ongoing-update decisions Q1/Q2/Q3), §11 (operating constitutional rules), and §12 (sync execution shape) were lifted from `CANON-UPSTREAM-GOVERNANCE-001` (ViTo §§5, 6, 7, 9) where they had been trapped at L3 despite being agnostic. The ViTo canon retains only the inventory, the npm baseline reference, the soldier/cadence assignments, the SpecKit-specific binding, and product-specific overlays.
+
+**Amendment 2026-05-25 (b):** §13 (Risk tiers as orthogonal axis to §4), §14 (Automation policy per tier), and the CVE severity policy folded into §11 rule 3 were lifted from `CANON-OSS-UPDATE-METHODOLOGY-001` (ViTo DRAFT) to resolve the overlap diagnosed during paso 3 scan.
+
+**Amendment 2026-05-25 (c) (Cluster C-7 reconciliation):** §15 (Runtime-location typology Host / Service / External as the third orthogonal axis to §4 and §13) including the "Import vs Curl" Litmus Test, and §16 (Intake & Outcome templates that §3 produces) were lifted from `THIRD_PARTY_ACCEPTANCE_PROTOCOL.md` (ViTo ACTIVE). The ViTo canon refactors to a thin L3 binding that names the actual gate documents (`VENDOR_EVALUATION_POLICY`, `GOVERNANCE_IMPORTS`, `VENDOR_UI_ADAPTER_CANON`). In the same wave, the duplicate ViTo `CANON-DEPENDENCY-UPGRADE-POLICY-001` (DRAFT, never sealed) was **consolidated into** `CANON-OSS-UPDATE-METHODOLOGY-001` (already an L3 binding of this spine) and superseded — its more-complete tier inventory and execution protocol were absorbed.
 
 **Amendment 2026-05-25 (b) (same DRAFT cycle, paso 3 reconciliation):** §13 (Risk tiers as orthogonal axis to §4), §14 (Automation policy per tier), and the CVE severity policy folded into §11 rule 3 were lifted from `CANON-OSS-UPDATE-METHODOLOGY-001` (ViTo DRAFT) to resolve the overlap diagnosed during paso 3 scan. The ViTo canon refactors to a thin L3 binding (the actual package lists per tier, the `.github/dependabot.yml` config, ViTo file paths, ViTo-specific examples).
