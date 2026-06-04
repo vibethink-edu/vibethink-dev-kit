@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-06-04
+
+### Added
+
+- Added `knowledge/ai-agents/REVIEW-READINESS-PROTOCOL.md` as the inherited
+  process for review readiness: test the layer that gives the true signal, attach
+  evidence, watch machine gates, avoid duplicate dispatch loops, and leave
+  concrete adapters to consuming repos.
+
+### Changed
+
+- Referenced the review-readiness protocol from `AGENTS_UNIVERSAL.md` so
+  inheriting repos can bind local launchers, auth bootstrap, evidence tools,
+  queue thresholds, and deploy gates without duplicating SUPRA policy.
+
 ## 2026-05-25
 
 ### Added
