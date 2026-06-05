@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that inherits this kit.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** approved by the architect for supra-repo integration (fire-test
+> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation; approved for supra-repo integration (fire-test
 > passed: no product, vendor, tool, or person name appears here).
 > **Amended 2026-05-22:** §3.2 / golden rules — inline code markers are
 > **advisory-only** (a real indexer does not harvest them); **Markdown/ADR is the

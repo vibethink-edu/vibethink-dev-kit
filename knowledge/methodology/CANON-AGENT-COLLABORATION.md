@@ -1,6 +1,6 @@
 # CANON-AGENT-COLLABORATION — Universal model for AI-agent ↔ human collaboration
 
-**Status:** DRAFT — awaiting Marcelo (Principal Architect) seal
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation
 **Date:** 2026-05-25
 **Scope:** Every repo where AI agents (Claude, Codex, Cursor, Gemini, Windsurf, equivalents) collaborate with a human authority on design, code, or governance.
 

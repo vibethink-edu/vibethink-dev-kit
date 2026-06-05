@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** approved (fire-test passed: no product, vendor, or agent brand names appear here).
+> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.

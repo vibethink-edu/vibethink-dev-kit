@@ -1,6 +1,6 @@
 # CANON-GIT-HYGIENE — Universal git hygiene for development sessions
 
-**Status:** DRAFT — awaiting Marcelo (Principal Architect) seal
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation
 **Date:** 2026-05-25
 **Scope:** Every repo where humans and/or agents run development sessions (servers, builds, tests).
 

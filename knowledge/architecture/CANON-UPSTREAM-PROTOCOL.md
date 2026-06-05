@@ -1,6 +1,6 @@
 # CANON-UPSTREAM-PROTOCOL — Universal protocol for adopting and tracking upstream code
 
-**Status:** DRAFT — awaiting Marcelo (Principal Architect) seal
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation
 **Date:** 2026-05-25
 **Scope:** Every repo that adopts, forks, or pins external code. Cross-product (agnostic).
 **Companion canons:** [`CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING`](./CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md) (the decision-capture spine this canon plugs into).
