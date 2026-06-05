@@ -1,7 +1,7 @@
 # CANON — Cross-Agent Context Layering (universal · agent-agnostic)
 
 > **Scope:** every repo that more than one AI agent works in. Vendor-neutral, product-neutral.
-> **Status:** approved (fire-test passed: no product or vendor brand names appear here).
+> **Status:** approved (fire-test passed: no product or vendor brand names appear here). **Amendment 2026-06-05: §9 the startup text and its wiring levels (lifted from a product L3 canon).**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 
 ## 1. Root principle
@@ -89,3 +89,26 @@ Keep three levels distinct; do not let a lower level leak into a higher one:
 
 The fire-test for level 1: it must read clean of any product name, vendor brand, or
 methodology name. If one appears, it is a leak from level 2 or 3 — remove it.
+
+## 9. The startup text and its wiring levels
+
+A repo gives every agent a **canonical startup text** — the minimal *"read these, in
+this order; obey these rules; close a session this way"* an agent needs before its
+first action. The **content** of that text (which docs, which rules) is an L2/L3
+concern; this section governs only that the text **exists** and **how it is
+delivered**.
+
+The text is delivered at **escalating wiring levels** — each higher level reduces the
+reliance on an agent remembering to read:
+
+| Level | Mechanism | Reliance |
+|-------|-----------|----------|
+| **1 — Committed bootstrap files (the floor)** | the startup text lives in the repo's agent-bootstrap files, loaded by working directory (§3) | the agent must actually load the layer |
+| **2 — System prompt** | the same text is pasted as the agent's system prompt | always present for that agent, but per-agent setup |
+| **3 — Session hooks (automation)** | a session-start hook injects or links the text automatically | none — no memory or per-agent setup needed |
+
+**The floor is level 1** — committed, so the text survives any single agent or
+session. Levels 2 and 3 are progressive enhancement, not prerequisites; build the
+hook (level 3) only when the manual levels demonstrably fail (build-on-pain). A repo
+declares which level it operates at; raising the level is an adoption decision, not a
+default.
