@@ -28,6 +28,7 @@ standard. **The only piece that is genuinely ours is the thin human-reading UX l
 | Decision gate / judgment escalation | **Human-in-the-loop approval gates** (mainstream; LangGraph HITL checkpoints; the 5 patterns: sequential/parallel/hierarchical/handoff/loop) | 🛑 Established — adopt the pattern names. |
 | ADR + fitness functions (decision→enforcement) | Nygard (ADR) / Neal Ford (fitness functions) | 🛑 Decades old — use as-is. |
 | **The compass / status-message contracts** (§5.1, §5.1.A, §5.1.B — how a *human* reads agent output) | — (protocols cover machine↔machine, not human-reading UX) | 🟢 **KEEP — this is genuinely ours.** The one slice worth our effort. |
+| **Handoff completeness** (a handoff that looks complete but isn't — §2.3) | **Closed-loop / read-back confirmation** (high-reliability comms: aviation, medicine) · **critic/verifier agent** (agentic-workflow pattern: a pass that hunts what's *missing*) · **"trust then verify" / the builder doesn't grade** (fresh-eval verification, Anthropic Claude Code best-practices) · **Definition of Done** checklists | 🛑 **ADOPT the patterns.** echo-back = read-back · completeness-critic = critic agent · fresh-context check = builder-doesn't-grade. **Ours** = applying them to the *handoff artifact* + the completeness rubric. Sealed into `CANON-MULTI-AGENT-ORCHESTRATION §2.3` (2026-06-05). |
 
 ## The key evidence (backs "lean", not "more")
 
@@ -51,6 +52,21 @@ anti-rooms discipline.
 2. **Keep the compass/status contracts** — they're ours; protocols don't cover them.
 3. **Don't re-derive** SDD, AGENTS.md, HITL, ADR/fitness — adopt by name, stay interoperable.
 4. **A2A** only matters if/when we go networked (server agents) — park until then.
+
+## §7-provenance — handoff completeness (2026-06-05)
+
+This row satisfies the **SOTA-informed seal gate** (`CANON-DEVELOPMENT-PROCESS §7.2`)
+for the `CANON-MULTI-AGENT-ORCHESTRATION §2.3` amendment — the **first** method canon
+authored under §7. Prior-art checked (≥2 independent leading sources), pattern
+extracted not depended-on, sources registered here for the §7.3 watchlist sweep:
+
+- **Closed-loop / read-back** (high-reliability domains) → the **echo-back** mechanism (receiver confirms understanding before acting).
+- **Critic/verifier agent** (agentic-workflow pattern — a pass that asks "what's missing?") → the **completeness-critic** mechanism (author, before declaring ready).
+- **Builder-doesn't-grade / fresh-eval** (Anthropic Claude Code best-practices) → the **fresh-context gap check** for high-stakes handoffs.
+- **Definition of Done** (engineering practice) → the **completeness rubric**.
+
+Extraction, not dependency: the patterns are reimplemented in our own terms against
+our *handoff artifact* — no external tool adopted.
 
 ## Sources
 
