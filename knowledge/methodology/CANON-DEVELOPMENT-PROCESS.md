@@ -95,6 +95,63 @@ An anomaly, risk, or opportunity **outside the current scope** is recorded as a
 typed **finding** (category · location · why · suggested action) — never silently
 fixed and never lost. Security findings escalate to the named authority immediately.
 
+## 7. Method and engineering canons are state-of-the-art-informed
+
+**Scope:** this section governs **method and engineering canons** — those about *how
+work is done* (verification, review, orchestration, scoping, gating, the process
+itself). It does **not** govern product or domain canons (what the product *is*).
+It strengthens the `research → canon` pipeline of §3: for this class of canon,
+research is **not optional**.
+
+### 7.1 — The principle
+
+A method/engineering canon is not sealed on internal conviction alone. Before it
+seals, its author checks how the leading practitioners of that discipline solve the
+same problem, and **inherits the pattern, not the implementation** — the idea adapted
+into the repo's own terms, never a copied dependency nor a cargo-culted ceremony.
+(Same extract-pattern discipline as the upstream-adoption canon; different *object* —
+there it is external *code*, here it is external *practice*.)
+
+### 7.2 — The seal gate (trigger-based)
+
+Before a method/engineering canon moves from draft to sealed:
+
+1. **Prior-art check** — survey how **≥2 independent leading sources** approach the
+   problem; record what was found.
+2. **Extract, don't depend** — state which pattern is adopted and how it was adapted;
+   reject what does not fit (a *documented rejection* is a valid outcome).
+3. **Watchlist entry** — register the sources so their future evolution can be
+   re-checked.
+
+A method/engineering canon sealed without this gate is **incomplete** — its seal is
+provisional until the prior-art is recorded.
+
+### 7.3 — The re-evaluation loop (hybrid cadence)
+
+The state of the art moves; a once-correct method canon drifts from it silently. Two
+cadences keep it honest:
+
+- **Trigger-based (primary)** — the seal gate (§7.2) fires on every new/amended
+  method canon; and a relevant external publication already on the watchlist is
+  itself a trigger to re-open the affected canon.
+- **Periodic sweep (light)** — on a fixed low-frequency cadence (e.g. quarterly,
+  aligned with the upstream/tooling reconciliation), a lightweight pass over the
+  watchlist asks *"did any source move enough to matter?"* The sweep produces
+  **findings, not mandatory rewrites**.
+
+The named authority **owns** the loop and may delegate the sweep; what is not
+optional is that the loop *exists* and is recorded.
+
+### 7.4 — Boundary (not "chase every new framework")
+
+Prior-art **informs**; it does not rule. The authority may seal against the apparent
+state of the art **with a recorded reason**. The discipline is *don't seal a method
+canon without having looked* — never *always copy the leaders*. (This mirrors the
+over-engineering lens of the architecture-review canon: looking is mandatory,
+importing ceremony is not.)
+
+---
+
 ## Fire-test
 
 This document names no product, vendor, brand, or methodology. Those bind at L2/L3.
