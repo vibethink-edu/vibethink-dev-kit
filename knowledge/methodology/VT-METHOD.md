@@ -31,7 +31,11 @@ in six steps:
 3. **Specify** — write the contract at the chosen weight: a short briefing, or a
    full spec. Heavier risk → heavier spec. Never quietly skip a level.
 4. **Execute, governed** — the author gives exact orders + a checklist; the builder
-   implements and raises blockers; the author verifies against the checklist.
+   implements and raises blockers; the author verifies against the checklist. Each
+   work-unit declares its **verification type(s)** up front — the verification gate
+   (`CANON-TESTING-GATE`) maps the unit's *nature × stakes* to the type(s) required
+   (unit · contract · smoke · CLI · self-test · UAT · eval · e2e). The test travels
+   in the **same change** as the code it verifies; TDD is permitted, not mandated.
 5. **Leave the trail** — the lifecycle artifacts (requirements, readiness plan,
    append-only log, roadmap, changelog) so the next person understands without asking.
 6. **Findings** — see something off outside your scope? Record it as a finding —
@@ -60,7 +64,7 @@ The key insight: the research never became the health code — it *informed* it.
 | **Governance** | tiered canon (`SEALED → CANON → DRAFT`) under a single Canon Index; one named approver (the Principal Architect) |
 | **Decision gate** | the **3-Gate Preflight**: structural-impact questions (SI count) + author clarity + a security-surface modifier → methodology choice |
 | **Specification pipeline** | **Direct Execution** (default — briefing + V-xx matrix) · **structured spec-kit** (complex discovery) · **interchange-spec** (laboratory) |
-| **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel |
+| **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel. Each work-unit carries a `Verification: <type(s)>` field selected by the verification gate (`CANON-TESTING-GATE`) — methodology-agnostic: the field lives in the spec's task list *or* in the briefing's V-xx matrix. The test ships in the same change; depth scales with stakes (no global coverage number) |
 | **Lifecycle artifacts** | PRD · deployment/readiness plan · **decision record (ADR)** · append-only log · roadmap · **per-package** changelog |
 | **Decision registration** | ADRs register by layer: agnostic/cross-product → dev-kit `doc/decisions/` (graph-indexed per `CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING`); product-specific → the product's decision store (e.g. a capture-protocol canon + inline `DM-xxx`). Each ADR names its enforcement check (§3.1). |
 | **Findings** | typed finding files in the shared channel (category · location · why · action); security findings escalate immediately |
