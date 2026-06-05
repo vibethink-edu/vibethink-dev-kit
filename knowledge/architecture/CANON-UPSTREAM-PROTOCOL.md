@@ -1,6 +1,6 @@
 # CANON-UPSTREAM-PROTOCOL — Universal protocol for adopting and tracking upstream code
 
-**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation · **§6 amendment RE-SEALED 2026-06-05 by Marcelo** (bounded-adaptation field + discoverable index)
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation · **§6 amendment RE-SEALED 2026-06-05 by Marcelo** (bounded-adaptation field + discoverable index) · **§17 amendment SEALED 2026-06-05 by Marcelo** (provider security-posture lifecycle — agnostic-lift A#7)
 **Date:** 2026-05-25
 **Scope:** Every repo that adopts, forks, or pins external code. Cross-product (agnostic).
 **Companion canons:** [`CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING`](./CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md) (the decision-capture spine this canon plugs into).
@@ -230,7 +230,7 @@ These rules apply to every ongoing-update touchpoint. They are **NOT negotiable*
 
 1. **Upstream claims ≠ product truth.** What the upstream documents is not what your consuming repo has. Verify against the actual local code, not the upstream README.
 2. **Every skip is documented.** "Did not look" ≠ "decided not to update". Only *"I looked and decided to skip because X"* is a valid skip — and X is recorded in the baseline doc.
-3. **Security patches are obligatory.** Without negotiation. Without convenient timing. **Severity policy:** Critical/High CVE → update **same day** (override every other rule). Medium → within **one week**. Low → at next **monthly review**.
+3. **Security patches are obligatory.** Without negotiation. Without convenient timing. **Severity policy:** Critical/High CVE → update **same day** (override every other rule). Medium → within **one week**. Low → at next **monthly review**. *(This rule governs a fix **you** apply to code you consume. When the **provider itself** degrades and there is no patch you can apply — an active breach, a leaked credential, an expired certificate — the response is not "patch" but "stop consuming until they remediate": see §17, the provider security-posture lifecycle.)*
 4. **One update per PR.** Never mix updates of multiple upstream repos in a single PR. Bundling defeats reviewability.
 5. **Build + test before merge.** No upstream update merges without a green build and a passing test suite.
 6. **Baseline is truth.** The baseline-versions doc (§6.2) is updated in the same PR as the update. Pin drift without a baseline update is a finding.
@@ -315,7 +315,7 @@ Each typology activates additional constraints the consuming repo's L3 binding d
 
 - **A (Host):** physical-admission gate (codebase placement, no import leaks), UI-contract gate (CSS isolation, token bridging), license compatibility with the host's distribution model.
 - **B (Service):** container / OCI isolation (must run in a codified container), **no shared memory** with host, explicit CPU / RAM limits, contract definition (OpenAPI / gRPC schema), separate observability.
-- **C (External):** adapter pattern between consuming code and the external API, rate-limit policy, key/secret management (no values in repo), fail-soft on outage.
+- **C (External):** adapter pattern between consuming code and the external API, rate-limit policy, key/secret management (no values in repo), fail-soft on outage, and a **provider security-posture grade** with a ban/reinstate lifecycle (§17) — the provider's own security is outside your patching control, so it is governed as a distinct axis.
 
 The consuming repo names the actual gate documents in its L3 binding; this canon names the gate **categories**.
 
@@ -372,13 +372,103 @@ These templates are the spine's SoT for the **structure** of Intake and Outcome.
 
 ---
 
-## §17 — What this canon does NOT do
+## §17 — Provider security-posture lifecycle (orthogonal axis)
+
+§4 classifies upstreams by **kind**, §13 by **risk tier**, §15 by **runtime location**. This section adds the axis those three miss: the **security trustworthiness of the provider itself**.
+
+> **§13 measures blast radius if the upstream breaks. This section measures whether the provider's own security can be trusted at all.** They are independent: a Tier-1 platform-core provider can still be security-grade-F, and a Tier-3 utility can be grade-A.
+
+This axis is most load-bearing for **Typology C (External)** and **Typology B (Service)** providers — the ones whose security posture sits **outside your patching control**. For a Typology A (Host) dependency you can patch the code yourself (§11 rule 3 governs that). For an external provider that is breached, you cannot patch them; the only lever is to **stop consuming them** until they remediate. That is what this lifecycle governs.
+
+> **Iron rule:** an insecure external provider is worse than no provider. Block first, evaluate later.
+
+### §17.1 — Security grading
+
+Every external provider (Typology B/C) carries a **security grade** drawn from provider-controlled criteria — authentication strength, transport security, data handling, incident history, and documentation/transparency. The grade is recorded wherever the provider is inventoried (the discoverable upstream index, §6.2).
+
+| Grade | Meaning | Action |
+|---|---|---|
+| **A — Trusted** | Strong auth, modern transport, no known incidents, public security posture | Full integration allowed |
+| **B — Acceptable** | Adequate auth, minor past incidents resolved, no current advisories | Integration allowed **with monitoring** |
+| **C — Caution** | Weak auth or thin security docs or past unresolved issues | Integration allowed **with extra controls** (rate limiting, secret-rotation schedule, network rules) |
+| **F — Banned** | Active security incident, breach, credential leak, transport compromise, malware, auth bypass | **BANNED — zero integration work until reinstated** |
+
+The spine mandates that a grade **exists** and that grade `F` blocks all integration work. The **exact weighted rubric, the numeric thresholds, and the column/field that stores the grade are L3 binding** — the consuming repo defines them (§17.7).
+
+### §17.2 — Ban triggers (block all integration work)
+
+A ban blocks **all** integration work on the provider — distinct from §11 rule 3, which obligates a patch **you** apply. A ban is the response when the provider itself has degraded and no patch of yours can fix it.
+
+**Automatic (no approval needed — any agent or human MUST set the provider to `F` on discovery):**
+
+| Trigger | Example |
+|---|---|
+| Active data breach | Provider announces a breach affecting API consumers |
+| Credential / secret exposure | Provider's API keys or OAuth secrets leaked publicly |
+| Transport compromise | Endpoint served over plaintext or with an invalid / expired certificate (MITM exposure) |
+| Malware delivery | Provider responses carry malicious payloads |
+| Authentication bypass | A known exploit allows unauthenticated access |
+| Regulatory shutdown | A government orders the provider to cease operations |
+| Supply-chain compromise | The provider's distributed SDK / library is hijacked |
+
+**Manual (requires the consuming repo's human authority to confirm):**
+
+| Trigger | Example |
+|---|---|
+| Repeated unplanned outages | Multiple unplanned outages in a short window affecting your consumers |
+| Silent breaking changes | Provider behavior changes with no changelog or notice |
+| Undocumented throttling | Provider silently throttles beyond any documented limit |
+| Unresponsive security team | A reported vulnerability gets no response within the policy window |
+| Sunset without migration path | API version deprecated with insufficient notice and no successor |
+
+### §17.3 — Ban execution (agnostic shape)
+
+When banning a provider, the consuming repo executes — in its own concrete artifacts:
+
+1. **Record the ban in the upstream index (§6.2)** with date, reason, and a review date.
+2. **Add a ban banner** to the provider's reference artifact.
+3. **File a decision / finding record** (this is a decision-capture trigger, §9).
+4. **Disable or feature-flag the integration code** — fail-soft per §15.3-C.
+5. **Notify live downstream consumers** if any have active connections.
+6. **Commit and push immediately** — a ban is a governance event.
+
+The consuming repo's L3 binding names the concrete artifacts (the registry/index file, the reference-file format, the ban-banner template, the notification channel).
+
+### §17.4 — Periodic security health-check
+
+Orthogonal to **drift detection (§6.3)**, which watches *version* drift. This check watches the provider's *security posture*: status / incident pages, security advisories and CVEs, transport-certificate validity and expiry, and endpoint or version changes that carry security implications. **Cadence follows the risk tier (§14).** The mechanism (script, CI gate, manual review) is the consuming repo's choice; the **existence** of the check is mandatory.
+
+### §17.5 — Reinstatement (governed, with probation)
+
+A banned provider returns to active status **only** when all hold:
+
+1. **Root cause remediated** — the issue that triggered the ban is fixed.
+2. **Provider confirms** — written confirmation (advisory, incident report, or equivalent) that it is resolved.
+3. **Independent verification** — the consuming repo verifies the fix itself, not just the provider's word.
+4. **Authority approves** — the consuming repo's human authority explicitly approves reinstatement.
+5. **Probation** — the provider returns at grade `C (Caution)` for a probation window before any re-grade upward.
+
+### §17.6 — L3 binding (what the consuming repo owns)
+
+- The **exact weighted scoring rubric** and the numeric grade thresholds.
+- **Where the grade lives** (the registry column or inventory field).
+- The **reference-artifact format** and the **ban-banner template**.
+- The **notification channel** for live consumers.
+- The **health-check tooling / command** and the concrete cadence per tier.
+- The **provider categories** specific to the product's domain.
+
+This section defines the lifecycle (grade → ban → health-check → reinstate); the L3 binding defines the **instance**. If the L3 binding restates the lifecycle instead of pointing at it, it drifts.
+
+---
+
+## §18 — What this canon does NOT do
 
 - It does **NOT** prescribe specific tools (commit hooks, dependency scanners, drift CI). The consuming repo picks its tooling.
 - It does **NOT** prescribe specific licenses to accept or reject. The consuming repo's authority decides license posture.
 - It does **NOT** replace the decision-capture canon — it sits on top of it for the upstream-adoption case.
 - It does **NOT** define the "small utility" threshold quantitatively. Use common sense; if in doubt, run the protocol — the cost of running it is lower than the cost of an undocumented adoption.
 - It does **NOT** govern the operator-personal axis (§8); that lives outside any product repo by design.
+- It does **NOT** fix the security-grade rubric, the numeric thresholds, or the ban-banner format (§17); it mandates that a grade exists, that grade `F` blocks integration, and that a reinstatement is governed — the consuming repo owns the rest.
 
 ---
 
@@ -397,5 +487,7 @@ The product-specific content (the actual inventory, baseline file path, stack ch
 **Amendment 2026-05-25 (c) (Cluster C-7 reconciliation):** §15 (Runtime-location typology Host / Service / External as the third orthogonal axis to §4 and §13) including the "Import vs Curl" Litmus Test, and §16 (Intake & Outcome templates that §3 produces) were lifted from `THIRD_PARTY_ACCEPTANCE_PROTOCOL.md` (ViTo ACTIVE). The ViTo canon refactors to a thin L3 binding that names the actual gate documents (`VENDOR_EVALUATION_POLICY`, `GOVERNANCE_IMPORTS`, `VENDOR_UI_ADAPTER_CANON`). In the same wave, the duplicate ViTo `CANON-DEPENDENCY-UPGRADE-POLICY-001` (DRAFT, never sealed) was **consolidated into** `CANON-OSS-UPDATE-METHODOLOGY-001` (already an L3 binding of this spine) and superseded — its more-complete tier inventory and execution protocol were absorbed.
 
 **Amendment 2026-05-25 (b) (same DRAFT cycle, paso 3 reconciliation):** §13 (Risk tiers as orthogonal axis to §4), §14 (Automation policy per tier), and the CVE severity policy folded into §11 rule 3 were lifted from `CANON-OSS-UPDATE-METHODOLOGY-001` (ViTo DRAFT) to resolve the overlap diagnosed during paso 3 scan. The ViTo canon refactors to a thin L3 binding (the actual package lists per tier, the `.github/dependabot.yml` config, ViTo file paths, ViTo-specific examples).
+
+**Amendment 2026-06-05 (A#7) — SEALED by Marcelo:** §17 (Provider security-posture lifecycle — grade A/B/C/F as a fourth orthogonal axis, ban triggers, ban execution, periodic security health-check, governed reinstatement with probation) was lifted from ViTo `CANON-API-SECURITY-BAN-POLICY-001` (SEALED 2026-03-30), whose agnostic substance — *"an insecure external provider is worse than none; grade it, ban active incidents, health-check, reinstate via probation"* — was buried under ViTo-specific binding (the `API-REGISTRY.md` Security Grade column, the 12-section `*_API_REFERENCE.md` format, the HTB category, `pnpm api:health-check`, LY-MSG tenant notifications, the exact weighted criteria values). Coverage-check confirmed the gap: §13 (risk tier = blast radius) ≠ provider security trustworthiness; §11 rule 3 (patch **you** apply) ≠ ban when the **provider** degrades; §6.3 (version drift) ≠ provider security posture. The old §17 ("What this canon does NOT do") shifted to §18 (uncited section, zero citation breakage; §15/§16 were verified cited and left intact). The ViTo canon restructures to a thin L3 binding (§17.6) pointing here and keeping only its product-specific instance. Additive only — no normative substance removed. **SEALED 2026-06-05 by Marcelo.**
 
 **Amendment 2026-06-05 — RE-SEALED by Marcelo:** §6.1 gained the **bounded-adaptation / do-not-overwrite-on-sync** field (descriptive diff summary alone silently reverts deliberate divergences on a sync); §6.2 broadened from a pinned-dep baseline into the **single discoverable upstream index** across all kinds (forks + deps + runtimes + providers), with `kind`, `cadence`, and `bounded-adaptation?` columns. Lifted as the agnostic generalization of two ViTo signals surfaced in `FINDING-UPSTREAM-PROCESS-NOT-STANDARD-2026-06-05` (#2999 actions #4 + #3): the ViTo SpecKit fork's `.specify/UPSTREAM.md` (a real bounded adaptation) and Marcelo's "el proceso debe ser estándar y discoverable". Additive only — no normative substance removed. **SEALED 2026-06-05 by Marcelo.**
