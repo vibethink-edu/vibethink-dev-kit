@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where the human authority asks an agent "where are we / what's left / what's next" on a feature or front.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** DRAFT — awaiting human-authority seal.
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-AGENT-COLLABORATION` §6 (report results, not process) — this canon is the specific shape of one such report.
 

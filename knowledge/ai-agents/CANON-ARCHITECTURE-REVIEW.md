@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where a second architect / external advisor / audit agent reviews the system's architecture (not a single change).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** DRAFT — awaiting human-authority seal.
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings (do not duplicate):** `REVIEW-CALL-CHECKLIST` (the controls for reviewing a single *implementation* — recall/precision, correct-by-design) · `REVIEW-READINESS-PROTOCOL` (is the work *ready* to review + handoff states). **This canon covers the third thing: verdicts on the *architecture itself*** — gaps, drift, contradictions, and the lens the reviewer brings.
 

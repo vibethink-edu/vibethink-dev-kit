@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that has not yet reached its first real user with live data.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** DRAFT — awaiting human-authority seal.
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Parent:** `CANON-AGENT-COLLABORATION` §4 (Pre-production discipline) states the principle and the transition; this canon is the tactical body it delegates to.
 
