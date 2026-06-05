@@ -142,3 +142,28 @@ Any implementation of this model must pass:
 ## §10 — External lineage
 
 This model follows the industry shift from "building agents" to "building skills" — composable, file-packaged procedural knowledge an agent loads on demand — and the harness/orchestration layer that runs sessions on top of generalist agents. The supra-repo tracks the specific external sources in its research notes; the consuming repo's L3 binding records which sources inspired its own adoption.
+
+---
+
+## §11 — When is something a skill? (three levels — settle this once, don't re-research)
+
+Not every task warrants a skill. The state of the art is consistent on the boundary:
+
+- **Level 1 — general programming → NO skill.** Writing CSS, Python, TypeScript, generic logic, generic architecture: the base model is already expert; a skill adds nothing. Do not wrap general coding in a skill.
+- **Level 2 — *always*-relevant conventions → the always-loaded rules doc** (the agent's `CLAUDE.md`/`AGENTS.md`-equivalent), not a skill. Constitutional rules that apply to every task live here.
+- **Level 3 — *sometimes*-relevant, repeatable, error-prone, project-specific procedure → SKILL** (on-demand, progressive disclosure). This is the only level where a skill earns its keep: a multi-step convention-heavy workflow the model would otherwise do inconsistently (e.g. "produce a compliant DB migration", "harden an API route to the project's auth/validation pattern", "interpret this repo's CI gate failures and run the pre-PR ritual").
+
+**Evidence:** controlled evals across models show a consistent positive lift (roughly +10 to +23 points) when the *right* Level-3 skill is loaded — but only for the specialized/convention-heavy task, never for general coding. The model matters less than the skill you load *for that task*.
+
+**Corollary — skills de-bloat the always-loaded rules doc.** When the rules doc grows past its host's context budget (and starts truncating), that is a signal that *sometimes*-relevant material is mis-filed as Level 2; move it to Level-3 skills (on-demand) to shrink the always-loaded surface.
+
+---
+
+## §12 — Inherit or build a skill? (extract-patterns)
+
+When a skill is warranted, decide inherit-vs-build by **how constitutional its content is**:
+
+- **Build** when the content is the repo's own constitution / conventions / product-DNA (its governance gates, its category vocabulary, its schema rules). No external skill can know your constitution — building it is the point. The more constitutional, the more you build.
+- **Inherit** three things regardless, never reinvent them: (1) the **open skill format/standard** (the manifest spec the ecosystem shares); (2) **interaction patterns** proven elsewhere (e.g. reconnaissance-then-act for any check-then-fix skill); (3) a **skill-development / eval-and-benchmark** capability to *measure whether the skill actually works* — adopting a skill without an eval to validate it is how a skill silently rots.
+
+Generic skills (a base code-review) lean toward inherit; constitutional/DNA skills lean toward build. The pattern is agnostic → it can live as a Dev-Kit template; the content is the consuming repo's (L3).
