@@ -152,6 +152,35 @@ importing ceremony is not.)
 
 ---
 
+## 8. Completeness and full ownership of a unit
+
+A slice (§2) is **done only when every dimension it requires is complete** — not
+when its primary artifact merely compiles. Which dimensions apply scales with the
+unit (type safety, data/schema, implementation, localization, documentation, and
+deployability are the usual ones; each repo enumerates its own set in its L3
+binding), but the discipline is universal:
+
+1. **One owner, end to end.** Whoever takes a unit owns *all* of its dimensions.
+   There is no "someone else will localize / document / migrate it later": a
+   dimension deferred to a follow-up is a dimension that silently never ships.
+2. **No handoff of a missing dimension.** A unit is not handed off, declared done,
+   or merged with a known-incomplete dimension. Half a unit is zero value to the
+   consumer, not half value.
+3. **A commit certifies the whole.** A commit is not "my file works"; it asserts
+   *the system works after this change*. The committer answers for the full vertical
+   the change touches, not only the line edited.
+4. **Completeness scales, but never to zero.** A trivial change carries fewer
+   dimensions, but no real change carries none — if it touches user-facing text it
+   carries localization; if it touches a shared unit it carries that unit's
+   changelog; if it makes an architectural decision it carries an ADR (§5).
+
+Enforcement is **cultural, not mechanical**: peer review, the named authority's
+review, and the session-close ritual (`CANON-AGENT-COLLABORATION` §8) check
+completeness — no automated gate can enumerate every dimension for every repo. The
+artifacts of §5 are the durable record that the dimensions were in fact carried.
+
+---
+
 ## Fire-test
 
 This document names no product, vendor, brand, or methodology. Those bind at L2/L3.
