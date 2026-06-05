@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here).
+> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -100,6 +100,56 @@ must end in exactly **one intentional, declared state**:
   or discard. A stricter automation (daemon, watcher, auto-rescue) is
   **deferred until the manual scan is shown to be insufficient** — build-on-pain
   applies here too (§3.1).
+
+## 2.3 Handoff completeness — a handoff that looks complete but isn't
+
+A **handoff** is the durable context one session/agent leaves for the next — broader
+than the six per-task artifacts of §8: it transfers a *whole front's* state, not one
+task's. Its failure mode is specific: **a handoff the author reads charitably as
+complete, while the receiver finds the holes only mid-execution.** The author cannot
+see their own gaps — they hold the missing context in their head, so the condensed
+doc *reads* complete to them. (Same family as "approved once ≠ still sound": the
+author trusts their own artifact instead of verifying it.)
+
+### The completeness rubric
+
+A complete handoff answers **all** of:
+
+- **mission / why** — the purpose to internalize, not just the task;
+- **verified state, with proof** — not "X is done" but the command / PR / artifact that shows it;
+- **every thread** — paused fronts, backlog, dependencies — not only the active one;
+- **level of detail** — the actual detail, or a link to it; never a condensation that drops the only copy;
+- **pending decisions** — what the human authority still owes;
+- **disciplines** — the non-negotiables for this work;
+- **read-first** — the committed docs to load;
+- **lessons** — what went wrong before, so it is not repeated;
+- **how to start** — the first concrete steps;
+- **the boundary: "what is NOT in here"** — condensation made visible, not silent.
+
+A handoff missing any line is **incomplete** — the gap becomes the next session's lost time.
+
+### Four mechanisms (defense in depth)
+
+1. **Completeness-critic (author, before declaring ready).** An active *"what did I
+   leave out?"* pass against the rubric — **not** a reread. A reread sees what is
+   present; the critic hunts what is **absent**.
+2. **Echo-back (receiver, before executing).** The receiver returns a short
+   orientation of its understanding (the compass §5.1, a few lines) **before** acting.
+   **A hole in the echo means the handoff was incomplete** — close it before work
+   starts, not after. This is closed-loop confirmation (read-back), borrowed from
+   high-reliability domains.
+3. **Committed + explicit boundary.** The handoff lives **committed** in the channel
+   (durable — chat memory compresses under pressure), and it **names what it does not
+   contain**, so condensation is a visible decision, never a silent loss.
+4. **Fresh-context gap check (high-stakes only).** For a high-stakes handoff, an
+   independent advisor in a context that did **not** author it reviews it for gaps
+   (the gaps lens of the architecture-review canon). The author cannot grade their
+   own completeness.
+
+> The author owns mechanisms 1 and 3; the receiver owns 2; 4 escalates for
+> high-stakes. The cheap default is **1 + 2 + 3**; reserve 4 for handoffs whose
+> failure is expensive (do not ceremonialize every handoff — the over-engineering
+> boundary of the architecture-review canon applies).
 
 ## 3. The safety boundary
 
