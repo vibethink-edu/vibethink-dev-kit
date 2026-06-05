@@ -71,6 +71,22 @@ Human authority of the consuming repo decides one of: `ADOPT` / `FORK` / `EXTRAC
 
 **No code lands before the ADR is written.** A code commit referencing an upstream without a matching ADR is a finding (§9).
 
+### §3.1 — License-compatibility matrix
+
+Step 3's verdict is bounded by this matrix. What a license permits depends on the **mode** of use — adopting as a managed dependency, extracting patterns (zero source copied), or forking source into the repo:
+
+| License | Adopt as dependency? | Extract patterns (zero code)? | Fork source into the repo? |
+|---|---|---|---|
+| MIT | ✅ | ✅ | ✅ (with attribution) |
+| Apache 2.0 | ✅ | ✅ | ✅ (with a NOTICE file) |
+| ISC / BSD | ✅ | ✅ | ✅ (with attribution) |
+| AGPL-3.0 | ⚠️ only as an external service (network boundary) | ✅ patterns only, zero code | ❌ **never** — copyleft contaminates the repo |
+| GPL-3.0 | ⚠️ only as an external service | ✅ patterns only, zero code | ❌ **never** — copyleft contaminates the repo |
+| Source-available (BSL / SSPL / SEE) | ❌ read the terms | ✅ patterns only | ❌ likely restricted |
+| Proprietary / no license | ❌ | ⚠️ fair use only | ❌ |
+
+> **Iron rule:** strong-copyleft code (AGPL / GPL) **never** enters the repo as a fork or copy — not "just this one function." It may be studied for patterns (reimplemented from scratch in the repo's own style) or consumed across a network boundary as an external service. The `UPSTREAM.md` must flag this constraint explicitly. (The matrix interacts with §15's runtime-location typology: "external service" is exactly the AGPL-safe runtime location.)
+
 ---
 
 ## §4 — Taxonomy of upstream types
