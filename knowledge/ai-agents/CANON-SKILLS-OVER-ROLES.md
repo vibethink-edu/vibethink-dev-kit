@@ -167,3 +167,29 @@ When a skill is warranted, decide inherit-vs-build by **how constitutional its c
 - **Inherit** three things regardless, never reinvent them: (1) the **open skill format/standard** (the manifest spec the ecosystem shares); (2) **interaction patterns** proven elsewhere (e.g. reconnaissance-then-act for any check-then-fix skill); (3) a **skill-development / eval-and-benchmark** capability to *measure whether the skill actually works* — adopting a skill without an eval to validate it is how a skill silently rots.
 
 Generic skills (a base code-review) lean toward inherit; constitutional/DNA skills lean toward build. The pattern is agnostic → it can live as a Dev-Kit template; the content is the consuming repo's (L3).
+
+---
+
+## §13 — Does the skill actually work? (the eval loop)
+
+§11 decides *whether* to create a skill (a-priori criterion). §13 is the missing other half: **evidence** that a created skill earns its place (a-posteriori). A skill adopted on intuition, never measured, silently rots — it drifts from the task, bloats context, or was never load-bearing to begin with. The eval loop is the guardrail §12's third inherit-item points at, made concrete.
+
+### §13.1 — The loop (five steps, provider-agnostic)
+
+1. **Eval set** — a small, fixed set of representative tasks the skill is meant to help with (5–15 is enough), each with a **checkable success criterion** — a rubric, an expected artifact shape, a gate it must pass. This rubric is the skill's *contract*; treat it as a verification artifact, not prose.
+2. **Baseline** — run the eval set with the skill **not** loaded; score against the rubric. This is the honest "what the bare model already does" number — the same discipline as measuring before optimizing.
+3. **With-skill** — run the same set with the skill loaded; score against the same rubric.
+4. **Lift** = with-skill − baseline. Adopt or keep the skill **only** when the lift is clearly positive and worth the context cost. Zero or negative lift → the skill is noise: cut it, or rewrite its triggers/body and re-run. "Sounds useful" is not adoption evidence; the lift is.
+5. **Regression** — re-run the eval set on a trigger (skill edited, host model changed, periodic sweep). A skill that helped at adoption can decay; the eval set is its standing regression test.
+
+### §13.2 — The eval is a verification contract, not a new mechanism
+
+A skill's eval set is exactly a **canon-contract** in the verification taxonomy — a checkable rubric over representative inputs. It is owned by, and runs under, the repo's existing testing/verification gate; §13 does **not** invent a parallel test system. Where a verification gate already routes change-nature × stakes to a test type, "validate a skill" routes to *canon-contract eval*, and escalates to architecture review only when the skill itself encodes a high-stakes contract.
+
+### §13.3 — Inherit the loop, never the dependency
+
+The eval-loop *capability* (a viewer to inspect runs, a runner to execute the set, a benchmark to compare baseline vs with-skill) is a proven external pattern — **inherit the pattern, implement a minimal own version, do not take a runtime dependency** (§12). The eval set's *content* — which tasks, which rubric — is the consuming repo's (L3); the loop's *shape* is agnostic (this spine). A consuming repo binds §13 by naming where its eval sets live and which gate runs them.
+
+### §13.4 — Floor
+
+No hard ceremony for a one-off, low-stakes skill — but a skill that gates production behavior, governs a constitutional convention, or is loaded broadly **must** carry an eval set before it is treated as load-bearing. Unmeasured skills in that tier are a finding, not a default.
