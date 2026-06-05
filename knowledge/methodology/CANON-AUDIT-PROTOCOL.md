@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that audits its own canon, features, or surfaces for truthfulness and follow-through.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** DRAFT — awaiting human-authority seal.
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling (do not duplicate):** `CANON-ARCHITECTURE-REVIEW` — that canon is the *verdict on a system's architecture* (is the design sound, what are the gaps). **This canon is a different object: the audit of *artifacts* (canon, features, surfaces) for *truthfulness*, and the *disposition* that carries every finding to closure.** Review asks "is it sound?"; audit asks "does it lie, and did we act on what we found?"
 > **SOTA-informed (`CANON-DEVELOPMENT-PROCESS §7`):** prior-art for the two halves — *claims/documentation auditing* (does the artifact assert a present truth it cannot back?) and *finding-lifecycle / triage disposition* (issue states carried to closure, definition-of-done for findings). Patterns extracted, not a tool adopted.
