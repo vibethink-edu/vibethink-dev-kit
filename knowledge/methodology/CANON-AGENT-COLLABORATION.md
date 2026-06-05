@@ -146,6 +146,34 @@ Before any non-trivial proposal:
 3. If they do, reformulate before presenting.
 4. State the cleanup cost if you are wrong (one line: *"if this is wrong, cleanup is ~X hours"*).
 
+### §5.3 — The four-step preflight (mandatory before any constitutional proposal)
+
+When the proposal touches a foundational concept, the rule of thumb (§5.2) expands into a formal protocol. Run these four steps **in order** before presenting:
+
+1. **Identify the governing canon(s).** List every canon that could govern the proposal's domain — the foundational / philosophy-root canon always, plus the canon(s) of the specific module the proposal touches, plus any canon those reference as a dependency.
+2. **Read them in full.** Not the summary. Read the critical sections: forbidden vocabulary, anti-patterns / constitutive rules, validation cases.
+3. **Map each proposal element against the canon.** For every concrete element (field, function, tier, metric, flow, UI term, name): is it named with permitted vocabulary? Does it contradict an explicit anti-pattern? Does it pass the canon's validation cases?
+4. **Binary decision.** If *every* element passes, the proposal may be presented — and the proposal doc carries a `## Preflight against canon` section naming the canons checked and the conclusion. If *any* element fails, the proposal is **not presented**: reformulate the conflicting element and return to step 3. If it cannot be reformulated without losing its point, present a **meta-level question** instead — *"do you want to amend canon X to allow this?"* — never *"do you approve this proposal?"*.
+
+### §5.4 — Operational vs constitutional questions
+
+Not every question needs the preflight. The test is what the question *touches*.
+
+- **Operational** (no preflight): naming a route, how many test fixtures to seed, approving a mechanical merge. The answer does not bind a foundational concept.
+- **Constitutional** (preflight mandatory): any question whose vocabulary, concepts, functions, or flows relate to a foundational concept. A question that *looks* operational but whose "yes" would commit the product to a foundational direction is constitutional — flag it as such and run the preflight.
+
+When unsure whether a proposal touches a foundational concept, **assume it does** and run the preflight.
+
+### §5.5 — An approval against canon is null
+
+When the preflight is skipped and the human approves something that contradicts canon:
+
+1. The approval is **automatically void** — not because the human cannot approve, but because the question was malformed. Canon prevails by default; no explicit revocation is needed.
+2. The proposing agent has an **operational bug** and documents it (what was proposed, which canon went unchecked, which elements contradict it, what the correct reformulation would have been) so the next agent learns.
+3. The agent may **never** argue *"but the human approved it."* If the human approved against their own canon, the bug belongs to the agent that skipped the preflight.
+
+This is traceability, not punishment. The preflight does not make agents infallible; it makes their failures detectable and correctable **before** they propagate into canon.
+
 ---
 
 ## §6 — Ten constitutional rules of collaboration
