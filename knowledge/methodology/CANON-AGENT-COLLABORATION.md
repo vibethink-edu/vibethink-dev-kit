@@ -117,9 +117,9 @@ DEV-MODE ends the day the human authority of the consuming repo declares the tra
 
 Until that phrase is pronounced, all is DEV-MODE.
 
-### §4.2 — Consuming-repo dependency
+### §4.2 — Tactical body
 
-This canon establishes the **principle**. The tactical rules of DEV-MODE (what kinds of action are default-allowed, what kinds need pause-and-confirm) live in a companion canon at the consuming repo's L3 binding (e.g., `CANON-DEV-MODE-AGENT-OPERATION-001` or equivalent in the consuming repo's convention).
+This canon (§4 / §4.1) establishes the **principle** and the **transition**. The full tactical body of DEV-MODE — deletion-as-default, migrations-without-preservation, ceremony-vs-governance, gates-stay-active, over-protection detection, and the warranted-ceremony exceptions — lives in the sibling spine **`CANON-DEV-MODE-DISCIPLINE`**. The consuming repo's specific gate set, exception list, and go-live context live in its L3 binding (e.g., `CANON-DEV-MODE-AGENT-OPERATION-001` or equivalent in the consuming repo's convention).
 
 ---
 
