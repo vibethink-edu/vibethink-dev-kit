@@ -1,0 +1,191 @@
+# CANON-BRANCH-WORKTREE-LIFECYCLE — Universal branch & worktree lifecycle mechanics
+
+**Status:** DRAFT 2026-06-05 (agnostic-lift A#8) — pending Marcelo seal
+**Date:** 2026-06-05
+**Scope:** Every repo where one or more contributors — human or agent — create branches or worktrees. Cross-product (agnostic).
+**Companion canons:** [`CANON-GIT-HYGIENE`](./CANON-GIT-HYGIENE.md) (session hygiene this spine does not restate) · [`CANON-MULTI-AGENT-ORCHESTRATION`](../ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md) (coordination + the exit-state vocabulary this spine's exit gate produces) · [`CANON-NAMING-CONVENTIONS-001`](./CANON-NAMING-CONVENTIONS-001.md) (the branch & worktree naming pattern this spine consumes, §3).
+
+---
+
+## §1 — Principle
+
+Every branch has a **birth and a death** — an entry gate and an exit gate. A branch or worktree that lingers without purpose is **invisible technical debt**. Workspace **isolation** is the mechanism (one task does not collide with another); lifecycle **discipline** is the rule (nothing is created without a gate, nothing is left without an exit).
+
+> **A branch with no exit gate, or a worktree with no cleanup, is the failure mode this canon prevents** — the same way an unreviewed upstream or a dirty working floor is the failure mode of the companion canons.
+
+This spine owns the **mechanics** that sit between **session hygiene** (`CANON-GIT-HYGIENE`) and **coordination/handoff** (`CANON-MULTI-AGENT-ORCHESTRATION`): the phase model, naming, worktree isolation, default-worktree read-only, and the spawned-worker lifecycle.
+
+---
+
+## §2 — Relationship to the companion spines (no duplication)
+
+| Concern | Owner | This spine |
+|---|---|---|
+| Clean working floor, forbidden force-push / rebase-of-published / silent hook-bypass, *all changes via PR* | **`CANON-GIT-HYGIENE`** §2/§4/§7 | does **not** restate them; §8 lists only the *additional* lifecycle anti-patterns |
+| Exit-state **vocabulary** (`PUSHED` / `READY-PR` / `DISCARDED`) + handoff completeness | **`CANON-MULTI-AGENT-ORCHESTRATION`** §2.2/§2.3 | the exit gate (§3) **produces** one of those states; it does **not** redefine them. A consuming repo may extend the set at L3 (e.g. `READY-MERGE` / `WIP` / `SUPERSEDED` / `BLOCKED`) |
+| Branch & worktree **naming** pattern (`{author}/{type}-{slug}`, `wt-<feature>`) | **`CANON-NAMING-CONVENTIONS-001`** §3 | does **not** redefine it; §4 only points at it and notes *when* in the lifecycle the name is assigned |
+| Branch + worktree **mechanics** (phases, isolation, cleanup, read-only default, worker lifecycle) | **this spine** | `CANON-MULTI-AGENT-ORCHESTRATION` §10.3 explicitly defers "the isolation rules" to L3 — this spine is the agnostic middle layer that L3 then binds |
+
+---
+
+## §3 — The branch lifecycle (phase model)
+
+Every branch moves through the same phases. The **gates are mandatory**; the commands are L3 (the consuming repo names its VCS tooling).
+
+```
+Entry gate → Create → Work → Open PR → Checks → Merge → Exit gate
+                                                          └→ Abort path (for abandoned work)
+```
+
+### §3.1 — Entry gate (before creating ANY branch)
+
+| Check | Threshold |
+|---|---|
+| On the default branch | yes |
+| Working tree clean | no uncommitted changes |
+| Local branch count under the repo's threshold | below limit (signal of un-closed lifecycles) |
+| Stash count zero | no stashes (stashes are invisible debt — §8) |
+| No stuck rebase/merge in progress | none |
+
+**If any check fails: fix it first. Do not create the branch.** (The hygiene preflight of `CANON-GIT-HYGIENE` §2.1 is the same gate from the hygiene side.)
+
+### §3.2 — Create → Work → PR → Checks → Merge
+
+- **Create** the branch **before editing any file** — never edit the default branch then stash/branch (§8).
+- **Work:** small, frequent, descriptive commits; push **early and often** — do not accumulate local-only work. Hit a problem → fix it **in the same branch**, never a "rescue" branch (§8). Unfixable → take the abort path, then start fresh.
+- **Open PR:** the change becomes visible and reviewable. *All changes merge through a PR* (`CANON-GIT-HYGIENE` §7).
+- **Checks:** never merge with failing checks; fix → push → re-run.
+- **Merge:** squash/merge per the repo's convention; deleting the remote branch on merge is the default.
+
+### §3.3 — Exit gate (immediately after merge — MANDATORY)
+
+| Step | Result |
+|---|---|
+| Remote branch deleted | confirmed (prune) |
+| Local branch deleted | removed |
+| Back on the default branch | yes |
+| Merged changes pulled | up to date |
+| Working tree clean | no uncommitted changes |
+| Stash list empty | no stashes |
+
+The exit gate **closes the lifecycle and emits an exit state** (`CANON-MULTI-AGENT-ORCHESTRATION` §2.2). **If any step fails, fix it before anything else.**
+
+### §3.4 — Abort path (abandoned without merge)
+
+Return to the default branch → force-delete the local branch → delete the remote branch if it was pushed → close the PR if one was opened. An aborted branch ends in the `DISCARDED` exit state — never silently left.
+
+---
+
+## §4 — Naming (pointer)
+
+The branch pattern `{author}/{type}-{slug}` and the worktree pattern `wt-<feature>` are **owned by `CANON-NAMING-CONVENTIONS-001` §3** — this spine does not redefine them.
+
+The lifecycle contribution is only **when** the name is assigned and **that it is never bare**: the branch is named at **Create** (§3.2), per NAMING-CONVENTIONS, **before** any file is edited. A bare branch name (`feature-x` with no `{author}/{type}` prefix) is a naming violation (NAMING-CONVENTIONS §8) *and* breaks the ownership signal the exit gate (§3.3) and the spawned-worker lifecycle (§7) depend on.
+
+---
+
+## §5 — Worktree isolation
+
+A worktree is a parallel checkout. The discipline that keeps worktrees from becoming the collision/orphan source they were meant to prevent:
+
+### §5.1 — Five principles
+
+1. **The default (main) worktree is read-only** — see §6.
+2. **Branches for ~90% of work.** A plain feature branch in the existing checkout is the default. (Hours-to-days work, normal features, fixes.)
+3. **Worktrees only for special cases:** true parallelism (work on B while A runs), long-running work that would otherwise block, or side-by-side comparison of two states.
+4. **Aggressive cleanup** (§5.4) — a worktree outlives its task by minutes, not weeks.
+5. **No naked worktrees** — a checkout alone is not a ready workspace (§5.3).
+
+### §5.2 — One task = one unique branch (collision-prevention)
+
+- **Each task MUST have its own unique branch.** Before starting, confirm *which* branch this task uses.
+- **Verify the branch does not already exist** before creating it.
+- **Never reuse an existing branch** without explicit confirmation from the work's owner — silently reusing another contributor's branch is the canonical multi-agent collision.
+
+### §5.3 — Placement & readiness
+
+- **Placement:** worktrees live **outside the repo tree** — never as a **sibling** of the repo root, never **nested inside** it (both pollute discovery and risk recursive tooling). The consuming repo names its worktree root convention at L3.
+- **Readiness:** a worktree is **operationally valid only when** its environment files, the secrets its governed flows need, and its dependencies have been hydrated to match — so the operator can actually run or validate the target without setup drift. **Do not call a worktree "ready" if it is just a checkout.**
+
+### §5.4 — Cleanup
+
+- **Remove the worktree immediately after merge** (the same moment as the branch exit gate, §3.3).
+- **Delete the branch** after its PR merges.
+- **Periodic audit** for abandoned worktrees; flag any older than the repo's age threshold for review.
+
+---
+
+## §6 — Default-worktree read-only enforcement
+
+The **default (main) worktree is read-only**: it permits only **git sync** and a **create-only communication lane** (the append-only shared mailbox, whose governed tool runs its own gates — consistent with `CANON-GIT-HYGIENE` §7's comm-lane exception). **All other work happens in a feature branch/worktree.**
+
+- Enforced by a **pre-commit hook mechanism** that blocks commits in the default worktree outside the allowed lane.
+- An **emergency override** exists but **must document its reason** in the commit (consistent with `CANON-GIT-HYGIENE` §2.4 — no silent bypass).
+
+The hook path, the exact allowlist, and the comms-lane location are **L3 binding**.
+
+---
+
+## §7 — Spawned-worker (subagent / parallel) lifecycle
+
+Worktree isolation does **not** exempt a spawned worker from the lifecycle.
+
+1. **One branch per worker** — two workers never share a branch (race conditions, lost work).
+2. **The parent owns the worker's exit gate** — the parent runs §3.3 for every branch/worktree a worker touched; the parent never ends its session with a worker's worktree still active.
+3. **The parent tracks every worker branch/worktree** — a worker never creates a branch the parent does not know about (the parent cannot clean up what it cannot see).
+
+This is the workspace-mechanics counterpart to `CANON-MULTI-AGENT-ORCHESTRATION`'s ownership and closeout rules.
+
+---
+
+## §8 — Prohibited patterns (additional to `CANON-GIT-HYGIENE` §4)
+
+`CANON-GIT-HYGIENE` §4 already forbids force-pushing the default branch, rebasing published commits, and silent hook-bypass. This spine adds the **lifecycle-specific** anti-patterns:
+
+| Pattern | Instead |
+|---|---|
+| Editing files on the default branch | Branch first, edit second |
+| Creating "rescue" branches | Fix in the same branch, or abort cleanly |
+| Leaving work local-only (no push) | Push early and often |
+| Ending a session without the exit gate | Always run §3.3 for every branch touched |
+| Accumulating branches past the threshold | Close lifecycles before opening new ones |
+| Leaving a rebase/merge mid-flight | Complete or abort immediately (it blocks everyone) |
+| Stashing as a workflow | Commit to a branch instead (stashes are invisible) |
+| Two workers sharing one branch | One branch per worker, always |
+| A parent ending with active worker worktrees | Run the exit gate for every worker worktree |
+| A worktree as a repo sibling, nested, or "naked" | Outside the tree + hydrated before use (§5.3) |
+
+---
+
+## §9 — L3 binding (what the consuming repo owns)
+
+- The concrete **VCS commands** (branch / push / PR / merge tooling and flags).
+- The **thresholds** — local-branch count (§3.1), worktree age (§5.4).
+- The **worktree root path convention** (§5.3) and the **comms-lane path** (§6).
+- The **pre-commit hook** path + allowlist (§6) and any **coordination-file** mechanism for announcing protocol changes.
+- The **environment-parity** doc the readiness rule (§5.3) points at.
+- **Incident records** and **worked examples** (evidence of what went wrong before the discipline existed).
+
+The L3 binding **points at this canon as the spine**; it does not re-write the phase model, the naming shape, or the isolation principles. If it repeats them, it drifts.
+
+---
+
+## §10 — What this canon does NOT do
+
+- It does **NOT** prescribe the VCS tooling or exact commands — the consuming repo picks them (§9).
+- It does **NOT** own **session hygiene** (clean floor, force-push/rebase/bypass bans, all-via-PR) — that is `CANON-GIT-HYGIENE`.
+- It does **NOT** own the **exit-state vocabulary** or **handoff completeness** — that is `CANON-MULTI-AGENT-ORCHESTRATION` §2.2/§2.3; the exit gate here only *produces* an exit state.
+- It does **NOT** define the **naming pattern** for branches/worktrees — that is `CANON-NAMING-CONVENTIONS-001` §3; §4 only consumes it.
+- It does **NOT** define the **comms-lane** format — only that a create-only lane is the one write the read-only default worktree permits.
+
+---
+
+## Provenance
+
+Lifted from a **sibling pair** of ViTo canons whose agnostic substance was buried under product-specific binding:
+- ViTo `CANON-BRANCH-LIFECYCLE-001` (SEALED 2026-03-21) — the phase model, the entry/exit gates, the prohibited patterns, the spawned-worker lifecycle.
+- ViTo `CANON-WORKTREE-PROTOCOL-001` (SEALED 2026-02-21) — workspace isolation, one-task-one-unique-branch, placement, readiness, cleanup, the read-only default worktree.
+
+**Coverage-check (agnostic-lift A#8):** `CANON-GIT-HYGIENE` covered session hygiene and PR governance; `CANON-MULTI-AGENT-ORCHESTRATION` covered coordination, exit-state vocabulary, and handoff; `CANON-NAMING-CONVENTIONS-001` §3 already owned the **branch & worktree naming pattern** (so this spine references it, §4, rather than re-lifting it) — but the **branch+worktree lifecycle mechanics** (the layer §10.3 of the orchestration spine explicitly defers to L3) had **no agnostic home**. This spine fills that gap and references the two companions rather than duplicating them. The two ViTo canons restructure to thin L3 bindings that point here and keep only product-specific content (concrete paths, package-manager commands, the pre-commit hook implementation, the coordination file, env-parity doc, incident records, worked examples).
+
+**DRAFT pending Marcelo seal** (Rule #4 — new spine awaits Principal Architect approval).
