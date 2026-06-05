@@ -135,14 +135,17 @@ Every forked package has an `UPSTREAM.md` at its root with:
 - license,
 - snapshot date or upstream commit,
 - the local-vs-upstream diff summary (what we changed and why),
+- **whether the fork is a *bounded adaptation*, and if so its explicit *do-not-overwrite-on-sync* list** — the commands, files, templates, or routing deliberately diverged from upstream that a future sync **MUST preserve** (and the upstream features deliberately dropped that a sync **MUST NOT restore**),
 - the assigned **cadence** (§6.4),
 - the next-review date.
 
-This is the per-fork accountability artifact. Without it, the fork is unreviewable.
+This is the per-fork accountability artifact. Without it, the fork is unreviewable. The diff summary is **descriptive** (what we changed); the do-not-overwrite list is **prescriptive** (what a sync must not undo) — a bounded adaptation needs both, or a future sync silently reverts the divergence.
 
-### 6.2 Baseline-versions document
+### 6.2 Baseline-versions document & discoverable upstream index
 
-A single document per consuming repo listing every pinned major dependency with: name, version, source URL, license, last-reviewed date, drift flags. Updated when versions bump or new pins land.
+A single, **discoverable** document per consuming repo — the one entry point for *"what upstreams do we have?"* — listing **every tracked upstream** (not only pinned deps: also forks, runtimes, design-systems, AI/model providers) with: name, **kind (§4)**, version / last-sync, source URL, license, **cadence (§6.4)**, **bounded-adaptation? flag** (→ the per-fork `UPSTREAM.md` §6.1 for the do-not-overwrite list), last-reviewed date, drift flags. Updated when versions bump or new upstreams land.
+
+The point is **discoverability**: the standard must be findable from this one index, not reconstructed by hunting across scattered per-fork docs. The per-fork `UPSTREAM.md` (§6.1) holds the detail; this index is the map.
 
 ### 6.3 Drift detection
 
@@ -394,3 +397,5 @@ The product-specific content (the actual inventory, baseline file path, stack ch
 **Amendment 2026-05-25 (c) (Cluster C-7 reconciliation):** §15 (Runtime-location typology Host / Service / External as the third orthogonal axis to §4 and §13) including the "Import vs Curl" Litmus Test, and §16 (Intake & Outcome templates that §3 produces) were lifted from `THIRD_PARTY_ACCEPTANCE_PROTOCOL.md` (ViTo ACTIVE). The ViTo canon refactors to a thin L3 binding that names the actual gate documents (`VENDOR_EVALUATION_POLICY`, `GOVERNANCE_IMPORTS`, `VENDOR_UI_ADAPTER_CANON`). In the same wave, the duplicate ViTo `CANON-DEPENDENCY-UPGRADE-POLICY-001` (DRAFT, never sealed) was **consolidated into** `CANON-OSS-UPDATE-METHODOLOGY-001` (already an L3 binding of this spine) and superseded — its more-complete tier inventory and execution protocol were absorbed.
 
 **Amendment 2026-05-25 (b) (same DRAFT cycle, paso 3 reconciliation):** §13 (Risk tiers as orthogonal axis to §4), §14 (Automation policy per tier), and the CVE severity policy folded into §11 rule 3 were lifted from `CANON-OSS-UPDATE-METHODOLOGY-001` (ViTo DRAFT) to resolve the overlap diagnosed during paso 3 scan. The ViTo canon refactors to a thin L3 binding (the actual package lists per tier, the `.github/dependabot.yml` config, ViTo file paths, ViTo-specific examples).
+
+**Amendment 2026-06-05 — PENDING RE-SEAL by Marcelo:** §6.1 gained the **bounded-adaptation / do-not-overwrite-on-sync** field (descriptive diff summary alone silently reverts deliberate divergences on a sync); §6.2 broadened from a pinned-dep baseline into the **single discoverable upstream index** across all kinds (forks + deps + runtimes + providers), with `kind`, `cadence`, and `bounded-adaptation?` columns. Lifted as the agnostic generalization of two ViTo signals surfaced in `FINDING-UPSTREAM-PROCESS-NOT-STANDARD-2026-06-05` (#2999 actions #4 + #3): the ViTo SpecKit fork's `.specify/UPSTREAM.md` (a real bounded adaptation) and Marcelo's "el proceso debe ser estándar y discoverable". Additive only — no normative substance removed. **Awaiting Marcelo seal.**
