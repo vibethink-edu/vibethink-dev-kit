@@ -1,6 +1,6 @@
 # CANON-BRANCH-WORKTREE-LIFECYCLE — Universal branch & worktree lifecycle mechanics
 
-**Status:** DRAFT 2026-06-05 (agnostic-lift A#8) — pending Marcelo seal
+**Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift A#8
 **Date:** 2026-06-05
 **Scope:** Every repo where one or more contributors — human or agent — create branches or worktrees. Cross-product (agnostic).
 **Companion canons:** [`CANON-GIT-HYGIENE`](./CANON-GIT-HYGIENE.md) (session hygiene this spine does not restate) · [`CANON-MULTI-AGENT-ORCHESTRATION`](../ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md) (coordination + the exit-state vocabulary this spine's exit gate produces) · [`CANON-NAMING-CONVENTIONS-001`](./CANON-NAMING-CONVENTIONS-001.md) (the branch & worktree naming pattern this spine consumes, §3).
@@ -188,4 +188,4 @@ Lifted from a **sibling pair** of ViTo canons whose agnostic substance was burie
 
 **Coverage-check (agnostic-lift A#8):** `CANON-GIT-HYGIENE` covered session hygiene and PR governance; `CANON-MULTI-AGENT-ORCHESTRATION` covered coordination, exit-state vocabulary, and handoff; `CANON-NAMING-CONVENTIONS-001` §3 already owned the **branch & worktree naming pattern** (so this spine references it, §4, rather than re-lifting it) — but the **branch+worktree lifecycle mechanics** (the layer §10.3 of the orchestration spine explicitly defers to L3) had **no agnostic home**. This spine fills that gap and references the two companions rather than duplicating them. The two ViTo canons restructure to thin L3 bindings that point here and keep only product-specific content (concrete paths, package-manager commands, the pre-commit hook implementation, the coordination file, env-parity doc, incident records, worked examples).
 
-**DRAFT pending Marcelo seal** (Rule #4 — new spine awaits Principal Architect approval).
+**SEALED 2026-06-05 by Marcelo** (Rule #4 — Principal Architect approval given).
