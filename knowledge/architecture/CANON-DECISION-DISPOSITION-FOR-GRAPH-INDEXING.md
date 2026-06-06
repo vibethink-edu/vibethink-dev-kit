@@ -7,6 +7,7 @@
 > **Amended 2026-05-22:** §3.2 / golden rules — inline code markers are
 > **advisory-only** (a real indexer does not harvest them); **Markdown/ADR is the
 > strong indexable binding**. Corrected on empirical verification, not assumption.
+> **§3.8 amendment PROPOSED 2026-06-05 (agnostic-lift A#17) — pending Marcelo seal:** added *documentation depth for complex / constitutional decisions* (3-part: formal spec + architectural context + concrete cross-context examples), lifted from ViTo `CANON-COMPLEX-DECISION-DOCUMENTATION-001`.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** supra-repo discipline, together with **Cross-Repo Artifact
 > Isolation** (`CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §4). Same discipline set.
@@ -152,6 +153,20 @@ Five universal failure modes:
 3. **"Too much effort to document."** Knowledge lost, work repeated. **Solution:** the cost of the protocol is small; the cost of not capturing is large.
 4. **"The agent already knows this."** Agent memory is volatile; new sessions and new agents lose it. **Solution:** the repo is the only persistent memory (per `CANON-AGENT-COLLABORATION` §1).
 5. **"Documenting after the fact."** Details forgotten, nuance lost, reconstruction incomplete. **Solution:** capture **during** or **immediately after** — not weeks later.
+
+---
+
+### 3.8 Documentation depth for complex / constitutional decisions
+
+The minimal ADR (§3.1) and the extended ADR (§3.4) capture *the decision*. When a decision is **complex**, the capture needs more **depth**. A decision is complex when **any** of these hold: it defines or amends a **capability / subsystem**; it touches **3+ canons or specs**; it requires **independent review before implementation** (the architecture-review gate); it introduces a **pattern reused across contexts**; or it has **survived multiple sessions unresolved**.
+
+For a complex decision, the documentation has **three parts** (one document with sections, or linked documents — but all three must exist):
+
+1. **Formal specification** — the problem statement; the options considered (**≥2**, each with pros / cons / risks); the chosen option with justification; the schema / contract if any; which documents are created / amended / superseded; cross-cutting dependencies. *Tone: technical, auditable.*
+2. **Architectural context** — how the decision fits the existing system and what it connects to; its cross-cutting impact (multi-tenant, cost/metering, evidence/audit, and the layers that participate). *Tone: explanatory, system-level.*
+3. **Concrete examples** — **≥3** scenarios (**happy path / exception / edge**) across **≥2 different contexts** (proving the decision is not context-specific); each showing the trigger, the actors, the sequence, the outcome, and the audit trail produced. *Tone: plain enough that a non-expert follows it.*
+
+This depth is **what** a complex decision documents; §3.4's extended template is **how** the constitutional sections (does-not-change / reactivation / cross-references) are added. The two compose: a SEALED complex decision uses both. The consuming repo's L3 binding names its concrete complexity thresholds (which subsystems, surfaces, or layers count as triggering) and its example contexts.
 
 ---
 
