@@ -112,6 +112,7 @@ A worktree is a parallel checkout. The discipline that keeps worktrees from beco
 - **Remove the worktree immediately after merge** (the same moment as the branch exit gate, §3.3).
 - **Delete the branch** after its PR merges.
 - **Periodic audit** for abandoned worktrees; flag any older than the repo's age threshold for review.
+- **Squash-merge blindspot (MANDATORY for any squash-merge repo):** when the merge convention is **squash** (§4), the merged commits are replaced by a **single new-hash commit** on the integration branch. The branch's original commits are therefore **never ancestors** of the integration branch, so `git branch --merged` (and any cleanup tool built on it) reports them as **un-merged forever** — local branches pile up unbounded even though their work shipped. Detection of "already merged" **must be squash-aware**: either (a) **patch-equivalence** — synthesize a commit with the branch's tree on top of its merge-base and test `git cherry <main>` (forge-agnostic, no network), or (b) **consult the forge** by head-ref for a merged PR. Never rely on `git branch --merged` alone as the delete criterion. *(Reference implementation: the session-hygiene scanner's `findSquashMergedBranches`.)*
 
 ---
 
