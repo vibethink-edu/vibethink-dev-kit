@@ -134,5 +134,56 @@ test("--json mode emits parseable JSON with summary", () => {
   }
 });
 
+// ── squash-merged detection: the root-cause case ───────────────────────────
+function scanJson(setup) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "session-hygiene-squash-"));
+  try {
+    execFileSync("git", ["init", "-q", "-b", "main"], { cwd: dir });
+    execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: dir });
+    execFileSync("git", ["config", "user.name", "Test"], { cwd: dir });
+    setup(dir);
+    return JSON.parse(execFileSync("node", [SCAN, "--json"], { cwd: dir, encoding: "utf8" }));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+// happy path: a squash-merged branch is detected even though `git branch --merged` misses it
+test("squash-merged branch → listed in squashMergedBranches (the blindspot)", () => {
+  const parsed = scanJson((dir) => {
+    fs.writeFileSync(path.join(dir, "README.md"), "# repo\n");
+    gitCommit(dir, "init", isoDaysAgo(2));
+    execFileSync("git", ["checkout", "-q", "-b", "feature/x"], { cwd: dir });
+    fs.writeFileSync(path.join(dir, "feat.txt"), "feature work\n");
+    gitCommit(dir, "feature commit", isoDaysAgo(1));
+    execFileSync("git", ["checkout", "-q", "main"], { cwd: dir });
+    execFileSync("git", ["merge", "--squash", "feature/x"], { cwd: dir });
+    gitCommit(dir, "squashed feature/x (new hash)", isoDaysAgo(0));
+    // sanity: git branch --merged is BLIND to it
+    const merged = execFileSync("git", ["branch", "--merged", "main"], { cwd: dir, encoding: "utf8" });
+    assert.ok(!/feature\/x/.test(merged), "precondition: --merged must NOT see the squashed branch");
+  });
+  assert.ok(
+    parsed.squashMergedBranches.includes("feature/x"),
+    `must detect squash-merged branch; got ${JSON.stringify(parsed.squashMergedBranches)}`,
+  );
+});
+
+// failure mode: an unmerged branch must NOT be reported (no false positive → no accidental delete)
+test("unmerged branch → NOT listed (no false positive)", () => {
+  const parsed = scanJson((dir) => {
+    fs.writeFileSync(path.join(dir, "README.md"), "# repo\n");
+    gitCommit(dir, "init", isoDaysAgo(2));
+    execFileSync("git", ["checkout", "-q", "-b", "feature/open"], { cwd: dir });
+    fs.writeFileSync(path.join(dir, "open.txt"), "still in flight\n");
+    gitCommit(dir, "unmerged work", isoDaysAgo(1));
+    execFileSync("git", ["checkout", "-q", "main"], { cwd: dir });
+  });
+  assert.ok(
+    !parsed.squashMergedBranches.includes("feature/open"),
+    `must NOT flag an unmerged branch; got ${JSON.stringify(parsed.squashMergedBranches)}`,
+  );
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

@@ -125,6 +125,48 @@ function inspect(wt, today) {
   };
 }
 
+function resolveMainRef(root) {
+  // The integration branch, forge-agnostic. Prefer the remote-tracking ref so
+  // the probe sees what was actually merged upstream, not a possibly-stale local.
+  for (const ref of ["origin/main", "origin/master", "main", "master"]) {
+    if (git(root, "rev-parse", "--verify", "--quiet", ref)) return ref;
+  }
+  return "";
+}
+
+function findSquashMergedBranches(root, mainRef) {
+  // Branches whose FULL content is already in mainRef even though their commits
+  // were squashed into a new hash on merge. These are INVISIBLE to
+  // `git branch --merged` (which only follows commit ancestry) — the root cause
+  // of local-branch pile-up in any squash-merge repo. Detection is forge-agnostic:
+  // synthesize a commit with the branch's tree on top of its merge-base, then ask
+  // `git cherry` whether that change already exists in mainRef.
+  if (!mainRef) return [];
+  const branchesRaw = git(root, "for-each-ref", "--format=%(refname:short)", "refs/heads/");
+  const branches = branchesRaw ? branchesRaw.split(/\r?\n/).filter(Boolean) : [];
+  const held = new Set(
+    parseWorktreeList(git(root, "worktree", "list", "--porcelain"))
+      .map((w) => w.branch)
+      .filter(Boolean),
+  );
+  const mainLocal = mainRef.replace(/^origin\//, "");
+  const out = [];
+  for (const b of branches) {
+    if (b === mainLocal || b === mainRef) continue;
+    if (held.has(b)) continue; // active worktree → never propose deleting
+    const base = git(root, "merge-base", mainRef, b);
+    if (!base) continue; // no shared history → not a squash-merge case
+    const tree = git(root, "rev-parse", `${b}^{tree}`);
+    if (!tree) continue;
+    if (tree === git(root, "rev-parse", `${base}^{tree}`)) continue; // empty branch
+    const dangling = git(root, "commit-tree", tree, "-p", base, "-m", "_squash-probe");
+    if (!dangling) continue;
+    // `git cherry` prints "- <sha>" when the change is already present upstream.
+    if (git(root, "cherry", mainRef, dangling).startsWith("-")) out.push(b);
+  }
+  return out;
+}
+
 function main() {
   const root = git(process.cwd(), "rev-parse", "--show-toplevel") || process.cwd();
   const porcelain = git(root, "worktree", "list", "--porcelain");
@@ -136,6 +178,8 @@ function main() {
   const today = todayLocalISODate();
   const worktrees = parseWorktreeList(porcelain);
   const results = worktrees.map((wt) => inspect(wt, today));
+  const mainRef = resolveMainRef(root);
+  const squashMerged = findSquashMergedBranches(root, mainRef);
 
   if (asJson) {
     const summary = {
@@ -144,6 +188,7 @@ function main() {
       stale: results.filter((r) => r.kind === "stale").length,
       current: results.filter((r) => r.kind === "current").length,
       clean: results.filter((r) => r.kind === "clean").length,
+      squashMergedBranches: squashMerged,
       results,
     };
     console.log(JSON.stringify(summary, null, 2));
@@ -164,6 +209,14 @@ function main() {
       console.log(`  ${mark} ${r.wt.path}  [${label}]  ${detail}`);
     }
     console.log("");
+    if (squashMerged.length > 0) {
+      console.log(
+        `↻ ${squashMerged.length} local branch(es) already squash-merged into ${mainRef} ` +
+          `(invisible to \`git branch --merged\` — safe to delete):`,
+      );
+      for (const b of squashMerged) console.log(`    git branch -D ${b}`);
+      console.log("");
+    }
     const stale = results.filter((r) => r.kind === "stale");
     if (stale.length === 0) {
       console.log("GREEN — no stale WIP. (Same-day WIP is allowed; close it in PUSHED / READY-PR / DISCARDED before ending the session — canon §2.2.)\n");
