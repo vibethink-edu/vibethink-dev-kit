@@ -12,7 +12,7 @@
 >
 > **Reason for being.** The kit's whole purpose is that *everything agnostic is
 > reusable in any project*. Until now, only the cross-agent governance piece had a
-> declared adoption path — the other ten pieces shipped without one, leaving
+> declared adoption path — the rest shipped without one, leaving
 > consumers to discover them by reading commits or by accident. This file closes
 > that gap as a **single, executable list**.
 
@@ -39,7 +39,7 @@ upstream — without it, the copy silently rots.
 ## How to use this index
 
 1. **Mount** the kit (one-time, dev only) — see the box below.
-2. Walk the **12 pieces** in order. For each: read **Qué**, decide if it applies,
+2. Walk the **pieces** in order. For each: read **Qué**, decide if it applies,
    follow **Cómo**, run **Verificar**.
 3. Skip what does not apply (e.g. a repo with one agent does not need the inbox
    yet, but should still declare so explicitly — see the per-piece adoption
@@ -288,29 +288,50 @@ verifica · Layer**.
 - **Verificar:** the most recent review/audit comm cites at least one control
   by number with its evidence — not just "LGTM".
 
-### 10 — Development process (L1) + VT-Method (L2 binding)
+### 10a — Development process (L1, neutral skeleton)
 
-**Layer:** L1 + L2.
-**Home:** `knowledge/methodology/CANON-DEVELOPMENT-PROCESS.md` (L1, neutral) +
-`knowledge/methodology/VT-METHOD.md` (L2, VibeThink binding) +
+**Layer:** L1 (neutral core).
+**Home:** `knowledge/methodology/CANON-DEVELOPMENT-PROCESS.md`.
+
+- **Qué:** the brand-free process skeleton — **governance precedes code**; the
+  four pillars (governance · slice + decision gate · spec pipeline · governed
+  execution); the document authority hierarchy (`canon > specs > strategy >
+  research`); lifecycle artifacts; findings; the SOTA-informed gate (§7) and
+  full-ownership (§8). Adoptable by **any** consumer — including a non-house repo
+  that already enforces "governance precedes code, rigour proportional to risk"
+  through its **own native process** (it binds the L1, it does not need a foreign
+  methodology to do so).
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points up, never copies.
+  - A consumer whose native development flow already satisfies the L1 declares
+    this piece `ADOPTED-NATIVE` and **names the native binding** (its own
+    lane/gate model). It does not import #10b to adopt #10a.
+- **Verificar:** a recent non-trivial change shows the gate verdict (the decision
+  to proceed was governed, not implicit) and the authority hierarchy held (no code
+  overrode a sealed canon). The native binding that satisfies the L1 is named in
+  your `AGENTS.md`.
+
+### 10b — VT-Method (L2, house methodology binding)
+
+**Layer:** L2 (house).
+**Home:** `knowledge/methodology/VT-METHOD.md` +
 `doc/decisions/ADR-20260524-vt-method-methodology-layering.md`.
 
-- **Qué:**
-  - **L1 — neutral skeleton:** governance precedes code; four pillars
-    (governance · slice + decision gate · spec pipeline · governed execution);
-    document authority hierarchy (`canon > specs > strategy > research`);
-    lifecycle artifacts; findings.
-  - **L2 — VibeThink binding (VT-Method):** the **3-Gate Preflight** for the
-    decision gate, the `Direct Execution / structured spec-kit / interchange-spec`
-    spec pipeline, ADR registration by layer.
+- **Qué:** the house instantiation of the #10a skeleton — the concrete
+  decision-gate questions (the multi-gate preflight), the `Direct Execution /
+  structured spec-kit / interchange-spec` spec pipeline, and ADR registration by
+  layer. This is the **L2 binding**: a consumer that is not a house repo is
+  **N-A** here — it binds the L1 (#10a) through its own native method instead.
 - **Cómo:**
-  - Both docs **by reference** — your `AGENTS.md` points up, never copies.
+  - Doc **by reference**. Adopt only if your repo is a house repo that uses this
+    methodology; otherwise declare `N-A` and point at your #10a native binding.
   - L3 product specifics (your own gate questions, your spec-kit cherry-picks,
     your product vocabulary, your domain model) stay **in your repo's own layer**
     — never flow upward.
-- **Verificar:** every non-trivial PR cites the slice + the gate verdict + the
-  spec weight chosen (briefing vs structured spec). A PR that opens with code
-  before a gate is non-compliant.
+- **Verificar:** if adopted — every non-trivial PR cites the slice + the gate
+  verdict + the spec weight chosen (briefing vs structured spec); a PR that opens
+  with code before a gate is non-compliant. If `N-A` — your #10a native binding is
+  declared and the reason for skipping L2 is stated (not a silent skip).
 
 ### 11 — Port assignment scheme (L2)
 
@@ -424,6 +445,294 @@ verifica · Layer**.
   - A recent ADR with status change to `SUPERSEDED-BY` has a body diff of zero lines (only status header touched).
   - The deployed app's `/healthz` (or equivalent) returns version + commit hash.
 
+### 17 — Agent ↔ human collaboration model (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-AGENT-COLLABORATION.md`.
+
+- **Qué:** the foundational model for how an agent collaborates with the human
+  authority — the repo is the only persistent memory; intuition + technique
+  (read the tendency, don't execute literal instructions); behavior-over-name
+  severity (a name is naming-debt, not a blocker); the against-canon anti-pattern
+  + the four-step proposal preflight + empirical verification before a costly
+  technical recommendation; the ten constitutional rules; the recalibration
+  protocol; the session-close ritual (lessons + proactive debt declaration);
+  real-fixture testing discipline; security-fix scope estimation. Other process
+  spines assume this one.
+- **Cómo:** doc by reference — your root rules cite it. L3 binding adds: the
+  concrete preflight / DEV-MODE / decision-capture / business-model canon paths,
+  the named human authority's voice, originating incidents, transition dates, and
+  the agent-context file paths referenced abstractly here.
+- **Verificar:** a recent correction from the human authority was saved to the
+  repo (not only to agent memory); a recent constitutional proposal carries a
+  `Preflight against canon` section; the session close carried the proactive
+  debt-declaration without the human having to ask.
+
+### 18 — Scope discipline (scope lock, layer boundaries, drift) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-AGENT-SCOPE-DISCIPLINE.md`.
+
+- **Qué:** the Scope Card declared before the first edit; the vertical/horizontal
+  layer-boundary rule (a vertical agent never edits horizontal files and vice
+  versa — they communicate through tasks); the cross-boundary **Task Protocol**
+  and the out-of-scope **Finding Protocol**; the assignment registry; the
+  6-point pre-work gate; the mid-session drift check; the no-silent-topic-shift
+  rule.
+- **Cómo:** doc by reference. L3 binding names the concrete verticals/horizontals
+  table (unit → file paths), the role-registry format, the finding-category
+  taxonomy, and the coordination-lane path.
+- **Verificar:** a recent session opened with a Scope Card; a cross-layer need
+  was raised as a TASK (not fixed in place); an out-of-scope discovery was filed
+  as a FINDING and the agent kept working its own scope.
+
+### 19 — Skills over roles (composable skills replace specialized roles) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-SKILLS-OVER-ROLES.md`.
+
+- **Qué:** generalist agents + a composable skill library invoked per task,
+  replacing permanent per-domain roles (the carpenter with a toolbox, not 35
+  specialists); the skill format (manifest + auxiliaries); two-level authority
+  (human + per-task decision positions + generalist execution, zero middle
+  management); progressive disclosure + the three invocation modes; the four
+  anti-contamination mechanisms; the three-level "when is it a skill?" test;
+  inherit-vs-build; the **skill eval loop** (§13 — evidence a skill earns its
+  place). Deprecates permanent role registries / greeting ceremony / author
+  siglas / "stay in your lane" as identity.
+- **Cómo:** doc by reference. L3 binding names the skills-root directory, which
+  decision positions exist, where eval sets live, and which gate runs them.
+- **Verificar:** new work is scoped by task (skill invoked), not by a permanent
+  role identity; a broadly-loaded or production-gating skill carries an eval set
+  (its lift was measured, not assumed).
+
+### 20 — Context hygiene (managing the agent's context window) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-CONTEXT-HYGIENE.md`.
+
+- **Qué:** the agent's context window as a finite resource (more is not better;
+  quality degrades silently past a fill threshold) — the green/amber/red/critical
+  thresholds + qualitative degradation signals; persistence to the filesystem
+  (the "if I cut now" test); in-session hygiene (fresh context per phase,
+  selectivity, poisoning → cut-don't-steer); the MCP-context-trap and the
+  external-skill-judgment-trap (no imported capability outranks canon); when to
+  cut the session. References the orchestration spine for closeout/handoff
+  (does not duplicate).
+- **Cómo:** doc by reference. L3 binding names the persistence paths (decision
+  store, work-log, handoff artifact) and may tune the threshold percentages.
+- **Verificar:** a long recent session shows an explicit context-state warning
+  from the agent before a major decision; tool-servers were off during a
+  dense-reasoning phase; no external "expert" skill was imported onto
+  identity-touching work.
+
+### 21 — Pre-production (DEV-MODE) discipline (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DEV-MODE-DISCIPLINE.md`.
+
+- **Qué:** the tactical body of operating before the first real user with live
+  data — DEV-MODE is a **declared** state (not inferred); deletion is the default
+  operation; migrations don't preserve seed data; multiple approval is ceremony,
+  not governance; governance gates stay active (only the tempo changes); detecting
+  over-protection in other agents; ceremony's measurable cost; the
+  warranted-ceremony exceptions; the exit-from-DEV-MODE inversion.
+- **Cómo:** doc by reference. Parent is Piece #17 §4 (the principle + the
+  transition); this is the tactical body it delegates to. L3 binding names the
+  concrete gate set, the go-live context, the exception list, and the human
+  authority's explicit transition phrase.
+- **Verificar:** in a pre-production repo, a recent obsolete-code cleanup was a
+  deletion (not a deprecation marker); mechanical fixes proceeded without
+  per-step approval; the governance gates still ran.
+
+### 22 — Git hygiene (clean development sessions) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-GIT-HYGIENE.md`.
+
+- **Qué:** the **"No Dirty Starts"** golden rule (dev/build/test start from a
+  clean tree); the enforcement patterns (automated preflight, LF normalization,
+  agent-context constraints, no forced hook-bypass, clean-floor root-write
+  prohibition); the 4-step session workflow; the forbidden-patterns list (zombie
+  files, EOL war, scope creep, force-push to default, rebase of published commits,
+  mid-flight rebase, commented-out code); recovery; the **all-changes-via-PR**
+  governance rule (§7); and the **L3 override clause (§8) that applies to every
+  Dev-Kit spine** — the one place the per-spine deviation mechanism is defined.
+- **Cómo:** doc by reference. L3 binding names the preflight script path, the dev
+  command it gates, the agent-context files, the designated temp dirs, the PR
+  tooling, and any `## Overrides` section (the override mechanism every spine
+  inherits from §8).
+- **Verificar:** a recent dev/build session started clean (`git status
+  --porcelain` empty); every change to the default branch went through a PR
+  (except the create-only comm lane); no silent `--no-verify`.
+
+### 23 — Branch & worktree lifecycle (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-BRANCH-WORKTREE-LIFECYCLE.md`.
+
+- **Qué:** every branch has a **birth and a death** — the phase model (entry gate
+  → create → work → PR → checks → merge → exit gate, + abort path); worktree
+  isolation (branches for ~90% of work, worktrees only for parallel/long/
+  side-by-side; one task = one unique branch; placement outside the tree;
+  readiness ≠ a bare checkout; aggressive cleanup including the **squash-merge
+  blindspot**); the read-only default worktree; the spawned-worker lifecycle (the
+  parent owns the worker's exit gate).
+- **Cómo:** doc by reference. Sits between Piece #22 (git hygiene) and the
+  orchestration spine; consumes the branch/worktree naming pattern from Piece #13.
+  L3 binding names the VCS commands, the thresholds (branch count, worktree age),
+  the worktree root path, the pre-commit hook + allowlist, and the env-parity doc.
+- **Verificar:** a recent branch ran the entry gate (clean tree, under threshold)
+  and the exit gate (remote + local deleted, back on default); merged-branch
+  detection is squash-aware (not `git branch --merged` alone); no worktree left as
+  a repo sibling, nested, or naked.
+
+### 24 — Architecture review (the advisor's verdict on the architecture) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-ARCHITECTURE-REVIEW.md`.
+
+- **Qué:** how a second architect / advisor reviews the architecture itself (not
+  a single change) — don't impose a foreign category frame; the two read-only
+  modes (strategic / operational); the independence axis (in-field default →
+  fresh-context escalation, "the one who builds does not grade"); the inbound
+  escalation from the verification-selection gate; the first-reads discipline; the
+  classification taxonomy + the **over-engineering lens** and the **hard-drop
+  discipline** (a finding must serve correctness / coherence / real-cost or be
+  discarded — silence on a non-finding is the correct output); the authority test;
+  the output format.
+- **Cómo:** doc by reference. Macro counterpart to Piece #9 (the single-
+  implementation review controls). L3 binding names the product's anti-frames, the
+  governing first-reads, and the over-engineering signal set (from Piece #21).
+- **Verificar:** a recent architecture review leads with the verdict shape (mode,
+  independence, governing reads, classification per finding); a clean review
+  legitimately left lines empty (no padding); each finding cites correctness /
+  coherence / real-cost.
+
+### 25 — Audit protocol (artifact truthfulness + finding disposition) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-AUDIT-PROTOCOL.md`.
+
+- **Qué:** how an audit of *artifacts* (canon / features / surfaces) judges and
+  how every finding is carried to closure — the root question (**does it lie?**,
+  not: is it built?); the five verdict categories (false present-claim / canon
+  contradiction / verifiable error / unimplemented-future-design / security risk);
+  the application rules (design DDL ≠ lie, roadmap ≠ FAIL, untracked-but-real ≠
+  phantom); the **disposition** discipline (every finding gets one of FIXED /
+  PARTIAL / OPEN / ACCEPTED_WITH_RISK / WAIVED / OBSOLETE /
+  UNVERIFIED_PENDING_REVIEW, self-describing in place, escalate on silence); the
+  anti-patterns; front division.
+- **Cómo:** doc by reference. Sibling to Piece #24 (review = is the design sound;
+  audit = does the artifact lie + did we act on what we found). L3 binding names
+  the auditor identities, the front split, and the concrete escalation windows /
+  channel.
+- **Verificar:** a recent audit delivery carries a `Disposition` section (one row
+  per critical finding, with link / owner / date); no finding sits "acknowledged
+  but idle"; a change citing a finding updated that finding's disposition.
+
+### 26 — Testing gate (verification type by complexity × stakes) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-TESTING-GATE.md`.
+
+- **Qué:** the 60-second decision that maps a change's **nature × stakes** to the
+  verification type(s) required — the selection matrix (unit / canon-contract /
+  smoke / CLI / integration self-test / UAT / eval / E2E); the behavioural floor
+  ("if you can't verify it, don't ship it"); mutation as an opt-in strength lens
+  (never a CI hard-gate); evals for AI/model behaviour (the rubric **is** the
+  canon-contract); escalation to a fresh-context advisor for high-complexity
+  changes; runs per work-unit, methodology-agnostic; no global coverage %.
+- **Cómo:** doc by reference. Selection layer **on top of** Piece #15 (the floor —
+  referenced, not rewritten); escalates to Piece #24; routes the E2E row to
+  Piece #27. L3 binding maps each type to its tooling and may add matrix rows.
+- **Verificar:** a recent work-unit carries a `Verification: <type(s)>` field
+  selected by nature × stakes; a high-stakes change carried more than the floor;
+  a trivial change did **not** carry the full set.
+
+### 27 — E2E test-user discipline (auth-test safety) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-E2E-TEST-USER-DISCIPLINE.md`.
+
+- **Qué:** E2E tests **NEVER** touch a real account — create an ephemeral user per
+  run (`e2e.<slug>.<ts>@<test-domain>`), delete it in teardown; the hard
+  prohibitions (no destructive auth action on a real account, no real account as
+  subject even read-only, no leftover ephemeral users, no hardcoded real emails in
+  test files); elevated-role handling; shared fixtures; the pre-commit/CI gate +
+  post-run residue check; incident response.
+- **Cómo:** doc by reference. The E2E row of Piece #26 defers here, and Piece #15
+  defers E2E here. L3 binding names the auth provider's admin-API equivalents, the
+  test domain, the fixtures index, and wires the grep gate into the governance set.
+- **Verificar:** auth tests create ephemeral users in setup and delete them in
+  teardown; the governance gate blocks a test-file email that lacks the `e2e.`
+  prefix and a destructive auth-admin call with no matching create on the same id.
+
+### 28 — Gap report (on-demand status verified against reality) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-GAP-REPORT.md`.
+
+- **Qué:** when the human authority asks "what are the gaps / what's next / where
+  are we", deliver a **verified-against-reality** status (not a recap of the plan
+  doc) — the mandatory protocol (read plan/requirements → read roadmap → **read
+  the real code** → deliver); the delivery format (✅ works / 🔴 UX gaps & bugs /
+  🟡 functional gaps / 🔴 infra blockers / logical order); the rules (don't invent,
+  code wins over docs, omit empty sections, **diagnosis not execution** — ask
+  before acting).
+- **Cómo:** doc by reference. The specific shape of the "report results, not
+  process" rule (Piece #17 §6). L3 binding records the exact trigger phrases in the
+  human's language and the plan/roadmap doc locations.
+- **Verificar:** a recent gap report diffed docs against real code (and flagged
+  stale docs), used the section format, and ended by proposing the next action
+  without starting work off the back of it.
+
+### 29 — Upstream protocol (adopting & tracking external code) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/architecture/CANON-UPSTREAM-PROTOCOL.md`.
+
+- **Qué:** the governance of every adopted / forked / pinned upstream — the
+  brownfield principle (an unreviewed upstream is invisible debt); the
+  constitutional rule (the 6-step adoption protocol + human decision + ADR before
+  code lands); the license-compatibility matrix (strong-copyleft never enters as a
+  fork); the **(kind, tier, typology) triple** (upstream taxonomy + risk tiers +
+  runtime-location) plus the **provider security-posture lifecycle** (grade
+  A/B/C/F, ban triggers, health-check, governed reinstatement); extract-patterns
+  as the default policy; the per-fork `UPSTREAM.md` + the single discoverable
+  upstream index; drift detection; cadence; the ongoing-update Q1/Q2/Q3; the
+  intake/outcome templates.
+- **Cómo:** doc by reference. Plugs into Piece #5 — the protocol's output **is** the
+  ADR. L3 binding owns the actual fork inventory, the baseline/index path, the
+  drift-detection check, the stack-compat checks, the security-grade rubric +
+  storage, and product vocabulary overlays.
+- **Verificar:** a recent upstream adoption has a matching ADR (intake + outcome
+  blocks); the discoverable upstream index lists every tracked upstream with
+  kind / cadence / grade; an external provider carries a security grade and
+  grade `F` blocks integration work.
+
+### 30 — Production safety (what the shipped artifact must not contain) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-PRODUCTION-SAFETY.md`.
+
+- **Qué:** the production artifact is not the development artifact — **zero**
+  development affordances ship (debug/inspector UI, dev shortcuts, config/runtime
+  backdoors, dev-only globals, output intercepts); "zero" means **not created**,
+  not hidden-behind-a-flag; gated at the **build/host boundary** (tree-shaken out
+  or a fail-closed host check), never a runtime toggle a user can flip; a genuine
+  production diagnostic is a designed product feature, not left-on debug tooling;
+  enforced by an automated fail-closed gate; no exceptions. Mode-independent (true
+  in every mode, unlike DEV-MODE tempo).
+- **Cómo:** doc by reference. Companion to Piece #21 (DEV-MODE tempo) and Piece #24
+  (a real production diagnostic is reviewed there as a feature). L3 binding owns
+  the stack exclusion mechanism + the no-op surface shape, the gate tool + scan
+  rules + where it runs, the artifact types in scope, and the originating incident.
+- **Verificar:** the production bundle contains no debug/inspector surface (not
+  created, not hidden); an automated gate fails closed if a dev affordance can
+  reach production; any production diagnostic in the artifact is a named, reviewed
+  product feature.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -443,14 +752,36 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 7 | Paused work lifecycle | ADOPTED / PENDING / N-A | TTL + cadence |
 | 8 | Governed task dispatch | ADOPTED / PENDING / N-A | comms:send wired? |
 | 9 | Review-call checklist | ADOPTED / PENDING / N-A | bound corpus |
-| 10 | Dev process + VT-Method | ADOPTED / PENDING / N-A | which canon binds it |
+| 10a | Development process (L1) | ADOPTED / ADOPTED-NATIVE / PENDING / N-A | the native binding that satisfies the L1 |
+| 10b | VT-Method (L2 binding) | ADOPTED / N-A | house repo? else N-A + name your #10a binding |
 | 11 | Port assignment scheme | ADOPTED / PENDING / N-A | ports registry path |
 | 12 | Agent-hook engines | ADOPTED / PENDING / N-A | which engines copied |
+| 13 | Naming conventions | ADOPTED / PENDING / N-A | branch/commit pattern binding |
+| 14 | Visual bug triage | ADOPTED / PENDING / N-A | cache dirs + restart command |
+| 15 | Testing minimum bar | ADOPTED / PENDING / N-A | in-scope dirs + framework |
+| 16 | Versioning | ADOPTED / PENDING / N-A | `.versioning` binding path |
+| 17 | Agent ↔ human collaboration | ADOPTED / PENDING / N-A | L3 binding path |
+| 18 | Scope discipline | ADOPTED / PENDING / N-A | verticals/horizontals table |
+| 19 | Skills over roles | ADOPTED / ADOPTED-NATIVE / PENDING / N-A | skills-root + eval-set location |
+| 20 | Context hygiene | ADOPTED / PENDING / N-A | persistence paths |
+| 21 | DEV-MODE discipline | ADOPTED / PENDING / N-A | go-live state + gate set |
+| 22 | Git hygiene | ADOPTED / PENDING / N-A | preflight script + PR tooling |
+| 23 | Branch & worktree lifecycle | ADOPTED / PENDING / N-A | worktree root + pre-commit hook |
+| 24 | Architecture review | ADOPTED / PENDING / N-A | anti-frames + governing first-reads |
+| 25 | Audit protocol | ADOPTED / PENDING / N-A | auditor split + escalation windows |
+| 26 | Testing gate | ADOPTED / PENDING / N-A | type→tooling map |
+| 27 | E2E test-user discipline | ADOPTED / PENDING / N-A | provider admin-API + gate |
+| 28 | Gap report | ADOPTED / PENDING / N-A | trigger phrases + doc locations |
+| 29 | Upstream protocol | ADOPTED / PENDING / N-A | inventory + discoverable index path |
+| 30 | Production safety | ADOPTED / PENDING / N-A | exclusion mechanism + gate |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
+- **ADOPTED-NATIVE** — satisfied by a repo's own equivalent rather than the kit's
+  artifact (in active use); name the native binding in the Notes.
 - **PENDING** — recognised, not yet wired.
-- **N-A** — does not apply to this repo (e.g. single-agent repo skipping #3).
+- **N-A** — does not apply to this repo (e.g. a single-agent repo skipping #3, or
+  a non-house repo skipping #10b and binding #10a natively).
 
 ---
 
@@ -504,3 +835,22 @@ moment made concrete (`keyword-reminder.mjs` adopted by one repo,
 `sync-agent-skills.mjs` by another, neither documented).
 **Companion audit:** `doc/AUDIT-DEVKIT-CLEANUP-2026-06-03.md` — refined cleanup
 findings raised by this index work.
+
+**Update 2026-06-07 (catalog ↔ spine reconciliation).** A second-consumer
+adoption audit surfaced that the index had drifted from the sealed-spine
+inventory: ~13 spines had been sealed in the lift sweep **without** adding their
+adoption section here — the exact failure class the Maintenance rule forbids.
+This update closes the loop: **14 pieces added** (#17–#30 — agent-collaboration,
+scope-discipline, skills-over-roles, context-hygiene, dev-mode-discipline,
+git-hygiene, branch-worktree-lifecycle, architecture-review, audit-protocol,
+testing-gate, e2e-test-user-discipline, gap-report, upstream-protocol,
+production-safety; git-hygiene was a 14th uncatalogued spine the audit's list of
+13 had folded into Piece #4), each as its own piece after a coverage-check (none
+folded — every one is a distinct object its siblings explicitly separate it
+from). Piece **#10 split into #10a (L1 `CANON-DEVELOPMENT-PROCESS`, universal) +
+#10b (L2 VT-Method, house-only)** per `ADR-20260524-vt-method-methodology-layering`,
+so a non-house consumer can adopt the neutral L1 natively without being forced to
+mark the whole piece N-A. The per-piece adoption table (previously truncated at
+#12) was extended to all pieces, and the `ADOPTED-NATIVE` status added. Existing
+piece numbers #1–#16 were preserved (no renumber). Surfaced by the second-consumer
+adoption audit; reconciled lift-side.
