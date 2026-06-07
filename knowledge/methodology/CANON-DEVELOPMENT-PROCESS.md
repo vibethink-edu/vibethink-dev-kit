@@ -1,7 +1,7 @@
 # Development Process — neutral core (L1)
 
 > **Status:** CANON (neutral core).
-> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by Marcelo 2026-06-05** ("SEAL DALE").
+> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by Marcelo 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by Marcelo (agnostic-lift A#21)** (lifted from ViTo `CANON-EXAMPLES-FIRST-001`).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **What this is:** the agnostic *skeleton* of how a unit of work goes from idea to
 > verified implementation. It carries **no brand, product, or methodology name**
@@ -89,6 +89,14 @@ code links back with inline `# WHY:` / `# DECISION:` markers. By layer: an
 agnostic / cross-product decision registers in the supra-repo's decision store, a
 product-specific one in that product's store. (Disposition + indexing rules live in
 the decision-disposition canon.)
+
+### 5.1 — Examples are first-class artifacts
+
+A decision or architecture document without **concrete worked examples** loses its *why* the moment the author moves on. Examples are not decoration buried in a commit — they are a **durable artifact** of the unit, expected in every decision / architecture / canon / specification document.
+
+Each example shows a real scenario: the situation, the challenge or trade-off, the chosen solution, and **why it matters** (what it preserves, what it prevents). Use a small, **consistent set of example contexts** across the repo so a reader builds intuition rather than re-parsing a new world each time. For a *complex* decision, the depth standard in the decision-disposition canon (§3.8 Part 3 — ≥3 scenarios across ≥2 contexts) is the concrete instance of this rule.
+
+The cost of omitting examples is **re-learning**: a future agent reconstructs from scratch the edge cases, trade-offs, and intent an example would have carried forward.
 
 ## 6. Findings
 
