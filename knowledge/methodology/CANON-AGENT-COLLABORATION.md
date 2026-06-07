@@ -1,6 +1,6 @@
 # CANON-AGENT-COLLABORATION — Universal model for AI-agent ↔ human collaboration
 
-**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation · **§5.6 amendment PROPOSED 2026-06-06 (agnostic-lift A#20) — pending Marcelo seal** (empirical verification before recommending a costly technical change; lifted from ViTo `CANON-EMPIRICAL-VERIFICATION-BEFORE-RECOMMENDATION-001`)
 **Date:** 2026-05-25
 **Scope:** Every repo where AI agents (Claude, Codex, Cursor, Gemini, Windsurf, equivalents) collaborate with a human authority on design, code, or governance.
 
@@ -173,6 +173,21 @@ When the preflight is skipped and the human approves something that contradicts 
 3. The agent may **never** argue *"but the human approved it."* If the human approved against their own canon, the bug belongs to the agent that skipped the preflight.
 
 This is traceability, not punishment. The preflight does not make agents infallible; it makes their failures detectable and correctable **before** they propagate into canon.
+
+### §5.6 — Empirical verification before recommending a costly technical change
+
+§5's preflight verifies a proposal against **canon**. This subsection adds the **empirical** counterpart: when the proposal is a **technical fix to infrastructure, build, deployment, or production behavior** — where being wrong burns CI time, infra cost, or the human's attention — do not recommend it on hypothesis alone.
+
+Before recommending such a fix:
+
+1. **Reproduce** the problem locally, under the same constraints as the affected environment.
+2. **Toggle the hypothesis** — apply the proposed change locally.
+3. **Compare** behavior with and without the fix.
+4. **Only then recommend**, with the empirical evidence attached.
+
+When local verification is **not feasible** (the infra is not available locally, the cost is prohibitive, or it would take longer than the fix is worth), say so explicitly — *"I cannot verify this empirically because X; this is an informed hypothesis, not certainty"* — state a **confidence** (low / medium / high) grounded in indirect evidence (logs, docs, parallels to other cases), and **propose the cheapest-to-reverse lever first** so a wrong hypothesis burns the least.
+
+This does **not** apply to trivial or freely-reversible changes (a typo, a doc edit, a tactical choice inside an already-approved unit). It applies exactly where the cost of being wrong is real — the same threshold §5.2 step 4 names. *"The human approved it"* is not a defense for an unverified recommendation any more than it is for an against-canon one (§5.5).
 
 ---
 
