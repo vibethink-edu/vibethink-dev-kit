@@ -1,7 +1,7 @@
 # Development Process — neutral core (L1)
 
 > **Status:** CANON (neutral core).
-> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by Marcelo 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by Marcelo (agnostic-lift A#21)** (lifted from ViTo `CANON-EXAMPLES-FIRST-001`).
+> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **What this is:** the agnostic *skeleton* of how a unit of work goes from idea to
 > verified implementation. It carries **no brand, product, or methodology name**
