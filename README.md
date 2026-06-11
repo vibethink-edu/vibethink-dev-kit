@@ -33,6 +33,77 @@ If your repo inherits this kit, these problems stop being yours to remember:
 
 ---
 
+## The rules, in plain words — the whole catalog, one line each
+
+Every rule below was distilled from a real incident, not theory — and each one
+names its enforcement (the catalog entry tells you how to verify it's in use).
+Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
+
+### 🏠 House basics
+
+| # | Rule | In one line |
+|---|---|---|
+| 1 | Universal root authority | ONE root rulebook; every repo extends it, never replaces it. |
+| 2 | Context layering + smoke | Every agent (any vendor) reads the SAME rules via one-line pointers — a robot verifies on each PR that none reads a truncated or contradictory version. |
+| 13 | Naming conventions | How everything is named: branches `{author}/{type}-{description}`, conventional commits, dated ADRs, canon IDs. Never bare names. |
+| 11 | Port assignment scheme | Production <5000, review ≥5000 (prod+2000), all in one registry — never an invented port. |
+| 16 | Versioning | Each artifact type (package, app, canon, ADR, tool) has ITS declared version model; breaking changes marked. |
+
+### 🤝 How agents work — with you and with each other
+
+| # | Rule | In one line |
+|---|---|---|
+| 17 | Agent ↔ human collaboration | The repo is the only persistent memory; read the human's intent — but **a direct instruction executes whole, first time**; preflight before proposing against canon; session-close ritual. |
+| 3 | Multi-agent orchestration | Agents talk to each other through git (inbox/comms), not through the human — the human relays signals, never content. |
+| 8 | Governed dispatch | Every agent-to-agent message goes through the governed send with a fail-closed secret scanner. |
+| 18 | Scope discipline | Each session declares WHAT it will touch; another module's problem isn't fixed — it becomes a TASK/FINDING to its owner. |
+| 19 | Skills over roles | Generalist agents with a toolbox of skills, not 35 permanently-titled specialists; skills are measured (eval loop). |
+| 20 | Context hygiene | An agent's memory degrades silently as it fills: persist to disk, cut the session in time, never steer a poisoned context back. |
+| 21 | Pre-production discipline | Before the first real user: deletion is the default, ceremony is a bug — but safety gates never switch off. |
+
+### 🌿 Git and the lifecycle of work
+
+| # | Rule | In one line |
+|---|---|---|
+| 22 | Git hygiene | Never start on a dirty tree; everything merges via PR; no silent hook-bypass; no junk at the repo root. |
+| 23 | Branch & worktree lifecycle | Every branch is born through a gate and dies through a gate; 1 task = 1 unique branch; the main worktree is read-only; cleanup right after merge (squash-blindspot aware). |
+| 4 | Session closeout + scan | Every branch touched ends declared: PUSHED / READY-PR / DISCARDED — and a scan hunts what was left hanging. |
+| 7 | Paused work lifecycle | Paused work is either declared-with-intent or reapable after N days — nothing floats forever. |
+| 10a | Development process (universal skeleton) | Governance precedes code: slice → decision gate → spec → governed execution → artifacts; **the plan carries a security section**; **suppressing a gate = a registered, expiring exemption**. |
+| 10b | House methodology (L2 binding) | The kit owner's concrete instantiation of the skeleton (gate questions, spec pipeline). Non-house repos: declare N-A and bind 10a natively. |
+
+### ✅ Quality: testing and review
+
+| # | Rule | In one line |
+|---|---|---|
+| 15 | Testing minimum bar | Every new function with logic: 1 happy-path + 1 failure test, same PR. **And the toolchain must be ALIVE** — an orphaned runner is a fake green. |
+| 26 | Testing gate | Tests aren't yes/no — they're WHICH TYPE by the change's nature × stakes (unit, contract, smoke, UAT, eval for AI). No global coverage %. |
+| 27 | Ephemeral test users | E2E tests NEVER touch real accounts: create a throwaway user, delete it after. (Born from a real two-hour lockout.) |
+| 14 | Visual bug triage | "It looks broken" is not evidence: DIFF first → cache/client side → only then touch code. |
+| 9 | Review-call checklist | The second architect's 10 controls before a seal: reality over fixtures, gates must bite, honest close. |
+| 24 | Architecture review | How an advisor judges the whole system: 4 lenses (gaps / drift / contradiction / **over-engineering**) and hard-drop — a finding with no real value is discarded, not noted. |
+| 25 | Audit protocol | An audit asks "does it LIE?", not "is it built?" — and every finding carries a disposition until closed; nothing stays "acknowledged but idle". |
+| 28 | Gap report | When asked "what's missing?": read the plan, read the REAL code, report verified — diagnosis, never execution without a go-ahead. |
+
+### 📜 Decisions and external code
+
+| # | Rule | In one line |
+|---|---|---|
+| 5 | Decisions as ADRs | Every architecture decision is written down, indexable, with its why and alternatives — so it's never re-litigated. |
+| 6 | Decision-capture reflex | About to add a dependency / framework / contract / security boundary? STOP and write the ADR first. |
+| 29 | Upstream protocol | All external code is governed: a 6-step protocol before adopting, license rules (strong copyleft never enters as a fork), an inventory with cadence, and external providers graded A/B/C/F (F = blocked). |
+
+### 📦 What ships, and configuration
+
+| # | Rule | In one line |
+|---|---|---|
+| 30 | Production safety | NO dev shortcut ships to production (not even behind a flag) — and what runs in prod must be able to **explain why it blocks** (reason codes + trace id, never a mute 403). |
+| 32 | Configuration discipline | Code defines behavior, not values: anything that can differ per deployment/group goes to layered config; secrets never fall to a code default; "look where the code looks". |
+| 31 | Copy-parity | Every tool copied from the kit carries an anti-rot guard: undeclared drift = red; deliberate adaptation = declared and visible. |
+| 12 | Agent-hook engines | The small reusable engines (keyword reminders, skill sync) that copy with their parity check. |
+
+---
+
 ## Works with your agents and your models
 
 **Any AI coding agent / IDE.** The root rulebook follows the open
