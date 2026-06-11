@@ -129,21 +129,18 @@ The consuming repo's L3 binding documents its specific PR tooling (GitHub PR, Gi
 
 ---
 
-## §8 — L3 binding override clause (when a consuming repo needs to deviate)
+## §8 — L3 binding override clause (PROMOTED → the Inheritance Contract)
 
-Sometimes a consuming repo needs to deviate from one of this canon's rules for legitimate local reasons (e.g., a constrained CI environment that forbids hooks, a solo-operator personal repo that does not need PRs, a corporate compliance posture that requires `--no-verify` in a specific automated path).
-
-The override mechanism is **explicit and documented**, never silent:
-
-1. The L3 binding declares an **`## Overrides`** section that names:
-   - the specific rule(s) being overridden (with section number from this spine),
-   - the local replacement rule,
-   - the **reason** (local constraint, compliance, environment, etc.),
-   - whether the override is **temporary** (with target close date) or **permanent**.
-2. The override is a **finding** to this canon's maintainer: it signals that either (a) the spine is missing a case that should be supported, or (b) the consuming repo carries unique constraints that don't apply broadly. Either way, the maintainer reviews and decides whether to amend the spine.
-3. **Silent deviation is forbidden** and counts as drift. A consuming repo whose practice differs from the spine without a declared override is in violation of this canon.
-
-This override pattern applies to **every Dev-Kit spine canon**, not only this one — `CANON-AGENT-COLLABORATION`, `CANON-UPSTREAM-PROTOCOL`, etc. all carry the same contract with their L3 bindings.
+> **Moved 2026-06-11 (authorized by the Principal Architect).** This clause was
+> defined here first because git-hygiene was the most foundational spine — but
+> it always applied to **every** spine, so an heir asking *"may I override X?"*
+> had to find it buried in a git-hygiene section. It now lives where an heir
+> looks: **`setup/INHERITANCE-CONTRACT.md` §4** (override visibly: `## Overrides`
+> section with spine+section · replacement · reason · temporality; every
+> override is a finding to the maintainer; silent deviation is drift).
+>
+> The mechanism is **unchanged** — only its home moved. Deviations from *this*
+> canon follow the contract like deviations from any other spine.
 
 ---
 
@@ -162,3 +159,5 @@ This canon was lifted from ViTo `docs/canon/processes/GIT_HYGIENE_PROTOCOL.md` (
 **Amendment 2026-05-25 (Cluster C-4 reconciliation):** §2.4 (No forced hook bypass), §2.5 (Clean Floor / root write prohibition), four new entries in §4 anti-patterns (force-push to main, rebase published commits, overnight rebase, commented-out code, silent `--no-verify`, root write), §7 (All changes via PR governance rule), and §8 (L3 binding override clause — applies to every Dev-Kit spine canon) were lifted from ViTo `CANON-REPO-HYGIENE-001.md` (status ACTIVE) where they had been trapped at L3 despite being agnostic. The ViTo `CANON-REPO-HYGIENE-001.md` was consolidated into `processes/GIT_HYGIENE_PROTOCOL.md` (the existing L3 binding) and superseded — the two duplicate ViTo hygiene canons collapsed into one L3 binding pointing at this spine.
 
 The **§8 override clause** is the meta-mechanism for handling exceptions across all spine canons — defined here once because git-hygiene is the most foundational, but applicable to every L3 binding.
+
+**Amendment 2026-06-11 — authorized by the Principal Architect:** §8's content was **promoted** to `setup/INHERITANCE-CONTRACT.md` §4 (the heir's one-page contract: mechanism · declare · never-duplicate · override-visibly · declared-adaptation · no-silent-deviation). §8 here is now a pointer; the mechanism is unchanged. Rationale: the clause always applied to every spine, and discoverability beats historical placement — an heir looks for deviation rules in the inheritance contract, not inside the git-hygiene spine.

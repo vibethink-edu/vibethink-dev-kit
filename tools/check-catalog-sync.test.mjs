@@ -33,13 +33,18 @@ function test(name, fn) {
 
 const SEALED = "> **Status:** SEALED 2026-01-01 by the Principal Architect\n\nbody\n";
 
-function run({ spines = {}, catalog = "", config = {} }) {
+function run({ spines = {}, catalog = "", config = {}, extraFiles = {} }) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "catalog-sync-test-"));
   fs.mkdirSync(path.join(root, "knowledge", "methodology"), { recursive: true });
   fs.mkdirSync(path.join(root, "setup"), { recursive: true });
   fs.mkdirSync(path.join(root, "tools"), { recursive: true });
   for (const [name, content] of Object.entries(spines)) {
     fs.writeFileSync(path.join(root, "knowledge", "methodology", name), content);
+  }
+  for (const [rel, content] of Object.entries(extraFiles)) {
+    const p = path.join(root, rel);
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, content);
   }
   fs.writeFileSync(path.join(root, "setup", "ADOPT-DEV-KIT.md"), catalog);
   fs.writeFileSync(
@@ -125,6 +130,35 @@ test("status outside the controlled vocabulary → RED, exit 1", () => {
   });
   assert.equal(code, 1, out);
   assert.match(out, /does not start with a controlled token/);
+});
+
+test("contract exists + catalog cites it → GREEN", () => {
+  const { code, out } = run({
+    catalog: "See [INHERITANCE-CONTRACT.md](INHERITANCE-CONTRACT.md) first.\n",
+    config: { contractFile: "setup/INHERITANCE-CONTRACT.md" },
+    extraFiles: { "setup/INHERITANCE-CONTRACT.md": "# Contract\n" },
+  });
+  assert.equal(code, 0, out);
+  assert.match(out, /contract: .* exists and the catalog routes heirs to it/);
+});
+
+test("contract declared but file missing → RED, exit 1", () => {
+  const { code, out } = run({
+    catalog: "INHERITANCE-CONTRACT.md mentioned\n",
+    config: { contractFile: "setup/INHERITANCE-CONTRACT.md" },
+  });
+  assert.equal(code, 1, out);
+  assert.match(out, /does NOT exist/);
+});
+
+test("contract exists but catalog never cites it → RED, exit 1 (heirs not routed)", () => {
+  const { code, out } = run({
+    catalog: "no routing here\n",
+    config: { contractFile: "setup/INHERITANCE-CONTRACT.md" },
+    extraFiles: { "setup/INHERITANCE-CONTRACT.md": "# Contract\n" },
+  });
+  assert.equal(code, 1, out);
+  assert.match(out, /never cites/);
 });
 
 test("missing config → setup error, exit 2", () => {

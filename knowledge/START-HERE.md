@@ -48,6 +48,8 @@ make them translate or copy content).
 - **Learn before you automate.** Do it by hand until you *understand* it; automate only
   the learned, mechanical part — judgment stays with the human. → §3.1
 - **Build on real pain.** Don't add machinery — or canon — ahead of demonstrated need.
+- **Inheriting this kit?** The heir's contract is `setup/INHERITANCE-CONTRACT.md`
+  (declare your adoption · never duplicate a doc · override visibly, never silently).
 - **Per-product specifics** live in that product's own `AGENTS.md`, never here.
 
 ## Your first task (prove you've got it)

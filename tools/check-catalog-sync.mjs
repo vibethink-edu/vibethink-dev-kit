@@ -60,11 +60,28 @@ const spineRe = new RegExp(cfg.spinePattern || "^CANON-.*\\.md$");
 const exempt = new Map((cfg.exempt || []).map((e) => [e.file.replace(/\\/g, "/"), e.reason || ""]));
 const statusTokens = cfg.statusTokens || [];
 const alsoStatusCheck = cfg.alsoStatusCheck || [];
+const contractFile = cfg.contractFile || "";
 
 console.log(`\ncheck-catalog-sync · ${path.relative(ROOT, configPath)}`);
 console.log(`catalog: ${path.relative(ROOT, catalogFile)}\n`);
 
 let failed = 0;
+
+// ── Check 0: the inheritance contract is wired, not a pretty idea ───────────
+// The contract must exist AND be cited by the catalog (a contract nobody is
+// routed to is the written-but-not-biting failure all over again).
+if (contractFile) {
+  const contractAbs = path.resolve(ROOT, contractFile);
+  if (!existsSync(contractAbs)) {
+    failed++;
+    console.log(`  ${red("✗")} contract: ${contractFile} does NOT exist (declared in config)`);
+  } else if (!catalog.includes(path.basename(contractFile))) {
+    failed++;
+    console.log(`  ${red("✗")} contract: the catalog never cites ${path.basename(contractFile)} — heirs are not routed to the contract`);
+  } else {
+    console.log(`  ${green("✓")} contract: ${contractFile} exists and the catalog routes heirs to it`);
+  }
+}
 
 // ── Check 1: catalog-coverage ────────────────────────────────────────────────
 const spines = [];
