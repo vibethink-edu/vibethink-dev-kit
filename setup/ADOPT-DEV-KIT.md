@@ -775,7 +775,7 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 ### 32 — Configuration discipline (code defines behavior, not configuration)
 
 **Layer:** L1 (neutral).
-**Home:** `knowledge/methodology/CANON-CONFIGURATION-DISCIPLINE.md` *(PROPOSED — awaiting seal)*.
+**Home:** `knowledge/methodology/CANON-CONFIGURATION-DISCIPLINE.md`.
 
 - **Qué:** the discipline that no value which can differ between deployments,
   environments, operators, or served groups lives in code — the layered

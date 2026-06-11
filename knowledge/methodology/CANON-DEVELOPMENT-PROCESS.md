@@ -98,7 +98,7 @@ Each example shows a real scenario: the situation, the challenge or trade-off, t
 
 The cost of omitting examples is **re-learning**: a future agent reconstructs from scratch the edge cases, trade-offs, and intent an example would have carried forward.
 
-### 5.2 The plan artifact carries security concerns *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+### 5.2 The plan artifact carries security concerns *(SEALED 2026-06-11 by the Principal Architect — "SEAL DALE", agnostic-lift batch G→Z)*
 
 The implementation/deployment plan artifact of a unit includes a **security-concerns section** before it can receive approval to execute: one row per concern (**concern · severity · status · mitigation**), covering at minimum authentication, secrets, injection/user-content handling, data isolation, third-party dependencies and license posture, and sensitive-data flow — plus an **upstream audit** (hardcoded secrets, license violations, vulnerable dependencies, replaced surfaces) when the unit imports or forks external code. Severity drives sequencing: critical concerns resolve before any code lands; high before merge; medium before deploy; low is tracked. A plan without this section is not approvable — the section is where a hardcoded upstream license key or a missing guard is caught **before** it enters the repo.
 
