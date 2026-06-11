@@ -32,7 +32,8 @@ artifact type:
 **Golden rule:** the engine is tested **once, here**. Your repo declares its
 **config** and runs the **smoke** against it; it never forks the engine. A copied
 runnable must carry the parity check that proves it is byte-identical to the
-upstream — without it, the copy silently rots.
+upstream — without it, the copy silently rots. That check is **Piece #31**
+(`check-copy-parity`), wired through the same reusable workflow as Piece #2.
 
 ---
 
@@ -385,11 +386,14 @@ verifica · Layer**.
     keyword; the banner appears as additional context.
   - `sync-agent-skills.mjs --check`: exits 0 when source and target are in sync.
 
-> **Honest status.** These two engines exist in the kit and are in real use
-> (`keyword-reminder.mjs` in one consuming repo, `sync-agent-skills.mjs` in
-> another), but the parity-check CI step that ADR-20260524 §3.1 requires for
-> runnable-by-copy artifacts is **not yet wired** — that gap travels with this
-> piece. See `doc/AUDIT-DEVKIT-CLEANUP-2026-06-03.md` finding F4.
+> **Honest status (updated 2026-06-11).** These two engines exist in the kit and
+> are in real use (`keyword-reminder.mjs` in one consuming repo,
+> `sync-agent-skills.mjs` in another). The parity-check the ADR-20260524 §3.1
+> mandate requires for runnable-by-copy artifacts **now exists as Piece #31**
+> (`tools/check-copy-parity.mjs` + the reusable workflow's `copy-parity` job) —
+> the remaining work is per-consumer: each repo declares its copies in a
+> `copy-parity.config.json` and passes `parity-config-path` to the workflow.
+> Original gap record: `doc/AUDIT-DEVKIT-CLEANUP-2026-06-03.md` finding F4.
 
 ### 13 — Naming conventions (universal L1)
 
@@ -733,6 +737,36 @@ verifica · Layer**.
   reach production; any production diagnostic in the artifact is a named, reviewed
   product feature.
 
+### 31 — Copy-parity check (the drift guard for copied runnables)
+
+**Layer:** L1 (neutral).
+**Home:** `tools/check-copy-parity.mjs` + `tools/copy-parity.example.json` +
+the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`) +
+`doc/decisions/ADR-20260524-supra-repo-inheritance-mechanism.md` (the mandate).
+
+- **Qué:** the enforcement of the inheritance mechanism's §3.1 mandate — every
+  runnable a consumer carries as a **verbatim copy** is verified **byte-identical
+  to the kit source (modulo line endings)** on every PR. An undeclared mismatch
+  is DRIFT → red. A deliberate divergence is declared per entry
+  (`adapted: { reason, since }`) and reported visibly as ADAPTED — bounded
+  adaptations (upstream-protocol canon §6.1) are legitimate, silent rot is not.
+  The judging engine always comes from the kit checkout, never from the
+  consumer's own (possibly drifted) copy.
+- **Cómo:**
+  - Declare your copies: drop a `tools/copy-parity.config.json` (start from the
+    kit's `copy-parity.example.json`) listing each `local ⇄ upstream` pair, with
+    `adapted` + reason where a bounded adaptation exists (its do-not-overwrite
+    detail lives in the per-fork `UPSTREAM.md`).
+  - Wire CI: pass `parity-config-path` to the reusable workflow you already call
+    for Piece #2. No config passed = job skipped (opt out is explicit, not silent).
+  - Local run: `node <kit>/tools/check-copy-parity.mjs tools/copy-parity.config.json --upstream-root <kit-path>`.
+- **Verificar:**
+  - CI shows a green `copy-parity` job on the latest PR.
+  - Negative test: patch one local copy by a character → the job goes RED naming
+    the pair and printing the diff hint.
+  - Every `adapted` entry in the config has a reason and a matching note in the
+    per-fork `UPSTREAM.md`.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -774,6 +808,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 28 | Gap report | ADOPTED / PENDING / N-A | trigger phrases + doc locations |
 | 29 | Upstream protocol | ADOPTED / PENDING / N-A | inventory + discoverable index path |
 | 30 | Production safety | ADOPTED / PENDING / N-A | exclusion mechanism + gate |
+| 31 | Copy-parity check | ADOPTED / PENDING / N-A(no copies) | parity config path + CI job |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
@@ -796,6 +831,9 @@ A consuming repo can claim full adoption only when:
 - [ ] Piece #5 decisions folder exists and is bound to your indexer (if any).
 - [ ] Piece #8 `comms:send` is wired and a test comm round-trips.
 - [ ] Piece #9 reviewers cite controls by number in review messages.
+- [ ] Piece #31: if the repo carries ANY copied kit runnable, its copy-parity
+      config declares every copy and the CI `copy-parity` job is green (a repo
+      with zero copies declares `N-A(no copies)` instead).
 - [ ] Your `AGENTS.md` carries the **Per-piece adoption status** table — every
       row declared `ADOPTED`, `PENDING`, or `N-A`. **No silent skips.**
 

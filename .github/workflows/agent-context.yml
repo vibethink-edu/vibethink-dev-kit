@@ -29,6 +29,13 @@ on:
         description: Ref of the dev-kit whose tools a fork should run.
         type: string
         default: main
+      parity-config-path:
+        description: >-
+          Path (in the consuming repo) to the copy-parity config declaring its
+          copy-distributed runnables (ADR-20260524 §3.1). Empty = job skipped —
+          a consumer with no declared copies opts out explicitly, not silently.
+        type: string
+        default: ""
 
 env:
   KIT_REPO: vibethink-edu/vibethink-dev-kit
@@ -69,6 +76,33 @@ jobs:
       - name: check-agent-context (smoke)
         run: node ${{ steps.tools.outputs.dir }}/check-agent-context.mjs "${{ inputs.config-path || 'tools/agent-context.config.json' }}"
 
+  copy-parity:
+    name: copy-parity (drift guard, ADR-20260524 §3.1)
+    # Runs only when a CONSUMING repo passes parity-config-path. The kit itself
+    # is the upstream — it has no copies to verify, so it never runs this job.
+    if: inputs.parity-config-path != '' && github.repository != 'vibethink-edu/vibethink-dev-kit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo under validation
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch dev-kit (upstream source of the copies)
+        uses: actions/checkout@v4
+        with:
+          repository: vibethink-edu/vibethink-dev-kit
+          ref: ${{ inputs.devkit-ref || 'main' }}
+          path: _devkit
+
+      # The engine itself comes from the kit checkout — a consumer's (possibly
+      # drifted) local copy must not be the judge of its own parity.
+      - name: check-copy-parity
+        run: node _devkit/tools/check-copy-parity.mjs "${{ inputs.parity-config-path }}" --upstream-root _devkit
+
   engine-tests:
     name: inbox / feed engine tests
     # The engine is tested once, at its source. Forks consume it; they don't re-test it.
@@ -88,3 +122,6 @@ jobs:
 
       - name: feed tests
         run: node tools/feed.test.mjs
+
+      - name: copy-parity tests
+        run: node tools/check-copy-parity.test.mjs

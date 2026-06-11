@@ -1,0 +1,17 @@
+{
+  "$schema": "VIBETHINK_COPY_PARITY_V1",
+  "_comment": "Per-consumer declaration of copy-distributed runnables (ADR-20260524 §3.1). Copy this file into the consuming repo (e.g. tools/copy-parity.config.json), list every kit runnable the repo carries as a verbatim copy, and pass its path to the reusable workflow's parity-config-path input. 'adapted' entries declare a bounded adaptation (upstream-protocol canon §6.1) — visible, never silently skipped.",
+  "upstreamRoot": "_devkit",
+  "copies": [
+    { "local": "scripts/inbox.mjs", "upstream": "tools/inbox.mjs" },
+    { "local": "scripts/feed.mjs", "upstream": "tools/feed.mjs" },
+    {
+      "local": "scripts/hooks/keyword-reminder.mjs",
+      "upstream": "tools/keyword-reminder.mjs",
+      "adapted": {
+        "reason": "EXAMPLE ONLY — declare the concrete reason for the divergence and keep the do-not-overwrite list in the per-fork UPSTREAM.md",
+        "since": "YYYY-MM-DD"
+      }
+    }
+  ]
+}
