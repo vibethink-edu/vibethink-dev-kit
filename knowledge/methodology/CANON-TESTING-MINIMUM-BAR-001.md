@@ -63,6 +63,15 @@ The self-test exercises the integration's real failure modes (auth, timeout, mal
 
 The specific endpoint shape (`GET /api/<service>/selftest`, a `cli <service> selftest` command, a runner subcommand) is per-repo binding; the **contract** of `{passed, failed, total}` is universal.
 
+### 6.1 — The toolchain must be alive *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+
+The minimum bar presumes the tests **actually run**. A workspace whose test script invokes a runner that is not installed, or whose test files import a framework the workspace does not use, produces the worst failure mode this canon exists to prevent: **silent false green** — tests that appear to pass because nothing executed. Therefore:
+
+- **One declared runner per workspace.** Hybrid or orphaned toolchains (script says runner A, imports say framework B, dependencies say neither) are a violation on sight, corrected before merge.
+- **Verified alive.** "The test command exits 0" is not evidence; *the runner executed N tests* is. A zero-test run on a workspace with test files is a red flag, not a pass.
+
+Which runner, and any consolidation plan from a legacy mix, are per-repo binding; the **one-live-declared-runner** rule is universal.
+
 ## 7. What this canon does NOT do
 
 - It does **not** prescribe a specific testing framework (Jest, Vitest, pytest, Go test, JUnit, whatever the language standard is).

@@ -46,6 +46,17 @@ It is **NOT** a runtime toggle a user can enable. **No backdoor** — no `?debug
 
 If production users genuinely need diagnostics (connection quality, sync status, a health indicator), that is a **designed, reviewed product feature** — named, scoped, built as a real UI component, governed like any feature (`CANON-ARCHITECTURE-REVIEW`). It does **not** reuse the debug infrastructure and does **not** become a backdoor. The need for prod diagnostics is satisfied by *building a feature*, never by *leaving debug tooling on*.
 
+### §4.1 — The diagnosability floor: a system that cannot explain why it blocks is not production-ready *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+
+§2 removes what must not ship; this is the floor of what **must**: the production artifact can **explain its own denials deterministically**, or every blocked user becomes hours of artisanal debugging.
+
+- **Reason codes, not silence.** Every blocking decision (auth, data state, config, runtime failure) emits a stable, machine-readable reason code with **PII-safe evidence** — never a bare denial.
+- **Severity taxonomy.** Diagnoses classify as *blocker / warning / info*, separating technical failure, missing business state, incomplete configuration, and placeholder surfaces — without the separation, everything feels like a bug and the wrong people debug it.
+- **Trace correlation.** A request-scoped trace id flows through every layer and into every structured log line, so one identifier reconstructs the full path of a denial.
+- **Read-only diagnosis.** The diagnosis surface **observes and explains; it never mutates, never enforces, never repairs** — enforcement stays in the guards, fixes stay explicit. (This keeps it from becoming the §3 backdoor.)
+
+The concrete taxonomy, endpoint shape, and trace-id format are L3 binding. The floor is the *capability*: blocked → explained → actionable, in minutes, not hours.
+
 ---
 
 ## §5 — Enforced, not trusted

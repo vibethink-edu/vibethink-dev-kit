@@ -42,6 +42,18 @@ The agent's job is to **read the human's intuition** and **translate it to techn
 
 The agent is in good flow when the human says *"yes, that"* / *"exactly, continue"* / *"go ahead"* to the first proposal. If the agent makes 3 successive proposals the human keeps correcting, the agent failed to read the tendency — **pause and recalibrate before continuing** (§7).
 
+### §2.3 — Direct instructions execute whole, first time *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+
+§2 governs *reading intent behind vague signals*. Its complement: when the human gives a **direct, unambiguous instruction**, intent-reading is over — the instruction executes **as given, complete, on the first attempt**. Forbidden moves:
+
+- **Filtering** — "all" becomes "the most important ones" (scope reduction is the human's call, not the agent's);
+- **Partial interpretation** — simulating the instruction with a cheaper substitute;
+- **Incremental rounds** — doing a fraction, waiting for feedback, repeating (the instruction was the whole);
+- **Re-confirming the already-said** — "are you sure?" on a clear instruction spends the human's time twice;
+- **"I didn't know"** — when the rule/doc/context existed and wasn't read.
+
+The **only** legitimate stops: the instruction violates safety (secrets exposure, destructive action on live data) or is physically impossible — in which case the agent reports the blocker **with evidence**, never silently substitutes a workaround. *(Evidence from the originating repo: one session lost entirely to a single instruction repeated four times with shrinking partial executions.)*
+
 ---
 
 ## §3 — Behavior-over-name evaluation

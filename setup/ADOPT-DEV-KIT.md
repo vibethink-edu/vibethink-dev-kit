@@ -772,6 +772,25 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - Every `adapted` entry in the config has a reason and a matching note in the
     per-fork `UPSTREAM.md`.
 
+### 32 — Configuration discipline (code defines behavior, not configuration)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-CONFIGURATION-DISCIPLINE.md` *(PROPOSED — awaiting seal)*.
+
+- **Qué:** the discipline that no value which can differ between deployments,
+  environments, operators, or served groups lives in code — the layered
+  resolution order (group/owner store → platform defaults → env → code default
+  for non-sensitive invariants only; secrets never fall through to a code
+  default), the agent discovery rule (**look where the code looks** — walk the
+  resolver before declaring a value missing), and the one-question hardcode test
+  for any diff.
+- **Cómo:** doc by reference. L3 binding names the concrete stores per layer,
+  the admin surfaces that manage them, product value categories, and any
+  mechanical enforcement (secret/URL literal scanners).
+- **Verificar:** a recent diff with a tunable value resolves it through the
+  declared layers (not a literal); an agent asked about a "missing" key walked
+  the resolver first; secrets absent → feature fails closed, no invented default.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -814,6 +833,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 29 | Upstream protocol | ADOPTED / PENDING / N-A | inventory + discoverable index path |
 | 30 | Production safety | ADOPTED / PENDING / N-A | exclusion mechanism + gate |
 | 31 | Copy-parity check | ADOPTED / PENDING / N-A(no copies) | parity config path + CI job |
+| 32 | Configuration discipline | ADOPTED / PENDING / N-A | stores per layer + enforcement |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
