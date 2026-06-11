@@ -29,6 +29,27 @@ If your repo inherits this kit, these problems stop being yours to remember:
 | *"Did someone paste a secret into an agent-to-agent message?"* | the **comms security gate** scans every outbound message fail-closed before it ever travels. |
 | *"How do I start a new repo with the same standards?"* | the 15-minute path below — and the new repo inherits future rule improvements automatically, because it points at the source instead of holding a copy. |
 | *"Our docs say one thing and reality does another…"* | norms here ship **with their enforcement** — a rule that can't bite is treated as a defect of the kit itself (it's how this repo audits *itself*). |
+| *"We switched IDE or model — do our rules still hold?"* | adapters are one-line pointers to a single root, verified on every PR; the neutral core names no vendor, so switching costs nothing. |
+
+---
+
+## Works with your agents and your models
+
+**Any AI coding agent / IDE.** The root rulebook follows the open
+[AGENTS.md](https://agents.md) standard, and one-line adapters ship for the
+common harnesses (e.g. Claude Code, Codex, Copilot, Windsurf; Cursor via its
+rules file — the verified per-tool map is
+[`knowledge/ai-agents/AI_AGENT_COMPATIBILITY.md`](knowledge/ai-agents/AI_AGENT_COMPATIBILITY.md)).
+Adding a new agent is a one-line pointer file. The layering smoke **verifies on
+every PR** that all adapters point at the same root and none contradicts it —
+multi-agent support is gated, not promised.
+
+**Any model, any vendor.** The neutral core names no model vendor — a CI check
+enforces it. Swap models or providers tomorrow; your governance doesn't notice.
+
+**Any platform.** The engines are pure Node (zero dependencies), validated
+cross-platform: the kit's own CI runs them on Linux on every PR, and consuming
+repos run them daily on Windows. Requirements: Node 20+ and git.
 
 ---
 

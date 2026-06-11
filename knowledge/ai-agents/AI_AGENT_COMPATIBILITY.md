@@ -1,144 +1,66 @@
-# AI Agent Compatibility Matrix - VThink 1.0
+# AI Agent Compatibility Matrix — which file each tool reads
 
-> **Qué archivos lee cada herramienta de IA**
+> **Status:** reference (compatibility facts; the governing model is
+> `CANON-CROSS-AGENT-CONTEXT-LAYERING.md`).
+> **What this is.** The verified map of *which rules file each AI coding tool
+> actually loads*, so a repo wires ONE root rulebook + one-line adapters
+> instead of N parallel rulebooks. How the layering works (root + adapters +
+> budgets + the smoke that gates it) lives in the canon — this file only keeps
+> the per-tool facts current.
 
-## 📋 Matriz de Compatibilidad
+## The matrix
 
-| Herramienta | Archivo | ¿Lo lee? | Notas |
-|-------------|---------|----------|-------|
-| **Cursor** | `.cursorrules` | ✅ Confirmado | Raíz del proyecto |
-| **Cursor** | `AGENTS.md` | ⚠️ Via rules | Debe referenciarse en .cursorrules |
-| **Claude Code** | `AGENTS.md` | ✅ Confirmado | [agents.md standard](https://agents.md) |
-| **Claude Code** | `CLAUDE.md` | ✅ Confirmado | Anthropic standard |
-| **OpenAI Codex** | `CODEX.md` | ⚠️ No confirmado | Creado por consistencia |
-| **OpenAI Codex** | `.rules` | ✅ Confirmado | En `~/.codex/rules/` (global) |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | ✅ Confirmado | GitHub standard |
-| **Windsurf** | `.windsurfrules` | ✅ Confirmado | Codeium standard |
+| Tool | File it reads | Confirmed? | Notes |
+|---|---|---|---|
+| Claude Code | `AGENTS.md` | ✅ | open [agents.md](https://agents.md) standard |
+| Claude Code | `CLAUDE.md` | ✅ | vendor adapter (pointer to the root) |
+| Codex | `AGENTS.md` | ✅ | loads by session cwd; **byte budget ~32 KiB** — an oversized root truncates silently (the smoke's root-budget check guards this) |
+| Codex | `CODEX.md` | ⚠️ unconfirmed | shipped for consistency (pointer) |
+| GitHub Copilot | `.github/copilot-instructions.md` | ✅ | GitHub standard (pointer) |
+| Windsurf | `.windsurfrules` | ✅ | pointer |
+| Cursor | `.cursorrules` | ✅ | must reference the root explicitly (no auto-load of `AGENTS.md`) |
+| Gemini-family CLIs | — | ⚠️ | no hierarchical auto-load; the root rule must instruct agents to read subdir rules manually |
 
-## 🔧 Archivos Recomendados por Proyecto
+**The shape this matrix serves:** ONE root rulebook (`AGENTS.md`, following the
+open standard) + per-tool **one-line pointer adapters**. Never N parallel
+rulebooks — that is the drift the layering smoke exists to catch.
 
-Para máxima compatibilidad, un proyecto VibeThink debe tener:
+## Enforcement (gated, not advisory)
 
-```
-project-root/
-├── .cursorrules              # Cursor IDE
-├── AGENTS.md                 # Claude Code + Standard
-├── CLAUDE.md                 # Claude Code (opcional, puede ser symlink)
-├── CODEX.md                  # OpenAI Codex (por consistencia)
-├── .windsurfrules            # Windsurf (opcional)
-└── .github/
-    └── copilot-instructions.md  # GitHub Copilot
-```
+The historical caveat "files are suggestions, no real enforcement" is obsolete:
+`tools/check-agent-context.mjs` (the layering smoke, reusable via
+`.github/workflows/agent-context.yml`) verifies on every PR that:
 
-## 🎯 Estrategia de Herencia
+- the root fits the most restrictive tool's byte budget (no silent truncation),
+- every adapter exists, points at the root, and stays within its size cap,
+- no parallel rulebook contradicts the root (repo-wide scan),
+- neutral core files leak no brand/vendor names.
 
-### Nivel 1: Dev-Kit (Genérico)
-```
-_vibethink-dev-kit/knowledge/ai-agents/
-├── AGENTS_UNIVERSAL.md                  # Autoridad única (reglas universales)
-├── CANON-CROSS-AGENT-CONTEXT-LAYERING.md # Canon de layering (companion)
-├── CLAUDE.md                            # Adapter Claude (puntero)
-├── CODEX.md                             # Adapter Codex (puntero)
-└── AI_AGENT_COMPATIBILITY.md            # Este archivo
-```
+**Do NOT "maximize compliance" by duplicating critical rules across files** —
+that legacy advice is the exact anti-pattern the inheritance contract forbids
+(two normative copies drift). One root, pointers, and the gate.
 
-### Nivel 2: Proyecto (Específico)
-```
-project-root/
-├── .cursorrules              # Hereda + Customiza
-├── AGENTS.md                 # Hereda + Quick Operations
-└── [otros archivos según necesidad]
-```
+## Platform requirements (validated)
 
-## 📝 Contenido Mínimo por Archivo
+The engines are **pure Node (zero npm dependencies) and cross-platform** —
+Linux, macOS, Windows. Evidence: the kit's own CI gates run them on Linux on
+every PR, and consuming repos run them daily on Windows (hooks + local runs).
+Requirements: **Node 20+** and **git** on PATH. The mount convenience script
+ships in both shells (`mount-devkit.sh` / `mount-devkit.ps1`).
 
-### `.cursorrules` (Cursor)
-```xml
-<mandatory_first_actions>
-- List scripts/ directory
-- Read AGENTS.md
-- Report available commands
-</mandatory_first_actions>
+## Adding a new tool
 
-<project_rules>
-- Quick Operations table
-- Tech stack
-- Prohibitions
-</project_rules>
-```
+1. Find which file the tool actually loads (vendor docs / empirical test).
+2. Add a one-line pointer adapter (copy any existing adapter).
+3. Register it in your repo's `tools/agent-context.config.json` so the smoke
+   verifies it.
+4. Add the row here with its confirmation status.
 
-### `AGENTS.md` (Claude Code + Standard)
-```markdown
-## 🔥 LEVEL 1: CRITICAL
-- Quick Operations table
-- Project mission
-- Tech stack
-- Prohibitions
+## Known limits (still true)
 
-## 📋 LEVEL 2: WORKFLOW
-- Development workflow
-- Pre-commit checklist
-
-## 📚 LEVEL 3: REFERENCE
-- Directory structure
-- Documentation map
-```
-
-### `CLAUDE.md` (Claude Code)
-```markdown
-# Project Instructions
-- Inherit from AGENTS.md
-- Claude-specific behaviors
-```
-
-### `CODEX.md` (OpenAI Codex)
-```markdown
-# Codex Instructions
-- Inherit from AGENTS.md
-- Codex-specific behaviors
-```
-
-### `.github/copilot-instructions.md` (GitHub Copilot)
-```markdown
-# Copilot Instructions
-- Project context
-- Coding standards
-```
-
-## ⚠️ Limitaciones Conocidas
-
-1. **Leer ≠ Ejecutar**: Los agentes leen los archivos pero no "ejecutan" las instrucciones automáticamente
-2. **Prioridad variable**: Cada herramienta prioriza diferente las instrucciones
-3. **Contexto limitado**: Archivos muy largos pueden ser truncados
-4. **Sin garantías**: No hay enforcement real, solo sugerencias fuertes
-
-## 🛡️ Maximizar Cumplimiento
-
-1. **Redundancia**: Poner reglas críticas en múltiples archivos
-2. **Brevedad**: Mantener instrucciones críticas al inicio
-3. **Tablas**: Usar formato tabular para comandos (fácil de parsear)
-4. **User Rules**: Configurar reglas a nivel de usuario en cada IDE
-
-### Cursor User Rules (Settings → Rules for AI)
-```
-BEFORE any task:
-1. List scripts/ directory
-2. Read AGENTS.md
-3. Report available commands
-NEVER start coding without checking project scripts.
-```
-
----
-
-**Last Updated:** 2025-12-16
-**Maintained by:** VibeThink Dev-Kit
-
-
-
-
-
-
-
-
-
-
+- Reading ≠ obeying: a rules file instructs; the agent's harness decides how
+  strongly. The gates verify the *files*; behavioral compliance is reviewed.
+- Each tool prioritizes instructions differently; keep critical rules at the
+  top of the root.
+- Long roots truncate on the most constrained tools — the byte-budget check is
+  the floor, brevity is the discipline.
