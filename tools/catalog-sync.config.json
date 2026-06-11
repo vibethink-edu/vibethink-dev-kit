@@ -1,0 +1,25 @@
+{
+  "$schema": "VIBETHINK_CATALOG_SYNC_V1",
+  "_comment": "Producer-side gate config (kit-only; consumers never run this). Check 1: every spine matching spinePattern in knowledgeDirs must be cited by the catalog or carry an exemption WITH a reason. Check 2: every spine (+ alsoStatusCheck files) declares a **Status:** line starting with a controlled token — the mechanical end of mixed status vocabulary (new spines conform on arrival; sealed headers are not cosmetically rewritten).",
+  "catalogFile": "setup/ADOPT-DEV-KIT.md",
+  "knowledgeDirs": [
+    "knowledge/ai-agents",
+    "knowledge/methodology",
+    "knowledge/architecture"
+  ],
+  "spinePattern": "^(CANON-.*|VT-METHOD)\\.md$",
+  "exempt": [],
+  "statusTokens": [
+    "SEALED",
+    "approved",
+    "CANON",
+    "DRAFT",
+    "PROPOSED",
+    "process protocol",
+    "BASELINE"
+  ],
+  "alsoStatusCheck": [
+    "knowledge/ai-agents/REVIEW-CALL-CHECKLIST.md",
+    "knowledge/ai-agents/REVIEW-READINESS-PROTOCOL.md"
+  ]
+}

@@ -2,6 +2,8 @@
 
 > **Scope:** every repo that inherits this kit. Vendor-neutral, product-neutral,
 > tool-neutral.
+> **Status:** process protocol (operational instrument), not canon-sealed — same
+> tier as `REVIEW-READINESS-PROTOCOL.md`; it grows as new failure modes are found.
 > **Home:** the dev-kit (supra-repo) — a single governance control point. Inherited
 > by every repo as upstream → fork, so any repo adopts it verbatim.
 > **Sibling:** `CANON-MULTI-AGENT-ORCHESTRATION.md` §6 (red-gate discipline) states

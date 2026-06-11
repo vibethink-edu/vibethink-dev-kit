@@ -857,6 +857,11 @@ inheritance from scratch, read in this order:
 - A new agnostic piece added to the kit (canon, ADR, engine) **must add a
   corresponding section here** in the same PR. Adding a piece without adopting
   it into this index is the failure class this file exists to prevent.
+  **Mechanically enforced** since 2026-06-11 by `tools/check-catalog-sync.mjs`
+  (the `catalog-sync` CI job): a spine in `knowledge/` with no piece here — and
+  no declared exemption with a reason — goes RED. The same gate enforces the
+  controlled Status vocabulary on spine headers (new spines conform on arrival;
+  sealed headers are not cosmetically rewritten).
 - A piece deprecated or removed → strike the section here, point to its
   superseding piece (or to its removal ADR), do not silently delete.
 - This file is **L1 neutral** — fire-test: no product or vendor brand names.
