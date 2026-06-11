@@ -20,6 +20,11 @@
 
 ## How inheritance works (the mechanism — read first)
 
+> **The full heir's contract is [`INHERITANCE-CONTRACT.md`](INHERITANCE-CONTRACT.md)**
+> — one page: mechanism · declare your adoption · never duplicate · **override
+> visibly** (the deviation clause) · declared adaptation · no silent deviation.
+> This section summarizes only the mechanism; the contract governs.
+
 From `doc/decisions/ADR-20260524-supra-repo-inheritance-mechanism.md`, by
 artifact type:
 
@@ -836,6 +841,10 @@ A consuming repo can claim full adoption only when:
       with zero copies declares `N-A(no copies)` instead).
 - [ ] Your `AGENTS.md` carries the **Per-piece adoption status** table — every
       row declared `ADOPTED`, `PENDING`, or `N-A`. **No silent skips.**
+- [ ] The **Inheritance Contract** holds end-to-end: zero copied docs, L3
+      bindings point up (none restates a spine), every deviation lives in an
+      `## Overrides` entry or an `adapted` declaration — see
+      [`INHERITANCE-CONTRACT.md`](INHERITANCE-CONTRACT.md) "Done when".
 
 ---
 
@@ -846,9 +855,11 @@ inheritance from scratch, read in this order:
 
 1. **`README.md`** of the kit (one-paragraph framing).
 2. **`knowledge/START-HERE.md`** (the 2-minute door).
-3. **`setup/ADOPT-DEV-KIT.md`** (this file — what you inherit).
-4. **`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`** (the detail for Pieces #2/#3/#4).
-5. The specific canon for whichever piece you are wiring next.
+3. **`setup/INHERITANCE-CONTRACT.md`** (the heir's contract — how inheritance
+   behaves: declare · never duplicate · override visibly).
+4. **`setup/ADOPT-DEV-KIT.md`** (this file — what you inherit, piece by piece).
+5. **`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`** (the detail for Pieces #2/#3/#4).
+6. The specific canon for whichever piece you are wiring next.
 
 ---
 
