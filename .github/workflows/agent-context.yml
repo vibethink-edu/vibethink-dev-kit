@@ -125,3 +125,26 @@ jobs:
 
       - name: copy-parity tests
         run: node tools/check-copy-parity.test.mjs
+
+      - name: catalog-sync tests
+        run: node tools/check-catalog-sync.test.mjs
+
+  catalog-sync:
+    name: catalog-sync (Maintenance rule bites)
+    # Producer-only: every spine in knowledge/ must have its catalog piece (or a
+    # declared exemption with a reason) and a controlled-vocabulary Status line.
+    # This is the gate for the failure class the 2026-06-07 reconciliation closed
+    # by hand (~14 spines sealed without their catalog section).
+    if: github.repository == 'vibethink-edu/vibethink-dev-kit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: check-catalog-sync
+        run: node tools/check-catalog-sync.mjs tools/catalog-sync.config.json
