@@ -126,6 +126,11 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
 
 ## Adopt it in your repo — the 15-minute path
 
+0. **Get the kit.** You need read access to this repo (it is currently
+   private/invite-only — ask the maintainer). Then clone it **as a sibling** of
+   your repo (`git clone <kit-url> ../_vibethink-dev-kit`): docs are read from
+   there by reference, local guards find it there, and CI fetches it via the
+   reusable workflow — nothing of the kit is vendored into your repo.
 1. **Read the contract** (one page): [`setup/INHERITANCE-CONTRACT.md`](setup/INHERITANCE-CONTRACT.md)
    — how inheritance behaves: docs by reference · runnables by copy+parity ·
    declare everything · override visibly · never duplicate.
@@ -134,6 +139,13 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
    into your repo (suggested: `docs/DEV_KIT_INHERITANCE_STATUS.md`). It comes
    pre-filled with every catalog piece as `PENDING` — flip rows as you adopt.
    `N-A(reason)` is a perfectly good answer; silence is not.
+
+   > **Greenfield repo (no rulebook yet)?** Create a root `AGENTS.md` with one
+   > line — *"This repo inherits the universal root authority:
+   > `<kit>/knowledge/ai-agents/AGENTS_UNIVERSAL.md` — rules below extend it,
+   > never replace it"* — plus your repo-specific rules. Add a one-line
+   > `CLAUDE.md` / `CODEX.md` / `.cursorrules` per agent you use, each pointing
+   > at `AGENTS.md` (per-tool map: [`knowledge/ai-agents/AI_AGENT_COMPATIBILITY.md`](knowledge/ai-agents/AI_AGENT_COMPATIBILITY.md)).
 3. **Wire your first gate** — the layering smoke, via the reusable workflow
    (no engine copied):
 
@@ -146,10 +158,24 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
          config-path: tools/agent-context.config.json
    ```
 
-   and declare your `tools/agent-context.config.json` (which file is your root
-   rulebook, which files are per-agent pointers — see
-   [`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`](setup/ADOPT-CROSS-AGENT-GOVERNANCE.md)).
-4. **Run it** — locally or in CI. Expect: `GREEN — cross-agent layering holds`.
+   and declare your `tools/agent-context.config.json`. Minimal working example
+   (edit the file names to yours):
+
+   ```json
+   {
+     "rootRulesFile": "AGENTS.md",
+     "canonFile": "../_vibethink-dev-kit/knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md",
+     "agentsDir": ".",
+     "agentBudgets": { "codex": 32768, "copilot": 32768, "windsurf": 32768, "claude": 1000000 },
+     "adapters": [{ "agent": "claude", "file": "CLAUDE.md" }],
+     "maxAdapterBytes": 6144,
+     "requiredAnchorsInRoot": ["AGENTS_UNIVERSAL"]
+   }
+   ```
+
+   Full field reference: [`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`](setup/ADOPT-CROSS-AGENT-GOVERNANCE.md).
+4. **Run it** — `node ../_vibethink-dev-kit/tools/check-agent-context.mjs tools/agent-context.config.json`
+   locally, or push and let CI run it. Expect: `GREEN — cross-agent layering holds`.
 5. **Done — you're a declared heir.** Walk the catalog
    ([`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md)) at your own pace and
    adopt further pieces **when you feel the pain they solve** — never for
