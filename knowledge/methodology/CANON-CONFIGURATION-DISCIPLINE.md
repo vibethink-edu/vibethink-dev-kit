@@ -2,7 +2,7 @@
 
 > **Scope:** every repo whose values can differ between deployments, environments, operators, or the product's served groups.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** PROPOSED 2026-06-11 (agnostic-lift batch G→Z) — awaiting seal by the Principal Architect.
+> **Status:** SEALED 2026-06-11 by the Principal Architect ("SEAL DALE" — agnostic-lift batch G→Z). Fire-test passed.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-PRODUCTION-SAFETY` (no config/runtime *backdoors* in the shipped artifact — this canon governs where legitimate config *lives*) · `AGENTS_UNIVERSAL` security rules (never expose secrets client-side — this canon generalizes from secrets to every configurable value).
 

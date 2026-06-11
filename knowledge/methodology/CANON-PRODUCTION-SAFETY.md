@@ -46,7 +46,7 @@ It is **NOT** a runtime toggle a user can enable. **No backdoor** — no `?debug
 
 If production users genuinely need diagnostics (connection quality, sync status, a health indicator), that is a **designed, reviewed product feature** — named, scoped, built as a real UI component, governed like any feature (`CANON-ARCHITECTURE-REVIEW`). It does **not** reuse the debug infrastructure and does **not** become a backdoor. The need for prod diagnostics is satisfied by *building a feature*, never by *leaving debug tooling on*.
 
-### §4.1 — The diagnosability floor: a system that cannot explain why it blocks is not production-ready *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+### §4.1 — The diagnosability floor: a system that cannot explain why it blocks is not production-ready *(SEALED 2026-06-11 by the Principal Architect — "SEAL DALE", agnostic-lift batch G→Z)*
 
 §2 removes what must not ship; this is the floor of what **must**: the production artifact can **explain its own denials deterministically**, or every blocked user becomes hours of artisanal debugging.
 

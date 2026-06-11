@@ -63,7 +63,7 @@ The self-test exercises the integration's real failure modes (auth, timeout, mal
 
 The specific endpoint shape (`GET /api/<service>/selftest`, a `cli <service> selftest` command, a runner subcommand) is per-repo binding; the **contract** of `{passed, failed, total}` is universal.
 
-### 6.1 — The toolchain must be alive *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+### 6.1 — The toolchain must be alive *(SEALED 2026-06-11 by the Principal Architect — "SEAL DALE", agnostic-lift batch G→Z)*
 
 The minimum bar presumes the tests **actually run**. A workspace whose test script invokes a runner that is not installed, or whose test files import a framework the workspace does not use, produces the worst failure mode this canon exists to prevent: **silent false green** — tests that appear to pass because nothing executed. Therefore:
 

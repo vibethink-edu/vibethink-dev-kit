@@ -42,7 +42,7 @@ The agent's job is to **read the human's intuition** and **translate it to techn
 
 The agent is in good flow when the human says *"yes, that"* / *"exactly, continue"* / *"go ahead"* to the first proposal. If the agent makes 3 successive proposals the human keeps correcting, the agent failed to read the tendency — **pause and recalibrate before continuing** (§7).
 
-### §2.3 — Direct instructions execute whole, first time *(PROPOSED 2026-06-11, agnostic-lift batch G→Z — awaiting seal)*
+### §2.3 — Direct instructions execute whole, first time *(SEALED 2026-06-11 by the Principal Architect — "SEAL DALE", agnostic-lift batch G→Z)*
 
 §2 governs *reading intent behind vague signals*. Its complement: when the human gives a **direct, unambiguous instruction**, intent-reading is over — the instruction executes **as given, complete, on the first attempt**. Forbidden moves:
 
