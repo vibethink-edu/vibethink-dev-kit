@@ -183,6 +183,44 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
 
 ---
 
+## Am I actually governed? — the 60-second self-test
+
+Saying "we inherit the kit" is a claim; these checks make it a fact. Run them
+from your repo's root (kit cloned as sibling). **Every red names exactly what
+to fix** — that's the point.
+
+```bash
+# 1. Do all my agents read the same, intact rules?
+node ../_vibethink-dev-kit/tools/check-agent-context.mjs tools/agent-context.config.json
+#    expect: GREEN — cross-agent layering holds
+
+# 2. Are my copied kit tools still faithful? (skip if you copied none — declare N-A(no copies))
+node ../_vibethink-dev-kit/tools/check-copy-parity.mjs tools/copy-parity.config.json \
+  --upstream-root ../_vibethink-dev-kit
+#    expect: GREEN — every declared copy is in parity (or visibly adapted)
+
+# 3. Is my adoption declaration honest and complete?
+#    (reference enforcement: a claims validator — both current consumers run one
+#    that rejects vague claims, verifies cited mechanisms exist, and flags any
+#    catalogued piece missing a row. Copy it from a consumer or review by hand:)
+#    every row in docs/DEV_KIT_INHERITANCE_STATUS.md names a real mechanism or
+#    is honestly PENDING / N-A(reason) — and no catalog piece lacks a row.
+```
+
+And four questions no script can answer for you (the contract's human half):
+
+- [ ] Status doc exists and covers the **full** catalog — no silent skips.
+- [ ] **Zero copied docs** from the kit in your tree (pointers only — a copied
+      canon is a second truth that rots).
+- [ ] Every deviation lives in an `## Overrides` entry or an `adapted`
+      declaration — nothing diverges silently.
+- [ ] The checks above run in **CI or a hook**, not only when someone remembers.
+
+All green + four boxes ticked = governed. Anything else = you know precisely
+what's missing — which is already better than believing you're governed.
+
+---
+
 ## The rules of inheritance (the contract in five lines)
 
 1. **Docs by reference** — your repo points at the kit; copying a doc creates a
