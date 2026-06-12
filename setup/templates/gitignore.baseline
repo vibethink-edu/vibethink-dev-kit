@@ -21,3 +21,8 @@ next-env.d.ts
 *.log
 .DS_Store
 Thumbs.db
+# graphify — regenerable structural-graph cache (Dev Tooling Baseline,
+# non-blocking). Real incident it prevents: 2971 cache files staged
+# (orchestrator, 2026-05-23).
+graphify-out/
+**/graphify-out/
