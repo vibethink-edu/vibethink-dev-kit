@@ -121,11 +121,12 @@ server, read the project's port registry and use the assigned block.
 # ❌ NEVER create .md files for every analysis - do analysis in response, only create .md for significant reports
 ```
 
-### 🧰 Dev Tooling Baseline — RTK + Graphify (RECOMMENDED · non-blocking)
+### 🧰 Dev Tooling Baseline — RTK + Graphify (DEFAULT · non-blocking)
 
-> **Status: BASELINE — always provisioned (owner standard of care). A quality/performance
-> enhancement, NEVER a correctness dependency. Non-blocking: no gate, no CI failure, no error
-> if absent.**
+> **Status: DEFAULT — provisioned by default in every dev environment (owner standard of
+> care); the kit ships the pins + install recipes (`setup/EXTERNAL-TOOLS.md`). A
+> quality/performance enhancement, NEVER a correctness dependency. Non-blocking: no gate,
+> no CI failure, no error if absent.**
 >
 > **Mental model: a database index.** A query runs correctly without the index — just slower;
 > you always add it because the gain is worth it. Same here: provision these by default in every
@@ -142,8 +143,10 @@ server, read the project's port registry and use the assigned block.
   fully — just less optimal. Keep this status **explicitly non-blocking**; do NOT let it harden
   into a required gate over time.
 - **Not adopted (settled — do not reconsider here):** Engram, agentmemory.
-- Tool **versions + install lifecycle** are governed **per-repo** (e.g. an EXTERNAL-TOOLS
-  registry), not in this universal layer. This layer only declares the *use* baseline.
+- Tool **versions + install lifecycle**: the kit ships the DEFAULT registry at
+  `setup/EXTERNAL-TOOLS.md` (pins, recipes, evidence, version-forward). A repo MAY override
+  with its own EXTERNAL-TOOLS registry — per-repo lifecycle wins, override declared visibly.
+  This layer only declares the *use* baseline.
 
 ### 📁 File Organization Rule (CRITICAL)
 
