@@ -153,7 +153,7 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
    # .github/workflows/agent-context.yml (in YOUR repo)
    jobs:
      agent-context:
-       uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@main
+       uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@master
        with:
          config-path: tools/agent-context.config.json
    ```

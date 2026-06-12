@@ -1,0 +1,23 @@
+# Baseline .gitignore for a VibeThink heir repo (Piece: onboarding step 0)
+# Copy to the repo root as .gitignore BEFORE the first `pnpm install`.
+# Real incident it prevents: vendored packages' node_modules staged on the
+# first `git add` (Campus onboarding, 2026-06-12).
+
+# deps
+node_modules/
+# build outputs
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+# env / secrets (never in the repo)
+.env
+.env.*
+!.env.example
+# logs / OS noise
+*.log
+.DS_Store
+Thumbs.db
