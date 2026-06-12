@@ -54,6 +54,10 @@ clonar):
    user.email "{{coder}}-agent@{{org}}.local"
 6. Smoke de llegada: {{p.ej. pnpm install + build}} debe quedar VERDE.
    Si algo del PASO 0 falla: detente y repórtalo — no improvises el entorno.
+7. OPCIONAL Y SALTABLE (dev tooling baseline; receta completa en
+   ../vibethink-dev-kit/setup/EXTERNAL-TOOLS.md, ya clonado en el paso 3):
+   graphify por pip + rtk por gh release. Si Python o la descarga fallan,
+   SIGUE SIN ELLOS y anótalo en el reporte — esto jamás es un bloqueo.
 
 Rol: EJECUTOR de {{PRODUCTO}}. NO eres el arquitecto: no tomas decisiones de
 diseño, no renombras nada, no reinterpretas el plan, no escribes ADRs. Ejecutas
