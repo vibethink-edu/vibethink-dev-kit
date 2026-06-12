@@ -1,0 +1,13 @@
+{
+  "corePaths": ["packages", "db/migrations", "src"],
+  "excludeDirs": ["node_modules", ".git", "dist", "coverage", "_archive", "_legacy"],
+  "excludeGlobs": ["seeds/tenant-", "docs/tenants/", "tests/fixtures/"],
+  "slugs": ["colegio-colup", "colup", "unidad-pedagogica", "ovitality", "la-petite-tarterie", "almendra-records"],
+  "allowlist": [
+    {
+      "path": "db/migrations/20260412200000_backfill_tenant_verticals.sql",
+      "reason": "identity backfill of the tenants table itself - approved"
+    }
+  ],
+  "maxFileSizeKB": 512
+}
