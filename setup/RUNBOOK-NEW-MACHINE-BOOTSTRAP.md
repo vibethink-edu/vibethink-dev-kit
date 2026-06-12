@@ -15,7 +15,11 @@
    `gh repo clone <org>/vibethink-dev-kit` · `gh repo clone <org>/<product>`
 3. **Git identity** (per repo or global): `git config user.name/user.email`.
 4. **Node toolchain** (if the repo has package.json): Node LTS + `corepack
-   enable` → `pnpm install` → hooks active.
+   enable` → `pnpm install` → hooks active. **Windows gotcha (lived):** husky
+   hooks run under git-bash, which does NOT pick up a machine PATH updated
+   mid-session — add `export PATH="$PATH:/c/Program Files/nodejs"` at the top
+   of each hook (or restart the session), or every commit fails with
+   `node: command not found`.
 5. **Session start:** `pnpm session:start` (hygiene scan + inbox) or read the
    repo's README "Para trabajar" section for the session prompts.
 6. **Sensitive data never travels via GitHub** — if a task needs local-only
