@@ -4,6 +4,23 @@
 > Direct Execution: el autor da órdenes exactas + matriz V-xx; el ejecutor
 > implementa y reporta; el autor verifica. **El ejecutor NO decide diseño.**
 
+## Ficha de lanzamiento (completar — el lanzador NO debería tener que preguntar NADA)
+
+> Regla: si el humano lanzador tuvo que hacer una pregunta antes de lanzar
+> (¿qué modelo? ¿qué valido antes? ¿qué sabe el agente?), la respuesta se
+> agrega AQUÍ — a la ficha del briefing, no al chat. Si la pregunta es
+> agnóstica al producto, se eleva como finding a esta plantilla.
+
+| Campo | Valor |
+|---|---|
+| Runtime | {{p.ej. Claude Code CLI/desktop — necesita terminal real (gh, git, build)}} |
+| Modelo recomendado | {{p.ej. el tier alto para ejecución larga autónoma; alternativa económica + su riesgo}} |
+| Sesión | Nueva y limpia, SIN contexto previo — el prompt es autocontenido |
+| Qué sabe el agente al arrancar | NADA — ni que el repo existe (por eso el PASO 0 va inline) |
+| Pre-vuelo del lanzador (checklist) | {{2-4 ítems máx: p.ej. navegador con la cuenta de la org listo para el device-flow · pegar el bloque del prompt COMPLETO · confirmar que NO lleva secrets}} |
+| Qué vuelve al final | {{p.ej. PR abierto + reporte en la lane}} — el lanzador no supervisa el medio |
+| Duración estimada | {{rango honesto}} |
+
 ## Quién corre qué (la cadena de un lanzamiento — completar y dejar en el briefing)
 
 | Acción | Quién | Nota |
