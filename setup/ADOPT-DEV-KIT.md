@@ -58,6 +58,37 @@ duplicating; everything else gets its adoption instruction here.
 
 ---
 
+## Step 0 — the machine (before everything; heir finding A-1/A-6/A-7, Campus 2026-06-12)
+
+The checklist used to assume a ready machine. Real onboardings hit machines with
+no Node, no gh, no git identity. Before mounting anything:
+
+1. **Bootstrap the machine** — follow `setup/RUNBOOK-NEW-MACHINE-BOOTSTRAP.md`
+   (gh + device-flow with the **org-authorization** gotcha, clone as siblings,
+   Node LTS + corepack/pnpm).
+2. **Git identity** — `git config user.name / user.email` (first commit fails or
+   misattributes without it).
+3. **`.gitignore` first** — copy `setup/templates/gitignore.baseline` to the repo
+   root BEFORE the first `pnpm install` (prevents staging vendored
+   node_modules — it nearly happened).
+4. **Confirm the kit's default branch** — `git remote show origin` → use THAT
+   ref in your `uses:` workflow lines (this kit's is `master`; an heir shipped
+   broken CI assuming `main`).
+5. **Declare data gravity** — if the project touches data that must never reach
+   GitHub (e.g. minors' data), write WHERE it lives and WHICH machines may run
+   the tasks that touch it (README + briefings).
+
+### Vendoring from a sibling repo is TRANSITIVE (heir finding A-3)
+
+When vendoring a package from another family repo (e.g. a UI kit), map its
+workspace-dependency closure first (`grep "workspace:" its package.json`,
+recursively) and vendor the whole set — the first `pnpm install` fails otherwise
+(`ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`, lived). Pattern: one parity config per
+upstream (`copy-parity.config.json` for the kit, `vendor-parity.config.json` for
+the sibling), each copy declared `adapted` with reason.
+
+---
+
 ## Mount the kit (local dev only — does **not** travel to CI)
 
 So the tools resolve locally:
@@ -865,6 +896,11 @@ A consuming repo can claim full adoption only when:
       bindings point up (none restates a spine), every deviation lives in an
       `## Overrides` entry or an `adapted` declaration — see
       [`INHERITANCE-CONTRACT.md`](INHERITANCE-CONTRACT.md) "Done when".
+- [ ] **Step 0 done:** machine bootstrapped (runbook), git identity set,
+      `.gitignore` baseline in place, workflow `uses:` pins the kit's REAL
+      default branch, **data gravity declared** (or `N-A(no sensitive data)`).
+- [ ] **Claims validator wired:** `tools/check-inheritance-claims.mjs` (or a
+      native equivalent) runs in CI against the status doc and is green.
 
 ---
 

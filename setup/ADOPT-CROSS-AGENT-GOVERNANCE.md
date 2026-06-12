@@ -103,7 +103,7 @@ name: agent-context
 on: [push, pull_request]
 jobs:
   agent-context:
-    uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@main
+    uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@master
     with:
       config-path: tools/agent-context.config.json
 ```
