@@ -57,6 +57,30 @@ gates strongly**:
 5. Communication is never the vertical's: it decides when/what; the core
    delivers (the vertical never touches providers).
 
+## Platform-first (the boundary's other direction — directive 2026-06-12)
+
+Anti-contamination protects the core FROM the vertical. This rule protects
+the vertical from **re-implementing the core**: forms engines, email/template
+infrastructure, calendars, contacts, auth/SSO, storage, UI systems, i18n —
+if the platform provides it, the vertical CONSUMES or EXTENDS it, never
+rebuilds it. A vertical is adjustments over the platform, not a parallel
+platform. Duplicates mean double maintenance, frontier drift, and wasted
+platform progress.
+
+**Enforcement at the spec level** (the cheapest choke point — one place gates
+every coder downstream):
+
+1. Every spec carries a mandatory **inheritance-sweep section** ("Herencia
+   <core>"): capability by capability → EXISTS (consume/extend, with paths in
+   the platform repo as evidence) or NOT-FOUND (sweep evidence, then build).
+2. A spec without the sweep is not ready for tasks. A PR that re-implements a
+   platform capability is returned, not patched.
+3. Each vertical maintains a living **capability map** (vertical needs ×
+   platform offers) as the first lookup — the sweep updates it.
+4. Lived origin: an architect was repeatedly caught designing what the
+   platform already shipped (forms designer, email templates, comms). The fix
+   is structural, not attentional — humans and agents both forget to look.
+
 ## Graduation (the cheap upgrade)
 
 A business may START as a core tenant and graduate to a vertical when gates
