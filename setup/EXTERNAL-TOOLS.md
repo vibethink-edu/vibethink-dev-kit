@@ -25,25 +25,27 @@ de WorkBench — verificados, no asumidos.
 
 | Tool | Clase | Pin | Fuente oficial | Licencia | Rol |
 |---|---|---|---|---|---|
-| Graphify | A — mission-critical | `0.7.13` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
+| Graphify | A — mission-critical | `0.8.39` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
 | RTK | B — cost/quality multiplier | `0.39.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
 
-## Graphify `0.7.13`
+## Graphify `0.8.39`
 
-> **⚠️ Pin drift (2026-06-13): el pin `0.7.13` está ~26 releases atrás.** Última
-> publicada en pip = `0.8.39`; vista instalada en una máquina de la familia =
-> `0.8.20`. **El pin NO se movió todavía** porque la política de este archivo
-> exige *ejercitar la versión nueva en una máquina* (`graphify --help` + un
-> `graphify update` real) antes de avanzarlo, y eso no se pudo hacer en la
-> sesión de seal (CLI no resoluble por multi-Python PATH). Bump a `0.8.x`
-> pendiente de esa verificación — **non-blocking** mientras tanto (cualquier
-> 0.7+/0.8+ orienta; la ausencia degrada, no rompe). Tarea chica: ejercitar
-> 0.8.39 en una máquina, luego avanzar el pin con evidencia (PR a este archivo).
+> **Pin avanzado a `0.8.39` (2026-06-13).** Ejercida en una máquina de la familia
+> (`vm-XL-app-cup`, Python 3.12.8): `graphify --version` → `graphify 0.8.39`;
+> `graphify update <subdir> --no-cluster` → grafo real (141 nodes / 233 edges,
+> extracción AST sin LLM) sobre código `.mjs` del propio kit. Instalada vía
+> `pip install graphifyy==0.8.39`. Cumple la política version-forward: el pin
+> solo avanza con la versión nueva verificada en al menos una máquina.
+>
+> Nota de superficie: 0.8.x amplió mucho la CLI respecto a 0.7.13 — modelo de
+> instalación como *skill* por plataforma (`graphify claude|codex|cursor… install`),
+> más `query`/`affected`/`extract`/grafo global y hooks de git. El `update
+> <subdir>` documentado abajo **sigue vigente** y es el camino mínimo sin backend.
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):
-  - Windows: `py -m pip install --user graphifyy==0.7.13`
-  - macOS/Linux: `python3 -m pip install --user graphifyy==0.7.13`
+  - Windows: `py -m pip install --user graphifyy==0.8.39`
+  - macOS/Linux: `python3 -m pip install --user graphifyy==0.8.39`
 - Verificación: `graphify --help`
 - Uso: `graphify update <subdir>` → escribe `graphify-out/` (indexar el
   subdirectorio donde se trabaja, NO el monorepo entero)

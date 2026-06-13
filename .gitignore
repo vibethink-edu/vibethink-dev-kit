@@ -26,3 +26,6 @@ tmp/
 # Build
 dist/
 build/
+
+# Graphify (code-graph cache — regenerable, never commit; privacy baseline)
+graphify-out/
