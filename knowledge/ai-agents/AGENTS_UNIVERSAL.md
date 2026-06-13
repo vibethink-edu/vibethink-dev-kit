@@ -121,32 +121,38 @@ server, read the project's port registry and use the assigned block.
 # ❌ NEVER create .md files for every analysis - do analysis in response, only create .md for significant reports
 ```
 
-### 🧰 Dev Tooling Baseline — RTK + Graphify (DEFAULT · non-blocking)
+### 🧰 Dev Tooling Baseline — RTK + Graphify (USE BY DEFAULT · graceful fallback · non-blocking)
 
-> **Status: DEFAULT — provisioned by default in every dev environment (owner standard of
-> care); the kit ships the pins + install recipes (`setup/EXTERNAL-TOOLS.md`). A
-> quality/performance enhancement, NEVER a correctness dependency. Non-blocking: no gate,
-> no CI failure, no error if absent.**
+> **Status: USE BY DEFAULT — provisioned in every dev environment (owner standard of care);
+> the kit ships the pins + install recipes (`setup/EXTERNAL-TOOLS.md`). A quality/performance
+> enhancement, NEVER a correctness dependency. Non-blocking: no CI gate, no merge gate, no
+> error if absent.**
 >
 > **Mental model: a database index.** A query runs correctly without the index — just slower;
-> you always add it because the gain is worth it. Same here: provision these by default in every
-> dev environment. Their absence DEGRADES the experience (more tokens, blind grep); it does NOT
-> fail anything.
+> you always add it because the gain is worth it. Same here: provision AND use these by default.
+> Their absence DEGRADES the experience (more tokens, blind grep); it does NOT fail anything.
 
+- **Use them by default — expected, not optional.** When provisioned, reach for `rtk` and
+  `graphify` as described below instead of going straight to raw/blind commands. The gain
+  (tokens, orientation) is why they are the standard of care, not a nicety.
+- **Graceful fallback, documented — never silent.** If the environment cannot provision them
+  (install fails, offline, unsupported platform), proceed WITHOUT them AND say so in your
+  report/PR — e.g. `rtk/graphify unavailable: <reason>`. The only wrong move is a silent skip.
 - **RTK** (token economy): wrap noisy/verbose command output (listings, builds, tests, logs,
   `status`, `find`) with `rtk`. Skip already-compact output (e.g. `git log --oneline`).
 - **Graphify** (code navigation): use for orientation (hubs, what-defines-what, dead-code,
   "what touches X") BEFORE blind grep. On-demand, no permanent runtime; index the subdir you
   work in (not the whole monorepo); gitignore `graphify-out/`. Graphify ORIENTS — verify
   authoritative dependencies with `git grep`.
-- **Provisioning is owner standard; absence is safe.** A repo / agent / CI without them works
-  fully — just less optimal. Keep this status **explicitly non-blocking**; do NOT let it harden
-  into a required gate over time.
+- **Still NEVER a correctness gate.** "Use by default" is an expectation on agent diligence,
+  NOT a CI/merge gate: a repo / agent / CI without them still works fully and passes. Do NOT
+  let the *use* expectation harden into a *correctness* gate — the documented fallback is
+  always a valid path.
 - **Not adopted (settled — do not reconsider here):** Engram, agentmemory.
 - Tool **versions + install lifecycle**: the kit ships the DEFAULT registry at
   `setup/EXTERNAL-TOOLS.md` (pins, recipes, evidence, version-forward). A repo MAY override
   with its own EXTERNAL-TOOLS registry — per-repo lifecycle wins, override declared visibly.
-  This layer only declares the *use* baseline.
+  This layer declares the *use* baseline (use-by-default + documented fallback).
 
 ### 🗣️ Duty to Flag (CRITICAL — culture law)
 
