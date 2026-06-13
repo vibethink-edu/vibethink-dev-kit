@@ -1,9 +1,12 @@
 # ADR — RTK + Graphify pasan de RECOMMENDED a DEFAULT (el kit shippea el ciclo de vida)
 
 - **Fecha:** 2026-06-12
-- **Estado:** PROPUESTO (merge = Principal Architect)
+- **Estado:** ACCEPTED — sellado por el Principal Architect el 2026-06-13
+  ("dale lo que sea necesario"). Body inmutable desde el seal; solo
+  transiciones de estado en el header de aquí en más.
 - **Decisor:** Marcelo Escallón ("quisiera promoverlo porque suma… dev-kit lo
-  debería tener default") · preparado por Claude/arquitecto (Campus)
+  debería tener default") · preparado por Claude/arquitecto (Campus) · sellado
+  vía devkit-arquitecto (claude, Opus 4.8)
 - **Resuelve:** la pregunta abierta desde 2026-05-23 en la comms lane del
   orchestrator (`TASK-PROMOVER-RTK-GRAPHIFY-AL-DEV-KIT-INSTALL-STATE-VERIFICADO`),
   dirigida a codex y nunca respondida.
