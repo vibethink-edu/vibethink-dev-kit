@@ -28,7 +28,7 @@ on:
       devkit-ref:
         description: Ref of the dev-kit whose tools a fork should run.
         type: string
-        default: main
+        default: master
       parity-config-path:
         description: >-
           Path (in the consuming repo) to the copy-parity config declaring its
@@ -36,6 +36,15 @@ on:
           a consumer with no declared copies opts out explicitly, not silently.
         type: string
         default: ""
+    secrets:
+      devkit-token:
+        description: >-
+          A read token for the dev-kit repo, used to fetch its tools when the
+          kit is PRIVATE and the consuming repo is a different one (the default
+          GITHUB_TOKEN cannot read another private repo → "repository not
+          found"). Optional: omit it when the kit is public or when running
+          inside the kit itself; then the step falls back to github.token.
+        required: false
 
 env:
   KIT_REPO: vibethink-edu/vibethink-dev-kit
@@ -60,7 +69,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: vibethink-edu/vibethink-dev-kit
-          ref: ${{ inputs.devkit-ref || 'main' }}
+          ref: ${{ inputs.devkit-ref || 'master' }}
+          token: ${{ secrets.devkit-token || github.token }}
           path: _devkit
 
       - name: Resolve tools dir
@@ -95,7 +105,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: vibethink-edu/vibethink-dev-kit
-          ref: ${{ inputs.devkit-ref || 'main' }}
+          ref: ${{ inputs.devkit-ref || 'master' }}
+          token: ${{ secrets.devkit-token || github.token }}
           path: _devkit
 
       # The engine itself comes from the kit checkout — a consumer's (possibly
