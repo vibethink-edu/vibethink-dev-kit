@@ -1,0 +1,40 @@
+{
+  "$schema": "VIBETHINK_EXTERNAL_TOOLS_LOCK_V1",
+  "_note": "Canonical machine-readable pins for the kit's DEFAULT operator tools (ADR-20260612). Single source of truth read by setup/install-external-tools.{ps1,sh}; the human lifecycle, rationale, and gotchas live in setup/EXTERNAL-TOOLS.md. DEFAULT != gate: absence degrades, never blocks. Version-forward ONLY via PR to this file with evidence the new version was exercised on a real machine.",
+  "tools": [
+    {
+      "name": "graphify",
+      "class": "A",
+      "role": "structural code navigation / local semantic memory (hubs, dead-code, 'what touches X') before blind grep",
+      "kind": "pip",
+      "package": "graphifyy",
+      "cli": "graphify",
+      "pin": "0.7.13",
+      "acceptInstalled": ">=0.7",
+      "source": "github.com/safishamsi/graphify",
+      "license": "MIT"
+    },
+    {
+      "name": "rtk",
+      "class": "B",
+      "role": "local compression of noisy shell output (builds, tests, logs) — agent token economy",
+      "kind": "github-release",
+      "cli": "rtk",
+      "pin": "0.39.0",
+      "repo": "rtk-ai/rtk",
+      "tag": "v0.39.0",
+      "assets": {
+        "windows-x64": "rtk-x86_64-pc-windows-msvc.zip",
+        "linux-x64": "rtk-x86_64-unknown-linux-musl.tar.gz",
+        "linux-arm64": "rtk-aarch64-unknown-linux-gnu.tar.gz",
+        "macos-x64": "rtk-x86_64-apple-darwin.tar.gz",
+        "macos-arm64": "rtk-aarch64-apple-darwin.tar.gz"
+      },
+      "installDirWindows": "~/.vt-tools/rtk/0.39.0",
+      "knownDirs": ["~/.vt-tools/rtk", "~/.vtwb-tools/rtk"],
+      "telemetryConfig": "~/.config/rtk/config.toml",
+      "source": "github.com/rtk-ai/rtk",
+      "license": "Apache-2.0"
+    }
+  ]
+}
