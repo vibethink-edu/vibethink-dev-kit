@@ -28,7 +28,7 @@ on:
       devkit-ref:
         description: Ref of the dev-kit whose tools a fork should run.
         type: string
-        default: main
+        default: master
       parity-config-path:
         description: >-
           Path (in the consuming repo) to the copy-parity config declaring its
@@ -36,6 +36,15 @@ on:
           a consumer with no declared copies opts out explicitly, not silently.
         type: string
         default: ""
+    secrets:
+      devkit-token:
+        description: >-
+          A read token for the dev-kit repo, used to fetch its tools when the
+          kit is PRIVATE and the consuming repo is a different one (the default
+          GITHUB_TOKEN cannot read another private repo → "repository not
+          found"). Optional: omit it when the kit is public or when running
+          inside the kit itself; then the step falls back to github.token.
+        required: false
 
 env:
   KIT_REPO: vibethink-edu/vibethink-dev-kit
@@ -46,21 +55,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo under validation
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       # A fork has no engine of its own — fetch the kit's tools. The kit's own run
       # uses its local (branch) tools, so a PR is validated by the code it changes.
       - name: Fetch dev-kit tools (forks only)
         if: github.repository != 'vibethink-edu/vibethink-dev-kit'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: vibethink-edu/vibethink-dev-kit
-          ref: ${{ inputs.devkit-ref || 'main' }}
+          ref: ${{ inputs.devkit-ref || 'master' }}
+          token: ${{ secrets.devkit-token || github.token }}
           path: _devkit
 
       - name: Resolve tools dir
@@ -84,18 +94,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo under validation
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Fetch dev-kit (upstream source of the copies)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: vibethink-edu/vibethink-dev-kit
-          ref: ${{ inputs.devkit-ref || 'main' }}
+          ref: ${{ inputs.devkit-ref || 'master' }}
+          token: ${{ secrets.devkit-token || github.token }}
           path: _devkit
 
       # The engine itself comes from the kit checkout — a consumer's (possibly
@@ -110,12 +121,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: inbox tests
         run: node tools/inbox.test.mjs
@@ -139,12 +150,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: check-catalog-sync
         run: node tools/check-catalog-sync.mjs tools/catalog-sync.config.json
