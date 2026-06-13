@@ -148,6 +148,23 @@ server, read the project's port registry and use the assigned block.
   with its own EXTERNAL-TOOLS registry — per-repo lifecycle wins, override declared visibly.
   This layer only declares the *use* baseline.
 
+### 🗣️ Duty to Flag (CRITICAL — culture law)
+
+**Noticing something and staying silent is the only real fault.** Mistakes are
+cheap to fix when flagged in the moment; silent observations become someone
+else's incident. Human or agent, when you notice a bug, a doc gap, a gotcha,
+a better way, or something already-solved being rebuilt:
+
+1. **SAY it** in the moment — even mid-task, even out of scope.
+2. **WRITE it** where it survives (finding in the comms lane, session log,
+   spec note — never only in chat: what lives only in a conversation dies
+   with it).
+3. **FIX it or ROUTE it** to the owner (the elevation filter decides whether
+   it rises to the kit or dies locally — but it gets DECIDED, not buried).
+
+Nobody should hit the same stone twice because the first one who saw it kept
+quiet. This duty outranks scope, politeness, and "not my task".
+
 ### 📁 File Organization Rule (CRITICAL)
 
 **REGLA FUNDAMENTAL:** ❌ **NUNCA** crear archivos de trabajo/reportes/validaciones en la raíz del proyecto.
