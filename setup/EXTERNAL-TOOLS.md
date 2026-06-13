@@ -26,9 +26,19 @@ de WorkBench — verificados, no asumidos.
 | Tool | Clase | Pin | Fuente oficial | Licencia | Rol |
 |---|---|---|---|---|---|
 | Graphify | A — mission-critical | `0.7.13` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
-| RTK | B — cost/quality multiplier | `0.38.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
+| RTK | B — cost/quality multiplier | `0.39.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
 
 ## Graphify `0.7.13`
+
+> **⚠️ Pin drift (2026-06-13): el pin `0.7.13` está ~26 releases atrás.** Última
+> publicada en pip = `0.8.39`; vista instalada en una máquina de la familia =
+> `0.8.20`. **El pin NO se movió todavía** porque la política de este archivo
+> exige *ejercitar la versión nueva en una máquina* (`graphify --help` + un
+> `graphify update` real) antes de avanzarlo, y eso no se pudo hacer en la
+> sesión de seal (CLI no resoluble por multi-Python PATH). Bump a `0.8.x`
+> pendiente de esa verificación — **non-blocking** mientras tanto (cualquier
+> 0.7+/0.8+ orienta; la ausencia degrada, no rompe). Tarea chica: ejercitar
+> 0.8.39 en una máquina, luego avanzar el pin con evidencia (PR a este archivo).
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):
@@ -44,22 +54,22 @@ de WorkBench — verificados, no asumidos.
   ausentes = gap de backend semántico, NO "graphify no disponible"
 - Privacidad: indexado 100% local, sin secrets, el grafo no se comparte
 
-## RTK `0.38.0`
+## RTK `0.39.0`
 
-- Binario: `rtk` · release pineado: `v0.38.0` (asset por plataforma —
+- Binario: `rtk` · release pineado: `v0.39.0` (asset por plataforma —
   **no usar `latest`**)
 - **Instalación Windows** (el ejecutor ya tiene `gh` por el PASO 0 del
   briefing):
 
   ```powershell
-  $target = "$env:USERPROFILE\.vt-tools\rtk\0.38.0"
+  $target = "$env:USERPROFILE\.vt-tools\rtk\0.39.0"
   New-Item -ItemType Directory -Force -Path $target | Out-Null
-  gh release download v0.38.0 -R rtk-ai/rtk -p rtk-x86_64-pc-windows-msvc.zip -D $target --clobber
+  gh release download v0.39.0 -R rtk-ai/rtk -p rtk-x86_64-pc-windows-msvc.zip -D $target --clobber
   Expand-Archive -LiteralPath "$target\rtk-x86_64-pc-windows-msvc.zip" -DestinationPath $target -Force
-  & "$target\rtk.exe" --version   # debe reportar: rtk 0.38.0
+  & "$target\rtk.exe" --version   # debe reportar: rtk 0.39.0
   ```
 
-  - macOS/Linux: descargar el asset del release `v0.38.0` para la plataforma
+  - macOS/Linux: descargar el asset del release `v0.39.0` para la plataforma
 - Tras instalar: **confirmar telemetría APAGADA** en `~/.config/rtk/config.toml`
 - Uso: envolver comandos de output ruidoso (`rtk <comando>`); NO envolver
   output ya compacto (p.ej. `git log --oneline`)

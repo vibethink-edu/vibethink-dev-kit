@@ -822,6 +822,29 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   declared layers (not a literal); an agent asked about a "missing" key walked
   the resolver first; secrets absent → feature fails closed, no invented default.
 
+### 33 — Dev tooling baseline (DEFAULT, non-blocking)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/AGENTS_UNIVERSAL.md` §Dev Tooling Baseline +
+`setup/EXTERNAL-TOOLS.md` (pins + install recipes) +
+`doc/decisions/ADR-20260612-rtk-graphify-default-tooling.md`.
+
+- **Qué:** a small set of dev tools the kit recommends **by default** to every
+  consuming repo — provisioned as owner standard of care, **never a gate**.
+  Mental model: a database index (works without it, just slower; you add it for
+  the gain). Today: a **token-economy** wrapper for noisy command output and a
+  **code-navigation / knowledge-graph** tool for orientation before blind grep.
+  The kit ships the pins + multi-platform install recipes; privacy posture
+  travels (graph output git-ignored, tool telemetry off).
+- **Cómo:** doc by reference. Provision the tools per `setup/EXTERNAL-TOOLS.md`
+  (optional, skippable step — a repo/agent/CI without them works fully). A repo
+  MAY override with its own `EXTERNAL-TOOLS` registry; per-repo lifecycle wins,
+  declared visibly. **Keep it explicitly non-blocking** — do not let it harden
+  into a required gate over time.
+- **Verificar:** the tools are provisioned in a dev environment (or the repo
+  declared `N-A` consciously); their absence degrades but never fails a build,
+  hook, or CI; `graphify-out/` (or equivalent) is git-ignored.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -865,6 +888,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 30 | Production safety | ADOPTED / PENDING / N-A | exclusion mechanism + gate |
 | 31 | Copy-parity check | ADOPTED / PENDING / N-A(no copies) | parity config path + CI job |
 | 32 | Configuration discipline | ADOPTED / PENDING / N-A | stores per layer + enforcement |
+| 33 | Dev tooling baseline | ADOPTED / PENDING / N-A | provisioned? + EXTERNAL-TOOLS registry |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
