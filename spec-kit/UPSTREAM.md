@@ -25,14 +25,14 @@
   `checklist-template`, `constitution-template`, `plan-template`, `tasks-template`,
   and `spec-template` (**neutral base** — a consumer composes its governance-contract
   addendum on top; composition, not fork).
-  - `agent-file-template` — present, but **consumer-authored** (upstream ships it only
-    under `presets/self-test/`, not core) → pending reclassification to consumer-local
-    (review A).
+  - `agent-file-template` — **kit-hosted, contributed (NOT upstream-synced):** upstream
+    ships it only under `presets/self-test/`, not core. Kept here as a neutral template;
+    it has no upstream baseline and is not re-synced.
 - `spec-kit/scripts/powershell/` — PowerShell scaffolding scripts:
   `check-prerequisites`, `create-new-feature`, `setup-plan`.
-  - `update-agent-context` — present, but **deprecated upstream** (moved to
-    `extensions/agent-context/` at v0.9.0, slated for removal at v0.12.0) → frozen,
-    pending consumer-side reclassification (review A).
+  - `update-agent-context` — **kit-hosted, FROZEN / deprecated:** upstream moved it to
+    `extensions/agent-context/` at v0.9.0 (removal at v0.12.0). Frozen here (not re-synced);
+    plan its removal before v0.12.0.
 
 ## What is intentionally NOT here (stays in the consumer — L2/L3)
 
@@ -69,16 +69,16 @@ Windows/PowerShell wins already landed pre-v0.8.1).
 Bounded divergences this review **adds** to the consumer do-not-overwrite list: the two
 DEFER decisions above (hardcoded-command model; git-assumed model).
 
-## Pending (consumer-side PR, coordinated)
+## Status (2026-06-13)
 
-- [ ] Wire the **spec-template composition** in the consumer (`specify` loads the neutral
-      base + appends the local governance-contract addendum); declare it clean parity.
-- [ ] Reclassify `agent-file-template` (→ consumer-local) and freeze/deprecate
-      `update-agent-context` (→ out of agnostic tracking).
-- [ ] Resolve `common.ps1`'s neutral baseline (or declare it `adapted`).
-- [ ] **Downstream ripple:** a consumer that vendors `spec-template` from another consumer
-      receives a different shape once composition lands — resolve its source/shape in the
-      same wave.
+- [x] **spec-template composition** — wired in the consumer (`specify` loads the neutral base
+      + appends the local governance-contract addendum); clean parity.
+- [x] **agent-file-template / update-agent-context** — dispositions finalized above
+      (kit-hosted contributed / kit-hosted frozen-deprecated; neither upstream-synced).
+- [x] **`common.ps1`** — stays **consumer-local** (not kit-tracked): its neutral baseline is
+      entangled with the deferred v0.10.x refactor; revisit only if/when that refactor is adopted.
+- [x] **Downstream consumer** that vendored `spec-template` — repointed to this neutral base
+      (correctly receives the base, without any product's governance addendum).
 
 ---
 
