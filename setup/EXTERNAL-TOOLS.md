@@ -21,6 +21,26 @@ de WorkBench — verificados, no asumidos.
    jamás se commitea (va al gitignore baseline); la telemetría de RTK
    permanece APAGADA.
 
+## Instalación — un comando (idempotente · non-blocking)
+
+Un heredero **no** necesita seguir las recetas a mano. El kit shippea un
+instalador que lee los pins de [`external-tools.lock.json`](external-tools.lock.json)
+(fuente de verdad legible por máquina), instala lo que falte y saltea lo ya
+presente. **Nunca rompe nada** (DEFAULT ≠ gate; si Python/`gh`/red faltan, degrada y sigue).
+
+```bash
+# Windows
+pwsh setup/install-external-tools.ps1
+# macOS/Linux
+bash setup/install-external-tools.sh
+# Verificar qué hay (el par "instalar / verificar")
+bash setup/check-tools.sh <ruta-al-repo>
+```
+
+> Las tools viven **en la máquina**, nunca en el repo (baranda #2). Un `git clone`
+> trae el instalador + el lock, no los binarios — corré el instalador una vez por
+> máquina. Las recetas manuales de abajo quedan como referencia/troubleshooting.
+
 ## Herramientas
 
 | Tool | Clase | Pin | Fuente oficial | Licencia | Rol |
