@@ -95,6 +95,23 @@ con espacios en el path.
 `commit-msg`, `pre-commit`, etc. Verificar en todos los repos de la familia.
 **Home:** § "Command Hygiene" (y candidato a check automático del kit).
 
+## F9 — Coordinación: ramificar de main ACTUAL, verificar trabajo en vuelo
+> Es un finding de **orquestación** (no de command-hygiene), incluido aquí por ser
+> de la misma sesión; su home es `CANON-MULTI-AGENT-ORCHESTRATION`.
+
+**Síntoma:** se scaffoldeó un deploy en una rama creada desde un main viejo; **otro
+coder ya había hecho la "etapa-1" del mismo trabajo en main** — resultando en
+duplicado e **inferior** (la rama usaba `pnpm@9`; main pineaba el `pnpm@10.32.1`
+correcto del lockfile).
+**Causa raíz:** ramificar de un HEAD de main desactualizado sin re-chequear el main
+actual ni el trabajo en vuelo de otros coders.
+**Regla:** antes de scaffoldear/crear una feature: `git fetch` + revisar **main
+actual** y PRs/ramas abiertas en esa área. Nombres tipo **"etapa-N"** o staged
+señalan trabajo en progreso de otro. Si ya existe: complementar (etapa siguiente),
+no duplicar; rescatar artefactos únicos y marcar superseded lo redundante
+(consistente con "newest-evidence-first" y reglas de ownership).
+**Home:** `CANON-MULTI-AGENT-ORCHESTRATION`.
+
 ---
 
 ## Acción propuesta para Marcelo
