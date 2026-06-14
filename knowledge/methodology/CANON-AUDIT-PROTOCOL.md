@@ -102,3 +102,34 @@ An audit names its **primary auditor** and an **independent second** (the one wh
 - **`CANON-ARCHITECTURE-REVIEW`** — sibling. Review = verdict on architecture; audit = truthfulness of artifacts + disposition of findings. The review's classification taxonomy (gap / drift / contradiction) and this canon's verdict categories are adjacent lenses, not duplicates.
 - **The findings discipline** of the development-process canon — every finding raised by an audit follows the same disposition lifecycle (§4).
 - **`CANON-DEVELOPMENT-PROCESS §7`** — this canon was authored under the SOTA-informed gate.
+
+---
+
+## §8 — Verifier integrity: an automated gate must not lie either
+
+> *(Amendment 2026-06-13, authorized by Marcelo — "ajusta la constitución". Drafted from a security-sweep precedent; §8.5.)*
+
+> **§1 asks whether an *artifact* lies. This section extends the same question to the *verifier* itself.** An automated gate (linter, health check, scanner, CI rule) can read **GREEN while the very defect it exists to catch silently persists.** A green gate that is wrong is worse than no gate — it manufactures false confidence.
+
+### §8.1 — Classify by the observed condition, never by a hand-maintained allowlist
+
+A verifier must judge by the **real condition** (is this object exposed? owned by us or by a dependency? does it carry the risky property?), not by a list of exceptions. **Hand-maintained allowlists/exemptions are debt that drifts toward false-green:** the world changes, the list does not, and the items that most need flagging are exactly the ones a stale exemption hides.
+
+- Prefer a *derived predicate* ("granted to the public role", "member of a dependency", "has the elevated attribute") over an enumerated exception set.
+- If an exemption is unavoidable, it must be **narrow, dated, and justified in place** — and re-derived, not trusted indefinitely.
+
+### §8.2 — Mirror the external source of truth
+
+When an authoritative external check exists (a provider's security advisor, an official linter, a platform scanner), the home-grown verifier must **faithfully reproduce it**. Divergence between your verifier and the external authority is a **bug in your verifier**, not noise to ignore. The external check is a **first-class QA layer**, not optional.
+
+### §8.3 — Severity by real risk, not a binary
+
+Findings are graded by real exposure/impact, not flattened. The opposite of an exposure (a "deny-all" that blocks everyone) is **not** a leak; a best-practice gap is **not** a vulnerability. Marking safe-by-design states as critical produces a permanent red that trains everyone to ignore the gate ("cry wolf"); marking real leaks as low hides them. Reserve the top severity for the genuinely exploitable.
+
+### §8.4 — Cadence must be self-triggered, not memory-dependent
+
+A periodic verifier that relies on someone remembering to run it will lapse. It needs a trigger that does not depend on human memory — a **staleness check at session/CI start** ("last run was N days ago") is enough. The rule seals first; richer automation is an L3 concern (over-engineering boundary).
+
+### §8.5 — Precedent
+
+A health verifier guarded by two hand-maintained allowlists read **GREEN** while a control-plane object was world-writable through the data API. The allowlists hid exactly the most critical objects; a third narrow filter (elevated-privilege only) hid a large class of best-practice gaps and reported "0". The defect was caught by the **provider's external advisor**, not the project's own ritual — which had also lapsed (no run in ~2 months). Fix: every check rewritten to classify by observed exposure (§8.1), aligned to the external advisor (§8.2), graded by real risk (§8.3), and put on a self-triggered cadence (§8.4). The L3 incarnation lives in the consuming repo's DB-health canon.
