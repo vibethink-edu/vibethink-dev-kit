@@ -13,6 +13,10 @@
     {
       "file": "knowledge/architecture/CANON-VERTICAL-BOUNDARY-001.md",
       "reason": "DRAFT pending Principal Architect seal (added by Campus 2026-06-12, PR #68; also an open layer question — L2-house naming a product). Not yet an adoptable piece: its catalog section is added when Marcelo seals it (and the exemption removed then). Until then it must not block the catalog of adoptable pieces — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/architecture/CANON-VERTICAL-UI-INHERITANCE-001.md",
+      "reason": "DRAFT pending Principal Architect seal (added 2026-06-13). Proposed registration as ADOPT piece #32 + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [
