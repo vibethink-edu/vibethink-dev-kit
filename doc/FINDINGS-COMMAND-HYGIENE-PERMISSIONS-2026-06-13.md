@@ -1,7 +1,7 @@
 # FINDINGS — Command Hygiene & Permission-Friction (multi-coder)
 
-**Fecha:** 2026-06-13 · **Autor:** Claude (sesión de orquestación) · **Estado:** PROPUESTO
-**Para sello de:** Marcelo · **Destino sugerido:** amend a `CANON-MULTI-AGENT-ORCHESTRATION`
+**Fecha:** 2026-06-13 · **Autor:** Claude (sesión de orquestación) · **Estado:** SELLADO (aprobado por Marcelo 2026-06-13)
+**Destino sugerido:** amend a `CANON-MULTI-AGENT-ORCHESTRATION`
 (§ nueva "Command Hygiene") + `CANON-BRANCH-WORKTREE-LIFECYCLE` (git -C) ·
 referencias cruzadas a `CANON-GIT-HYGIENE`.
 
