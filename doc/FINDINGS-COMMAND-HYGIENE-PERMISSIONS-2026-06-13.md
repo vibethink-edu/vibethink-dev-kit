@@ -84,6 +84,17 @@ allowlist hace match por ruta absoluta literal → **una sola regla sirve desde 
 cwd/worktree**, sin duplicar entradas por worktree.
 **Home:** § "Command Hygiene".
 
+## F8 — Hooks (husky) deben comillar `"$1"` — rutas con espacios rompen TODO commit
+**Síntoma:** `commit-msg` falla con `Unknown arguments: Marcelo, Labs/...` y aborta
+cualquier commit.
+**Causa raíz:** `.husky/commit-msg` llama `commitlint --edit $1` con `$1` **sin
+comillas**; si la ruta del repo tiene espacios (`C:/IA Marcelo Labs/...`), el shell
+parte la ruta en varios argumentos. Es un bug latente que se dispara solo en máquinas
+con espacios en el path.
+**Regla:** todo hook que reciba paths debe comillar (`--edit "$1"`). Aplica a
+`commit-msg`, `pre-commit`, etc. Verificar en todos los repos de la familia.
+**Home:** § "Command Hygiene" (y candidato a check automático del kit).
+
 ---
 
 ## Acción propuesta para Marcelo
