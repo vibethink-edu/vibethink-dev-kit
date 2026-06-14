@@ -1,6 +1,6 @@
 # REFERENCE — Vertical Deployment Topology (runtime complement to CANON-VERTICAL-BOUNDARY-001)
 
-**Fecha:** 2026-06-13 · **Estado:** PROPUESTO (para sello de Marcelo) · **Tipo:** referencia neutral
+**Fecha:** 2026-06-13 · **Estado:** SELLADO (aprobado por Marcelo 2026-06-13) · **Tipo:** referencia neutral
 
 > **Relación con el canon:** `CANON-VERTICAL-BOUNDARY-001` define la frontera de
 > **datos/dominio** (cuándo un negocio es tenant vs vertical; la plataforma posee
