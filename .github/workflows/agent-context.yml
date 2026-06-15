@@ -158,6 +158,12 @@ jobs:
       - name: canon-links engine tests
         run: node tools/check-canon-links.test.mjs
 
+      - name: tool versions declared
+        run: node tools/check-tool-versions.mjs
+
+      - name: tool-versions engine tests
+        run: node tools/check-tool-versions.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a

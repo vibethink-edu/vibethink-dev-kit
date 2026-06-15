@@ -1,0 +1,23 @@
+{
+  "_schema": "VIBETHINK_TOOL_VERSIONS_V1",
+  "_doc": "SemVer-lite (MAJOR.MINOR) for every wired tool. CANON-VERSIONING-001 §6 lets a tool declare its version 'in a VERSION constant in the source OR in a manifest' — this is the manifest (one file, no per-engine edit → no copy-parity ripple for consumers that copy these runnables). Bump MINOR when CLI args / return shape / behavior contract changes; MAJOR on a breaking contract change. check-tool-versions.mjs enforces that every tools/*.mjs (non-test) has an entry here and every entry points at a real tool.",
+  "tools": {
+    "check-agent-context.mjs": "1.0",
+    "check-canon-links.mjs": "1.0",
+    "check-catalog-sync.mjs": "1.0",
+    "check-copy-parity.mjs": "1.0",
+    "check-governance.mjs": "1.0",
+    "check-inheritance-claims.mjs": "1.0",
+    "check-tenant-contamination.mjs": "1.0",
+    "check-tool-versions.mjs": "1.0",
+    "comms-security-gate.mjs": "1.0",
+    "comms-send.mjs": "1.0",
+    "comms-sync.mjs": "1.0",
+    "devkit-doctor.mjs": "1.0",
+    "feed.mjs": "1.0",
+    "graph-canon.mjs": "1.0",
+    "inbox.mjs": "1.0",
+    "keyword-reminder.mjs": "1.0",
+    "session-hygiene-scan.mjs": "1.0"
+  }
+}
