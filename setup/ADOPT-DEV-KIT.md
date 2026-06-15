@@ -44,6 +44,10 @@ upstream — without it, the copy silently rots. That check is **Piece #31**
 
 ## How to use this index
 
+> **New to the kit?** Start at the on-ramp **[`USING-THE-KIT.md`](USING-THE-KIT.md)**
+> (who you are → your path → a worked example → the daily loop). This index is the
+> **reference menu**; the on-ramp is *how to use it*.
+
 1. **Mount** the kit (one-time, dev only) — see the box below.
 2. Walk the **pieces** in order. For each: read **Qué**, decide if it applies,
    follow **Cómo**, run **Verificar**.
