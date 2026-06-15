@@ -16,6 +16,23 @@ Reusable skeletons for the three governance instruments defined by
    pick names that fit the repo (the present-mirror at the repo root is common, the
    log and register under a `doc/` or `docs/` path are common). Honors
    `CANON-CONTEXT-HYGIENE` §3 (*"the concrete paths/files are an L3 concern"*).
+
+   **Recommended naming pattern** (per `CANON-NAMING-CONVENTIONS-001` §2 — docs are
+   `{TOPIC}-{slug}`, and these are *living* docs so they carry **no date**): lead with
+   a shared **scope** prefix so the three sort and read as one family, and put the
+   **role** in the suffix. Scope-led beats role-led (groups in a listing). Example
+   for a delivery/orchestration scope:
+
+   | Role | Recommended example | Alternatives |
+   |---|---|---|
+   | present-mirror | `ORCHESTRATION-DASHBOARD.md` | `DELIVERY-DASHBOARD`, `<scope>-BOARD` |
+   | append-only log | `ORCHESTRATION-LOG.md` | `<scope>-LOGBOOK`, `<scope>-JOURNAL` |
+   | decision register | `ORCHESTRATION-DECISIONS.md` | `<scope>-REGISTER`, `GO-REGISTER` |
+
+   Match the repo's existing governance-doc casing (e.g. ALL-CAPS-KEBAB if the repo
+   already uses `AGENTS.md`/`README.md`-style caps). Narrow the scope (`CODERS-`,
+   `AGENTS-`) only if the instruments truly track *only* executor work; if the
+   present-mirror tracks the whole effort, keep the broader scope.
 2. **Bind the local specifics** in each file's header where marked `<L3: …>`:
    - the repo's **authority classes** (which decisions require a register row);
    - the **channels** the register recognizes as valid sources of an approval;
