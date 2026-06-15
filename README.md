@@ -241,29 +241,32 @@ repos run them daily on Windows. Requirements: Node 20+ and git.
 
 ---
 
-## Am I actually governed? — the 60-second self-test
+## Am I actually governed? — one command
 
-Saying "we inherit the kit" is a claim; these checks make it a fact. Run them
-from your repo's root (kit cloned as sibling). **Every red names exactly what
-to fix** — that's the point.
+Saying "we inherit the kit" is a claim; this makes it a fact. **One command, one
+screen** — verdict first, one line per gate, the exact fix for every red. Run it
+from your repo's root (kit cloned as sibling):
 
 ```bash
-# 1. Do all my agents read the same, intact rules?
-node ../_vibethink-dev-kit/tools/check-agent-context.mjs tools/agent-context.config.json
-#    expect: GREEN — cross-agent layering holds
-
-# 2. Are my copied kit tools still faithful? (skip if you copied none — declare N-A(no copies))
-node ../_vibethink-dev-kit/tools/check-copy-parity.mjs tools/copy-parity.config.json \
-  --upstream-root ../_vibethink-dev-kit
-#    expect: GREEN — every declared copy is in parity (or visibly adapted)
-
-# 3. Is my adoption declaration honest and complete?
-#    (reference enforcement: a claims validator — both current consumers run one
-#    that rejects vague claims, verifies cited mechanisms exist, and flags any
-#    catalogued piece missing a row. Copy it from a consumer or review by hand:)
-#    every row in docs/DEV_KIT_INHERITANCE_STATUS.md names a real mechanism or
-#    is honestly PENDING / N-A(reason) — and no catalog piece lacks a row.
+node ../_vibethink-dev-kit/tools/devkit-doctor.mjs
 ```
+```
+  Dev-Kit Doctor · my-repo
+  ──────────────────────────────────────────────────
+  ✅ GREEN — 3/3 gates pass, nothing to fix
+    ✓ cross-agent layering      all agents read the same intact rules
+    ✓ copy-parity               every declared copy is in parity
+    ✓ adoption claims honest    every catalog piece has an honest row
+  skipped (no config here): no tenant contamination
+```
+Each gate runs only if its config exists in your repo (others are **skipped, never
+silently absent**). A red prints the exact fix. Need the detail? `--verbose` streams
+every gate's full output; `--json` is the CI-friendly form. Exit 0 = all green.
+
+> **Under the hood** (the doctor just runs these for you — call them directly to debug
+> one gate): `check-agent-context.mjs` (layering) · `check-copy-parity.mjs --upstream-root
+> ../_vibethink-dev-kit` (copied runnables) · `check-inheritance-claims.mjs
+> docs/DEV_KIT_INHERITANCE_STATUS.md` (claims) · `check-catalog-sync.mjs` (producer-side).
 
 And four questions no script can answer for you (the contract's human half):
 

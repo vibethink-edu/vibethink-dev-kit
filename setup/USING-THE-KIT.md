@@ -13,7 +13,7 @@
 
 | You are… | Your goal | Start here | First move |
 |---|---|---|---|
-| **A dev joining a repo that already inherits the kit** | understand the rules you're now under | [`knowledge/START-HERE.md`](../knowledge/START-HERE.md) (2-min door) | run the **60-second self-test** (README) to see what's actually wired |
+| **A dev joining a repo that already inherits the kit** | understand the rules you're now under | [`knowledge/START-HERE.md`](../knowledge/START-HERE.md) (2-min door) | run **`devkit-doctor`** (the one-command health board) to see what's actually wired |
 | **Starting a NEW repo** (or adding the kit to an existing one) | become a declared heir | README → **"Adopt it — the 15-minute path"** | clone the kit as a sibling, create your status doc, wire the layering smoke |
 | **An AI agent landing in a repo** | work under the shared method | [`knowledge/START-HERE.md`](../knowledge/START-HERE.md) → the 3 things + hard rules | check your inbox, read the root `AGENTS.md`, declare your scope |
 | **A maintainer of the kit itself** | add/seal a piece | README **"For maintainers"** + the model section | land the canon + its catalog piece in one PR; only the Principal Architect seals |
@@ -38,7 +38,7 @@ git clone <kit-url> ../_vibethink-dev-kit
 git -C ../_vibethink-dev-kit rev-parse --abbrev-ref HEAD   # expect: master
 ```
 Then follow **§2 (the first hour)**: status doc → wire the layering smoke →
-60-second self-test.
+run the doctor.
 
 **B) Update — you already inherit the kit and want the latest law:**
 
@@ -81,8 +81,10 @@ you* — do them in order; stop when you've got value, not when you've done all 
 3. **Wire the first gate** (the cross-agent layering smoke, via the reusable
    workflow — no engine copied). → Now a robot proves, on every PR, that all your
    agents read the same intact root rules.
-4. **Run the 60-second self-test** (README). → Every red line names exactly what to
-   fix. Green + the contract's 4 boxes = you are *governed*, not just claiming it.
+4. **Run the doctor** — `node ../_vibethink-dev-kit/tools/devkit-doctor.mjs` → one
+   screen: verdict first, one line per gate, the exact fix for any red (`--verbose`
+   for the detail). Green + the contract's 4 boxes = you are *governed*, not just
+   claiming it.
 5. **Adopt further pieces only when you feel the pain they solve** — never for
    symmetry. The catalog is a menu, not a checklist to clear.
 
