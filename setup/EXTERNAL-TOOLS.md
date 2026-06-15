@@ -45,18 +45,26 @@ bash setup/check-tools.sh <ruta-al-repo>
 
 | Tool | Clase | Pin | Fuente oficial | Licencia | Rol |
 |---|---|---|---|---|---|
-| Graphify | A — mission-critical | `0.8.20` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
+| Graphify | A — mission-critical | `0.8.39` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
 | RTK | B — cost/quality multiplier | `0.39.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
 
-## Graphify `0.8.20`
+## Graphify `0.8.39`
 
-> **Pin bumped `0.7.13 → 0.8.20` (2026-06-15) con la evidencia exigida.** La política
-> de este archivo exige *ejercitar la versión nueva en una máquina* (`graphify --help`
-> + un `graphify update` real) antes de avanzar el pin. **Ya se ejercitó:** `0.8.20`
-> corrió `--help` + un `update` real (indexó una feature: 69 nodos / 146 edges /
-> 8 communities, a cero tokens) en el work-server → esa es la prueba pedida. El pin
-> avanza a `0.8.20` (la versión verificada; pip publica hasta `0.8.39`, sin ejercitar
-> aún → no se adopta sin evidencia). **Non-blocking:** la ausencia degrada, no rompe.
+> **Pin bumped `0.7.13 → 0.8.20 → 0.8.39` (2026-06-15) con la evidencia exigida.** La
+> política de este archivo exige *ejercitar la versión nueva en una máquina*
+> (`graphify --version`/`--help` + un `graphify update` real) antes de avanzar el pin.
+> Trazo: `0.8.20` se ejercitó primero (`--help` + un `update` real, 69 nodos / 146 edges
+> / 8 communities, a cero tokens — work-server). Luego **`0.8.39` se ejercitó en una
+> máquina de la familia** (`vm-XL-app-cup`, Python 3.12.8): `graphify --version` →
+> `0.8.39` + `graphify update <subdir> --no-cluster` → grafo real **141 nodos / 233
+> edges** (extracción AST, sin backend LLM) sobre los `.mjs` del propio kit. Esa es la
+> prueba más fuerte y la versión más nueva verificada → el pin queda en `0.8.39`.
+> **Non-blocking:** la ausencia degrada, no rompe.
+>
+> *Nota de superficie:* 0.8.x amplió la CLI (instalación como skill por plataforma,
+> `query`/`affected`/`extract`, grafo global, hooks de git). El `update <subdir>`
+> documentado sigue vigente y es el camino mínimo sin backend, así que la guía de uso
+> no rompe. Aprovechar el modelo skill = PR aparte.
 
 > **⚠️ Gotcha "instalado ≠ disponible" (multi-Python PATH).** El síntoma observado en
 > los 5 ejecutores de una ola: todos reportaron `graphify: unavailable` aunque el
@@ -73,8 +81,8 @@ bash setup/check-tools.sh <ruta-al-repo>
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):
-  - Windows: `py -m pip install --user graphifyy==0.8.20`
-  - macOS/Linux: `python3 -m pip install --user graphifyy==0.8.20`
+  - Windows: `py -m pip install --user graphifyy==0.8.39`
+  - macOS/Linux: `python3 -m pip install --user graphifyy==0.8.39`
 - Verificación: `graphify --help` (debe **resolver por nombre** — si no, ver el gotcha de PATH arriba)
 - Uso: `graphify update <subdir>` → escribe `graphify-out/` (indexar el
   subdirectorio donde se trabaja, NO el monorepo entero)

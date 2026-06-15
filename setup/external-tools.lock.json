@@ -9,7 +9,7 @@
       "kind": "pip",
       "package": "graphifyy",
       "cli": "graphify",
-      "pin": "0.8.20",
+      "pin": "0.8.39",
       "acceptInstalled": ">=0.8",
       "source": "github.com/safishamsi/graphify",
       "license": "MIT"

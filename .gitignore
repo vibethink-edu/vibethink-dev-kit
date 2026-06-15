@@ -26,3 +26,6 @@ tmp/
 # Build
 dist/
 build/
+
+# Graphify cache (regenerable, never committed — privacy baseline, EXTERNAL-TOOLS.md)
+graphify-out/
