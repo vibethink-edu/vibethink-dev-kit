@@ -1,6 +1,6 @@
 # CANON-CODER-SAFE-IDENTITY-001 — Safe low-privilege executor identity & per-session isolation
 
-**Status:** proposed 2026-06-13 — fire-tested on the first vertical's executor launch wave; **seals on merge** by the Principal Architect.
+**Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested on the first vertical's executor launch wave (proposed 2026-06-13).
 **Date:** 2026-06-13
 **Scope:** Every repo where one or more AI agents ("coders"/executors) push code on behalf of a **bot account** with asymmetric permissions (propose-only: write + open PR, no merge, no admin/bypass), while a separate **owner/maintainer** identity reviews and merges. Vendor-neutral, forge-neutral, harness-neutral, bot-implementation-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -147,4 +147,4 @@ First assembled while launching the **first vertical's executor wave** (2026-06-
 
 **Coverage-check:** `CANON-BRANCH-WORKTREE-LIFECYCLE` owned worktree isolation but not identity binding; `CANON-GIT-HYGIENE` owned the working-floor preflight but not an identity gate; `CANON-CONFIGURATION-DISCIPLINE` owned env layering but not per-session credential isolation; `CANON-MULTI-AGENT-ORCHESTRATION` owned handoff but not the executor-identity model; `CANON-SKILLS-OVER-ROLES` owned the skills model but PREP was unnamed. This canon fills that gap and references the companions rather than duplicating them; consuming repos keep only the concrete bindings (§10).
 
-**Proposed 2026-06-13 — awaiting seal by the Principal Architect (merge = seal).**
+**SEALED 2026-06-15 by the Principal Architect (merge = seal).** (Proposed 2026-06-13.)

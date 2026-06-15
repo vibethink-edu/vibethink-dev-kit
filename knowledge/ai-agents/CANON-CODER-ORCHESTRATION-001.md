@@ -1,6 +1,6 @@
 # CANON-CODER-ORCHESTRATION-001 — Running an autonomous executor without stalling and without crossing the gates
 
-**Status:** proposed 2026-06-15 — fire-tested across a vertical's executor waves (sequential identity/access waves + a fan-out wiring wave), command-hygiene evolved over five iterations from watching real executor sessions; **seals on merge** by the Principal Architect.
+**Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested across a vertical's executor waves (sequential identity/access waves + a fan-out wiring wave), command-hygiene evolved over five iterations from watching real executor sessions.
 **Date:** 2026-06-15
 **Scope:** Every repo where AI agents ("coders"/executors) run long autonomous sessions under a harness with a **per-command permission gate**. Vendor-neutral, product-neutral, harness-neutral, forge-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -179,6 +179,6 @@ Assembled from the command-hygiene findings sealed 2026-06-13 (F1–F9) and the 
 
 **Coverage-check:** the command-hygiene findings doc (sealed 2026-06-13) proposed a "Command Hygiene §" in `CANON-MULTI-AGENT-ORCHESTRATION` and an amendment to `CANON-BRANCH-WORKTREE-LIFECYCLE`; that canonization was never executed. This canon is the **consolidated home** — it keeps command hygiene, the design gate, and the wave shape together, references the companion spines rather than splitting the material across them, and supersedes the findings doc's *suggested* destination (the finding's disposition is updated to point here). `CANON-CODER-SAFE-IDENTITY-001` already owned the identity model and the permission-scoping *policy*; this canon owns the *craft* of writing matchable commands and the orchestration shape, and references §8 rather than restating it.
 
-**Fire-test:** vendor/product/agent/tool/forge-neutral — names no product, vendor, agent harness, shell, package manager, or forge. PASS on authoring; re-confirm on seal.
+**Fire-test:** vendor/product/agent/tool/forge-neutral — names no product, vendor, agent harness, shell, package manager, or forge. PASS.
 
-**Proposed 2026-06-15 — awaiting seal by the Principal Architect (merge = seal).**
+**SEALED 2026-06-15 by the Principal Architect (merge = seal).**

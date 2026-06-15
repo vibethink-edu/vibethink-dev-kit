@@ -1,6 +1,6 @@
 # CANON-STATE-MIRROR-AND-DECISION-REGISTER-001 — Governance instruments: present-mirror, append-only log, decision register
 
-**Status:** proposed 2026-06-15 — fire-tested on a vertical's multi-wave delivery (state mirror + history log + approval ledger run across several agent/human waves); **seals on merge** by the Principal Architect.
+**Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested on a vertical's multi-wave delivery (state mirror + history log + approval ledger run across several agent/human waves).
 **Date:** 2026-06-15
 **Scope:** Every repo where one or more contributors — human or agent — hold governance state across sessions: the live state of who is doing what, the history of why the work reached its current shape, and the record of authority approvals. Vendor-neutral, product-neutral, tool-neutral, harness-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -149,6 +149,6 @@ First assembled while running a vertical's multi-wave delivery across several ag
 
 **Coverage-check:** `CANON-AGENT-COLLABORATION` §1 sealed the root (repo is the only memory) but published no instruments; §8 owned lesson-canonization but not the operational sync of present/history/approval state. `CANON-DEVELOPMENT-PROCESS` §5 owned the ADR + append-only-log concepts but neither the present-mirror role nor the authority-approval register as a distinct object. `CANON-CONTEXT-HYGIENE` §3 explicitly left the concrete paths/files an L3 concern and published **no reusable skeleton**, so each vertical reinvented the instruments. `CANON-AUDIT-PROTOCOL` §4 owned the *findings* ledger but not the *approvals* ledger. This canon fills that gap, references the companions rather than duplicating them, and publishes the L3 skeleton (§8); consuming repos keep only the concrete bindings.
 
-**Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent harness, school, person, or concrete file. PASS on authoring; re-confirm on seal.
+**Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent harness, school, person, or concrete file. PASS.
 
-**Proposed 2026-06-15 — awaiting seal by the Principal Architect (merge = seal).**
+**SEALED 2026-06-15 by the Principal Architect (merge = seal).**

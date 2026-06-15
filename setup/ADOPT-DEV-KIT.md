@@ -845,6 +845,80 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   declared `N-A` consciously); their absence degrades but never fails a build,
   hook, or CI; `graphify-out/` (or equivalent) is git-ignored.
 
+### 34 — State mirror & decision register (governance instruments) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-STATE-MIRROR-AND-DECISION-REGISTER-001.md`
++ `setup/templates/governance-instruments/` (the reusable L3 skeleton).
+
+- **Qué:** the three governance instruments a repo holds across sessions —
+  **present-mirror** (the whole state on one page; *mirror wins reality*; "if you
+  did not update the mirror, you did not close"), **append-only log** (the
+  history / why), and **decision register** (the ledger of **authority approvals**
+  with who-proposed / authority / when / what / channel / evidence — distinct from
+  the ADR, which is the *why of the design*; the register captures the
+  *authorization event*, especially a "go ahead" given through an ephemeral
+  channel). Plus the close ritual that synchronizes all three.
+- **Cómo:** doc by reference. Concretizes Piece #17 §1 (repo is the only memory)
+  and §8 (lesson-canonization), and Piece #20 §3 (which left the concrete
+  paths/files an L3 concern). Copy `setup/templates/governance-instruments/`,
+  rename to the repo's convention, bind the authority classes / channels /
+  timezone / evidence conventions. Does **not** re-derive the ADR or append-only
+  log *concept* (Piece #10a §5) nor the audit-finding ledger (Piece #25 §4).
+- **Verificar:** the repo's present-mirror was current at last session close; an
+  authority approval given this period has a register row with channel + evidence;
+  the log was appended to at each substantive step.
+
+### 35 — Coder safe identity (low-privilege executor + session isolation) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-CODER-SAFE-IDENTITY-001.md`.
+
+- **Qué:** the asymmetric identity model that makes "all changes through a reviewed
+  PR" real — the executor pushes as a **low-privilege bot** (propose-only: write +
+  open PR, no merge / admin / bypass); a **separate owner** reviews and merges; the
+  two **never share an active credential in one session**. Per-session identity
+  binding (token in the session env, never a file), the **auth gate** (verify your
+  OWN session before any push), the three identities (commit author ≠ push actor ≠
+  PR author — audit the push actor), worktree↔identity binding, per-session
+  permission scoping (scope the relaxation, guard even under bypass), and **PREP**
+  (launch setup as a skill, not a role).
+- **Cómo:** doc by reference. Adds the identity binding to Piece #23 (§7), the
+  identity check to Piece #22's preflight (§5), rides on Piece #32 for the
+  per-session credential (§4), feeds Piece #3's handoff via PREP (§9). L3 binds the
+  concrete bot account + branch-protection settings, the credential env-var, and the
+  forge's auth/audit commands. Pairs with `setup/RUNBOOK-LAUNCH-CODERS.md`.
+- **Verificar:** the default branch is protected; the bot account is write-not-admin;
+  a recent push's **actor** (not just commit author) was the bot; launch scripts
+  expect the token in the env (never contain it).
+
+### 36 — Coder orchestration (run autonomous without stalling, without crossing the gates) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-CODER-ORCHESTRATION-001.md`
++ `setup/RUNBOOK-LAUNCH-CODERS.md` (the developer-facing how-to).
+
+- **Qué:** how an autonomous executor runs a long session **without stalling on a
+  permission prompt** and **without crossing the gates** — the insight that the
+  prompt fires on **matchability, not danger** (a command that can't be prefix-
+  matched prompts regardless of safety); the **two levers** (the prompt teaches
+  matchable commands + the allowlist covers the routine); the **trigger→fix table**
+  (each anti-pattern paired with its clean form: `cd &&` → `-C`, `$VAR` → literal,
+  status-echo → omit, heredoc/pipe → file, glob-like tokens → commit-from-file…);
+  the **gates never allowlisted** (identity / destruction / secrets); the **design
+  gate** (boundary work stops to present design; mechanical work runs autonomously);
+  and **wave shape** (sequential vs fan-out).
+- **Cómo:** doc by reference. Builds on Piece #35 (identity / PREP / permission
+  *policy* §8 — referenced, not restated), Piece #3 (the dance + exit states),
+  Piece #23 (worktree + `git -C`), Piece #22 (all-via-PR), Piece #34 (the
+  instruments the executor reports to). Consolidates the sealed command-hygiene
+  findings (F1–F9). L3 binds the concrete allowlist, the prompt, and which spec
+  classes are boundary vs mechanical.
+- **Verificar:** a recent executor session ran with an allowlist scoped to the
+  session (not global, not committed); identity/destruction/secrets stayed
+  prompted; a boundary spec presented its design before sensitive code; the
+  executor opened a draft PR and did not self-merge.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -889,6 +963,9 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 31 | Copy-parity check | ADOPTED / PENDING / N-A(no copies) | parity config path + CI job |
 | 32 | Configuration discipline | ADOPTED / PENDING / N-A | stores per layer + enforcement |
 | 33 | Dev tooling baseline | ADOPTED / PENDING / N-A | provisioned? + EXTERNAL-TOOLS registry |
+| 34 | State mirror & decision register | ADOPTED / PENDING / N-A | mirror/log/register paths + authority classes |
+| 35 | Coder safe identity | ADOPTED / PENDING / N-A(no coders) | bot account + branch protection + credential env |
+| 36 | Coder orchestration | ADOPTED / PENDING / N-A(no coders) | allowlist + launch prompt + boundary/mechanical classes |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
@@ -988,3 +1065,14 @@ mark the whole piece N-A. The per-piece adoption table (previously truncated at
 #12) was extended to all pieces, and the `ADOPTED-NATIVE` status added. Existing
 piece numbers #1–#16 were preserved (no renumber). Surfaced by the second-consumer
 adoption audit; reconciled lift-side.
+
+**Update 2026-06-15 (seal — governance instruments + coder orchestration).** Sealed
+by the Principal Architect from a vertical's elevation handoff: **3 pieces added**
+(#34 state-mirror-and-decision-register, #35 coder-safe-identity, #36
+coder-orchestration), each its own piece after a coverage-check (none folded —
+#34 instruments Pieces #17/#20 without re-deriving the ADR of #10a; #35 owns the
+identity model the orchestration spine #3 lacked; #36 owns the command-hygiene
+craft + design gate, consolidating the sealed command-hygiene findings F1–F9 and
+referencing #35's permission *policy* rather than restating it). #35 was authored
+in flight (its proposed registration deferred to this seal). The per-piece adoption
+table extended to #36; `N-A(no coders)` added for repos that launch no executors.
