@@ -79,6 +79,10 @@ law; the **piece** (a numbered section in `ADOPT-DEV-KIT.md`) is its adoptable e
 > maintainer), with a worked example and the daily loop. A kit dies from
 > *non-adoption*, not bad rules — that file is the antidote.
 
+> **Want to *see* it?** → **[`knowledge/SUPRA-MAP.md`](knowledge/SUPRA-MAP.md)**: the canon
+> constellation as one rendered diagram — every spine, grouped by domain, with the
+> relationships each declares. Auto-generated (`tools/graph-canon.mjs`), kept fresh by CI.
+
 ---
 
 ## The rules, in plain words — the whole catalog, one line each
