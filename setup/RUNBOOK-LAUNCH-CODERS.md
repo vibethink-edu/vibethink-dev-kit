@@ -32,6 +32,17 @@ permission gate).
 3. **A per-session credential mechanism.** A way to inject the bot's token **into the launch
    shell's environment** so the agent process and its children inherit it — never written to
    a file (`…SAFE-IDENTITY-001` §4/§9). `<bind the env-var name>`.
+4. **Provisioned optional tooling (if the repo uses any).** If coders are expected to use
+   per-user-installed tools (a CLI installed under the user's home), provision them in the
+   launch's PASO 0 — and beware the **"installed ≠ on PATH" gotcha**: a package can be
+   installed yet its CLI not resolve by name because the per-user binary dir is not on PATH.
+   - **Verify the CLI *resolves by name*** (run its `--help`), not merely that the package is
+     present — "installed ≠ available" is the trap. The provisioner should detect the per-user
+     binary dir, prepend it to the launch session's PATH, and report the exact dir.
+   - **A fresh shell is required.** A process freezes its PATH at startup, so fixing PATH does
+     **not** reach already-open shells (stale-shell) — only a new shell/launch picks it up.
+     Since the launch script starts the agent as a child of a fresh shell, fixing PATH there
+     propagates correctly. Absence degrades, never blocks (use-by-default, §7 / `…ORCHESTRATION-001` §10).
 
 ---
 

@@ -45,26 +45,37 @@ bash setup/check-tools.sh <ruta-al-repo>
 
 | Tool | Clase | Pin | Fuente oficial | Licencia | Rol |
 |---|---|---|---|---|---|
-| Graphify | A — mission-critical | `0.7.13` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
+| Graphify | A — mission-critical | `0.8.20` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
 | RTK | B — cost/quality multiplier | `0.39.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
 
-## Graphify `0.7.13`
+## Graphify `0.8.20`
 
-> **⚠️ Pin drift (2026-06-13): el pin `0.7.13` está ~26 releases atrás.** Última
-> publicada en pip = `0.8.39`; vista instalada en una máquina de la familia =
-> `0.8.20`. **El pin NO se movió todavía** porque la política de este archivo
-> exige *ejercitar la versión nueva en una máquina* (`graphify --help` + un
-> `graphify update` real) antes de avanzarlo, y eso no se pudo hacer en la
-> sesión de seal (CLI no resoluble por multi-Python PATH). Bump a `0.8.x`
-> pendiente de esa verificación — **non-blocking** mientras tanto (cualquier
-> 0.7+/0.8+ orienta; la ausencia degrada, no rompe). Tarea chica: ejercitar
-> 0.8.39 en una máquina, luego avanzar el pin con evidencia (PR a este archivo).
+> **Pin bumped `0.7.13 → 0.8.20` (2026-06-15) con la evidencia exigida.** La política
+> de este archivo exige *ejercitar la versión nueva en una máquina* (`graphify --help`
+> + un `graphify update` real) antes de avanzar el pin. **Ya se ejercitó:** `0.8.20`
+> corrió `--help` + un `update` real (indexó una feature: 69 nodos / 146 edges /
+> 8 communities, a cero tokens) en el work-server → esa es la prueba pedida. El pin
+> avanza a `0.8.20` (la versión verificada; pip publica hasta `0.8.39`, sin ejercitar
+> aún → no se adopta sin evidencia). **Non-blocking:** la ausencia degrada, no rompe.
+
+> **⚠️ Gotcha "instalado ≠ disponible" (multi-Python PATH).** El síntoma observado en
+> los 5 ejecutores de una ola: todos reportaron `graphify: unavailable` aunque el
+> paquete **estaba instalado** — su directorio `Scripts/` (Windows) o `bin/` (POSIX)
+> del `--user` site **no estaba en PATH**, así que el CLI `graphify` no resolvía por
+> nombre y el flujo que lo invoca no podía usarlo. Agravante **stale-shell:** un proceso
+> congela su PATH al arrancar, así que arreglar el PATH del registro **no** afecta a los
+> shells ya abiertos — solo un shell/lanzamiento nuevo lo toma. Por eso:
+> - `install-external-tools.{ps1,sh}` detecta el `Scripts/`/`bin/` real del `--user` site,
+>   lo **antepone al PATH de la sesión** (para que el lanzamiento hijo lo herede) y
+>   **reporta el dir exacto** + el comando para agregarlo de forma persistente.
+> - `check-tools.sh` verifica que `graphify` **RESUELVE por nombre** (no solo que el
+>   paquete esté instalado) y marca explícito el estado "instalado PERO no en PATH".
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):
-  - Windows: `py -m pip install --user graphifyy==0.7.13`
-  - macOS/Linux: `python3 -m pip install --user graphifyy==0.7.13`
-- Verificación: `graphify --help`
+  - Windows: `py -m pip install --user graphifyy==0.8.20`
+  - macOS/Linux: `python3 -m pip install --user graphifyy==0.8.20`
+- Verificación: `graphify --help` (debe **resolver por nombre** — si no, ver el gotcha de PATH arriba)
 - Uso: `graphify update <subdir>` → escribe `graphify-out/` (indexar el
   subdirectorio donde se trabaja, NO el monorepo entero)
 - `graphify-out/` es cache regenerable: **jamás se commitea** (lección

@@ -9,8 +9,8 @@
       "kind": "pip",
       "package": "graphifyy",
       "cli": "graphify",
-      "pin": "0.7.13",
-      "acceptInstalled": ">=0.7",
+      "pin": "0.8.20",
+      "acceptInstalled": ">=0.8",
       "source": "github.com/safishamsi/graphify",
       "license": "MIT"
     },
