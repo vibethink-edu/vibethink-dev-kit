@@ -295,6 +295,11 @@ just prose a human must read:
 repos can act **without opening the thread, reconstructing context, or asking
 "what does this even mean?"**
 
+> This section is the **message-instance** of the broader surface law
+> [`CANON-HUMAN-SURFACE-LEGIBILITY-001`](../methodology/CANON-HUMAN-SURFACE-LEGIBILITY-001.md)
+> (every human surface leads with the decision layer; depth on demand; verbose-but-mute
+> is a defect). The shape below is that law applied to a chat message.
+
 > **The human is the navigator, not the investigator.**
 > A message must orient the human; it must never force the human to dig to
 > understand it.

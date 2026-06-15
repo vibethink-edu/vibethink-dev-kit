@@ -1,6 +1,6 @@
 # CANON-HUMAN-SURFACE-LEGIBILITY-001 — Every human-facing surface leads with the decision layer
 
-**Status:** proposed 2026-06-15 — fire-tested on a verbose-but-mute health screen and the one-screen `devkit-doctor` that fixed the same shape; **seals on merge** by the Principal Architect.
+**Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested on a verbose-but-mute health screen and the one-screen `devkit-doctor` that fixed the same shape.
 **Date:** 2026-06-15
 **Scope:** Every repo that shows a human a surface to read — CLI output, a dashboard or UI health view, a status report, a log, an API health endpoint, an agent's message. Vendor-neutral, product-neutral, tool-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -124,6 +124,6 @@ legibility law**, with the verbose-but-mute anti-pattern named so it can be call
 
 **Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent
 harness, or framework (the one named file is a kit-internal reference instance, not a
-dependency). PASS on authoring; re-confirm on seal.
+dependency). PASS.
 
-**Proposed 2026-06-15 — awaiting seal by the Principal Architect (merge = seal).**
+**SEALED 2026-06-15 by the Principal Architect (merge = seal).**
