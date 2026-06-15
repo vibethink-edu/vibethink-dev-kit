@@ -948,6 +948,30 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   with no spec ceremony; the repo's root rules declare its class→authority binding
   and its path cut (no silent default).
 
+### 38 — DB security baseline (exposed Postgres/Supabase security floor) (engine-specific L1)
+
+**Layer:** L1 (neutral) — but **engine-gated**: adoptable only by repos whose data plane is Postgres exposed over PostgREST/Supabase. Non-Postgres repos mark `N-A(non-postgres)`.
+**Home:** `knowledge/methodology/CANON-DB-SECURITY-BASELINE-001.md`.
+
+- **Qué:** the closures that must be true before a Postgres schema reachable by
+  `anon`/`authenticated` is safe to expose — deny is a thing you *do*, per object,
+  and *verify*. SECDEF functions not anon-executable (§2); **revoke from `PUBLIC`,
+  not just the roles** — the silent no-op (§3); no `USING(true)` anon write (§4);
+  `search_path` pinned (§5); extensions out of `public` (§6); no matviews/buckets
+  exposed to anon (§7); the **Supabase advisor as the CI/pre-cutover gate** so the
+  warning classes can't regrow (§8); catalog-driven + idempotent + self-testing
+  migration discipline (§9); shared-schema fix-ownership boundary (§10).
+- **Cómo:** doc by reference; engine-specific (its mechanisms are Postgres + PostgREST
+  properties, not generalizable). Companion to Piece #30 (production-safety governs
+  the shipped *artifact*; this governs the exposed *database*). Lifted from ViTo's
+  W3–W7 advisor convergence — the §3 `PUBLIC`-grant discovery and §9 self-test
+  discipline are battle-proven (the self-test caught a silent no-op against cloud).
+- **Verificar:** the Supabase Security Advisor is wired as a CI/pre-cutover gate
+  (green = 0 security warnings or documented exceptions); a recent DB-security
+  migration is catalog-driven, idempotent, and ends in a self-test that rolls back
+  on unmet invariant; no SECDEF function in the exposed schema is anon-executable
+  except a documented allowlist entry.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
