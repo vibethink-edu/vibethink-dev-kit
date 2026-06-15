@@ -43,6 +43,39 @@
   90 seconds": supra-repo · L1/L2/L3 · inherit-by-reference vs copy · the seal); the
   two-checkouts repo-topology note; "Am I governed?" now points to `devkit-doctor`.
 
+### Added (later same day — gates, visibility, adoption)
+
+- **`CANON-AGENT-COLLABORATION` §6 rule 11** (#100) — the advisor's duty not to let the
+  human walk into a foreseeable, cheap-to-prevent hole; surfaced in `AGENTS_UNIVERSAL`
+  Duty-to-Flag so it bites at runtime.
+- **`tools/check-governance.mjs`** (#102) — the gate that makes #34/#37 bite (declared
+  instruments exist + non-empty; decision-class binding declared) + `governance.config.example.json`.
+- **`knowledge/SUPRA-MAP.md` + `tools/graph-canon.mjs`** (#104) — auto-generated canon
+  constellation (Mermaid), with a `--check` freshness gate.
+- **`tools/check-canon-links.mjs`** (#105) — cross-reference integrity gate (every markdown
+  link resolves; every "Piece #N" exists).
+- **`tools/versions.json` + `tools/check-tool-versions.mjs`** (#106) — every wired tool
+  versioned (CANON-VERSIONING-001 §6, via manifest).
+- **`setup/templates/heir-bootstrap/`** (#107) — copy-a-folder adoption bundle (AGENTS.md,
+  configs, CI workflow, FIRST-PROMPT).
+- **`devkit-doctor` gates** (#101 test, #102/#105/#106) — now a 5-gate one-screen board;
+  each gate has a test wired into CI.
+
+### Changed (later same day)
+
+- **`check-tools.sh`** (#108) — probe `python3` (macOS), not just `py`/`python` — the first
+  Mac-heir gotcha.
+- **`check-canon-links.mjs`** (#107) — skip `setup/templates/` (template links resolve in
+  the consumer post-copy, not in place).
+- **`README.md`** (#109/#110) — platform compatibility as a table (Linux/Windows ✅ ·
+  macOS 🟡 pending the first Mac green); gates-that-bite table extended (governance,
+  canon-references, tool-versions).
+- **`tools/agent-context.config.json`** (#107) — allowlist the heir-bootstrap `AGENTS.md`
+  template (no-parallel false positive).
+- **`tools/versions.json`** (this entry) — `check-canon-links` → 1.1 (templates-skip);
+  the shell tools (`check-tools.sh`, `install-external-tools.{sh,ps1}`) added; the gate
+  now scans `.sh`/`.ps1` too, not only `.mjs`.
+
 ## 2026-06-04
 
 ### Added
