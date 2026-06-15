@@ -180,9 +180,12 @@ multi-agent support is gated, not promised.
 **Any model, any vendor.** The neutral core names no model vendor — a CI check
 enforces it. Swap models or providers tomorrow; your governance doesn't notice.
 
-**Any platform.** The engines are pure Node (zero dependencies), validated
-cross-platform: the kit's own CI runs them on Linux on every PR, and consuming
-repos run them daily on Windows. Requirements: Node 20+ and git.
+**Any platform.** The engines are pure Node (zero dependencies). **Validated on
+Linux** (the kit's own CI, every PR) and **Windows** (a consuming repo, daily);
+**macOS is landing now** with the first Mac heir — Node, git and bash are all present
+there, and the one Windows-ism that surfaced (`check-tools.sh` probing `python3`) is
+fixed, but the first green on a Mac is what will mark macOS *validated* rather than
+*expected*. Requirements: Node 20+, git, and bash (for the optional shell helpers).
 
 ---
 
