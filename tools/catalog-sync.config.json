@@ -17,6 +17,10 @@
     {
       "file": "knowledge/architecture/CANON-VERTICAL-UI-INHERITANCE-001.md",
       "reason": "DRAFT pending Principal Architect seal (added 2026-06-13). Proposed registration as ADOPT piece #32 + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/methodology/CANON-HUMAN-SURFACE-LEGIBILITY-001.md",
+      "reason": "DRAFT pending Principal Architect seal (added 2026-06-15). Every human-facing surface leads with the decision layer (verdict first, depth on demand; verbose-but-mute = defect) — generalizes the compass (§5.1) from messages to any surface; reference instance: tools/devkit-doctor.mjs. Catalog piece + inheritance-status row deferred to the seal (numbering is the architect's call). Until sealed it must not block the catalog — but it is not silently absent either."
     }
   ],
   "statusTokens": [
