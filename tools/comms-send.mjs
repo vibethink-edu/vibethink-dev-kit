@@ -27,8 +27,11 @@
  *     [--target-layer SUPRA-L1L2|product-L3|both] [--ref-branch <branch>] \
  *     [--summary "<1-line>"] (--body "<text>" | --body-file <path>) [--dry-run] [--no-push]
  *
- * Exit codes: 0 ok · 1 SAFETY block (secret) · 2 governance/validation error ·
- *   3 create-only conflict (file exists) · 4 git/push failure (file IS written).
+ * Exit codes: 0 ok (pushed — OR a declared COMMITTED-LOCAL fallback when no remote
+ *   is configured / --no-push, per CANON-MULTI-AGENT-ORCHESTRATION §2.2.1) ·
+ *   1 SAFETY block (secret) · 2 governance/validation error · 3 create-only conflict
+ *   (file exists) · 4 git failure with the file written (the COMMIT failed, or the
+ *   PUSH failed though a remote exists — surfaced, never swallowed).
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -265,37 +268,63 @@ if (isMain()) {
     console.log(`\n[dry-run] would write ${relPath}\n`);
     console.log(content);
     console.log(
-      `[dry-run] would commit + push · would appear in: node tools/inbox.mjs ${String(args.to).toLowerCase()}\n`
+      `[dry-run] would commit (+ push if a remote exists; else COMMITTED-LOCAL) · would appear in: node tools/inbox.mjs ${String(args.to).toLowerCase()}\n`
     );
     process.exit(0);
   }
 
-  // 3. AUTOMATIC — write → commit (real pre-commit gate runs too = double safety)
-  //    → push (--no-verify only skips the dirty-worktree HYGIENE check; the secret
-  //    SECURITY check already ran twice).
+  // 3. AUTOMATIC — write → commit (PERSISTENCE, always required) → push (TRAVEL, only
+  //    when a remote exists). No remote / --no-push degrades to a declared
+  //    COMMITTED-LOCAL fallback with a loud warning, NOT a hard failure
+  //    (CANON-MULTI-AGENT-ORCHESTRATION §2.2.1). --no-verify on push only skips the
+  //    dirty-worktree HYGIENE check; the secret SECURITY check already ran twice.
   mkdirSync(join(root, LANE), { recursive: true });
   writeFileSync(absPath, content, "utf8");
+
+  // 3a. Commit = persistence. If THIS fails, that is the real failure class.
   try {
     execFileSync("git", ["add", "--", relPath], { cwd: root, stdio: "pipe" });
     // Conventional-commit message (type docs, scope comms) with a lowercased subject,
     // so it passes commitlint anywhere — not a custom "comms:" type (which the
     // standard config-conventional enum rejects).
     const subject = `${args.re.charAt(0).toLowerCase()}${args.re.slice(1)}`;
-    execFileSync("git", ["commit", "-m", `docs(comms): ${subject}`], {
-      cwd: root,
-      stdio: "pipe",
-    });
-    if (!args.noPush) {
-      execFileSync("git", ["push", "--no-verify"], { cwd: root, stdio: "pipe" });
-    }
+    execFileSync("git", ["commit", "-m", `docs(comms): ${subject}`], { cwd: root, stdio: "pipe" });
   } catch (err) {
     console.error(
-      `⚠ comms:send — file WRITTEN (${relPath}) but git step failed: ${err?.message ?? err}`
+      `⚠ comms:send — file WRITTEN (${relPath}) but the COMMIT failed: ${err?.message ?? err}`
     );
     console.error(
-      "   Nothing is lost. Commit/push manually (e.g. detached HEAD → checkout a branch first)."
+      "   Nothing is lost. Commit manually (e.g. detached HEAD → checkout a branch first)."
     );
     process.exit(4);
+  }
+
+  // 3b. Push = travel. Only when a remote exists and the caller didn't opt out.
+  const hasRemote = (() => {
+    try {
+      return execFileSync("git", ["remote"], { cwd: root, encoding: "utf8" }).trim().length > 0;
+    } catch {
+      return false;
+    }
+  })();
+  let outcome; // "pushed" | "committed-local"
+  if (args.noPush || !hasRemote) {
+    outcome = "committed-local";
+  } else {
+    try {
+      execFileSync("git", ["push", "--no-verify"], { cwd: root, stdio: "pipe" });
+      outcome = "pushed";
+    } catch (err) {
+      // A remote EXISTS but the push failed (network / auth). Surfaced, never swallowed,
+      // never reported as if it travelled. The commit is safe → exit 4.
+      console.error(
+        `⚠ comms:send — committed (${relPath}) but the PUSH to the remote FAILED: ${err?.message ?? err}`
+      );
+      console.error(
+        "   The commit is safe locally. Fix the remote/auth issue and `git push` to make it travel."
+      );
+      process.exit(4);
+    }
   }
 
   const branch = (() => {
@@ -309,7 +338,19 @@ if (isMain()) {
     }
   })();
   console.log(`✓ sent: ${relPath}`);
-  console.log(`  committed${args.noPush ? "" : " + pushed"} on ${branch}.`);
+  if (outcome === "pushed") {
+    console.log(`  committed + pushed on ${branch}.`);
+  } else {
+    // COMMITTED-LOCAL — the declared offline fallback (§2.2.1), with the mandatory warning.
+    const why = args.noPush ? "--no-push (deliberate)" : "no remote is configured";
+    console.log(`  committed on ${branch} — state: COMMITTED-LOCAL (${why}).`);
+    console.warn(
+      "  ⚠ LOCAL ONLY — not pushed. It will NOT reach other machines and is not backed up off this machine."
+    );
+    console.warn(
+      "    Push it as soon as a remote is available; the state reconciles to PUSHED then (CANON-MULTI-AGENT-ORCHESTRATION §2.2.1)."
+    );
+  }
   console.log(
     `  appears in ${String(args.to).toLowerCase()}'s inbox once on their lane: node tools/inbox.mjs ${String(args.to).toLowerCase()}`
   );
