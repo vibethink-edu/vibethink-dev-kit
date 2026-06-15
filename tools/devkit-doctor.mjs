@@ -81,6 +81,12 @@ const GATES = [
     targets: ["knowledge"],
     fix: "a markdown link points at a missing file, or a 'Piece #N' has no such catalog piece — --verbose names it",
   },
+  {
+    label: "tool versions",
+    engine: "check-tool-versions.mjs",
+    targets: ["tools/versions.json"],
+    fix: "a wired tool has no version in tools/versions.json (or a stale/malformed entry) — add or fix it",
+  },
 ];
 
 function firstExisting(paths) {

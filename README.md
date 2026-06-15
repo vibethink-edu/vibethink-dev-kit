@@ -369,6 +369,7 @@ consumer. **Both are load-bearing.**
 | **comms security** | secrets in outbound agent-to-agent messages | the governed send path, fail-closed |
 | **governance gate** | a declared governance instrument (mirror/log/register) that's missing or empty, or an undeclared decision-class binding (the "no silent default" rule) | `devkit-doctor` + the engine-tests CI job (config-driven; skips if not adopted) |
 | **canon cross-references** | a markdown link to a missing file, or a "Piece #N" with no such catalog piece — link-rot across the canon web | `devkit-doctor` + CI (producer-side; scans `knowledge/` + `setup/`) |
+| **tool versions** | a wired tool with no declared version (or a stale/malformed entry) in `tools/versions.json` — CANON-VERSIONING-001 §6 | `devkit-doctor` + CI (producer-side) |
 
 A norm without a gate is how governance dies politely. This repo's own
 maintenance rule was violated 14 times in a row while it was prose — zero times
