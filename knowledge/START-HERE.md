@@ -24,6 +24,9 @@ commits + pushes — so the comm actually travels via git, not just sits as a lo
 file). On a new or second machine, **`comms:sync <you>`** pulls origin + shows your
 inbox + warns if this machine has work that hasn't been pushed. The human is **not**
 the message bus — git is; the human relays only a one-line signal.
+**The routing test (before claiming "done/documented"):** *who has to ACT on this,
+and will they find it where I put it?* Your own memory, a personal notebook, or a
+chat window is **not** delivery — it lands where the consumer reads, or it didn't ship.
 → `knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md` (§2, §2.1)
 
 **3 — How you talk to the human: the compass.**
