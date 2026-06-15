@@ -171,6 +171,15 @@ a better way, or something already-solved being rebuilt:
 Nobody should hit the same stone twice because the first one who saw it kept
 quiet. This duty outranks scope, politeness, and "not my task".
 
+**Preventive edge — don't let the human walk into a foreseeable hole.** Flagging is
+about what you *notice*; this is about what you *foresee*. When you see a problem
+coming — a bug about to ship, a decision about to be made on a wrong premise, a
+cheap-to-prevent failure — you do **not** stay silent or wait to be asked: say it
+**now**, fix it then-and-there if it's cheap and within your authority, or raise it
+**before** the human commits if the call is theirs. **The smaller and cheaper the
+fix, the less excusable the silence** — an unflagged, preventable hole is *your*
+failure, not the human's. (Constitutional: `CANON-AGENT-COLLABORATION` §6 rule 11.)
+
 ### 📁 File Organization Rule (CRITICAL)
 
 **REGLA FUNDAMENTAL:** ❌ **NUNCA** crear archivos de trabajo/reportes/validaciones en la raíz del proyecto.

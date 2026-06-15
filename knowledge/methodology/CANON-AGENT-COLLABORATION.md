@@ -1,6 +1,6 @@
 # CANON-AGENT-COLLABORATION — Universal model for AI-agent ↔ human collaboration
 
-**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation · **§5.6 amendment SEALED 2026-06-06 by Marcelo (agnostic-lift A#20)** (empirical verification before recommending a costly technical change; lifted from ViTo `CANON-EMPIRICAL-VERIFICATION-BEFORE-RECOMMENDATION-001`) · **§6 rule 11 amendment 2026-06-15 (proposed — seals on merge): the advisor's duty not to let the human walk into a foreseeable, cheap-to-prevent hole** (sharpens the duty-to-flag with a preventive obligation + proportionality + the silence-is-the-failure asymmetry)
+**Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation · **§5.6 amendment SEALED 2026-06-06 by Marcelo (agnostic-lift A#20)** (empirical verification before recommending a costly technical change; lifted from ViTo `CANON-EMPIRICAL-VERIFICATION-BEFORE-RECOMMENDATION-001`) · **§6 rule 11 amendment SEALED 2026-06-15 by Marcelo (Principal Architect): the advisor's duty not to let the human walk into a foreseeable, cheap-to-prevent hole** (sharpens the duty-to-flag with a preventive obligation + proportionality + the silence-is-the-failure asymmetry)
 **Date:** 2026-05-25
 **Scope:** Every repo where AI agents (Claude, Codex, Cursor, Gemini, Windsurf, equivalents) collaborate with a human authority on design, code, or governance.
 
