@@ -482,9 +482,11 @@ verifica · Layer**.
 - **Cómo:**
   - Docs by reference — your `AGENTS.md` points to the canon.
   - Per-repo binding declared in a single file (e.g. `.versioning.yaml`) with: packages model + manager, apps model + pattern, canons numbering + approver, ADRs folder + pattern + immutability flag, tools model.
-  - Optional CI enforcement: `commitlint`, changeset bot, canon header validation, ADR immutability gate, changelog mandatory, health-endpoint version check.
+  - **Tools/scripts — enforcement shipped by the kit (so this norm bites for every heir, not just the kit).** Declare a `tools/versions.json` manifest (the kit's own is the worked example) listing every wired runnable (`tools/`+`setup/`: `.mjs`/`.sh`/`.ps1`) at `MAJOR.MINOR`. The kit's `tools/check-tool-versions.mjs` then verifies every runnable is declared (and no stale/malformed entry), and **`devkit-doctor` runs it automatically** — config-driven: a repo with no manifest is skipped (declare `N-A` if it has no custom runnables), one with a manifest is gated. Run from the mount; nothing copied.
+  - Optional CI enforcement for the other types: `commitlint`, changeset bot, canon header validation, ADR immutability gate, changelog mandatory, health-endpoint version check. (Canon-doc lifecycle vocabulary is already gated by `catalog-sync` here.)
 - **Verificar:**
   - The per-repo binding file exists and declares each artifact type's model.
+  - **`devkit-doctor` shows the `tool versions` gate green** (every wired runnable is in `tools/versions.json`) — or the repo has no custom runnables and consciously declares `N-A`.
   - A recent breaking change in a publishable package carries `!` in its commit message.
   - A recent ADR with status change to `SUPERSEDED-BY` has a body diff of zero lines (only status header touched).
   - The deployed app's `/healthz` (or equivalent) returns version + commit hash.
