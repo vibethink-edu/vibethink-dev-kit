@@ -180,12 +180,21 @@ multi-agent support is gated, not promised.
 **Any model, any vendor.** The neutral core names no model vendor — a CI check
 enforces it. Swap models or providers tomorrow; your governance doesn't notice.
 
-**Any platform.** The engines are pure Node (zero dependencies). **Validated on
-Linux** (the kit's own CI, every PR) and **Windows** (a consuming repo, daily);
-**macOS is landing now** with the first Mac heir — Node, git and bash are all present
-there, and the one Windows-ism that surfaced (`check-tools.sh` probing `python3`) is
-fixed, but the first green on a Mac is what will mark macOS *validated* rather than
-*expected*. Requirements: Node 20+, git, and bash (for the optional shell helpers).
+**Any platform.** The engines are pure Node (zero dependencies). Requirements:
+Node 20+, git, and bash (for the optional shell helpers).
+
+**Platform compatibility:**
+
+| OS | Status | Evidence |
+|---|---|---|
+| **Linux** | ✅ Validated | the kit's own CI runs every engine on each PR |
+| **Windows** | ✅ Validated | a consuming repo runs them daily |
+| **macOS** | 🟡 Expected — pending first green | first Mac heir landing; the one Windows-ism (`check-tools.sh` not probing `python3`) is fixed — a Mac running `devkit-doctor` green flips this to ✅ |
+
+> The core is cross-platform by construction (pure Node, `node:path`, LF/CRLF-neutral);
+> the only OS-specific surface is the optional bash/PowerShell helper scripts. macOS is
+> marked **expected, not validated** until a Mac actually runs green — honesty over a
+> checkmark we haven't earned.
 
 ---
 
