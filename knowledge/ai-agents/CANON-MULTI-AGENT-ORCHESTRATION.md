@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by Marcelo 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by Marcelo, Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.**
+> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by Marcelo 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by Marcelo, Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (proposed — seals on merge): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -47,6 +47,13 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
   comm/handoff that is not in your inbox, run `comms:sync` and check the sender's
   worktree/lane before concluding it does not exist; a missing comm is often a
   comm stranded in another worktree, not an absent one.
+- **The routing test (producer side — the mirror of §2.1's pull).** Before claiming
+  something is "documented" or "handed off", ask: ***who has to ACT on this, and
+  will they find it where I put it?*** Actionable knowledge is *delivered* only when
+  it lands where the consumer reads (their repo's channel / canon / ops) — **your
+  own memory, a personal notebook, or a chat window is NOT delivery.** The producer
+  hunts the routing gap; the human is never the one who discovers the consumer
+  cannot see it.
 - A receiving agent must self-orient before acting on any inbox item: compare the
   comm's `repo` / `ref_branch` / `ref_doc` / `ref_pr` / `target_layer` fields
   against its current working directory, branch, and methodology layer. If they
