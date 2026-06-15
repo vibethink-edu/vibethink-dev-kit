@@ -75,6 +75,12 @@ const GATES = [
     targets: ["tools/governance.config.json"],
     fix: "a declared instrument (mirror/log/register) or the decision-class binding is missing/empty — create it, or set it null for a conscious N-A",
   },
+  {
+    label: "canon cross-references",
+    engine: "check-canon-links.mjs",
+    targets: ["knowledge"],
+    fix: "a markdown link points at a missing file, or a 'Piece #N' has no such catalog piece — --verbose names it",
+  },
 ];
 
 function firstExisting(paths) {

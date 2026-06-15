@@ -152,6 +152,12 @@ jobs:
       - name: supra-map fresh + sound
         run: node tools/graph-canon.test.mjs
 
+      - name: canon cross-reference integrity
+        run: node tools/check-canon-links.mjs
+
+      - name: canon-links engine tests
+        run: node tools/check-canon-links.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
