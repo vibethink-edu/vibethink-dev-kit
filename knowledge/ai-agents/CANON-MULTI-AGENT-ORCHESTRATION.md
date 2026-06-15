@@ -33,6 +33,20 @@ Every "what happens next" falls into one of three lanes. Route it by its class.
   recipient inbox (`node tools/inbox.mjs <agent>`). If the command is unavailable,
   manually create the comm in the shared channel with valid front matter, then
   commit, push, and verify routing. The human must not be the reminder.
+- **A comm left in the sender's own feature branch is invisible to the recipient.**
+  The shared channel is the lane the recipient actually pulls — not whatever
+  worktree/branch you happened to author in. This bites hardest on a **cross-repo
+  handoff** (e.g. a vertical → dev-kit elevation): a comm with `to_agent: <other
+  repo>` committed only to *your* unmerged branch never reaches that repo's inbox.
+  Route it to the **recipient repo's lane** (`comms:send` resolves `repo`/`to_agent`;
+  if sending by hand, author the comm **in the recipient repo's worktree** and
+  push it there), then verify it appears in the recipient's inbox. The artifact a
+  cross-repo handoff *proposes* (a canon, a migration) likewise lands in the
+  **recipient repo's** worktree, never only in the sender's.
+- **Discovery side — search before declaring absent.** If you are referenced to a
+  comm/handoff that is not in your inbox, run `comms:sync` and check the sender's
+  worktree/lane before concluding it does not exist; a missing comm is often a
+  comm stranded in another worktree, not an absent one.
 - A receiving agent must self-orient before acting on any inbox item: compare the
   comm's `repo` / `ref_branch` / `ref_doc` / `ref_pr` / `target_layer` fields
   against its current working directory, branch, and methodology layer. If they
