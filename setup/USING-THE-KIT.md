@@ -127,6 +127,7 @@ Once adopted, the kit is mostly invisible — it shows up at these moments:
   spec-first / design-gate) and its **decision class** — Pieces #10a / #37.
 - **While working:** clean tree, one branch per task, `git -C` not `cd && git`,
   matchable commands so the permission gate doesn't stall you — Pieces #22 / #23 / #36.
+  (Claude Code users: set up your allowlist safely via [`CLAUDE-CODE-PERMISSIONS.md`](CLAUDE-CODE-PERMISSIONS.md).)
 - **On every PR:** the gates run (layering smoke, copy-parity, catalog-sync,
   comms-security) — green or they name what to fix.
 - **At session close:** declare each branch (PUSHED / READY-PR / DISCARDED), update
