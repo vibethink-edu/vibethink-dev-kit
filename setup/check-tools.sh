@@ -14,7 +14,7 @@ R="${1:-.}"; R="${R%/}"
 [ -d "$R" ] || { echo "✗ repo no existe: $R"; exit 2; }
 
 # ── señales de MÁQUINA (iguales para cualquier repo) ───────────────────
-gf_ver="$( { py -m pip show graphifyy 2>/dev/null || python -m pip show graphifyy 2>/dev/null; } | awk -F': ' '/^Version/{print $2; exit}')"
+gf_ver="$( { py -m pip show graphifyy 2>/dev/null || python3 -m pip show graphifyy 2>/dev/null || python -m pip show graphifyy 2>/dev/null; } | awk -F': ' '/^Version/{print $2; exit}')"
 gf_cli="$(command -v graphify 2>/dev/null || true)"
 rtk_bin="$(command -v rtk 2>/dev/null || ls "$HOME/.vtwb-tools/rtk/"*/rtk* 2>/dev/null | head -1 || ls "$HOME/.vt-tools/rtk/"*/rtk* 2>/dev/null | head -1 || true)"
 rtk_ver="$(printf '%s' "$rtk_bin" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
@@ -26,7 +26,7 @@ elif [ -n "$gf_ver" ]; then gf_state=nopath    # paquete instalado pero el CLI n
 fi
 gf_hint=""
 if [ "$gf_state" = nopath ]; then
-  ubase="$( { py -m site --user-base 2>/dev/null || python -m site --user-base 2>/dev/null; } )"
+  ubase="$( { py -m site --user-base 2>/dev/null || python3 -m site --user-base 2>/dev/null || python -m site --user-base 2>/dev/null; } )"
   case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) gf_hint="$ubase\\Scripts" ;; *) gf_hint="$ubase/bin" ;; esac
 fi
 rtk_machine=no; [ -n "$rtk_bin" ] && rtk_machine=si
