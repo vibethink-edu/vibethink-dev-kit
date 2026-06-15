@@ -24,6 +24,49 @@
 
 ---
 
+## 1.5 Fresh clone vs update — the two entry situations
+
+Two distinct situations, two short recipes. Both keep the kit as a **sibling**
+checkout next to your repo (`../_vibethink-dev-kit`) — never vendored inside it.
+
+**A) Fresh clone — you don't have the kit yet (a new machine, or a brand-new repo):**
+
+```bash
+# 1. get the kit as a sibling of your repo (read access required — ask the maintainer)
+git clone <kit-url> ../_vibethink-dev-kit
+# 2. confirm you're on the real default branch
+git -C ../_vibethink-dev-kit rev-parse --abbrev-ref HEAD   # expect: master
+```
+Then follow **§2 (the first hour)**: status doc → wire the layering smoke →
+60-second self-test.
+
+**B) Update — you already inherit the kit and want the latest law:**
+
+```bash
+# pull the latest sealed canon + engines (fast-forward only — no local kit edits)
+git -C ../_vibethink-dev-kit fetch origin && git -C ../_vibethink-dev-kit merge --ff-only origin/master
+```
+Because **canon inherits by reference, an update is mostly free** — your rules are
+now the latest the moment the kit is pulled; you re-sync nothing. After pulling,
+do these three checks (each ~10s):
+
+1. **Copied runnables still match?** → run copy-parity. If a script changed
+   upstream, parity goes **red** → re-copy that one file (it's the only thing that
+   needs a manual re-copy on update). `node ../_vibethink-dev-kit/tools/check-copy-parity.mjs tools/copy-parity.config.json --upstream-root ../_vibethink-dev-kit`
+2. **New pieces to consider?** → skim the catalog tail / the README "rules in plain
+   words" for entries above your last adopted number. Adopt one only if you feel its
+   pain — never for symmetry. Add a `PENDING`/`N-A` row for each new piece so your
+   status doc has no silent gaps.
+3. **More than one kit checkout on this machine?** → fast-forward **each** to
+   `master` (a stale mount causes *false drift*, not a real problem — see the
+   README "repo topology"). Never delete one as a "duplicate".
+
+> **Rule of thumb:** *clone once per machine; pull to update; re-copy only the
+> runnables parity flags; declare any new piece.* The law travels by reference — you
+> chase it, it doesn't chase you.
+
+---
+
 ## 2. The first hour (becoming a real heir, concretely)
 
 This is the **15-minute path** from the README, expanded with what each step *gets
