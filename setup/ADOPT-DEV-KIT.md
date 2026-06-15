@@ -919,6 +919,31 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   prompted; a boundary spec presented its design before sensitive code; the
   executor opened a draft PR and did not self-merge.
 
+### 37 — Change-path & decision classes (which path a change takes, whose approval) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md`.
+
+- **Qué:** the two orthogonal questions every change answers before work starts —
+  **which path** (process depth): **direct** (trivial + reversible + no contract) /
+  **spec-first** (a unit with a contract) / **design-gate** (boundary work —
+  identity / access / security / sensitive data — presents its design before the
+  sensitive code), with the explicit **cut** (top-down, first match wins); and
+  **whose approval** (decision class): **authority-sealed** (boundary / security /
+  sensitive-data / spend / public / **canon itself**) / **delegated-with-record**
+  (internal, via ADR) / **autonomous** (mechanical within a unit). Plus how
+  path × class compose and the contradiction guard.
+- **Cómo:** doc by reference. Adds the **decision rule** on top of Piece #10a §4
+  (which owns the pipeline layers); generalizes Piece #36 §8's design gate to any
+  contributor as one path; routes verification to Piece #26; names the authority
+  **classes** Piece #17 says the authority owns; registers approvals via Piece #34
+  §6. L3 binds the concrete class list, who the authority is per class, and the
+  path-cut thresholds.
+- **Verificar:** a recent boundary-touching change took the design-gate path and
+  carries an authority-sealed approval (register row); a trivial fix went direct
+  with no spec ceremony; the repo's root rules declare its class→authority binding
+  and its path cut (no silent default).
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -966,6 +991,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 34 | State mirror & decision register | ADOPTED / PENDING / N-A | mirror/log/register paths + authority classes |
 | 35 | Coder safe identity | ADOPTED / PENDING / N-A(no coders) | bot account + branch protection + credential env |
 | 36 | Coder orchestration | ADOPTED / PENDING / N-A(no coders) | allowlist + launch prompt + boundary/mechanical classes |
+| 37 | Change-path & decision classes | ADOPTED / PENDING / N-A | class→authority binding + path-cut thresholds |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
@@ -1076,3 +1102,12 @@ craft + design gate, consolidating the sealed command-hygiene findings F1–F9 a
 referencing #35's permission *policy* rather than restating it). #35 was authored
 in flight (its proposed registration deferred to this seal). The per-piece adoption
 table extended to #36; `N-A(no coders)` added for repos that launch no executors.
+
+**Update 2026-06-15 (seal — change-path & decision classes).** Sealed by the
+Principal Architect to close the gate-decision gap heirs hit after the governance
+seal: **1 piece added** (#37 change-path-and-decision-classes), after a
+coverage-check (none folded — it adds the *decision rule* on top of Piece #10a §4's
+pipeline layers, generalizes Piece #36 §8's design gate to any contributor as one
+path, and names the authority *classes* Piece #17 owns — a consuming repo's L3
+decision-class model lifted to agnostic canon so a new heir inherits it). The
+per-piece adoption table extended to #37.
