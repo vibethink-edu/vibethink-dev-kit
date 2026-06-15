@@ -3,7 +3,7 @@
 **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift A#8
 **Date:** 2026-06-05
 **Scope:** Every repo where one or more contributors — human or agent — create branches or worktrees. Cross-product (agnostic).
-**Companion canons:** [`CANON-GIT-HYGIENE`](./CANON-GIT-HYGIENE.md) (session hygiene this spine does not restate) · [`CANON-MULTI-AGENT-ORCHESTRATION`](../ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md) (coordination + the exit-state vocabulary this spine's exit gate produces) · [`CANON-NAMING-CONVENTIONS-001`](./CANON-NAMING-CONVENTIONS-001.md) (the branch & worktree naming pattern this spine consumes, §3).
+**Companion canons:** [`CANON-GIT-HYGIENE`](./CANON-GIT-HYGIENE.md) (session hygiene this spine does not restate) · [`CANON-MULTI-AGENT-ORCHESTRATION`](../ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md) (coordination + the exit-state vocabulary this spine's exit gate produces) · [`CANON-NAMING-CONVENTIONS-001`](./CANON-NAMING-CONVENTIONS-001.md) (the branch & worktree naming pattern this spine consumes, §3) · [`CANON-CODER-SAFE-IDENTITY-001`](../ai-agents/CANON-CODER-SAFE-IDENTITY-001.md) (binds a low-privilege executor identity to the worktree/worker lifecycle, §7).
 
 ---
 
