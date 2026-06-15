@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-06-15
+
+### Added
+
+- **Governance + orchestration canons sealed** (from a vertical's elevation handoff),
+  each registered as an ADOPT piece: **#34** `CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`
+  (present-mirror + append-only log + decision register, with a reusable L3 skeleton at
+  `setup/templates/governance-instruments/`); **#35** `CANON-CODER-SAFE-IDENTITY-001`
+  (low-privilege executor identity + per-session isolation); **#36**
+  `CANON-CODER-ORCHESTRATION-001` (command hygiene, the design gate, wave shape) +
+  `setup/RUNBOOK-LAUNCH-CODERS.md`; **#37** `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001`
+  (which path a change takes + whose approval); **#38** `CANON-DB-SECURITY-BASELINE-001`
+  (Postgres/Supabase exposed-schema floor, engine-specific); **#39**
+  `CANON-HUMAN-SURFACE-LEGIBILITY-001` (every human surface leads with the decision layer;
+  verbose-but-mute = defect).
+- **`tools/devkit-doctor.mjs`** — one-screen health board (verdict first, one line per
+  gate, the fix per red, `--verbose`/`--json`); the reference instance of piece #39. Now
+  the kit's "Am I governed?" one-command self-test.
+- **`setup/USING-THE-KIT.md`** — the adoption on-ramp (persona router · fresh-clone-vs-update
+  · worked example · the daily loop · adoption failure modes).
+- **`doc/decisions/DECISION-REGISTER.md`** — the kit dogfooding piece #34 (records its own
+  authority seals).
+- **`setup/CLAUDE-CODE-PERMISSIONS.md`** — harness adapter: a safe `settings.json` allowlist
+  for Claude Code users (what to never allowlist).
+- **`tools/comms-send.test.mjs`** — tests for the governed send, incl. the §2.2.1
+  COMMITTED-LOCAL fallback (wired into the engine-tests CI job).
+
+### Changed
+
+- **`CANON-MULTI-AGENT-ORCHESTRATION`** — §2.2.1 no-remote local-commit handoff fallback
+  (`COMMITTED-LOCAL` exit state + mandatory warning); §2 producer-side routing test
+  ("who has to ACT on this, and will they find it where I put it?"); §5.1 back-reference
+  to the surface-legibility law (#39).
+- **`tools/comms-send.mjs`** — splits commit (persistence) from push (travel): no remote /
+  `--no-push` degrades to `COMMITTED-LOCAL` + warning (exit 0), not a hard exit-4 failure.
+- **`tools/external-tools.lock.json` + `setup/EXTERNAL-TOOLS.md`** — graphify pin bumped to
+  `0.8.39` (exercised on a real machine); the "installed ≠ on PATH" gotcha closed in
+  `install-external-tools.{ps1,sh}` + `check-tools.sh`; `graphify-out/` added to the kit's
+  own `.gitignore`.
+- **`README.md` + `knowledge/START-HERE.md`** — the SUPRA model made legible ("The model in
+  90 seconds": supra-repo · L1/L2/L3 · inherit-by-reference vs copy · the seal); the
+  two-checkouts repo-topology note; "Am I governed?" now points to `devkit-doctor`.
+
 ## 2026-06-04
 
 ### Added

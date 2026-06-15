@@ -140,6 +140,9 @@ jobs:
       - name: catalog-sync tests
         run: node tools/check-catalog-sync.test.mjs
 
+      - name: comms-send tests
+        run: node tools/comms-send.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
