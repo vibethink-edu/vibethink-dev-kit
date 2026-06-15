@@ -17,6 +17,10 @@
     {
       "file": "knowledge/architecture/CANON-VERTICAL-UI-INHERITANCE-001.md",
       "reason": "DRAFT pending Principal Architect seal (added 2026-06-13). Proposed registration as ADOPT piece #32 + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md",
+      "reason": "DRAFT pending Principal Architect seal (added 2026-06-15). Closes the gate-decision gap for heirs: which path a change takes (direct / spec-first / design-gate) + the decision classes (authority-sealed / delegated-with-record / autonomous). Catalog section as an ADOPT piece + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [
