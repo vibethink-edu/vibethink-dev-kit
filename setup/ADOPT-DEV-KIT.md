@@ -1040,13 +1040,16 @@ A consuming repo can claim full adoption only when:
 If you are an agent landing in a consuming repo and want to understand the
 inheritance from scratch, read in this order:
 
-1. **`README.md`** of the kit (one-paragraph framing).
+1. **`README.md`** of the kit — the one-paragraph framing **+ "The model in 90
+   seconds"** (supra-repo · L1/L2/L3 · inherit by reference vs copy · the seal).
 2. **`knowledge/START-HERE.md`** (the 2-minute door).
-3. **`setup/INHERITANCE-CONTRACT.md`** (the heir's contract — how inheritance
+3. **`setup/USING-THE-KIT.md`** (the adoption on-ramp — *how to actually use it*:
+   who you are → your path · fresh clone vs update · a worked example · the daily loop).
+4. **`setup/INHERITANCE-CONTRACT.md`** (the heir's contract — how inheritance
    behaves: declare · never duplicate · override visibly).
-4. **`setup/ADOPT-DEV-KIT.md`** (this file — what you inherit, piece by piece).
-5. **`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`** (the detail for Pieces #2/#3/#4).
-6. The specific canon for whichever piece you are wiring next.
+5. **`setup/ADOPT-DEV-KIT.md`** (this file — what you inherit, piece by piece).
+6. **`setup/ADOPT-CROSS-AGENT-GOVERNANCE.md`** (the detail for Pieces #2/#3/#4).
+7. The specific canon for whichever piece you are wiring next.
 
 ---
 
