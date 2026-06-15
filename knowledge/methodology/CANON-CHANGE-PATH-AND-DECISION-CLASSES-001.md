@@ -1,6 +1,6 @@
 # CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 — Which path a change takes, and whose approval it needs
 
-**Status:** proposed 2026-06-15 — fire-tested on a vertical that ran trivial fixes, contract-bearing features, and boundary work (identity/access/sensitive data) side by side under one authority; **seals on merge** by the Principal Architect.
+**Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested on a vertical that ran trivial fixes, contract-bearing features, and boundary work (identity/access/sensitive data) side by side under one authority.
 **Date:** 2026-06-15
 **Scope:** Every repo where changes of different weight (trivial fixes, contract-bearing units, boundary-class work) flow under a governance authority — human or agent contributors alike. Vendor-neutral, product-neutral, harness-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -113,6 +113,6 @@ Forced by a recurring question from inheriting repos: *"does this go direct, spe
 
 **Coverage-check:** this canon adds the **decision rule** on top of `CANON-DEVELOPMENT-PROCESS` §4 (which owns the layers), generalizes `CANON-CODER-ORCHESTRATION-001` §8's gate to any contributor as one path, routes verification to `CANON-TESTING-GATE`, and names the authority **classes** that `CANON-AGENT-COLLABORATION` says the authority owns — registering them through `CANON-STATE-MIRROR-AND-DECISION-REGISTER-001` §6. It references each rather than duplicating; consuming repos keep only the concrete class list, authority, and thresholds.
 
-**Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent harness, person, or concrete class. PASS on authoring; re-confirm on seal.
+**Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent harness, person, or concrete class. PASS.
 
-**Proposed 2026-06-15 — awaiting seal by the Principal Architect (merge = seal).**
+**SEALED 2026-06-15 by the Principal Architect (merge = seal).**
