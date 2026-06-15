@@ -996,6 +996,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 35 | Coder safe identity | ADOPTED / PENDING / N-A(no coders) | bot account + branch protection + credential env |
 | 36 | Coder orchestration | ADOPTED / PENDING / N-A(no coders) | allowlist + launch prompt + boundary/mechanical classes |
 | 37 | Change-path & decision classes | ADOPTED / PENDING / N-A | class→authority binding + path-cut thresholds |
+| 38 | DB security baseline (Postgres/Supabase) | ADOPTED / PENDING / N-A(non-postgres) | migrations dir + advisor/lint command + CI gate wiring |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
@@ -1118,3 +1119,20 @@ pipeline layers, generalizes Piece #36 §8's design gate to any contributor as o
 path, and names the authority *classes* Piece #17 owns — a consuming repo's L3
 decision-class model lifted to agnostic canon so a new heir inherits it). The
 per-piece adoption table extended to #37.
+
+**Update 2026-06-15 (seal — DB security baseline, Postgres/Supabase).** Sealed by
+the Principal Architect from ViTo's W3–W7 advisor convergence: **1 piece added**
+(#38 db-security-baseline), after a coverage-check (none folded — Piece #30
+production-safety governs the shipped *artifact*; this owns the exposed
+*database*, a distinct surface). Deliberately **engine-specific** (Postgres +
+PostgREST/Supabase) at Marcelo's direction — its mechanisms (`PUBLIC` execute
+grant, RLS, `search_path`, the anon/authenticated/service_role model, the
+Supabase advisor) do not generalize to other engines, so non-Postgres repos mark
+it `N-A(non-postgres)` rather than inheriting it verbatim. Carries the
+`PUBLIC`-grant silent-no-op discovery (§3) and the self-testing-migration
+discipline (§9) as battle-proven rules, and names the **Supabase advisor as the
+CI/pre-cutover gate** (§8) so the warning classes cannot regrow. The per-piece
+adoption table extended to #38. Companion sharpening in the same seal: a
+cross-repo-handoff discovery rule added to `CANON-MULTI-AGENT-ORCHESTRATION` §2 (a
+comm left in the sender's own branch is invisible to the recipient; route it to
+the recipient repo's lane).
