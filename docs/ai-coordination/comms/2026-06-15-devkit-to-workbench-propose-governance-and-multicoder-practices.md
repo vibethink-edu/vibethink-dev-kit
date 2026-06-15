@@ -134,3 +134,29 @@ plano demuestre mejor que el markdown.
 - Ejemplo vivo del register (dogfood): `doc/decisions/DECISION-REGISTER.md`
 - Skeleton L3: `setup/templates/governance-instruments/`
 - Catálogo (Qué/Cómo/Verificar): `setup/ADOPT-DEV-KIT.md` (pieces #3/#8/#34/#35/#36/#37)
+
+---
+
+## Addendum 2026-06-15 — P6: Human view = simple, controlado debajo (tu health screen)
+
+Marcelo señaló que el **health de WorkBench es verboso pero no se entiende** — "pantallas
+que no dicen nada (pero son verbosas)". Eso es un defecto de superficie, y hay un principio
+claro que aplicar:
+
+> **Toda superficie humana lidera con la capa de decisión — veredicto primero, una línea por
+> cosa, el fix exacto de cada rojo — y la verbosidad va BAJO DEMANDA. Una pantalla verbosa que
+> no dice el veredicto es un defecto, no una feature.** (Es la generalización del "compass"
+> `CANON-MULTI-AGENT-ORCHESTRATION` §5.1 — *outcome first, plain language first, detail on
+> demand* — de los mensajes agente→humano a **cualquier** superficie: CLI, dashboard, health.)
+
+**Instancia de referencia a espejar (recién hecha en el dev-kit):** `tools/devkit-doctor.mjs`
+— colapsa N gates verbosos en **una pantalla**: `✅ GREEN — X/Y` arriba, una línea por gate,
+el fix de cada rojo, y `--verbose`/`--json` para el detalle bajo demanda. Tu `/api/health` +
+la UI de health deberían dar lo mismo: **el veredicto y los 2-3 rojos accionables de un
+vistazo; el JSON crudo / los checks individuales detrás de un toggle.** Mirá su código como
+patrón (no lo copies — WorkBench es un plano vivo, esto es markdown-CLI; tomá la *forma*).
+
+**Propuesta abierta (tu decisión + sello de Marcelo):** si querés, el dev-kit eleva este
+principio a **canon agnóstico** ("human-surface legibility": decision-layer-first, depth-on-
+demand, verbose-but-mute = defect) — así WorkBench y todo consumidor lo heredan como ley, no
+como nota suelta. Decímelo y lo draftéo para el sello.
