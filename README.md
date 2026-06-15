@@ -23,13 +23,56 @@ If your repo inherits this kit, these problems stop being yours to remember:
 |---|---|
 | *"Did an agent (or a teammate) quietly break our working rules?"* | the **layering smoke** runs on every PR: all agents and humans read the same root rules — no truncated copies, no contradictory parallel rulebooks. |
 | *"Is this copied script three months stale?"* | the **copy-parity gate** compares every copied runnable against its source and goes red on silent drift — you find out at commit time, not in an incident. |
-| *"Where was the rule about X written?"* | one **catalog** (31 pieces, each with *what you inherit · how · how to verify*) and a **one-page contract** — no archaeology across scattered docs. |
+| *"Where was the rule about X written?"* | one **catalog** (37 pieces, each with *what you inherit · how · how to verify*) and a **one-page contract** — no archaeology across scattered docs. |
 | *"What did we actually adopt, and what did we skip?"* | your repo carries a **status doc** with a strict vocabulary, and a validator rejects vague claims — adoption is declared, never folklore. |
 | *"Can we deviate without breaking the model?"* | yes — the contract's **override clause**: declare the rule, your replacement, the reason. Visible deviation is legitimate; silent deviation is the only sin. |
 | *"Did someone paste a secret into an agent-to-agent message?"* | the **comms security gate** scans every outbound message fail-closed before it ever travels. |
 | *"How do I start a new repo with the same standards?"* | the 15-minute path below — and the new repo inherits future rule improvements automatically, because it points at the source instead of holding a copy. |
 | *"Our docs say one thing and reality does another…"* | norms here ship **with their enforcement** — a rule that can't bite is treated as a defect of the kit itself (it's how this repo audits *itself*). |
 | *"We switched IDE or model — do our rules still hold?"* | adapters are one-line pointers to a single root, verified on every PR; the neutral core names no vendor, so switching costs nothing. |
+
+---
+
+## The model in 90 seconds — what "supra" means here
+
+This kit is a **supra-repo**: the governance layer that sits *above* every product
+and repo you run. Your repos are **heirs** — they **point up** at the kit; they
+don't copy it. If you only read one section, read this — it's the part people
+(maintainers included) most often mix up.
+
+**Three layers — who owns what:**
+
+| Layer | What it is | Where it lives | Example |
+|---|---|---|---|
+| **L1 — neutral canon** | vendor/product-neutral law (naming, git hygiene, testing, orchestration…) | **here**, `knowledge/` | *"keep an append-only log of decisions"* |
+| **L2 — house binding** | the kit owner's concrete instantiation of an L1 skeleton | **here**, marked L2 (e.g. VT-Method binds the L1 development process) | *"the gate questions are A–G"* |
+| **L3 — consumer instantiation** | the concrete file names, accounts, thresholds a product fills in | **in that product's repo — never here** | *"our log is `ORCHESTRATION-LOG.md`"* |
+
+> A canon prescribes the *role*; your repo picks the *name/value*. The canon says
+> **what** and **why**; L3 binds the **which file / which account / which threshold**.
+
+**Two ways things inherit — and they are different on purpose:**
+
+- **Canon & docs → by reference.** Your repo *points* at the kit's doc; it never
+  holds a copy. A copied canon is a second truth that rots. **Canon is NOT
+  copy-parity-tracked** — adding a new canon needs no consumer change; heirs read it
+  in place.
+- **Runnables (scripts) → by verbatim copy + the copy-parity gate.** A script must
+  run without the kit mounted, so it's copied — and the drift guard proves the copy
+  still matches its source.
+
+**How a rule becomes law — the seal:** a new canon lands as **DRAFT/proposed**. It
+must be registered as a **piece** in the catalog ([`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md))
+or the `catalog-sync` gate stays **red** (an uncatalogued law is the failure this
+gate exists for). **Only the Principal Architect seals — and *merge = seal*:** when
+the PR merges, the canon's status flips to `SEALED` and it becomes an adoptable
+piece. No contributor (human or agent) widens the law alone; an agent can't even
+loosen its own permission gates — the same least-privilege rule the canon preaches.
+
+**A canon vs a piece vs a template:** the **canon** (`knowledge/CANON-*.md`) is the
+law; the **piece** (a numbered section in `ADOPT-DEV-KIT.md`) is its adoptable entry
+(*what you inherit · how · how to verify*); a **template/skeleton**
+(`setup/templates/…`) is a copy-and-rename starter for the L3 instance.
 
 ---
 
@@ -60,6 +103,9 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 19 | Skills over roles | Generalist agents with a toolbox of skills, not 35 permanently-titled specialists; skills are measured (eval loop). |
 | 20 | Context hygiene | An agent's memory degrades silently as it fills: persist to disk, cut the session in time, never steer a poisoned context back. |
 | 21 | Pre-production discipline | Before the first real user: deletion is the default, ceremony is a bug — but safety gates never switch off. |
+| 34 | State mirror & decision register | Three governance instruments: a **present-mirror** (state on one page; if it's stale, reality wins), an **append-only log** (history), and a **decision register** (who authorized what, when, through which channel, with what evidence — distinct from the ADR). |
+| 35 | Coder safe identity | An autonomous coder pushes as a **low-privilege bot** (propose-only, can't merge or bypass); a separate owner reviews and merges; they never share a credential in one session. The lock is real only if the executor is on the wrong side of it. |
+| 36 | Coder orchestration | Run a coder long and autonomous **without stalling on permission prompts** (the prompt fires on matchability, not danger) **and without crossing the gates** (identity / destruction / secrets stay gated; boundary work presents its design first). |
 
 ### 🌿 Git and the lifecycle of work
 
@@ -71,6 +117,7 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 7 | Paused work lifecycle | Paused work is either declared-with-intent or reapable after N days — nothing floats forever. |
 | 10a | Development process (universal skeleton) | Governance precedes code: slice → decision gate → spec → governed execution → artifacts; **the plan carries a security section**; **suppressing a gate = a registered, expiring exemption**. |
 | 10b | House methodology (L2 binding) | The kit owner's concrete instantiation of the skeleton (gate questions, spec pipeline). Non-house repos: declare N-A and bind 10a natively. |
+| 37 | Change-path & decision classes | Two questions every change answers up front: **which path** (direct / spec-first / design-gate) and **whose approval** (authority-sealed / delegated-with-record / autonomous). Kills the "do I just do it, or spec it, or ask?" guesswork — and canon changes are always authority-sealed. |
 
 ### ✅ Quality: testing and review
 
@@ -253,7 +300,7 @@ Full text: [`setup/INHERITANCE-CONTRACT.md`](setup/INHERITANCE-CONTRACT.md).
 ```
 setup/
   INHERITANCE-CONTRACT.md           ← read first: the heir's one-page contract
-  ADOPT-DEV-KIT.md                  ← the catalog: 31 pieces (Qué/Cómo/Verificar/Layer)
+  ADOPT-DEV-KIT.md                  ← the catalog: 37 pieces (Qué/Cómo/Verificar/Layer)
   ADOPT-CROSS-AGENT-GOVERNANCE.md   ← step-by-step runbook for the agent-governance pieces
   templates/                        ← copy-paste starters (status doc, …)
 knowledge/
@@ -267,8 +314,29 @@ tools/                              ← engines (pure Node, zero deps) + their t
 doc/decisions/                      ← this repo's own ADRs (it eats its own cooking)
 ```
 
-23 principle documents ("spines"), 31 catalogued pieces, every engine tested at
-the source — consumers never re-test or fork an engine.
+30 principle documents ("spines"), 37 catalogued pieces, every engine tested at
+the source — consumers never re-test or fork an engine. (`ADOPT-DEV-KIT.md` is the
+source of truth for the piece count — the `catalog-sync` gate keeps it honest.)
+
+---
+
+## The kit's own repo topology — don't delete a "duplicate" checkout
+
+A subtle one that bites even maintainers: on one machine the kit may be **checked
+out more than once — and that's by design, not clutter.** Each heir's copy-parity
+resolves the kit as a **sibling** (e.g. `../_vibethink-dev-kit`), but heirs sit at
+**different directory depths**, so each needs the sibling at *its* level. In this
+family, for example, a top-level checkout (`_vibethink-dev-kit`) is the mount for a
+top-level consumer, while a checkout nested one level down is the mount for a nested
+consumer. **Both are load-bearing.**
+
+- **Don't delete one as a "phantom duplicate."** Removing a consumer's mount breaks
+  its drift guard — copy-parity fails closed (`upstreamRoot must exist`).
+- **A stale checkout is not a phantom — it's just behind.** The symptom (false drift,
+  or a tool that "isn't there") is fixed by syncing, not deleting:
+  `git -C <checkout> fetch origin && git -C <checkout> merge --ff-only origin/master`.
+- **Rule:** keep *every* checkout fast-forward-synced to `master`; consolidate to one
+  only after repointing each consumer's `upstreamRoot` first.
 
 ---
 
@@ -302,10 +370,17 @@ since it became a gate. That lesson is baked into everything here.
 ## For maintainers (producer side)
 
 - A new agnostic piece (canon, ADR, engine) **must land with its catalog
-  section in the same PR** — the `catalog-sync` gate makes that bite.
+  section in the same PR** — the `catalog-sync` gate makes that bite. (A DRAFT
+  canon may instead carry a **declared exemption** in `tools/catalog-sync.config.json`
+  until it's sealed; the exemption is removed and the piece added *at* the seal.)
 - Principle docs carry a controlled `Status:` vocabulary (`SEALED / approved /
   CANON / DRAFT / PROPOSED / process protocol / BASELINE`) — also gated.
-- Only the named authority seals canon. Sealed = committed + pushed.
+- **The seal flow:** a canon lands `proposed/DRAFT` → on approval, the same PR flips
+  its status to `SEALED`, removes any exemption, and registers its catalog piece.
+  **Only the Principal Architect seals, and *merge = seal*.** No one — human or
+  agent — widens the law alone; the harness even refuses to let an agent loosen its
+  own permission gates on a vague instruction (a human adds the rule explicitly).
+- Sealed = committed + pushed (immutable).
 - Engines are tested **once, here** (`npm run validate:agent-context`, plus
   each engine's `*.test.mjs`). Consumers call or copy them — never fork.
 

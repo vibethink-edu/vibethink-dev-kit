@@ -50,6 +50,11 @@ make them translate or copy content).
 - **Build on real pain.** Don't add machinery — or canon — ahead of demonstrated need.
 - **Inheriting this kit?** The heir's contract is `setup/INHERITANCE-CONTRACT.md`
   (declare your adoption · never duplicate a doc · override visibly, never silently).
+- **This kit is a *supra-repo*** — the governance layer above every product.
+  **L1** neutral canon lives here; **L2** house bindings live here; **L3** concrete
+  instantiation (file names, accounts, thresholds) lives in *each product's* repo,
+  never here. Canon inherits **by reference**; runnable scripts **by copy + a parity
+  gate**. → the README's "The model in 90 seconds" + `setup/INHERITANCE-CONTRACT.md`.
 - **Per-product specifics** live in that product's own `AGENTS.md`, never here.
 
 ## Your first task (prove you've got it)
