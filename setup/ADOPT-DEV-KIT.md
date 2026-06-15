@@ -972,6 +972,27 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   on unmet invariant; no SECDEF function in the exposed schema is anon-executable
   except a documented allowlist entry.
 
+### 39 — Human-surface legibility (verdict first, depth on demand) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-HUMAN-SURFACE-LEGIBILITY-001.md`.
+
+- **Qué:** every human-facing surface (CLI output, dashboard/UI health, status report,
+  log, API health endpoint, agent→human message) **leads with the decision layer** —
+  verdict first, one line per item, the fix for each red, **depth on demand**, no
+  silent gaps (what was skipped is stated). The named anti-pattern: **verbose-but-mute**
+  — a wall the human must read end-to-end to learn the one thing that matters. The cure
+  is inverting the order (verdict on top), not adding a summary at the bottom.
+- **Cómo:** doc by reference. Generalizes the **compass** (Piece #3 / `CANON-MULTI-AGENT-
+  ORCHESTRATION` §5.1) from agent→human *messages* to **any** surface; sibling to Piece
+  #25 (audit = *does it lie?*; this = *can a human read the verdict in one glance?*).
+  Reference instances: the compass (messages) + `tools/devkit-doctor.mjs` (CLI). L3
+  binds the concrete depth-on-demand mechanism (`--verbose`, a UI toggle), the verdict
+  vocabulary, and the styling.
+- **Verificar:** a recent human-facing surface (a health view, a CLI, a report) states
+  its verdict in the first glance and puts detail behind a flag/toggle; a red names the
+  fix, not just "FAILED"; skipped/not-run items are shown, never silently absent.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -1021,6 +1042,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 36 | Coder orchestration | ADOPTED / PENDING / N-A(no coders) | allowlist + launch prompt + boundary/mechanical classes |
 | 37 | Change-path & decision classes | ADOPTED / PENDING / N-A | class→authority binding + path-cut thresholds |
 | 38 | DB security baseline (Postgres/Supabase) | ADOPTED / PENDING / N-A(non-postgres) | migrations dir + advisor/lint command + CI gate wiring |
+| 39 | Human-surface legibility | ADOPTED / PENDING / N-A | depth-on-demand mechanism + verdict vocabulary per surface |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
@@ -1160,3 +1182,12 @@ adoption table extended to #38. Companion sharpening in the same seal: a
 cross-repo-handoff discovery rule added to `CANON-MULTI-AGENT-ORCHESTRATION` §2 (a
 comm left in the sender's own branch is invisible to the recipient; route it to
 the recipient repo's lane).
+
+**Update 2026-06-15 (seal — human-surface legibility).** Sealed by the Principal
+Architect: **1 piece added** (#39 human-surface-legibility), after a coverage-check
+(none folded — it **generalizes** the compass `CANON-MULTI-AGENT-ORCHESTRATION` §5.1
+from agent→human *messages* to *any* human-facing surface, and is a sibling of Piece
+#25 audit: that asks *does it lie?*, this asks *can a human read the verdict in one
+glance?*). Born from a verbose-but-mute health screen; reference instances are the
+compass (messages) and `tools/devkit-doctor.mjs` (CLI). The per-piece adoption table
+extended to #39, and the compass §5.1 now carries a back-reference to this surface law.
