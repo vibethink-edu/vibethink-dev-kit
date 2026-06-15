@@ -1,0 +1,10 @@
+{
+  "_schema": "VIBETHINK_GOVERNANCE_V1",
+  "_doc": "The kit dogfooding its own governance gate (#34/#37). The kit is a library, not a live delivery, so it has no present-mirror (N-A). Its history is the CHANGELOG; its authority approvals live in the decision register; its decision-class binding (canon = authority-sealed) is declared in that register's header per CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.",
+  "instruments": {
+    "presentMirror": null,
+    "appendOnlyLog": "CHANGELOG.md",
+    "decisionRegister": "doc/decisions/DECISION-REGISTER.md"
+  },
+  "decisionClasses": "doc/decisions/DECISION-REGISTER.md"
+}

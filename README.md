@@ -363,6 +363,7 @@ consumer. **Both are load-bearing.**
 | **catalog-sync** | a principle added without its catalog entry; a missing or off-vocabulary Status header; a contract nobody routes to | every PR, producer-side |
 | **copy-parity** | a copied runnable drifting from its source — or an adaptation nobody declared | consumer-side (workflow input or pre-commit) |
 | **comms security** | secrets in outbound agent-to-agent messages | the governed send path, fail-closed |
+| **governance gate** | a declared governance instrument (mirror/log/register) that's missing or empty, or an undeclared decision-class binding (the "no silent default" rule) | `devkit-doctor` + the engine-tests CI job (config-driven; skips if not adopted) |
 
 A norm without a gate is how governance dies politely. This repo's own
 maintenance rule was violated 14 times in a row while it was prose — zero times

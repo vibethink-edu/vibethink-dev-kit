@@ -871,7 +871,10 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   log *concept* (Piece #10a §5) nor the audit-finding ledger (Piece #25 §4).
 - **Verificar:** the repo's present-mirror was current at last session close; an
   authority approval given this period has a register row with channel + evidence;
-  the log was appended to at each substantive step.
+  the log was appended to at each substantive step. **Mechanically:** declare the
+  instrument paths in `tools/governance.config.json` (see `governance.config.example.json`)
+  and `check-governance.mjs` (the `governance gate`, also in `devkit-doctor`) verifies
+  each declared instrument exists and is non-empty — a `null` is a conscious N-A.
 
 ### 35 — Coder safe identity (low-privilege executor + session isolation) (universal L1)
 
@@ -946,7 +949,9 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 - **Verificar:** a recent boundary-touching change took the design-gate path and
   carries an authority-sealed approval (register row); a trivial fix went direct
   with no spec ceremony; the repo's root rules declare its class→authority binding
-  and its path cut (no silent default).
+  and its path cut (no silent default). **Mechanically:** the `decisionClasses` path
+  in `tools/governance.config.json` must point at a real, non-empty binding —
+  `check-governance.mjs` fails if it is missing (the "no silent default" rule, gated).
 
 ### 38 — DB security baseline (exposed Postgres/Supabase security floor) (engine-specific L1)
 
@@ -1191,3 +1196,14 @@ from agent→human *messages* to *any* human-facing surface, and is a sibling of
 glance?*). Born from a verbose-but-mute health screen; reference instances are the
 compass (messages) and `tools/devkit-doctor.mjs` (CLI). The per-piece adoption table
 extended to #39, and the compass §5.1 now carries a back-reference to this surface law.
+
+**Update 2026-06-15 (governance gate — making #34/#37 bite).** Pieces #34 and #37 were
+canon-as-prose with no mechanical enforcement (the honest gap from the self-audit). Added
+**`tools/check-governance.mjs`** + `governance.config.example.json`: a config-driven gate
+that verifies declared governance instruments (mirror/log/register) exist and are
+non-empty, and that the decision-class binding is declared (the "no silent default" rule
+of #37). Deliberately non-bureaucratic — config-driven (paths are L3), `null` = conscious
+N-A, no config = the gate does not apply (the doctor skips it). Wired into `devkit-doctor`
+(now a gate it runs) and the engine-tests CI job, with `tools/check-governance.test.mjs`.
+The kit dogfoods it (`tools/governance.config.json`: CHANGELOG as the log, the
+DECISION-REGISTER as register + class binding, present-mirror N-A as a library).

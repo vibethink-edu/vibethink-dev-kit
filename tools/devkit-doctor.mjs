@@ -69,6 +69,12 @@ const GATES = [
     targets: ["tools/tenant-contamination.config.json"],
     fix: "a tenant/product name leaked into a neutral core file — --verbose names file:line",
   },
+  {
+    label: "governance instruments",
+    engine: "check-governance.mjs",
+    targets: ["tools/governance.config.json"],
+    fix: "a declared instrument (mirror/log/register) or the decision-class binding is missing/empty — create it, or set it null for a conscious N-A",
+  },
 ];
 
 function firstExisting(paths) {
