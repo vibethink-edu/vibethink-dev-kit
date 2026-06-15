@@ -1,0 +1,10 @@
+{
+  "_schema": "VIBETHINK_GOVERNANCE_V1",
+  "_doc": "Consumer-side declaration for the governance gate (check-governance.mjs). The canon (CANON-STATE-MIRROR-AND-DECISION-REGISTER-001 #34, CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 #37) prescribes the ROLES; you bind the concrete L3 paths here. A path → must exist + be non-empty. `null` → a CONSCIOUS N-A (reported, never a failure). Copy to tools/governance.config.json and fill in. No file → the gate does not apply (the doctor skips it).",
+  "instruments": {
+    "presentMirror": "ORCHESTRATION-DASHBOARD.md",
+    "appendOnlyLog": "ORCHESTRATION-LOG.md",
+    "decisionRegister": "doc/decisions/DECISION-REGISTER.md"
+  },
+  "decisionClasses": "AGENTS.md"
+}
