@@ -82,6 +82,18 @@ test("code-block / external / placeholder links are not flagged", () => {
   assert.match(out, /GREEN/);
 });
 
+// 4b. templates/ is payload (links resolve post-copy) → NOT scanned, even if broken
+test("setup/templates/ links are not scanned", () => {
+  const d = repo({
+    "knowledge/a.md": "real [ok](./b.md)\n",
+    "knowledge/b.md": "hi\n",
+    "setup/templates/t.md": "this [points](./nope-after-copy.md) at a consumer file\n",
+  });
+  const { code, out } = run(d);
+  assert.equal(code, 0, `templates must be skipped, got ${code}\n${out}`);
+  assert.match(out, /GREEN/);
+});
+
 // 5. no docs at all → setup error, exit 2
 test("no docs → exit 2", () => {
   const d = mkdtempSync(path.join(os.tmpdir(), "links-test-"));

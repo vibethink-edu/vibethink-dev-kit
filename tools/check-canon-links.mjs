@@ -28,7 +28,9 @@ const bold = (s) => `\x1b[1m${s}\x1b[0m`;
 function walk(dir, acc) {
   if (!existsSync(dir)) return acc;
   for (const e of readdirSync(dir)) {
-    if (e === "node_modules" || e.startsWith(".git")) continue;
+    // `templates/` holds copy-and-rename payload — its links resolve in the CONSUMER's
+    // repo after copying, not here, so checking them in place is a false positive.
+    if (e === "node_modules" || e.startsWith(".git") || e === "templates") continue;
     const p = join(dir, e);
     const st = statSync(p);
     if (st.isDirectory()) walk(p, acc);

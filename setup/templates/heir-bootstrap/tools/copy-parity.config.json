@@ -1,0 +1,5 @@
+{
+  "_doc": "Copy-parity (drift guard) config. Starts at 'no copies' — most repos inherit docs by reference and copy NO runnables (declare N-A(no copies) in your status doc). If you DO copy a kit engine into your repo, add an entry: { local: 'tools/x.mjs', upstream: 'tools/x.mjs' } and the gate proves it stays byte-identical to the kit. Engine: ../_vibethink-dev-kit/tools/check-copy-parity.mjs",
+  "upstreamRoot": "../_vibethink-dev-kit",
+  "copies": []
+}

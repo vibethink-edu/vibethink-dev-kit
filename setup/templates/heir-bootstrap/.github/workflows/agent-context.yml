@@ -1,0 +1,14 @@
+# Heir CI — the cross-agent layering smoke (the first gate, reusable workflow).
+# Copy to .github/workflows/agent-context.yml in your repo. The engine is the kit's
+# (no copy); your repo supplies only tools/agent-context.config.json. Pin @master to
+# the kit's REAL default branch. See ../_vibethink-dev-kit/setup/ADOPT-CROSS-AGENT-GOVERNANCE.md
+name: agent-context
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+jobs:
+  agent-context:
+    uses: vibethink-edu/vibethink-dev-kit/.github/workflows/agent-context.yml@master
+    with:
+      config-path: tools/agent-context.config.json
