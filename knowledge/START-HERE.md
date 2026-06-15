@@ -72,3 +72,6 @@ point, ask: **where am I · what happened · what's missing.**
 
 *This is the door. The rooms behind it (the canons) are for depth on demand — you are
 the navigator, not the investigator.*
+
+*Want the map of all the rooms? → [`SUPRA-MAP.md`](SUPRA-MAP.md) — the canon constellation,
+auto-generated, in one diagram.*

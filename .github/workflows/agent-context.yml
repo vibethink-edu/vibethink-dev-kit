@@ -149,6 +149,9 @@ jobs:
       - name: governance gate tests
         run: node tools/check-governance.test.mjs
 
+      - name: supra-map fresh + sound
+        run: node tools/graph-canon.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
