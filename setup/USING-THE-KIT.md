@@ -69,6 +69,11 @@ do these three checks (each ~10s):
 
 ## 2. The first hour (becoming a real heir, concretely)
 
+> **Shortcut — don't assemble by hand.** Starting a new repo? Copy the bundle in
+> [`templates/heir-bootstrap/`](templates/heir-bootstrap/) (AGENTS.md, the two configs,
+> the CI workflow, a first-agent prompt), fill the `<slots>`, run the doctor. It's the
+> path below, pre-wired.
+
 This is the **15-minute path** from the README, expanded with what each step *gets
 you* — do them in order; stop when you've got value, not when you've done all 37.
 

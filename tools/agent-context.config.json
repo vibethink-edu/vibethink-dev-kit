@@ -19,7 +19,7 @@
   "maxAdapterBytes": 6144,
   "nonAdapterAgentFiles": ["AI_AGENT_COMPATIBILITY.md"],
   "agentFilePattern": "^(CLAUDE|CODEX|COPILOT_INSTRUCTIONS|WINDSURFRULES|GEMINI|AGENTS|AGENTS_GOLDEN)\\.md$",
-  "agentFileAllowlist": [],
+  "agentFileAllowlist": ["setup/templates/heir-bootstrap/AGENTS.md"],
   "_agentFileAllowlistNote": "Repo-wide paths whose basename matches agentFilePattern but which are NOT agent-rules constitutions (templates, examples, integration docs). Empty after the 2026-05-23 legacy reap removed the two former entries (a generated v1 project-constitution and Gemini integration docs). Check #6 scans the whole repo (finding #2): the root authority (rootRulesFile) + declared adapters are auto-legit; everything else matching the pattern must be allowlisted here or it is flagged as a parallel constitution.",
   "requiredAnchorsInRoot": ["CANON-CROSS-AGENT-CONTEXT-LAYERING"],
   "_brandExclusionNote": "L1 neutrality fire-test (canon §8 / finding F1): the neutralL1Files below must name no product/brand. Word-boundary + case-insensitive. Org/methodology names (VibeThink, VT-Method) may appear in L2/portal docs (e.g. START-HERE, VT-METHOD), never in these neutral cores.",

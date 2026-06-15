@@ -1,0 +1,10 @@
+{
+  "_doc": "Layering-smoke config (the check-agent-context engine). Verifies every agent reads the SAME intact root rulebook. Edit: 'adapters' to the per-agent pointer files you actually have; 'agentBudgets' if you add an agent. rootRulesFile/canonFile usually stay. Full field reference: ../_vibethink-dev-kit/setup/ADOPT-CROSS-AGENT-GOVERNANCE.md",
+  "rootRulesFile": "AGENTS.md",
+  "canonFile": "../_vibethink-dev-kit/knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md",
+  "agentsDir": ".",
+  "agentBudgets": { "codex": 32768, "copilot": 32768, "windsurf": 32768, "claude": 1000000 },
+  "adapters": [{ "agent": "claude", "file": "CLAUDE.md" }],
+  "maxAdapterBytes": 6144,
+  "requiredAnchorsInRoot": ["AGENTS_UNIVERSAL"]
+}
