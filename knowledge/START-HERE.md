@@ -56,6 +56,8 @@ make them translate or copy content).
   never here. Canon inherits **by reference**; runnable scripts **by copy + a parity
   gate**. → the README's "The model in 90 seconds" + `setup/INHERITANCE-CONTRACT.md`.
 - **Per-product specifics** live in that product's own `AGENTS.md`, never here.
+- **Want the "how do I actually use/adopt this" on-ramp?** → `setup/USING-THE-KIT.md`
+  (routes you by who you are, with a worked example + the daily loop).
 
 ## Your first task (prove you've got it)
 

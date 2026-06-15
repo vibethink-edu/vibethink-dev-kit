@@ -74,6 +74,11 @@ law; the **piece** (a numbered section in `ADOPT-DEV-KIT.md`) is its adoptable e
 (*what you inherit · how · how to verify*); a **template/skeleton**
 (`setup/templates/…`) is a copy-and-rename starter for the L3 instance.
 
+> **Now — how do you actually *use* it?** → **[`setup/USING-THE-KIT.md`](setup/USING-THE-KIT.md)**:
+> the adoption on-ramp that routes you by who you are (new dev · new repo · agent ·
+> maintainer), with a worked example and the daily loop. A kit dies from
+> *non-adoption*, not bad rules — that file is the antidote.
+
 ---
 
 ## The rules, in plain words — the whole catalog, one line each
@@ -299,6 +304,7 @@ Full text: [`setup/INHERITANCE-CONTRACT.md`](setup/INHERITANCE-CONTRACT.md).
 
 ```
 setup/
+  USING-THE-KIT.md                  ← the adoption on-ramp: who you are → how to use it
   INHERITANCE-CONTRACT.md           ← read first: the heir's one-page contract
   ADOPT-DEV-KIT.md                  ← the catalog: 37 pieces (Qué/Cómo/Verificar/Layer)
   ADOPT-CROSS-AGENT-GOVERNANCE.md   ← step-by-step runbook for the agent-governance pieces
