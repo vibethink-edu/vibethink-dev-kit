@@ -18,7 +18,17 @@ gf_ver="$( { py -m pip show graphifyy 2>/dev/null || python -m pip show graphify
 gf_cli="$(command -v graphify 2>/dev/null || true)"
 rtk_bin="$(command -v rtk 2>/dev/null || ls "$HOME/.vtwb-tools/rtk/"*/rtk* 2>/dev/null | head -1 || ls "$HOME/.vt-tools/rtk/"*/rtk* 2>/dev/null | head -1 || true)"
 rtk_ver="$(printf '%s' "$rtk_bin" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
-gf_machine=no; { [ -n "$gf_ver" ] || [ -n "$gf_cli" ]; } && gf_machine=si
+# graphify: "instalado" (paquete presente) NO implica "disponible" (CLI resuelve por
+# nombre). El gotcha "instalado != en PATH" hizo que 5 ejecutores lo vieran unavailable.
+gf_state=none   # none | nopath | ok
+if   [ -n "$gf_cli" ]; then gf_state=ok        # el CLI graphify RESUELVE por nombre → usable
+elif [ -n "$gf_ver" ]; then gf_state=nopath    # paquete instalado pero el CLI no resuelve (PATH)
+fi
+gf_hint=""
+if [ "$gf_state" = nopath ]; then
+  ubase="$( { py -m site --user-base 2>/dev/null || python -m site --user-base 2>/dev/null; } )"
+  case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) gf_hint="$ubase\\Scripts" ;; *) gf_hint="$ubase/bin" ;; esac
+fi
 rtk_machine=no; [ -n "$rtk_bin" ] && rtk_machine=si
 
 # ── señales por-REPO ───────────────────────────────────────────────────
@@ -37,11 +47,22 @@ rtk_repo=no; [ "${rtk_ref:-0}" -gt 0 ] && rtk_repo=si
 mlabel(){ [ "$2" = si ] && echo "instalado ${3:-?}" || echo "NO instalado"; }
 rlabel(){ [ "$2" = si ] && echo "$3" || echo "no"; }
 
+case "$gf_state" in
+  ok)     gf_m="disponible ${gf_ver:-?}" ;;
+  nopath) gf_m="instalado ${gf_ver:-?} · NO en PATH" ;;
+  *)      gf_m="NO instalado" ;;
+esac
+
 echo "REPO: $(basename "$R")"
 echo "────────────────────────────────────────────────────────────────────"
 printf '  %-9s %-7s  %s\n' "SpecKit" "[$sk]" "repo-embebido · .specify=$sk_specify · speckit.*=$sk_cmds · parity→kit=$sk_parity"
-printf '  %-9s máquina:[%-15s]  repo:[%-3s]  (graphify-out=%s · refs=%s)\n' \
-       "graphify" "$(mlabel x "$gf_machine" "$gf_ver")" "$(rlabel x "$gf_repo" usa)" "$gf_out" "$gf_ref"
-printf '  %-9s máquina:[%-15s]  repo:[%-7s] (refs=%s)\n' \
+printf '  %-9s máquina:[%-26s]  repo:[%-3s]  (graphify-out=%s · refs=%s)\n' \
+       "graphify" "$gf_m" "$(rlabel x "$gf_repo" usa)" "$gf_out" "$gf_ref"
+printf '  %-9s máquina:[%-26s]  repo:[%-7s] (refs=%s)\n' \
        "RTK" "$(mlabel x "$rtk_machine" "$rtk_ver")" "$(rlabel x "$rtk_repo" declara)" "$rtk_ref"
 echo "────────────────────────────────────────────────────────────────────"
+if [ "$gf_state" = nopath ]; then
+  echo "  ⚠ graphify instalado pero el CLI no RESUELVE por nombre (gotcha 'instalado ≠ disponible')."
+  [ -n "$gf_hint" ] && echo "    Agregá al PATH:  $gf_hint"
+  echo "    Ojo stale-shell: un shell ya abierto congela su PATH — abrí uno NUEVO tras arreglarlo."
+fi

@@ -47,6 +47,23 @@ foreach ($t in $lock.tools) {
           else { $summary += "⚠ $($t.name): pip falló (¿Python ausente?) — degrada, no bloquea" }
         } else { $summary += "· $($t.name): se instalaría $($t.pin) (dry-run)" }
       }
+
+      # gotcha "instalado ≠ disponible": el paquete puede estar presente pero su CLI
+      # no resolver por nombre si el Scripts\ del --user site no está en PATH.
+      if ($t.cli -and -not $WhatIfPreference) {
+        if (-not (Get-Command $t.cli -ErrorAction SilentlyContinue)) {
+          $ub = (& py -m site --user-base 2>$null); if (-not $ub) { $ub = (& python -m site --user-base 2>$null) }
+          $scripts = if ($ub) { Join-Path $ub 'Scripts' } else { $null }
+          if ($scripts -and (Test-Path $scripts)) { $env:PATH = "$scripts;$env:PATH" }  # sesión + hijos
+          if (Get-Command $t.cli -ErrorAction SilentlyContinue) {
+            $summary += "✓ $($t.name): CLI ahora resuelve (antepuse $scripts al PATH de ESTA sesión)"
+            $summary += "  ↳ persistir: agregá '$scripts' al PATH de usuario; un shell ya abierto NO lo toma (stale) — abrí uno nuevo"
+          } else {
+            $summary += "⚠ $($t.name): paquete instalado pero el CLI '$($t.cli)' NO resuelve por nombre (gotcha 'instalado ≠ disponible')"
+            if ($scripts) { $summary += "  ↳ agregá '$scripts' al PATH y abrí un shell NUEVO" }
+          }
+        }
+      }
     }
 
     # ── rtk (github release) ─────────────────────────────────────────

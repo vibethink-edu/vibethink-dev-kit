@@ -37,6 +37,22 @@ else
   summary+=("⚠ graphify: falta python3 — degrada, no bloquea")
 fi
 
+# gotcha "instalado ≠ disponible": el paquete puede estar pero el CLI no resolver por
+# nombre si el bin/ del --user site no está en PATH (multi-Python). Verificar y arreglar.
+gcli="$(field graphify cli)"; [ -z "$gcli" ] && gcli=graphify
+if [ -n "$py" ] && ! command -v "$gcli" >/dev/null 2>&1; then
+  ubase="$("$py" -m site --user-base 2>/dev/null)"
+  sdir="${ubase:+$ubase/bin}"
+  [ -n "$sdir" ] && [ -d "$sdir" ] && PATH="$sdir:$PATH" && export PATH
+  if command -v "$gcli" >/dev/null 2>&1; then
+    summary+=("✓ graphify: CLI ahora resuelve (antepuse $sdir al PATH de ESTA sesión)")
+    summary+=("  ↳ persistir: agregá '$sdir' al PATH (tu rc); un shell ya abierto NO lo toma — abrí uno nuevo")
+  else
+    summary+=("⚠ graphify: paquete instalado pero el CLI '$gcli' no resuelve por nombre (gotcha 'instalado ≠ disponible')")
+    [ -n "$sdir" ] && summary+=("  ↳ agregá '$sdir' al PATH y abrí un shell NUEVO")
+  fi
+fi
+
 # ── rtk (github release) ───────────────────────────────────────────────
 rpin="$(field rtk pin)"; rtag="$(field rtk tag)"; rrepo="$(field rtk repo)"
 if command -v rtk >/dev/null 2>&1; then
