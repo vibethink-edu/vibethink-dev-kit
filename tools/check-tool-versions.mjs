@@ -37,12 +37,20 @@ try {
 }
 const versions = manifest.tools || {};
 
+// Wired runnables live in tools/ (the .mjs engines) and setup/ (the .sh/.ps1 helpers).
+// A runnable is any .mjs / .sh / .ps1 in those dirs, excluding *.test.mjs. Keyed by basename.
 const toolsDir = join(ROOT, "tools");
 if (!existsSync(toolsDir)) {
   console.error("✗ check-tool-versions — no tools/ directory (run from the kit root).");
   process.exit(2);
 }
-const onDisk = readdirSync(toolsDir).filter((f) => f.endsWith(".mjs") && !f.endsWith(".test.mjs"));
+const isRunnable = (f) =>
+  (f.endsWith(".mjs") && !f.endsWith(".test.mjs")) || f.endsWith(".sh") || f.endsWith(".ps1");
+const onDisk = [];
+for (const dir of ["tools", "setup"]) {
+  const abs = join(ROOT, dir);
+  if (existsSync(abs)) for (const f of readdirSync(abs)) if (isRunnable(f)) onDisk.push(f);
+}
 
 const SEMVER_LITE = /^\d+\.\d+$/;
 const missing = []; // tool on disk, no manifest entry
