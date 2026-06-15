@@ -25,6 +25,12 @@
 open standard) + per-tool **one-line pointer adapters**. Never N parallel
 rulebooks — that is the drift the layering smoke exists to catch.
 
+> **Claude Code — permissions:** beyond the rules adapter, Claude Code gates
+> commands via `settings.json`. To set up a safe allowlist (reduce prompts without
+> opening a hole), see the harness adapter `setup/CLAUDE-CODE-PERMISSIONS.md`. Other
+> harnesses: apply the same allowlist-vs-gate principle (`CANON-CODER-ORCHESTRATION-001`
+> §7) to their own config.
+
 ## Enforcement (gated, not advisory)
 
 The historical caveat "files are suggestions, no real enforcement" is obsolete:

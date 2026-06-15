@@ -167,6 +167,12 @@ Adding a new agent is a one-line pointer file. The layering smoke **verifies on
 every PR** that all adapters point at the same root and none contradicts it —
 multi-agent support is gated, not promised.
 
+> **Using Claude Code and tired of approving routine commands?** The harness adapter
+> [`setup/CLAUDE-CODE-PERMISSIONS.md`](setup/CLAUDE-CODE-PERMISSIONS.md) shows how to
+> set up your `settings.json` allowlist safely — and what to **never** allowlist
+> (identity / destruction / secrets stay gated). It binds the agnostic allowlist-vs-gate
+> canon to one harness; other harnesses apply the same principle to their own config.
+
 **Any model, any vendor.** The neutral core names no model vendor — a CI check
 enforces it. Swap models or providers tomorrow; your governance doesn't notice.
 
