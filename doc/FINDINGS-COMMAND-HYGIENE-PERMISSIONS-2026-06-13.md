@@ -120,3 +120,29 @@ no duplicar; rescatar artefactos únicos y marcar superseded lo redundante
 3. Una vez sellado en el dev-kit, los productos lo heredan por capa (L1/L2); cada repo
    puede materializar las reglas operativas (script de health, CLI de lectura, allowlist)
    vía copy-parity o adapter local — NO copiar el canon.
+
+---
+
+## Disposition (CANON-AUDIT-PROTOCOL §4 — appended in place)
+
+**Status: FIXED (canonized) — 2026-06-15 — pending Principal Architect seal.**
+
+The canonization action proposed above was **executed with a consolidated home** rather
+than split across two canons. F1–F8 (command hygiene) + the design gate + the wave shape
+now live in a dedicated spine, **`CANON-CODER-ORCHESTRATION-001`** (`knowledge/ai-agents/`):
+
+- **F1** (`git -C`, never `cd … && git`), **F2** (literal values, no `$VAR`), heredoc/pipe,
+  loops→script-at-stable-path (**F4**), read-only-CLI vs interpreter heredocs (**F5**),
+  arbitrary-exec wildcards (**F6**), shared-tooling stable root (**F7**) → the trigger→fix
+  table, `CANON-CODER-ORCHESTRATION-001` §5, each paired with its clean form.
+- **F3** (bypass mode is the lever beyond the allowlist ceiling; deny-guard survives) →
+  §4 here, with the *policy* owned by `CANON-CODER-SAFE-IDENTITY-001` §8 (not duplicated).
+- **F9** (branch from current integration head; check in-flight work) → §9 (wave shape).
+- **F8** (hooks must quote `"$1"` — paths with spaces break commits) → remains a process
+  finding and a **candidate automated kit check**; cross-referenced from §5 but its
+  enforcement is an L3/tooling concern, not canon prose.
+
+The findings doc's original *suggested* destination (a "Command Hygiene §" inside
+`CANON-MULTI-AGENT-ORCHESTRATION` + an amendment to `CANON-BRANCH-WORKTREE-LIFECYCLE`) is
+**superseded** by this consolidated home; the new canon references both spines rather than
+splitting the material. This doc is retained as the **sealed evidence of provenance**.

@@ -1,0 +1,165 @@
+# RUNBOOK — How to configure and launch coders (executors)
+
+> **What this is.** The **operational how-to** for standing up and launching autonomous
+> coders (executors). It is the *how*; the *why/what* is canon:
+> [`CANON-CODER-SAFE-IDENTITY-001`](../knowledge/ai-agents/CANON-CODER-SAFE-IDENTITY-001.md)
+> (identity, auth gate, per-session isolation, PREP) and
+> [`CANON-CODER-ORCHESTRATION-001`](../knowledge/ai-agents/CANON-CODER-ORCHESTRATION-001.md)
+> (command hygiene, the design gate, wave shape). This runbook does not re-derive them —
+> it walks you through instantiating them. Everything in `<…>` is an L3 choice for your repo.
+
+---
+
+## 0. Mental model (one paragraph)
+
+A coder is an agent session that **pushes as a low-privilege bot** (propose-only: it opens
+a PR, it cannot merge or bypass review), runs in **its own worktree**, and is launched by
+**one command** that a non-executor session (PREP) prepared. The launch wires three things:
+an **identity gate** (refuse to run unless the session's own credential is the bot), a
+**per-session allowlist** (silence the routine, keep identity/destruction/secrets prompted),
+and a **launch prompt** (the spec to build + how to write commands that don't stall on the
+permission gate).
+
+---
+
+## 1. Prerequisites (one-time, per repo)
+
+1. **A low-privilege bot identity.** A separate account with **write but not admin** on the
+   repo — it can push a branch and open a PR, but cannot merge, bypass protection, or
+   self-approve (`CANON-CODER-SAFE-IDENTITY-001` §3). `<bind the concrete bot account>`.
+2. **A protected default branch.** Require PR + review; forbid force-push/deletion. This is
+   the lock; the bot identity is what makes it bite (`…SAFE-IDENTITY-001` §3).
+3. **A per-session credential mechanism.** A way to inject the bot's token **into the launch
+   shell's environment** so the agent process and its children inherit it — never written to
+   a file (`…SAFE-IDENTITY-001` §4/§9). `<bind the env-var name>`.
+
+---
+
+## 2. Build the launch surface (PREP — once per wave)
+
+PREP is a **skill any non-executor session performs** (`CANON-SKILLS-OVER-ROLES`); it only
+writes local files, so it does **not** need the bot credential. Per wave it prepares, so
+launching each coder is one command:
+
+- **a launch script** (§3) that runs the identity gate, enters/creates the worktree, writes
+  the per-session settings, and starts the agent with its prompt;
+- **a per-session settings file** with the allowlist + deny-guard (§5);
+- **one prompt per spec** (or a family/base prompt) carrying the command-hygiene section (§6).
+
+---
+
+## 3. The launch script anatomy
+
+A launch script, in order (pseudocode — bind to your shell/harness/forge):
+
+```
+# input: <spec-id>     # token (e.g. the bot's credential) expected in the session ENV, not here
+
+# 1) IDENTITY GATE (CANON-CODER-SAFE-IDENTITY-001 §5) — verify THIS session, abort otherwise
+if   <session credential is unset>                 -> ABORT "set the bot token in this shell first"
+if   <forge CLI's own auth login> != <bot login>   -> ABORT "active identity is not the bot; refusing to push"
+<forge CLI: set up git auth>
+
+# 2) WORKTREE (CANON-BRANCH-WORKTREE-LIFECYCLE §5/§7) — dedicated, from the LATEST integration head
+if   <worktree for this spec does not exist>:
+       <fetch integration branch>
+       <add worktree at C:/tmp/<prefix>-<spec> on a new branch from origin/<integration>>
+<enter the worktree>
+
+# 3) PER-SESSION SETTINGS (§5) — rewritten each launch so the current policy always applies
+<write .<harness>/settings.local.json with the allowlist + deny-guard below>
+
+# 4) LAUNCH the agent with the prompt + the assigned spec
+<start agent>  <prompt-for-this-spec + ">>> YOUR ASSIGNED SPEC: specs/<spec-id>">
+```
+
+**Prompt selection:** `prompt-<spec-id>` if it exists (a specific spec, e.g. a boundary spec
+with its design gate) → else a **family** prompt (e.g. a shared wiring prompt) → else the
+**base** prompt. Keep boundary specs on their own prompt so the design gate (§7) is explicit.
+
+---
+
+## 4. Resuming after a closed terminal
+
+The per-session credential lives in the shell's environment and **dies when the terminal
+closes**. To resume: exit the agent → re-set the token in a fresh shell → resume the session
+by id. (A bare interrupt is not enough — the process already captured its environment at
+launch.) Work already committed in the worktree is safe.
+
+---
+
+## 5. The allowlist (what to cover / what NEVER to cover)
+
+The allowlist is **scoped to the session/worktree, never global, never committed** to the
+repo (`CANON-CODER-SAFE-IDENTITY-001` §8). It auto-allows the **routine** and leaves the
+**gates** prompted. Skeleton (bind the concrete tool names):
+
+```jsonc
+{
+  "permissions": {
+    "allow": [
+      // version control, package manager, build/runtime, the forge's read + PR commands
+      "<VC> *", "<package-manager> *", "<runtime> *", "<forge> pr *", "<forge> api *", "<forge> auth status",
+      // read-only shell utilities (file recon is better via the harness's file tools)
+      "<grep>", "<cat>", "<tail>", "<head>", "<find>", "<sort>", "<uniq>", "<wc>", "<diff>",
+      // the harness's file tools — need no prefix-match at all
+      "Read", "Edit", "Write", "Glob", "Grep"
+    ],
+    "deny": [
+      "Read(<secret-file>)", "Read(<secret-file>.*)",   // never read secrets
+      "<recursive-delete>", "<read of any *.env*>"        // never destroy / leak
+    ]
+  }
+}
+```
+
+**NEVER allowlist** (these stay prompted/denied on purpose — `CANON-CODER-ORCHESTRATION-001` §7):
+identity change (the forge CLI's login/switch), recursive delete / force-push / hard reset,
+secret-file reads, and **arbitrary-execution wildcards** (`<interpreter> *`, `<shell> *`,
+`eval`, remote-shell, a raw forge-API wildcard, a task-runner wildcard). If a recurring
+script needs one, give it a fixed name and allowlist that **exact** invocation.
+
+> **Beyond the allowlist's ceiling:** on your own trusted worktrees you may run the harness
+> in **bypass mode** instead of chasing every pattern — but keep the deny-guard, and never
+> let bypass dissolve the identity gate. (See `CANON-CODER-ORCHESTRATION-001` §4 and the
+> GUI-vs-CLI gotcha in the sealed command-hygiene findings: a desktop GUI may not honor a
+> settings-file `bypassPermissions` default — it is enabled in the app's settings + the
+> mode selector.)
+
+## 6. The command-hygiene section to embed in every prompt
+
+Paste a section like this into the launch prompt (lever **a** of
+`CANON-CODER-ORCHESTRATION-001` §4). Each "never" is paired with its clean form (§5):
+
+- **File recon → use the harness's file tools** (Read/Glob/Grep), not shell `ls`/`cat`/`grep`.
+- **Never `cd "<dir>" && <cmd>`** — your worktree is already the working dir; point VC at the
+  path with a literal flag (`<VC> -C "<literal-path>"`).
+- **Never variables or env-prefix** (`$VAR`, `NAME=…`, `VAR=x cmd`); never an expandable
+  string with an embedded expression (a `"…$expr…"` status-echo). Put the **literal value**
+  in each statement. A commit trailer goes **literally** inside the commit, not in a variable.
+- **DB/SQL → feed a file** (`-f file`), not a heredoc; **commit messages → feed a file**
+  (`-F file`), not an inline message flag (avoids glob-like tokens like `<->` tripping the gate).
+- **Avoid pipes/loops/substitutions** in commands you want silent — let a long command finish
+  and read its output with the file tools; put recurring loops in a named, allowlisted script.
+- **Prefer the POSIX shell** over a shell whose expandable strings turn status-echoes dynamic.
+- **Do not touch the architect's governance instruments** (the present-mirror, the decision
+  register — `CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`); report to the coordination
+  channel and append to the history log only.
+
+## 7. Gates and wave shape
+
+- **Boundary specs** (identity, access control, security, sensitive data): the coder produces
+  plan/data-model/tasks and **presents them for approval before writing sensitive code** (the
+  **design gate**, `CANON-CODER-ORCHESTRATION-001` §8). Mechanical specs run autonomously
+  after a canary. Either way: draft PR, no merge, no self-approve.
+- **Wave shape** (§9): pieces that **depend** → launch **sequentially** along the spine; pieces
+  that are **independent** → **fan out**, one coder per worktree. Dependent coders branch from
+  the **latest integration head at launch time** to inherit merged foundations.
+
+## 8. Definition of done for a coder session
+
+The coder exits with every branch it touched in one of three states (`CANON-GIT-HYGIENE` §3 +
+`CANON-BRANCH-WORKTREE-LIFECYCLE`; vocabulary `CANON-MULTI-AGENT-ORCHESTRATION` §2.2):
+**PUSHED**, **READY-PR** (draft PR open), or **DISCARDED**. No uncommitted WIP at exit; a
+final report to the coordination channel (state per task, verification matrix); and, if the
+spec has a row in the dispatch board, its row updated.
