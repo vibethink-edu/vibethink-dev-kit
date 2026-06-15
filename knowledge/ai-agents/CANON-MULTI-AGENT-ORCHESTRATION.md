@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by Marcelo 2026-06-05 ("SEAL DALE").**
+> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by Marcelo 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (proposed — seals on merge): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -82,6 +82,7 @@ must end in exactly **one intentional, declared state**:
 | `PUSHED` | Committed and pushed; no uncommitted changes | nothing further this session |
 | `READY-PR` | Pushed and a pull request exists (or is being opened) | the PR link travels in the closeout signal |
 | `DISCARDED` | The branch / worktree is intentionally abandoned; nothing of value is lost | the branch is removed or explicitly marked, never silently left |
+| `COMMITTED-LOCAL` | Committed but **NOT pushed** — no remote reachable (offline / single machine). **Fallback only** (§2.2.1) | declared **with the developer warning**; push and promote to `PUSHED` when a remote returns |
 
 - **Local-only WIP older than the current session is the failure class.** A
   rescue branch, a long-lived uncommitted change, or a stale stash that only the
@@ -100,6 +101,49 @@ must end in exactly **one intentional, declared state**:
   or discard. A stricter automation (daemon, watcher, auto-rescue) is
   **deferred until the manual scan is shown to be insufficient** — build-on-pain
   applies here too (§3.1).
+
+## 2.2.1 Persistence vs travel — and the no-remote local-commit fallback
+
+*(Amendment proposed 2026-06-15 — seals on merge.)*
+
+The exit states above assume a reachable remote: `PUSHED` is the default because a
+commit *persists* the work but only a push makes it *travel*. Two transports are
+distinct, and conflating them is what makes §2.2 read as "local is always wrong":
+
+- **Persistence = the commit** — the work survives the session, in the repo's
+  history. **Always required**; an *uncommitted* change is the real failure class.
+- **Travel = the push** — the commit reaches other machines and the durable shared
+  backup. Required **whenever the recipient is on another machine, or the remote is
+  the record of truth.** When a remote exists, push is the default and §2.2's "if
+  work matters, it lives in `origin`" stands unchanged.
+
+**The fallback — no remote reachable (offline · single machine · no forge configured):**
+a **local commit is an accepted handoff transport.** Both agents on the same machine
+read the handoff from the local history; pushing is simply not available. This is
+**legitimate — not the silent-WIP failure §2.2 forbids — on two conditions:**
+
+1. **It is a declared state with a loud warning to the developer.** A fourth exit
+   state, **`COMMITTED-LOCAL`** — *committed, NOT pushed, local-only.* The
+   session-end signal (§5.1.B) must name it and warn, in plain words:
+   **"handoff committed LOCALLY only — not pushed; it will not reach other machines
+   and is not backed up off this machine; push as soon as a remote is available."**
+   Silent local-only is still the failure class; *declared* local-only **with the
+   warning** is the offline fallback. The difference is the warning, nothing else.
+2. **It carries a reconciliation obligation.** `COMMITTED-LOCAL` is **temporary**:
+   the next session that gains a reachable remote **pushes it and promotes the state
+   to `PUSHED`.** The session-start scan (§2.2) already flags unpushed work — here
+   that flag is *expected*, not an anomaly, until reconciled.
+
+**The governed send degrades, it does not fail.** A send that finds **no remote**
+(or whose push fails for lack of one) **falls back to commit-only and emits the
+warning** — it must never drop the handoff, and never report success as if it had
+travelled. A *deliberate* offline send is an explicit opt-in (the engine's
+no-push path); an *unexpected* missing remote still commits, still warns, and is
+surfaced — not swallowed. (The concrete detection and warning wording are L3 / the
+engine.)
+
+> **Mnemonic:** *commit always; push when you can; when you can't, say so — loudly,*
+> *and reconcile when a remote returns.*
 
 ## 2.3 Handoff completeness — a handoff that looks complete but isn't
 
