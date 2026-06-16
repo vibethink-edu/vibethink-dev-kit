@@ -42,6 +42,10 @@ run the doctor.
 
 **B) Update — you already inherit the kit and want the latest law:**
 
+> **One shot:** `node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs` does the whole
+> recipe below (pull → re-sync copied runnables → report tool drift). The manual steps
+> are kept here so you know what it does. Use `--dry-run` to preview.
+
 ```bash
 # pull the latest sealed canon + engines (fast-forward only — no local kit edits)
 git -C ../_vibethink-dev-kit fetch origin && git -C ../_vibethink-dev-kit merge --ff-only origin/master
@@ -93,7 +97,14 @@ pwsh  ../_vibethink-dev-kit/setup/install-external-tools.ps1     # Windows
 # presence + drift is shown by `devkit-doctor --adoption`; the pins live in setup/external-tools.lock.json
 ```
 
-**Update to the latest kit:** see §1.5 B (pull `--ff-only` → copy-parity → doctor).
+**Update to the latest kit (one shot):**
+```bash
+node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs            # pull --ff-only + re-sync copied runnables + report tool drift
+node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs --dry-run  # preview first (it APPLIES by default)
+```
+It does the §1.5 steps as one command. It does NOT auto-install global tools or move a
+pin (that stays an evidence-PR to the lock) — it re-syncs your copied runnables and
+prints the exact command for any tool behind its pin.
 
 **Send a governed comm (write path — commits + pushes):**
 ```bash
