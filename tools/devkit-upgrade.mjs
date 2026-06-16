@@ -122,6 +122,7 @@ if (parityCfg && Array.isArray(parityCfg.copies)) {
 let provision = {
   ran: false,
   note: DRY ? "skipped (dry-run)" : NO_TOOLS ? "skipped (--no-tools)" : "skipped",
+  output: "",
 };
 if (!DRY && !NO_TOOLS) {
   const isWin = process.platform === "win32";
@@ -131,7 +132,7 @@ if (!DRY && !NO_TOOLS) {
     isWin ? "install-external-tools.ps1" : "install-external-tools.sh"
   );
   if (!existsSync(script)) {
-    provision = { ran: false, note: "no install script in upstream" };
+    provision = { ran: false, note: "no install script in upstream", output: "" };
   } else {
     const [cmd, cmdArgs] = isWin ? ["pwsh", ["-NoProfile", "-File", script]] : ["bash", [script]];
     try {
@@ -140,11 +141,15 @@ if (!DRY && !NO_TOOLS) {
         timeout: 180000,
         stdio: ["ignore", "pipe", "pipe"],
       });
+      // Surface the provisioner's own per-tool messages ("ya instalado (vX)", drift,
+      // "instalando…", the PATH gotcha) — they ARE the value of this step; swallowing
+      // them would hide whether a tool was already present or freshly installed.
+      const text = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();
       provision = r.error
-        ? { ran: false, note: `${cmd} unavailable — provision by hand` }
-        : { ran: true, note: "ran install-external-tools (install-if-missing)" };
+        ? { ran: false, note: `${cmd} unavailable — provision by hand`, output: "" }
+        : { ran: true, note: "ran install-external-tools (install-if-missing)", output: text };
     } catch {
-      provision = { ran: false, note: `${cmd} unavailable — provision by hand` };
+      provision = { ran: false, note: `${cmd} unavailable — provision by hand`, output: "" };
     }
   }
 }
@@ -204,6 +209,9 @@ if (!resync.applies) {
   if (!DRY) out.push(`     → review with: git diff`);
 }
 out.push(`  Provision tools    ${provision.ran ? green("✓") : "·"} ${provision.note}`);
+if (provision.output)
+  for (const line of provision.output.split(/\r?\n/))
+    if (line.trim()) out.push(`      ${line.trim()}`);
 const drifted = tools.filter((t) => t.behind);
 out.push(
   `  Tools (to pin)     ${drifted.length === 0 ? green("✓ all at pin / absent") : yellow(`${drifted.length} behind`)}`
