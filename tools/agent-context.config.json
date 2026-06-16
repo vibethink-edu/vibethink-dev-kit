@@ -23,7 +23,18 @@
   "_agentFileAllowlistNote": "Repo-wide paths whose basename matches agentFilePattern but which are NOT agent-rules constitutions (templates, examples, integration docs). Empty after the 2026-05-23 legacy reap removed the two former entries (a generated v1 project-constitution and Gemini integration docs). Check #6 scans the whole repo (finding #2): the root authority (rootRulesFile) + declared adapters are auto-legit; everything else matching the pattern must be allowlisted here or it is flagged as a parallel constitution.",
   "requiredAnchorsInRoot": ["CANON-CROSS-AGENT-CONTEXT-LAYERING"],
   "_brandExclusionNote": "L1 neutrality fire-test (canon §8 / finding F1): the neutralL1Files below must name no product/brand. Word-boundary + case-insensitive. Org/methodology names (VibeThink, VT-Method) may appear in L2/portal docs (e.g. START-HERE, VT-METHOD), never in these neutral cores.",
-  "brandExclusionPatterns": ["ViTo", "XMS", "Cantor", "Ovitality", "VibeThink", "Marcelo", "Friendship", "Heartbeat", "Amigo", "amistad"],
+  "brandExclusionPatterns": [
+    "ViTo",
+    "XMS",
+    "Cantor",
+    "Ovitality",
+    "VibeThink",
+    "Marcelo",
+    "Friendship",
+    "Heartbeat",
+    "Amigo",
+    "amistad"
+  ],
   "neutralL1Files": [
     "knowledge/methodology/CANON-DEVELOPMENT-PROCESS.md",
     "knowledge/methodology/CANON-NAMING-CONVENTIONS-001.md",
@@ -72,6 +83,9 @@
   "secretExcludeContains": [
     "tools/agent-context.config.json",
     "tools/check-agent-context.mjs",
-    "tools/check-agent-context.test.mjs"
-  ]
+    "tools/check-agent-context.test.mjs",
+    "tools/comms-security-gate.mjs",
+    "tools/comms-security-gate.test.mjs"
+  ],
+  "_secretExcludeContainsNote": "These files DEFINE or TEST the secret patterns, so they legitimately contain secret-shaped strings (pattern literals + test fixtures). Excluding them is correct — a scanner must not flag its own fixtures, or every secret-gate test becomes un-committable. The exclusion is path-scoped (substring match), not a pattern weakening."
 }
