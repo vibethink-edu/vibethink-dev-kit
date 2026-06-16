@@ -130,12 +130,17 @@ secret-file reads, and **arbitrary-execution wildcards** (`<interpreter> *`, `<s
 `eval`, remote-shell, a raw forge-API wildcard, a task-runner wildcard). If a recurring
 script needs one, give it a fixed name and allowlist that **exact** invocation.
 
-> **Beyond the allowlist's ceiling:** on your own trusted worktrees you may run the harness
-> in **bypass mode** instead of chasing every pattern — but keep the deny-guard, and never
-> let bypass dissolve the identity gate. (See `CANON-CODER-ORCHESTRATION-001` §4 and the
-> GUI-vs-CLI gotcha in the sealed command-hygiene findings: a desktop GUI may not honor a
-> settings-file `bypassPermissions` default — it is enabled in the app's settings + the
-> mode selector.)
+> **Beyond the allowlist's ceiling — the permissive-deny posture:** on your own trusted
+> worktrees, instead of chasing every pattern, **broadly allow Bash and let an airtight `deny`
+> list be the boundary** (`deny` wins; the harness checks each sub-command of a compound). A
+> ready instance is **`setup/templates/coder-permissions/`** (`settings.local.json` + README):
+> it auto-allows the routine, denies identity-change / destruction / secret-reads / cloud-apply
+> / arbitrary-exec hatches, and **leans on the backstop** (low-priv bot + disposable worktree +
+> credential scoping) rather than pretending to be airtight. **Do NOT use full
+> `bypassPermissions` mode** — verified behavior: full bypass skips `deny` too, silencing every
+> gate. (GUI-vs-CLI gotcha from the sealed command-hygiene findings: a desktop GUI may not honor
+> a settings-file default — confirm the mode in the app's selector, and smoke-verify that a
+> denied command in a compound is still blocked.)
 
 ## 6. The command-hygiene section to embed in every prompt
 
