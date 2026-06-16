@@ -9,18 +9,22 @@
  *   2. RE-SYNC the copy-distributed runnables this repo declares (copy-parity) from the
  *      kit → local — the only step that was manual; the kit is the source of truth, a
  *      local drift in a copied runnable is a bug, so this restores it;
- *   3. REPORT external-tool drift (installed vs the pinned-vetted version) + the exact
- *      upgrade command — it does NOT auto-install global packages (different blast radius
- *      than repo files) and never moves a pin forward (that stays an evidence-gated PR
- *      to external-tools.lock.json — CANON: version-forward with evidence).
+ *   3. PROVISION missing default tools — runs install-external-tools, which is
+ *      install-if-missing + non-blocking, so it provisions ABSENT tools to their pin
+ *      and never moves a present tool's version (the evidence-gated pin rule holds for
+ *      free). Default in apply; `--no-tools` to skip. It does NOT force an installed
+ *      tool past its pin — a pin move stays an evidence-gated PR to external-tools.lock.json.
+ *   4. REPORT remaining external-tool drift (installed-but-behind vs pin) + the exact
+ *      upgrade command (a present-but-behind tool is a deliberate version-forward, not
+ *      an auto-action).
  *
  * APPLIES BY DEFAULT (you want the latest). Guards that are NOT timidity:
  *   - `--ff-only` pull (never force a diverged kit);
  *   - re-copied files land in your working tree → review `git diff` (nothing is lost — git has it);
- *   - `--dry-run` if you want to preview; `--no-pull` to skip the git step (tests/offline).
+ *   - `--dry-run` to preview; `--no-pull` skips git; `--no-tools` skips provisioning (offline).
  *
  * Usage:
- *   node <kit>/tools/devkit-upgrade.mjs [--dry-run] [--no-pull] [--json]
+ *   node <kit>/tools/devkit-upgrade.mjs [--dry-run] [--no-pull] [--no-tools] [--json]
  *     [--parity-config tools/copy-parity.config.json] [--upstream-root <path>]
  * Exit: 0 ok · 1 a re-sync or pull step failed. Pure Node, zero deps.
  */
@@ -35,6 +39,7 @@ const CWD = process.cwd();
 const argv = process.argv.slice(2);
 const DRY = argv.includes("--dry-run");
 const NO_PULL = argv.includes("--no-pull");
+const NO_TOOLS = argv.includes("--no-tools");
 const JSON_OUT = argv.includes("--json");
 const flag = (name, def) => {
   const i = argv.indexOf(name);
@@ -109,7 +114,42 @@ if (parityCfg && Array.isArray(parityCfg.copies)) {
   }
 }
 
-// ── 3. REPORT external-tool drift (installed vs pin) — never auto-install, never bump a pin ─
+// ── 3. PROVISION missing default tools (fresh installs only) ──────────────────
+// install-external-tools is install-if-missing + non-blocking BY DESIGN, so running
+// it provisions ABSENT tools to their pin and NEVER moves a present tool's version —
+// it respects the evidence-gated pin rule for free. Default in apply; --no-tools to
+// skip (offline / no-network); never in --dry-run; never fails the upgrade.
+let provision = {
+  ran: false,
+  note: DRY ? "skipped (dry-run)" : NO_TOOLS ? "skipped (--no-tools)" : "skipped",
+};
+if (!DRY && !NO_TOOLS) {
+  const isWin = process.platform === "win32";
+  const script = join(
+    UPSTREAM,
+    "setup",
+    isWin ? "install-external-tools.ps1" : "install-external-tools.sh"
+  );
+  if (!existsSync(script)) {
+    provision = { ran: false, note: "no install script in upstream" };
+  } else {
+    const [cmd, cmdArgs] = isWin ? ["pwsh", ["-NoProfile", "-File", script]] : ["bash", [script]];
+    try {
+      const r = spawnSync(cmd, cmdArgs, {
+        encoding: "utf8",
+        timeout: 180000,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      provision = r.error
+        ? { ran: false, note: `${cmd} unavailable — provision by hand` }
+        : { ran: true, note: "ran install-external-tools (install-if-missing)" };
+    } catch {
+      provision = { ran: false, note: `${cmd} unavailable — provision by hand` };
+    }
+  }
+}
+
+// ── 4. REPORT external-tool drift (installed vs pin) — never auto-install, never bump a pin ─
 const lock = JSON.parse(readMaybe(join(UPSTREAM, "setup", "external-tools.lock.json")) || "{}");
 const tools = (lock.tools || []).map((t) => {
   let installed = null;
@@ -137,6 +177,7 @@ const result = {
   mode: DRY ? "dry-run" : "applied",
   pull,
   resync,
+  provision,
   tools: tools.map(({ hint, ...t }) => t),
 };
 
@@ -162,6 +203,7 @@ if (!resync.applies) {
   for (const f of resync.drift) out.push(`        ↻ ${f}`);
   if (!DRY) out.push(`     → review with: git diff`);
 }
+out.push(`  Provision tools    ${provision.ran ? green("✓") : "·"} ${provision.note}`);
 const drifted = tools.filter((t) => t.behind);
 out.push(
   `  Tools (to pin)     ${drifted.length === 0 ? green("✓ all at pin / absent") : yellow(`${drifted.length} behind`)}`
