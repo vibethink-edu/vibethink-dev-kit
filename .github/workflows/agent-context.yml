@@ -61,6 +61,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          # These jobs run `node` only (no install) — they never invoke a package
+          # manager. setup-node@v5 otherwise auto-detects a consumer repo's
+          # `packageManager` pin (e.g. pnpm) and tries to enable its cache, which
+          # fails with "Unable to locate executable file: pnpm" since the runner
+          # never installs it. Disable the auto cache: these jobs don't need it.
+          package-manager-cache: false
 
       # A fork has no engine of its own — fetch the kit's tools. The kit's own run
       # uses its local (branch) tools, so a PR is validated by the code it changes.
@@ -100,6 +106,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          # These jobs run `node` only (no install) — they never invoke a package
+          # manager. setup-node@v5 otherwise auto-detects a consumer repo's
+          # `packageManager` pin (e.g. pnpm) and tries to enable its cache, which
+          # fails with "Unable to locate executable file: pnpm" since the runner
+          # never installs it. Disable the auto cache: these jobs don't need it.
+          package-manager-cache: false
 
       - name: Fetch dev-kit (upstream source of the copies)
         uses: actions/checkout@v5
@@ -127,6 +139,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          # These jobs run `node` only (no install) — they never invoke a package
+          # manager. setup-node@v5 otherwise auto-detects a consumer repo's
+          # `packageManager` pin (e.g. pnpm) and tries to enable its cache, which
+          # fails with "Unable to locate executable file: pnpm" since the runner
+          # never installs it. Disable the auto cache: these jobs don't need it.
+          package-manager-cache: false
 
       - name: inbox tests
         run: node tools/inbox.test.mjs
@@ -156,6 +174,12 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+          # These jobs run `node` only (no install) — they never invoke a package
+          # manager. setup-node@v5 otherwise auto-detects a consumer repo's
+          # `packageManager` pin (e.g. pnpm) and tries to enable its cache, which
+          # fails with "Unable to locate executable file: pnpm" since the runner
+          # never installs it. Disable the auto cache: these jobs don't need it.
+          package-manager-cache: false
 
       - name: check-catalog-sync
         run: node tools/check-catalog-sync.mjs tools/catalog-sync.config.json
