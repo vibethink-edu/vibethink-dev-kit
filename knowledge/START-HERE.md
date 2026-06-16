@@ -75,3 +75,6 @@ the navigator, not the investigator.*
 
 *Want the map of all the rooms? → [`SUPRA-MAP.md`](SUPRA-MAP.md) — the canon constellation,
 auto-generated, in one diagram.*
+
+*Don't know a word (L1/L2/L3, instrument, gate, sealed, the dance…)? → [`GLOSSARY.md`](GLOSSARY.md) —
+the kit's vocabulary, one line each, look it up on demand.*
