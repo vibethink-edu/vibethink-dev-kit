@@ -136,11 +136,13 @@ script needs one, give it a fixed name and allowlist that **exact** invocation.
 > ready instance is **`setup/templates/coder-permissions/`** (`settings.local.json` + README):
 > it auto-allows the routine, denies identity-change / destruction / secret-reads / cloud-apply
 > / arbitrary-exec hatches, and **leans on the backstop** (low-priv bot + disposable worktree +
-> credential scoping) rather than pretending to be airtight. **Do NOT use full
-> `bypassPermissions` mode** — verified behavior: full bypass skips `deny` too, silencing every
-> gate. (GUI-vs-CLI gotcha from the sealed command-hygiene findings: a desktop GUI may not honor
-> a settings-file default — confirm the mode in the app's selector, and smoke-verify that a
-> denied command in a compound is still blocked.)
+> credential scoping) rather than pretending to be airtight. The **Claude-Code-specific scope**
+> (precedence, what `bypassPermissions` does and does NOT cover, the command-line-only ceiling) is
+> pinned in that folder's `CLAUDE-CODE-SCOPE.md`. **You don't need bypass mode** —
+> `allow: ["Bash"]` + `deny` already silences the routine while the guard bites (deny is enforced
+> even under bypass; bypass only skips allow-prompts). Smoke-verify that a denied command inside a
+> compound is still blocked; and mind the GUI-vs-CLI gotcha — a desktop GUI may not honor a
+> settings-file default, so confirm the mode in the app's selector.
 
 ## 6. The command-hygiene section to embed in every prompt
 
