@@ -90,6 +90,18 @@ agnostic / cross-product decision registers in the supra-repo's decision store, 
 product-specific one in that product's store. (Disposition + indexing rules live in
 the decision-disposition canon.)
 
+> **Amended 2026-06-16 §5 — PROPOSED (seal = Principal Architect's merge):** the artifact
+> set above now ships as a **heritable instrument** — `setup/templates/feature-docs/` (one
+> template per artifact role + a `FINDING` template for §6 + a README *discoverability map*
+> that names which canon governs each part, **including the versioning rules**), enforced by
+> the `check-feature-docs` gate, which fails a declared unit missing a required artifact and
+> is run by `devkit-doctor`. Until now §5/§6 declared the artifacts but shipped no shape and
+> no gate, so each consumer documented in a different form and a missing artifact stayed
+> invisible until someone went looking. The concrete filenames remain **L3** (the gate is
+> config-driven; `null` = conscious N-A); the kit defines the *roles* and the *mechanism*.
+> Same closure pattern as the §5 versioning instrument and the governance-instruments —
+> *a rule with no shape and no gate is a suggestion.*
+
 ### 5.1 — Examples are first-class artifacts
 
 A decision or architecture document without **concrete worked examples** loses its *why* the moment the author moves on. Examples are not decoration buried in a commit — they are a **durable artifact** of the unit, expected in every decision / architecture / canon / specification document.

@@ -6,6 +6,7 @@
     "check-canon-links.mjs": "1.1",
     "check-catalog-sync.mjs": "1.0",
     "check-copy-parity.mjs": "1.0",
+    "check-feature-docs.mjs": "1.0",
     "check-governance.mjs": "1.0",
     "check-inheritance-claims.mjs": "1.0",
     "check-tenant-contamination.mjs": "1.0",

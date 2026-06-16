@@ -99,6 +99,12 @@ const GATES = [
     targets: ["tools/versioning.config.json"],
     fix: "a declared app/package model has no live version source (the frozen-version trap) — wire it, or set the model null for a conscious N-A",
   },
+  {
+    label: "feature documentation",
+    engine: "check-feature-docs.mjs",
+    targets: ["tools/feature-docs.config.json"],
+    fix: "a declared unit is missing a required artifact (requirements/plan/roadmap/log/changelog) — add it, or set the section null for a conscious N-A",
+  },
 ];
 
 function firstExisting(paths) {
