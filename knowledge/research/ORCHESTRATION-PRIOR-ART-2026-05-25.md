@@ -158,6 +158,29 @@ The new pattern sits adjacent to two sealed spines but is covered by neither as 
   coder's permission file; this is a runtime interception engine for any agent), which tilts toward
   **B**, but it is genuinely a judgment call and stays Marcelo's.
 
+### For developers — what the pattern fixes / helps with (source-cited)
+
+> For a developer building or running agents in a consuming product (ViTo / WorkBench / Campus). The
+> kit names the *pattern*; you would build the engine as L3. We are **not** adopting omnigent — these
+> rows are the concrete pains the pattern addresses and **exactly where to read it in the source**
+> (omnigent @ `HEAD 5a8fd16`), so a future implementation copies the idea, not the dependency.
+
+| Pain today (in our repos) | How the runtime-policy pattern helps | Source to read |
+|---|---|---|
+| An agent **silently burns the LLM budget**; "use a cheaper model for simple work" is prose nobody enforces live | A cost policy **DENYs an expensive model past a hard limit** (forces a `/model` downgrade, then allows) and **ASKs at soft thresholds**, with per-user-per-day memory | `omnigent/policies/builtins/cost.py` (`cost_budget`, `user_daily_cost_budget`) |
+| The deny-list is a **flat prefix-match** — it cannot see "this whole session is getting risky" | A risk policy **accumulates points per tool-call** (+ on sensitive results) and escalates ASK/DENY once the session crosses a threshold | `omnigent/policies/builtins/risk_score.py` |
+| **Prompt-every-time** trains people to click "yes" (approval fatigue); a half-applied prompt can leave side effects | **ASK is stateful**: approve once per threshold; a denied/timed-out ASK **withholds all writes** ("leaves no trace") | `omnigent/runtime/policies/engine.py` (`evaluate` — ASK accumulation + withhold) |
+| Governance is **scattered** — canon prose + per-route guards + the coder permission file — with no single point to audit | **One engine** intercepts at typed enforcement points (request / pre-LLM / tool-call / tool-result), composes policies with explicit precedence, and names the `deciding_policy` on every verdict | `omnigent/runtime/policies/engine.py`, `docs/POLICIES.md` |
+| Nothing stops a **trivial task running on an expensive model** | A routing policy **classifies the turn** and DENYs trivial work on an expensive model | `omnigent/policies/builtins/routing.py` (`deny_trivial_to_expensive_model`) |
+| Our **"git -C not cd" + main-readonly** disciplines are prose + one pre-commit hook | A working-dir policy gates `cd` / `git -C` / `git worktree` **at runtime** with an allowed-dirs allowlist | `omnigent/policies/builtins/working_dir.py` |
+| A **buggy guard could fail open** (allow by mistake) | The engine is **fail-closed**: a policy that throws DENYs by default (ALLOW only for an advisory/classifier-only policy) | `omnigent/runtime/policies/engine.py` (`_fail_closed`) |
+
+**Bottom line for a developer:** today you write a guard per route plus a rule in canon prose; the
+pattern gives you **one place** to say *allow / ask / deny* with **memory** (cost, risk, approvals) and
+a **safe default** (fail-closed). Build it **when a product feels one of these pains** (build-on-pain),
+against the canon the ADR proposes — not preemptively. *(This developer guidance graduates into the
+canon spine if/when the ADR is accepted.)*
+
 ### Verdict
 
 **👀 watching · extract-patterns-not-dependency.** Do **not** adopt omnigent (alpha/pre-1.0; it is the
