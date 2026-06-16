@@ -16,7 +16,7 @@
     "comms-send.mjs": "1.1",
     "comms-sync.mjs": "1.0",
     "devkit-doctor.mjs": "1.1",
-    "devkit-upgrade.mjs": "1.1",
+    "devkit-upgrade.mjs": "1.2",
     "feed.mjs": "1.0",
     "graph-canon.mjs": "1.0",
     "inbox.mjs": "1.0",

@@ -106,6 +106,42 @@ test("missing upstream → exit 1", () => {
   assert.match(out, /upstream missing/i);
 });
 
+// 5. The provisioner's own messages are SURFACED (not swallowed) — a fake
+//    install-external-tools that echoes a marker must appear in the upgrade output.
+//    (No --no-tools here; the temp scripts are inert echoes, safe to run.)
+test("provision surfaces install-external-tools output", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-test-"));
+  tmpdirs.push(root);
+  const upstream = path.join(root, "upstream");
+  const consumer = path.join(root, "consumer");
+  mkdirSync(path.join(upstream, "setup"), { recursive: true });
+  mkdirSync(path.join(consumer, "tools"), { recursive: true });
+  // Both platform scripts echo the same marker + exit 0 (non-blocking, no real install).
+  writeFileSync(
+    path.join(upstream, "setup", "install-external-tools.sh"),
+    '#!/usr/bin/env bash\necho "✓ graphify: ya instalado (MARKER-123)"\nexit 0\n'
+  );
+  writeFileSync(
+    path.join(upstream, "setup", "install-external-tools.ps1"),
+    'Write-Host "✓ graphify: ya instalado (MARKER-123)"\nexit 0\n'
+  );
+  writeFileSync(
+    path.join(consumer, "tools", "copy-parity.config.json"),
+    JSON.stringify({ copies: [] })
+  );
+  const r = spawnSync("node", [TOOL, "--no-pull", "--upstream-root", upstream], {
+    cwd: consumer,
+    encoding: "utf8",
+  });
+  const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
+  assert.equal(r.status ?? 1, 0, `expected exit 0\n${out}`);
+  assert.match(
+    out,
+    /ya instalado \(MARKER-123\)/,
+    "the provisioner's messages must be surfaced, not swallowed"
+  );
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });
