@@ -21,8 +21,8 @@
  * Exit: 0 = every gate that ran passed · 1 = a gate failed. Skips never fail.
  * Pure Node, zero deps.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,6 +31,7 @@ const CWD = process.cwd();
 const argv = process.argv.slice(2);
 const VERBOSE = argv.includes("--verbose") || argv.includes("-v");
 const JSON_OUT = argv.includes("--json");
+const ADOPTION = argv.includes("--adoption");
 
 const ESC = String.fromCharCode(27); // ANSI escape; built via fromCharCode so no control char sits in a regex literal
 const stripAnsi = (s) => s.replace(new RegExp(`${ESC}\\[[0-9;]*m`, "g"), "");
@@ -100,6 +101,134 @@ function firstExisting(paths) {
   for (const p of paths) if (existsSync(join(CWD, p))) return p;
   return null;
 }
+
+// ── Adoption lens (`--adoption`) ──────────────────────────────────────────────
+// A SECOND lens, distinct from the gate-health board: an INVENTORY of what this
+// repo has adopted from the kit. doctor (default) answers "are my gates green?";
+// --adoption answers "what do I have / use?". Data comes from sources that already
+// exist (no new source of truth): the kit's catalog (the roster of pieces), this
+// repo's DEV_KIT_INHERITANCE_STATUS.md (what it declared), the kit's
+// external-tools.lock.json (the default tools), and the gate configs present here.
+function readMaybe(p) {
+  try {
+    return readFileSync(p, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+function runAdoption() {
+  const KIT_ROOT = dirname(KIT_TOOLS);
+  // 1. The roster of pieces, from the kit's catalog (`### N — Title`).
+  const catalogText = readMaybe(join(KIT_ROOT, "setup", "ADOPT-DEV-KIT.md")) || "";
+  const roster = [];
+  for (const line of catalogText.split(/\r?\n/)) {
+    const m = /^###\s+(\d+)\s+[—-]\s+(.+?)\s*$/.exec(line);
+    if (m) roster.push({ n: Number(m[1]), title: m[2] });
+  }
+
+  // 2. This repo's declared adoption, from its status doc (if any).
+  const statusRel = firstExisting([
+    "DEV_KIT_INHERITANCE_STATUS.md",
+    "docs/DEV_KIT_INHERITANCE_STATUS.md",
+  ]);
+  const statusText = statusRel ? readMaybe(join(CWD, statusRel)) : null;
+  const STATUS_KW =
+    /\b(WIRED-CI|WIRED-HOOK|WIRED-SCRIPT|DECLARED-ONLY|ADOPTED-NATIVE|PENDING|N-A)\b/;
+  const buckets = { wired: 0, declared: 0, na: 0, pending: 0, rows: 0 };
+  if (statusText) {
+    for (const line of statusText.split(/\r?\n/)) {
+      if (!line.trim().startsWith("|")) continue;
+      const claim = (line.match(STATUS_KW) || [])[1];
+      if (!claim) continue;
+      buckets.rows++;
+      if (claim === "DECLARED-ONLY") buckets.declared++;
+      else if (claim === "N-A") buckets.na++;
+      else if (claim === "PENDING") buckets.pending++;
+      else buckets.wired++; // WIRED-* / ADOPTED-NATIVE
+    }
+  }
+
+  // 3. The kit's default external tools + a best-effort presence probe.
+  const lock = JSON.parse(readMaybe(join(KIT_ROOT, "setup", "external-tools.lock.json")) || "{}");
+  const tools = (lock.tools || []).map((t) => {
+    let present = null;
+    try {
+      const r = spawnSync(t.cli, ["--version"], {
+        encoding: "utf8",
+        timeout: 4000,
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      const out = (r.stdout || "").trim().split(/\r?\n/)[0];
+      if ((r.status === 0 || out) && !r.error) present = out ? out.slice(0, 40) : "present";
+    } catch {
+      /* not on PATH → present stays null */
+    }
+    return { name: t.name, cli: t.cli, pin: t.pin, class: t.class, present };
+  });
+
+  // 4. Gates wired here (reuses the gate-config detection — health is the doctor's job).
+  const gatesWired = GATES.filter((g) => firstExisting(g.targets)).length;
+
+  const isUpstream = !statusText && CWD === KIT_ROOT;
+  const result = {
+    repo: basename(CWD),
+    role: isUpstream
+      ? "upstream (the kit itself)"
+      : statusText
+        ? "consumer"
+        : "no adoption declared",
+    pieces: { catalog: roster.length, ...buckets },
+    tools: tools.map(({ cli, ...t }) => t),
+    gatesWired: `${gatesWired}/${GATES.length}`,
+  };
+
+  if (JSON_OUT) {
+    console.log(JSON.stringify(result, null, 2));
+    return 0;
+  }
+
+  const out = [];
+  out.push("");
+  out.push(`  Dev-Kit Adoption · ${result.repo}`);
+  out.push(`  ${"─".repeat(50)}`);
+  if (isUpstream) {
+    out.push(`  📦 UPSTREAM — the kit itself · ${roster.length} pieces in the catalog`);
+    out.push(
+      "     (a consumer's board reads its DEV_KIT_INHERITANCE_STATUS.md; the kit is the source)"
+    );
+  } else if (statusText) {
+    out.push(
+      `  ✅ CONSUMER — ${buckets.wired} wired · ${buckets.declared} declared-only · ${buckets.na} N-A · ${buckets.pending} pending  (of ${roster.length} in catalog)`
+    );
+  } else {
+    out.push(`  ◌ NO ADOPTION DECLARED — no DEV_KIT_INHERITANCE_STATUS.md here`);
+    out.push(
+      `     (the catalog has ${roster.length} pieces available; add a status doc to declare adoption)`
+    );
+  }
+  out.push("");
+  out.push(`  Tools (kit defaults · ${"external-tools.lock.json"})`);
+  if (tools.length === 0) out.push("    (none registered)");
+  for (const t of tools) {
+    const mark = t.present ? "✓" : "✗";
+    const detail = t.present ? `present (${t.present})` : `not on PATH — pinned ${t.pin}`;
+    out.push(`    ${mark} ${t.name.padEnd(12)} [${t.class}]  ${detail}`);
+  }
+  out.push("");
+  out.push(`  Gates wired here   ${result.gatesWired}   (run \`devkit-doctor\` for their health)`);
+  if (statusText && buckets.declared > 0) {
+    out.push("");
+    out.push(
+      `  ${buckets.declared} piece(s) DECLARED-ONLY — declared but not yet wired to a mechanism.`
+    );
+  }
+  out.push("");
+  console.log(out.join("\n"));
+  return 0;
+}
+
+if (ADOPTION) process.exit(runAdoption());
 
 function summarize(out) {
   const lines = stripAnsi(out)

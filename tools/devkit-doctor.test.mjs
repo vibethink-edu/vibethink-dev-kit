@@ -7,7 +7,7 @@
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -63,12 +63,38 @@ test("a failing gate → RED, exit 1, with a fix hint", () => {
   writeFileSync(path.join(repo, "x.txt"), "local\n");
   writeFileSync(
     path.join(repo, "tools", "copy-parity.config.json"),
-    JSON.stringify({ upstreamRoot: "./does-not-exist", copies: [{ local: "x.txt", upstream: "x.txt" }] })
+    JSON.stringify({
+      upstreamRoot: "./does-not-exist",
+      copies: [{ local: "x.txt", upstream: "x.txt" }],
+    })
   );
   const { code, out } = doctor(repo);
   assert.equal(code, 1, `expected exit 1 on a failing gate, got ${code}\n${out}`);
   assert.match(out, /RED/, "should be RED when a gate fails");
   assert.match(out, /fix →/, "a red gate must print its fix hint");
+});
+
+// 4. --adoption → the inventory lens (distinct from the health board). A bare temp
+//    repo has no status doc → "no adoption declared"; the JSON still carries the
+//    catalog roster (read from the kit) + the tools list + a gatesWired count.
+test("--adoption --json → inventory shape, exit 0", () => {
+  const { code, out } = doctor(tmp(), ["--adoption", "--json"]);
+  assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
+  const j = JSON.parse(out);
+  assert.equal(j.role, "no adoption declared", "a bare repo declares no adoption");
+  assert.ok(j.pieces.catalog > 0, "the catalog roster should be read from the kit");
+  assert.ok(Array.isArray(j.tools), "tools must be an array");
+  assert.match(j.gatesWired, /^\d+\/\d+$/, "gatesWired is an x/y count");
+});
+
+// 5. --adoption (text) → leads with the verdict line, one section per lens.
+test("--adoption (text) → verdict-first board", () => {
+  const { code, out } = doctor(tmp(), ["--adoption"]);
+  assert.equal(code, 0);
+  assert.match(out, /Dev-Kit Adoption/);
+  assert.match(out, /NO ADOPTION DECLARED/);
+  assert.match(out, /Tools \(kit defaults/);
+  assert.match(out, /Gates wired here/);
 });
 
 for (const d of tmpdirs) {
