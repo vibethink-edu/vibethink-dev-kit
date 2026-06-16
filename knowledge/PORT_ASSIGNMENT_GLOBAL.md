@@ -1,10 +1,11 @@
 # Política Global de Puertos — VibeThink (capa metodología · level 2)
 
-> **Versión:** 3.0
-> **Última actualización:** 2026-05-23
+> **Versión:** 4.0 — DRAFT, awaiting Marcelo canon approval (Rule #4)
+> **Última actualización:** 2026-06-16
 > **Propósito:** Definir el **sistema** de puertos que heredan todos los proyectos VibeThink.
 > **Alcance:** capa metodología (level 2). Esto define el **esquema y las reglas**, no
-> los puertos de un producto concreto.
+> los puertos de un producto concreto. **v4.0** agrega el caso **co-residente** (varios
+> sistemas en una misma workstation) → bandas cross-sistema deterministas y sin solape.
 
 ---
 
@@ -18,6 +19,37 @@ raíz) y asigna sus apps **dentro** de estos rangos. El kit **no** dicta qué ap
 qué puerto — eso es contenido de cada producto (level 3), no del supra-repo.
 
 **Nunca** se hardcodea un puerto sin registrarlo primero en el registro del repo.
+
+---
+
+## 🖥️ Co-residencia en una workstation (v4.0 — supersede "cada repo dueño de su espacio" cuando aplica)
+
+El principio "dos repos pueden usar el mismo número" (ver §"Cómo lo interpreta un repo
+consumidor" punto 5) vale SÓLO cuando los sistemas corren **aislados**. En la workstation
+de desarrollo VibeThink **varios sistemas co-corren a la vez** (Campus, WorkBench, ViTo y
+sus DBs) → el espacio de puertos es **compartido a nivel de máquina** y las asignaciones
+DEBEN ser deterministas y **no solaparse** entre sistemas. **Este artículo prevalece** sobre
+el §"asignaciones concretas son tuyas" en el caso co-residente.
+
+### Registro de bandas cross-sistema (machine-global, determinista)
+
+| Sistema | HTTP | DB / sandbox local | Review (`prod+2000`) |
+|---|---|---|---|
+| **ViTo / orchestrator** | 3000–3099 | 54321–54329 | 50xx |
+| **WorkBench** | 3100–3109 | 54330–54339 | 51xx |
+| **Campus** | 3400–3409 | 55321–55329 (Supabase local) | 54xx |
+| **dev-kit** | — sin runtime — | — | — |
+
+Para los sistemas co-residentes, **este registro es la autoridad**: ningún sistema bindea
+fuera de su banda. (El esquema genérico de abajo sigue describiendo los *tipos* de rango;
+la asignación concreta por-sistema vive acá y en el `ports.json` de cada repo.)
+
+### Regla: NINGÚN default compartido
+
+Ningún sistema hereda el default de una herramienta que otro ya use — p. ej. **Vite 5173**
+o **Postgres embebido 54329**. Cada servidor Vite / DB se **pinea explícitamente dentro de
+la banda de SU sistema**. Heredar el default ciego es exactamente el choque que hizo que el
+preview de Campus mostrara WorkBench (2026-06-16): ambos heredaban Vite :5173.
 
 ---
 
@@ -113,6 +145,13 @@ Get-NetTCPConnection -State Listen |
 ---
 
 **Mantenedor:** the dev-kit (supra-repo upstream).
+**Cambios v4.0 (2026-06-16, DRAFT awaiting Marcelo):** agrega la sección **co-residencia**
+— cuando varios sistemas corren en la misma workstation, las bandas son machine-global,
+deterministas y sin solape (registro cross-sistema: ViTo 3000–3099 · WorkBench 3100–3109 ·
+Campus 3400–3409). Regla "ningún default compartido" (Vite 5173 / PG embebido 54329). Esto
+**supersede** el clause "dos repos pueden usar el mismo número" para sistemas co-residentes
+(antes lo permitía; co-residir lo invalida). Disparador: el preview de Campus mostró WorkBench
+por compartir Vite :5173.
 **Cambios v3.0 (2026-05-23):** la política pasó de "mapa de puertos de ViTo" (level-3
 duplicado de su `ports.json`) a **esquema + reglas agnósticos** (level 2). Las
 asignaciones por-app de cada producto viven en el `ports.json` de ese repo, no acá.
