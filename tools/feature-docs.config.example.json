@@ -1,0 +1,12 @@
+{
+  "_schema": "VIBETHINK_FEATURE_DOCS_V1",
+  "_doc": "Per-repo binding for CANON-DEVELOPMENT-PROCESS §5/§6, enforced by check-feature-docs.mjs. The canon prescribes the artifact ROLES; the concrete filenames are L3 (yours). Copy to tools/feature-docs.config.json and bind to your repo. Any section set to null is a conscious N-A (reported, never a failure). No config file at all → the gate is skipped by devkit-doctor.",
+  "binding": "AGENTS.md",
+  "featureScope": {
+    "root": "docs/features",
+    "requiredArtifacts": ["ROADMAP.md", "BITACORA.md", "PRDI.md"]
+  },
+  "findings": {
+    "location": "docs/ai-coordination/comms"
+  }
+}

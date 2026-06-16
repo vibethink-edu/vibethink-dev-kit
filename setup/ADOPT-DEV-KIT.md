@@ -347,10 +347,24 @@ verifica · Layer**.
   - A consumer whose native development flow already satisfies the L1 declares
     this piece `ADOPTED-NATIVE` and **names the native binding** (its own
     lane/gate model). It does not import #10b to adopt #10a.
+  - **Lifecycle artifacts (§5) + findings (§6) — enforcement shipped by the kit**
+    (so the artifact set bites for every heir, not just by convention). Copy
+    `setup/templates/feature-docs/` (requirements · readiness-plan-with-security ·
+    roadmap · append-only log · per-unit changelog · finding — plus a README
+    *discoverability map* that points at which canon governs each part, including the
+    versioning rules), rename to your filenames (L3), and declare them in
+    `tools/feature-docs.config.json`. The kit's `tools/check-feature-docs.mjs` then
+    verifies every declared unit carries each required artifact (existing + non-empty)
+    and the findings location exists; **`devkit-doctor` runs it automatically** —
+    config-driven: no config → skipped, declared → gated, `null` = conscious N-A. The
+    gate guarantees the artifact is *present* (the precondition for review); a reviewer
+    judges its content.
 - **Verificar:** a recent non-trivial change shows the gate verdict (the decision
   to proceed was governed, not implicit) and the authority hierarchy held (no code
   overrode a sealed canon). The native binding that satisfies the L1 is named in
   your `AGENTS.md`.
+  - **`devkit-doctor` shows the `feature documentation` gate green** (every declared
+    unit carries its artifacts) — or the repo consciously declares the section `N-A`.
 
 ### 10b — VT-Method (L2, house methodology binding)
 
