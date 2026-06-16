@@ -201,6 +201,12 @@ When local verification is **not feasible** (the infra is not available locally,
 
 This does **not** apply to trivial or freely-reversible changes (a typo, a doc edit, a tactical choice inside an already-approved unit). It applies exactly where the cost of being wrong is real — the same threshold §5.2 step 4 names. *"The human approved it"* is not a defense for an unverified recommendation any more than it is for an against-canon one (§5.5).
 
+### §5.7 — Reference verification before a structural file move
+
+§5.6 verifies a *hypothesis* before *recommending*. This adds the structural counterpart: before **moving, renaming, or deleting a file referenced from outside its origin location** (a shared module, CSS, config, asset, or any path hardcoded in scripts/gates), verify ALL its references across the whole workspace — not just the directory or app it lived in.
+
+A reference search scoped to the origin is insufficient: cross-package / cross-app imports, and literal paths baked into governance gates, build configs, or scripts, break **silently** — they pass the origin's type-check and fail only in a consumer's build (or in a gate scanning a now-moved path). Technique: grep the whole workspace for the file's name + old path BEFORE the move; scope the pre-merge build/type-check to **every** affected consumer, not only the origin; and update any gate/config/script that hardcodes the old path in the same change. *"It compiled where it lived"* is not evidence the move is safe — the same way *"the human approved it"* is not (§5.5).
+
 ---
 
 ## §6 — Eleven constitutional rules of collaboration
