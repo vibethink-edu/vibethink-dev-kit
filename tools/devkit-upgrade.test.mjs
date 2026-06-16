@@ -53,10 +53,12 @@ function scaffold({ upstreamBody, localBody }) {
 }
 
 function run(consumer, upstream, extra = []) {
-  const r = spawnSync("node", [TOOL, "--no-pull", "--upstream-root", upstream, ...extra], {
-    cwd: consumer,
-    encoding: "utf8",
-  });
+  // --no-tools: never trigger a real install-external-tools during tests/CI.
+  const r = spawnSync(
+    "node",
+    [TOOL, "--no-pull", "--no-tools", "--upstream-root", upstream, ...extra],
+    { cwd: consumer, encoding: "utf8" }
+  );
   return { code: r.status ?? 1, out: `${r.stdout ?? ""}${r.stderr ?? ""}` };
 }
 const localOf = (consumer) => readFileSync(path.join(consumer, "tools", "engine.mjs"), "utf8");

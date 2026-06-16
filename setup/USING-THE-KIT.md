@@ -99,12 +99,15 @@ pwsh  ../_vibethink-dev-kit/setup/install-external-tools.ps1     # Windows
 
 **Update to the latest kit (one shot):**
 ```bash
-node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs            # pull --ff-only + re-sync copied runnables + report tool drift
+node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs            # pull --ff-only + re-sync runnables + provision MISSING tools + report drift
 node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs --dry-run  # preview first (it APPLIES by default)
+node ../_vibethink-dev-kit/tools/devkit-upgrade.mjs --no-tools # skip the tool-provision step (offline / no-network)
 ```
-It does the §1.5 steps as one command. It does NOT auto-install global tools or move a
-pin (that stays an evidence-PR to the lock) — it re-syncs your copied runnables and
-prints the exact command for any tool behind its pin.
+It does the §1.5 steps as one command: re-syncs your copied runnables, and runs
+`install-external-tools` to provision any **missing** default tool to its pin
+(install-if-missing — it never moves a *present* tool's version; a pin move stays an
+evidence-PR to the lock). Any tool present-but-behind its pin is reported with the
+exact upgrade command, not changed for you.
 
 **Send a governed comm (write path — commits + pushes):**
 ```bash
