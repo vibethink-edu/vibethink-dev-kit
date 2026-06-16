@@ -146,6 +146,18 @@ jobs:
       - name: comms-security-gate tests
         run: node tools/comms-security-gate.test.mjs
 
+      - name: comms-sync tests
+        run: node tools/comms-sync.test.mjs
+
+      - name: inheritance-claims tests
+        run: node tools/check-inheritance-claims.test.mjs
+
+      - name: tenant-contamination tests
+        run: node tools/check-tenant-contamination.test.mjs
+
+      - name: keyword-reminder tests
+        run: node tools/keyword-reminder.test.mjs
+
       - name: devkit-doctor tests
         run: node tools/devkit-doctor.test.mjs
 
