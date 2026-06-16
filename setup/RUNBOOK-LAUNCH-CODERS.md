@@ -181,3 +181,38 @@ The coder exits with every branch it touched in one of three states (`CANON-GIT-
 **PUSHED**, **READY-PR** (draft PR open), or **DISCARDED**. No uncommitted WIP at exit; a
 final report to the coordination channel (state per task, verification matrix); and, if the
 spec has a row in the dispatch board, its row updated.
+
+---
+
+## 9. Worked example — Claude CLI (PowerShell)
+
+This is the concrete shape any agent uses to **produce the launch instruction** for a coder running
+as a `claude` CLI session. The launcher (`launch-coder.ps1`) is the consuming repo's L3 instance of §3;
+the agent does **not** invent the command — it hands the human this exact frame.
+
+**The instruction to emit (per coder):**
+```powershell
+# Once per terminal — the bot token lives in the ENV, never in a file (§5):
+$env:GH_TOKEN = "<PAT of the coder bot, e.g. colupbot-coder>"
+cd "<repo>/ops/coder-launch"
+
+# One coder per terminal (run several terminals for a parallel wave):
+.\launch-coder.ps1 <spec-id>        # e.g. 028-config-academica
+```
+
+**What the human sees happen (the launcher does §3 automatically):**
+1. **Identity gate** — aborts unless THIS session's `gh` is the coder bot (never pushes as someone else).
+2. **Clean worktree** from the latest `origin/main` → `<tmp>/wt-<spec-id>` (reused if present).
+3. **Per-session `settings.local.json`** written into that worktree (allowlist + deny-guard, §5) so the
+   session runs without stalling on every prompt, while identity/destruction/secrets stay gated.
+4. **Launches `claude`** in the worktree with `prompt-<spec-id>.txt` (or `prompt-base.txt`) + the line
+   `>>> YOUR ASSIGNED SPEC: specs/<spec-id>`.
+
+**To launch ANY new spec** (not a fixed list): ensure `prompt-<spec-id>.txt` exists (carrying the
+command-hygiene section of §6 + the design-gate for boundary specs), then the instruction is always the
+same frame above with the new `<spec-id>`. The coder opens a **draft PR as the bot, never merges**, and
+**stops at the boundary gate** (new RLS/migration) for the architect to verify before apply.
+
+**Resuming / parallel:** see §4. One `$env:GH_TOKEN` per terminal; coders on independent specs (distinct
+tables/providers) don't collide. The consuming repo names the concrete launcher + token var (L3, §1);
+this appendix is the Claude-CLI binding of the agnostic body above.
