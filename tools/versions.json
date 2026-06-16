@@ -12,7 +12,7 @@
     "check-tool-versions.mjs": "1.1",
     "check-tools.sh": "1.1",
     "comms-security-gate.mjs": "1.0",
-    "comms-send.mjs": "1.0",
+    "comms-send.mjs": "1.1",
     "comms-sync.mjs": "1.0",
     "devkit-doctor.mjs": "1.0",
     "feed.mjs": "1.0",

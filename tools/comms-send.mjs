@@ -121,6 +121,20 @@ export function buildFilename(type, re, date) {
   return `${String(type).toUpperCase()}-${slugify(re)}-${date}.md`;
 }
 
+/** Text of the markdown section started by `headingRe`, up to the next `## ` heading
+ *  (or end of doc). Lets governance inspect a section's CONTENT, not just its presence. */
+export function sectionBody(body, headingRe) {
+  const lines = String(body).split(/\r?\n/);
+  const start = lines.findIndex((l) => headingRe.test(l));
+  if (start === -1) return "";
+  const out = [];
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^## /.test(lines[i])) break; // next section ends this one
+    out.push(lines[i]);
+  }
+  return out.join("\n");
+}
+
 /** GOVERNANCE: returns an array of error strings ([] = valid). */
 export function validate({ to, type, re, body, targetLayer, refBranch }) {
   const errors = [];
@@ -138,10 +152,38 @@ export function validate({ to, type, re, body, targetLayer, refBranch }) {
       errors.push(`--target-layer must be one of: ${[...TARGET_LAYERS].join(", ")}`);
     if (!refBranch || !String(refBranch).trim())
       errors.push(`--ref-branch is required for ${normalizedType} comms`);
-    if (!/^## Recipient Self-Check\b/m.test(String(body)))
+    const SELF_CHECK_RE = /^## Recipient Self-Check\b/m;
+    if (!SELF_CHECK_RE.test(String(body)))
       errors.push(
         `body must include a "## Recipient Self-Check" section for ${normalizedType} comms`
       );
+    else {
+      // A heading alone is not a self-check (#23.3 — a blank heading used to pass):
+      // the section must carry content AND orient the recipient — at minimum the
+      // branch to work on and the target repo/layer it pertains to.
+      const text = sectionBody(String(body), SELF_CHECK_RE).trim();
+      if (text.length < 12)
+        errors.push(
+          `the "## Recipient Self-Check" section must have content, not just a heading, for ${normalizedType} comms`
+        );
+      else {
+        const lower = text.toLowerCase();
+        const namesBranch =
+          /\bbranch\b/.test(lower) ||
+          (refBranch && lower.includes(String(refBranch).toLowerCase()));
+        const namesTarget =
+          /\brepo\b|\blayer\b/.test(lower) ||
+          (targetLayer && lower.includes(String(targetLayer).toLowerCase()));
+        if (!namesBranch)
+          errors.push(
+            `the Self-Check must reference the branch (ref_branch / branch) for ${normalizedType} comms`
+          );
+        if (!namesTarget)
+          errors.push(
+            `the Self-Check must reference the target repo or layer for ${normalizedType} comms`
+          );
+      }
+    }
   }
   return errors;
 }
