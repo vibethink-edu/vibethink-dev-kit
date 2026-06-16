@@ -62,7 +62,11 @@ const GATES = [
   {
     label: "adoption claims honest",
     engine: "check-inheritance-claims.mjs",
-    targets: ["docs/DEV_KIT_INHERITANCE_STATUS.md", "DEV_KIT_INHERITANCE_STATUS.md"],
+    targets: [
+      "doc/DEV_KIT_INHERITANCE_STATUS.md",
+      "docs/DEV_KIT_INHERITANCE_STATUS.md",
+      "DEV_KIT_INHERITANCE_STATUS.md",
+    ],
     fix: "a status-doc row is vague or cites a mechanism that does not exist",
   },
   {
@@ -129,8 +133,9 @@ function runAdoption() {
 
   // 2. This repo's declared adoption, from its status doc (if any).
   const statusRel = firstExisting([
-    "DEV_KIT_INHERITANCE_STATUS.md",
+    "doc/DEV_KIT_INHERITANCE_STATUS.md",
     "docs/DEV_KIT_INHERITANCE_STATUS.md",
+    "DEV_KIT_INHERITANCE_STATUS.md",
   ]);
   const statusText = statusRel ? readMaybe(join(CWD, statusRel)) : null;
   const STATUS_KW =

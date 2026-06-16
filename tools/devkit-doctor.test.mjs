@@ -97,6 +97,27 @@ test("--adoption (text) → verdict-first board", () => {
   assert.match(out, /Gates wired here/);
 });
 
+// 6. --adoption finds the status doc at doc/ (singular), not only docs/ — the
+//    false-negative the WorkBench seat caught (TASK #129): a present status doc in
+//    doc/ was read as "NO ADOPTION DECLARED" because the path list missed doc/.
+test("--adoption detects doc/ (singular) status doc → role consumer", () => {
+  const repo = tmp();
+  mkdirSync(path.join(repo, "doc"), { recursive: true });
+  writeFileSync(
+    path.join(repo, "doc", "DEV_KIT_INHERITANCE_STATUS.md"),
+    "| Piece | Status |\n|---|---|\n| layering | WIRED-CI(x.yml:smoke) |\n"
+  );
+  const { code, out } = doctor(repo, ["--adoption", "--json"]);
+  assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
+  const j = JSON.parse(out);
+  assert.equal(
+    j.role,
+    "consumer",
+    "a doc/ status doc must be detected (not 'no adoption declared')"
+  );
+  assert.ok(j.pieces.rows >= 1, "its claim rows should be counted");
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });
