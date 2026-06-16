@@ -90,7 +90,7 @@ agnostic / cross-product decision registers in the supra-repo's decision store, 
 product-specific one in that product's store. (Disposition + indexing rules live in
 the decision-disposition canon.)
 
-> **Amended 2026-06-16 §5 — PROPOSED (seal = Principal Architect's merge):** the artifact
+> **Amended 2026-06-16 §5 — SEALED 2026-06-16 by the Principal Architect (delegated merge — "mergealos vos"; PR #134 → `b71c5fa`):** the artifact
 > set above now ships as a **heritable instrument** — `setup/templates/feature-docs/` (one
 > template per artifact role + a `FINDING` template for §6 + a README *discoverability map*
 > that names which canon governs each part, **including the versioning rules**), enforced by

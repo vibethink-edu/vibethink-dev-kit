@@ -1,6 +1,6 @@
 # ADR-20260616-runtime-policy-engine
 
-**Status:** PROPOSED — pending Principal Architect seal (merge of this PR = ACCEPTED)
+**Status:** ACCEPTED 2026-06-16 — Principal Architect, delegated merge of PR #136 → `5cd285f` ("mergealos vos"). New-spine direction approved; **next step on accept** (below) = draft `CANON-RUNTIME-POLICY-ENGINE`. Registered as D-009.
 **Date:** 2026-06-16
 **Decider:** Marcelo (Principal Architect)
 **Context source:** `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md` (omnigent entry, source-verified at clone `HEAD 5a8fd16`)
