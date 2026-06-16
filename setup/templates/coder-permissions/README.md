@@ -71,14 +71,17 @@ is not.
 1. The launch script writes this file to the coder worktree's `.claude/settings.local.json`
    **each launch** (so the current policy always applies), per `RUNBOOK-LAUNCH-CODERS.md` §3.
 2. **Never commit it** to the repo and **never** make it global (`CANON-CODER-SAFE-IDENTITY-001` §8).
-3. **Do NOT use the harness's full bypass-permissions mode** as a shortcut — verified behavior:
-   full bypass skips `deny` too, which would silence every gate above. The whole posture relies
-   on broad-`allow` + `deny`-wins, **not** on bypass.
+3. **You don't need bypass mode** — `allow: ["Bash"]` + `deny` already silences the routine while
+   the guard bites; prefer it so there's no global "skip" flag to misapply. (For the exact
+   Claude Code semantics — including the fact that `bypassPermissions` does **not** skip `deny` —
+   see `CLAUDE-CODE-SCOPE.md` in this folder. The harness-specific behavior is pinned there, not
+   guessed here.)
 4. **Smoke-verify on your harness version (2 checks, once):**
    - a compound recon command (`cd <wt> && ls`) runs **silent** → allow-broad works;
-   - a denied command in a compound (`true && rm -rf /tmp/x`) is **blocked** → deny still bites.
-   If the second one is NOT blocked, your harness is not enforcing `deny` under this allow —
-   stop and fall back to the allowlist middle-ground (`RUNBOOK-LAUNCH-CODERS.md` §5) until fixed.
+   - a denied command in a compound (`true && rm -rf /tmp/x`) is **blocked** → deny bites
+     per-sub-command.
+   If the second one is NOT blocked, a stray local `allow` is overriding the deny — fix it before
+   launching coders.
 
 ## A knob you may turn (per repo)
 
