@@ -65,6 +65,51 @@ do these three checks (each ~10s):
 > runnables parity flags; declare any new piece.* The law travels by reference — you
 > chase it, it doesn't chase you.
 
+> **After an update, see what moved:** `node ../_vibethink-dev-kit/tools/devkit-doctor.mjs --adoption`
+> (the inventory lens) shows your pieces (wired / declared-only / N-A) **and** your
+> default tools with installed-vs-pin drift — so a stale tool or an undeclared new
+> piece is visible, not silent. To move a default tool to its pin, re-run the
+> provisioner (below); version-forward of a pin is a deliberate PR to the lock.
+
+---
+
+## 1.6 Command cheat-sheet (what you actually run)
+
+All paths assume the kit is a sibling at `../_vibethink-dev-kit`. Everything here is
+**read-only** except the provisioner (installs tools) and `comms-send` (commits).
+
+**See your state (run anytime):**
+```bash
+node ../_vibethink-dev-kit/tools/devkit-doctor.mjs              # HEALTH — are my gates green? (+ --verbose / --json)
+node ../_vibethink-dev-kit/tools/devkit-doctor.mjs --adoption   # INVENTORY — what have I adopted / what tools do I use?
+node ../_vibethink-dev-kit/tools/inbox.mjs <you|human>          # your comms inbox
+node ../_vibethink-dev-kit/tools/comms-sync.mjs <you|human>     # pull + filtered inbox + "is anything stuck on my machine?"
+```
+
+**Default operator tools (graphify, rtk, …):**
+```bash
+bash ../_vibethink-dev-kit/setup/install-external-tools.sh      # macOS/Linux — install to pin (idempotent, non-blocking)
+pwsh  ../_vibethink-dev-kit/setup/install-external-tools.ps1     # Windows
+# presence + drift is shown by `devkit-doctor --adoption`; the pins live in setup/external-tools.lock.json
+```
+
+**Update to the latest kit:** see §1.5 B (pull `--ff-only` → copy-parity → doctor).
+
+**Send a governed comm (write path — commits + pushes):**
+```bash
+node ../_vibethink-dev-kit/tools/comms-send.mjs --to <agent|human> --type <task|finding|note|…> \
+  --re "<subject>" --body "<text>"   # safety-scanned, create-only; governance types need --target-layer/--ref-branch
+```
+
+**Launch autonomous coders:** follow [`RUNBOOK-LAUNCH-CODERS.md`](RUNBOOK-LAUNCH-CODERS.md);
+the per-session permissions instance is [`templates/coder-permissions/`](templates/coder-permissions/)
+(broad-allow Bash + airtight deny; the Claude-Code scope is pinned in that folder's
+`CLAUDE-CODE-SCOPE.md`).
+
+**Versioning instrument** (apps/packages, so a version can't freeze): the live source +
+binding live in [`templates/versioning/`](templates/versioning/); `check-versioning`
+verifies a declared model points at a real source. See `CANON-VERSIONING-001`.
+
 ---
 
 ## 2. The first hour (becoming a real heir, concretely)
