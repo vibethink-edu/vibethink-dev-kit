@@ -1,0 +1,32 @@
+# Per-repo versioning binding (CANON-VERSIONING-001 §10).
+# One file that answers "how do I bump this repo?" for a fresh agent or contributor.
+# Copy to `.versioning.yaml` at your repo root and fill in YOUR posture.
+# Set a section to a model OR delete it — check-versioning treats absent/null as a
+# conscious N-A (reported, never a failure).
+
+inherits: CANON-VERSIONING-001
+
+# Deployed app (service / site / runtime). CalVer by default.
+apps:
+  model: calver                 # calver | semver (semver only if you expose a versioned API)
+  pattern: YYYY.MM.DD+sha        # stateless, deploy-in-commit (see get-app-version.mjs)
+  #         YYYY.MM.DD-N         # OR the stateful per-day counter form (canon §5)
+  version_source: tools/get-app-version.mjs   # the LIVE source — computed, cannot freeze
+  health_endpoint: /healthz      # returns at minimum {version, commit}
+
+# Publishable code packages. SemVer 2.0.
+packages:
+  model: semver-2.0
+  manager: changesets            # changesets | semantic-release | manual
+  conventional_commits: required # required | advisory | not-enforced
+  internal_dep_pinning: exact
+
+# Canon docs + ADRs + tools inherit the canon's models as-is; declare the approver.
+canons:
+  numbering: sequential
+  approver: <named-authority>    # the single person who seals canon transitions here
+adrs:
+  folder: docs/decisions
+  pattern: ADR-YYYYMMDD-slug
+tools:
+  model: semver-lite             # MAJOR.MINOR via tools/versions.json (check-tool-versions)

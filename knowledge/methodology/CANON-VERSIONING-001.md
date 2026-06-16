@@ -57,6 +57,9 @@ A repo MAY enforce this mechanically via `commitlint` (or equivalent) in a pre-c
 ## 5. Deployed apps — CalVer vs SemVer
 
 - **Default: CalVer** for apps that are not consumed by external APIs. Pattern: `YYYY.MM.DD-N` (e.g. `2026.06.03-1`) or `YYYY.WW-N` (week-based; e.g. `2026.23-2`).
+- **Stateless / deploy-in-commit apps** MAY instead use `YYYY.MM.DD+<shortSha>` (e.g. `2026.06.16+a1b2c3d`), where `+<shortSha>` is SemVer build metadata (ignored for ordering). It pins the exact build with **zero state** — no per-day counter to maintain — and is the form a *derived* version source emits. A version that is computed cannot freeze; a hand-typed one will. The reference instrument is `setup/templates/versioning/` (a live version source + the per-repo binding), enforced by `check-versioning`.
+
+> **Amended 2026-06-16 §5:** added the `YYYY.MM.DD+<shortSha>` build-metadata form for stateless/deploy-in-commit apps (the `-N` counter remains the default). Motivated by a consuming repo that sat frozen on a hand-typed version for weeks — a derived `+<sha>` version is always fresh by construction. Shipped together with the heritable instrument (`setup/templates/versioning/`) and the `check-versioning` gate that fails a declared model with no live source.
 - **Alternative: SemVer** for apps that expose a stable versioned API to other apps, mobile clients, or third parties. Then the app's API version follows SemVer, and the build version may still be CalVer.
 - **Deployment manifest** declares the version at the deploy boundary (`version.json` at runtime, `/healthz` endpoint, equivalent).
 - **Health endpoint returns the version.** A request to `/healthz` or equivalent returns at minimum the deployed version + git commit hash. This is the runtime-side counterpart to the deploy-time tag.
@@ -174,6 +177,7 @@ A repo MAY (and is strongly recommended to) wire mechanical enforcement for:
 4. **ADR immutability check** — diff over `doc/decisions/` (or equivalent) allows only Status header changes; body diffs are blocked.
 5. **Changelog mandatory** — PR touching a publishable package without `CHANGELOG.md` update → blocked.
 6. **Health endpoint version check** — CI deploy step verifies `/healthz` returns the expected version + commit hash.
+7. **App/package versioning wired** — `check-versioning` verifies a declared app/package model points at a *live* version source (a derived version, not a hand-typed literal that can freeze), not merely that the model is named. The instrument it checks ships at `setup/templates/versioning/`.
 
 Each gate is per-repo enabled in the binding; this canon defines the menu, not the choices.
 

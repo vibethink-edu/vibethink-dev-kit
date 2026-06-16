@@ -32,7 +32,8 @@ const argv = process.argv.slice(2);
 const VERBOSE = argv.includes("--verbose") || argv.includes("-v");
 const JSON_OUT = argv.includes("--json");
 
-const stripAnsi = (s) => s.replace(/\x1b\[[0-9;]*m/g, "");
+const ESC = String.fromCharCode(27); // ANSI escape; built via fromCharCode so no control char sits in a regex literal
+const stripAnsi = (s) => s.replace(new RegExp(`${ESC}\\[[0-9;]*m`, "g"), "");
 const cap = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 // Each gate: the engine, candidate target paths (first existing wins — config file
@@ -86,6 +87,12 @@ const GATES = [
     engine: "check-tool-versions.mjs",
     targets: ["tools/versions.json"],
     fix: "a wired tool has no version in tools/versions.json (or a stale/malformed entry) — add or fix it",
+  },
+  {
+    label: "app/package versioning",
+    engine: "check-versioning.mjs",
+    targets: ["tools/versioning.config.json"],
+    fix: "a declared app/package model has no live version source (the frozen-version trap) — wire it, or set the model null for a conscious N-A",
   },
 ];
 
@@ -166,8 +173,7 @@ out.push("");
 out.push(`  Dev-Kit Doctor · ${basename(CWD)}`);
 out.push(`  ${"─".repeat(50)}`);
 out.push(
-  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass` +
-    (failed.length ? `, ${failed.length} to fix` : ", nothing to fix")
+  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass${failed.length ? `, ${failed.length} to fix` : ", nothing to fix"}`
 );
 out.push("");
 for (const r of ran) {
@@ -177,7 +183,9 @@ for (const r of ran) {
 }
 out.push("");
 if (failed.length) {
-  out.push(`  ${failed.length} gate${failed.length > 1 ? "s" : ""} need attention — re-run with --verbose to see exactly what.`);
+  out.push(
+    `  ${failed.length} gate${failed.length > 1 ? "s" : ""} need attention — re-run with --verbose to see exactly what.`
+  );
 } else {
   out.push(`  All clear.${VERBOSE ? "" : " Run with --verbose for the full per-gate output."}`);
 }

@@ -1,0 +1,13 @@
+{
+  "_about": "Example versioning posture for a CONSUMER that ships an app + a package (CANON-VERSIONING-001). Copy to tools/versioning.config.json and edit. check-versioning confirms each declared model is WIRED to a live source — not just named. Set a model to null for a conscious N-A.",
+  "binding": ".versioning.yaml",
+  "apps": {
+    "model": "calver",
+    "versionSource": "tools/get-app-version.mjs",
+    "pattern": "YYYY.MM.DD+sha"
+  },
+  "packages": {
+    "model": "semver-2.0",
+    "manifest": "package.json"
+  }
+}

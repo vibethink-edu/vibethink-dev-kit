@@ -179,6 +179,12 @@ jobs:
       - name: tool-versions engine tests
         run: node tools/check-tool-versions.test.mjs
 
+      - name: app/package versioning wired
+        run: node tools/check-versioning.mjs
+
+      - name: versioning engine tests
+        run: node tools/check-versioning.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
