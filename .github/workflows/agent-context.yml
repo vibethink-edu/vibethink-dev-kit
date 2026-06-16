@@ -143,6 +143,9 @@ jobs:
       - name: comms-send tests
         run: node tools/comms-send.test.mjs
 
+      - name: comms-security-gate tests
+        run: node tools/comms-security-gate.test.mjs
+
       - name: devkit-doctor tests
         run: node tools/devkit-doctor.test.mjs
 
