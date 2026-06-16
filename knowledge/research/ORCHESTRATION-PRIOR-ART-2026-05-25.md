@@ -71,12 +71,21 @@ our *handoff artifact* — no external tool adopted.
 
 ## omnigent — runtime policy-engine prior-art (added 2026-06-16, source-verified)
 
-**Repo:** https://github.com/omnigent-ai/omnigent · **License:** Apache-2.0 · **Maturity:** alpha (~2.7k★).
+**Repo:** https://github.com/omnigent-ai/omnigent · **License:** Apache-2.0 · **Maturity:** alpha — **repo created 2026-06-11** (days old at time of writing), ~2.7k★ already (heavy buzz, not maturity).
 **Evidence:** read at clone `HEAD 5a8fd16` (2026-06-16) — `omnigent/policies/{types,base}.py`,
 `omnigent/runtime/policies/engine.py`, `omnigent/policies/builtins/*`, `docs/POLICIES.md`,
 `docs/AGENT_YAML_SPEC.md`. Level-2 bitácora: `_upstream-bitacora/tools/omnigent.md`.
 **What it is (one line):** a meta-orchestration layer over many agent runtimes whose strongest,
 most-transferable piece is a **runtime policy engine** that governs agent behaviour by interception.
+
+**Provenance check (secondary source flagged):** a popular walkthrough (Cole Medin, 2026) describes
+omnigent as *"open-source from Databricks, driven by their CTO, dogfooded internally."* **The repo does
+NOT confirm that** — owner is the org `omnigent-ai` (not Databricks); the GitHub metadata names no
+Databricks authorship. Databricks appears only as an **optional model provider** (`omnigent[databricks]`
+extra) and the source uses `databricks-claude-*` model ids as examples — *consistent with* a Databricks
+connection, but **not proof of ownership**. Treat the Databricks-origin claim as **plausible, unverified**;
+it does not change the analysis. (Lesson: a secondary source's provenance claim is not propagated as fact
+without repo confirmation.) The 5-day age **reinforces** the verdict below — extract patterns, do not depend.
 
 ### The engine model (verified from source — not memory)
 
@@ -192,7 +201,8 @@ strong L1 candidate; the builtin primitives (#4) are L1/L2 candidates. Next step
 
 ## Sources
 
-- omnigent (meta-orchestration + runtime policy engine), Apache-2.0, alpha — https://github.com/omnigent-ai/omnigent (read at HEAD `5a8fd16`, 2026-06-16; `docs/POLICIES.md`, `docs/AGENT_YAML_SPEC.md`, `omnigent/policies/*`, `omnigent/runtime/policies/engine.py`). Level-2 bitácora: `_upstream-bitacora/tools/omnigent.md`.
+- omnigent (meta-orchestration + runtime policy engine), Apache-2.0, alpha — https://github.com/omnigent-ai/omnigent (read at HEAD `5a8fd16`, 2026-06-16; `docs/POLICIES.md`, `docs/AGENT_YAML_SPEC.md`, `omnigent/policies/*`, `omnigent/runtime/policies/engine.py`; repo created 2026-06-11, owner org `omnigent-ai`, Databricks = optional model-provider extra only). Level-2 bitácora: `_upstream-bitacora/tools/omnigent.md`.
+- omnigent walkthrough — Cole Medin (video transcript, 2026; **secondary source**, shared by Marcelo). Corroborates the meta-harness framing (one layer over Claude Code / Codex / Pi), the policy + guardrail + human-in-the-loop model (the force-push-approval demo = a working-dir/safety policy), and OS/cloud sandboxing. Makes an **unverified** Databricks-origin claim (see Provenance check above) — not propagated as fact.
 - GNAP (Git-Native Agent Protocol), RFC draft — https://github.com/farol-team/gnap
 - A2A Protocol v1.0 (Linux Foundation) — https://a2a-protocol.org/latest/ · https://github.com/a2aproject/A2A
 - AGENTS.md spec + Gloaguen 2026 finding — https://asdlc.io/practices/agents-md-spec/
