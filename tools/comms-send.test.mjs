@@ -54,7 +54,15 @@ function send(cwd, args) {
 }
 
 const baseArgs = (extra = []) => [
-  "--to", "human", "--type", "note", "--re", "test subject", "--body", "a plain body", ...extra,
+  "--to",
+  "human",
+  "--type",
+  "note",
+  "--re",
+  "test subject",
+  "--body",
+  "a plain body",
+  ...extra,
 ];
 
 // 1. COMMITTED-LOCAL fallback — no remote configured → commit only, warn, exit 0
@@ -83,12 +91,23 @@ test("--no-push → COMMITTED-LOCAL (deliberate), exit 0", () => {
 // 3. SAFETY first — a secret value blocks the send, nothing written, exit 1
 test("secret value → BLOCKED, exit 1", () => {
   const repo = makeRepo();
-  const { code, out } = send(repo, ["--to", "human", "--type", "note", "--re", "leak",
-    "--body", "the key is sk-ABCDEF0123456789ghij"]);
+  const { code, out } = send(repo, [
+    "--to",
+    "human",
+    "--type",
+    "note",
+    "--re",
+    "leak",
+    "--body",
+    "the key is sk-ABCDEF0123456789ghij",
+  ]);
   assert.equal(code, 1, `expected exit 1, got ${code}\n${out}`);
   assert.match(out, /BLOCKED/, "should block on the secret");
   // nothing committed beyond the initial commit
-  const count = execFileSync("git", ["rev-list", "--count", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  const count = execFileSync("git", ["rev-list", "--count", "HEAD"], {
+    cwd: repo,
+    encoding: "utf8",
+  }).trim();
   assert.equal(count, "1", "no comm should have been committed");
 });
 
@@ -108,6 +127,51 @@ test("missing --re → validation error, exit 2", () => {
   const { code, out } = send(repo, ["--to", "human", "--type", "note", "--body", "x"]);
   assert.equal(code, 2, `expected exit 2, got ${code}\n${out}`);
   assert.match(out, /invalid|required/i);
+});
+
+// Governance comms (task/review/audit) require a Recipient Self-Check with CONTENT,
+// not just a heading (#23.3 — a blank heading used to pass). branch + target repo/layer.
+const govArgs = (body, extra = []) => [
+  "--to",
+  "codex",
+  "--type",
+  "task",
+  "--re",
+  "gov subject",
+  "--target-layer",
+  "product-L3",
+  "--ref-branch",
+  "main",
+  "--body",
+  body,
+  ...extra,
+];
+
+// 6. Governance comm whose Self-Check is a bare heading → validation error, exit 2.
+test("governance comm with empty Self-Check → exit 2", () => {
+  const repo = makeRepo();
+  const { code, out } = send(repo, govArgs("intro line\n\n## Recipient Self-Check\n"));
+  assert.equal(code, 2, `expected exit 2, got ${code}\n${out}`);
+  assert.match(out, /Self-Check.*content|content.*Self-Check/i);
+});
+
+// 7. Self-Check has content but never names the branch → exit 2 (must orient the recipient).
+test("governance Self-Check missing the branch → exit 2", () => {
+  const repo = makeRepo();
+  const body = "## Recipient Self-Check\n- this pertains to the repo at layer product-L3\n";
+  const { code, out } = send(repo, govArgs(body));
+  assert.equal(code, 2, `expected exit 2, got ${code}\n${out}`);
+  assert.match(out, /branch/i);
+});
+
+// 8. A proper Self-Check (branch + target repo/layer) → governance passes, comm sends.
+test("governance comm with a complete Self-Check → exit 0", () => {
+  const repo = makeRepo();
+  const body =
+    "## Recipient Self-Check\n- branch: main\n- target repo vibethink-dev-kit, layer product-L3\n";
+  const { code, out } = send(repo, govArgs(body));
+  assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
+  assert.match(out, /COMMITTED-LOCAL/);
 });
 
 for (const d of tmpdirs) {
