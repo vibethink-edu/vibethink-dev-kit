@@ -1,7 +1,7 @@
 # CANON — Port Assignment (universal · agent-agnostic)
 
 > **Scope:** every repo that runs or deploys one or more long-running services (an app, an API, a database, a preview server, a worker) on a host where a port can collide.
-> **Status:** PROPOSED 2026-06-17 — awaiting the Principal Architect's seal (fire-test passed: no product, vendor, brand, framework, or methodology name appears here).
+> **Status:** SEALED 2026-06-17 by the Principal Architect ("sella") — fire-test passed (no product, vendor, brand, framework, methodology name, or concrete port number appears here). PR #145 · D-013.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** operational readiness discipline · binds with `CANON-CONFIGURATION-DISCIPLINE.md` (single source of truth for config) and `REVIEW-READINESS-PROTOCOL.md` (a reachable port is a review precondition).
 

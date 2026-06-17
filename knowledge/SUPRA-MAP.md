@@ -34,7 +34,7 @@ flowchart LR
     CANON_GIT_HYGIENE["#22 git hygiene"]
     CANON_HUMAN_SURFACE_LEGIBILITY_001["#39 human surface legibility"]
     CANON_NAMING_CONVENTIONS_001["#13 naming conventions"]
-    CANON_PORT_ASSIGNMENT_001["port assignment"]
+    CANON_PORT_ASSIGNMENT_001["#41 port assignment"]
     CANON_PRODUCTION_SAFETY["#30 production safety"]
     CANON_STATE_MIRROR_AND_DECISION_REGISTER_001["#34 state mirror and decision register"]
     CANON_TESTING_GATE["#26 testing gate"]
