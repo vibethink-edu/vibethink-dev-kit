@@ -4,14 +4,19 @@ from: claude
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
-needs: review
+status: withdrawn
+resolution: RETIRADO 2026-06-17 por Marcelo — NO es agnóstico. Es GOBERNANZA DE ViTo (depende del portal, Widget Protocol, XMS, que son constructos de ViTo). Re-homed a ViTo governance (orchestrator docs/canon/). Campus, como vertical, la OBEDECE; no es supra del dev-kit.
+needs: none
 priority: normal
 date: 2026-06-17
-re: subir agnóstico "una superficie por clase de consumidor; los verticales se enchufan, nunca forkean"
+re: [RETIRADO] subir agnóstico "una superficie por clase de consumidor" — corregido: es gobernanza de ViTo
 ---
 
-# PROPOSAL — una sola superficie por clase de consumidor (supra agnóstico)
+> **⚠️ RETIRADO (2026-06-17, Marcelo):** esto NO es agnóstico → no va al dev-kit. Es **gobernanza de ViTo**
+> (el portal / Widget Protocol / XMS son constructos de ViTo). Vive en **ViTo governance** (orchestrator);
+> Campus la **obedece** como vertical. El texto de abajo queda como registro de la propuesta original.
+
+# PROPOSAL — una sola superficie por clase de consumidor (supra agnóstico) [RETIRADO]
 
 **Origen:** Marcelo + Fable, 2026-06-17, durante la UAT de Campus. Marcelo lo **selló** ya en el lado producto
 (`vibethink-campus/docs/canon/CANON-EXTERNAL-CONSUMER-SURFACE-001`); esta propuesta es el **lift agnóstico** al
