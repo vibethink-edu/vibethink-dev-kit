@@ -13,10 +13,6 @@
     {
       "file": "knowledge/architecture/CANON-VERTICAL-UI-INHERITANCE-001.md",
       "reason": "DRAFT pending Principal Architect seal (added 2026-06-13). Proposed registration as ADOPT piece #32 + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
-    },
-    {
-      "file": "knowledge/ai-agents/CANON-RUNTIME-POLICY-ENGINE-001.md",
-      "reason": "PROPOSED 2026-06-16 pending Principal Architect seal (ADR-20260616-runtime-policy-engine ACCEPTED, DECISION-REGISTER D-009; drafted from the omnigent prior-art). Catalog-piece + inheritance-status registration deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [
