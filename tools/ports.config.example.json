@@ -1,0 +1,6 @@
+{
+  "$comment": "Per-repo binding for CANON-PORT-ASSIGNMENT-001. Copy to tools/ports.config.json. — deploys:false → a markdown/library repo with no runtime (the gate becomes a conscious N-A). — deploys:true → a canonical port declaration MUST exist (fail-closed: missing = deploy refused). — format:'recommended' uses the kit's ports.json shape and the gate ALSO rejects two services sharing a port; format:'custom' is checked for existence only (you own its shape + overlap check). The kit mandates THAT you declare your ports, never WHICH.",
+  "deploys": true,
+  "declaration": "ports.json",
+  "format": "recommended"
+}

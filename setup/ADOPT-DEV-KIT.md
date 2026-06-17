@@ -1044,6 +1044,29 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 41 — Port assignment (declare-your-ports-not-which + fail-closed gate) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md`.
+
+- **Qué:** the instance declares its ports **canonically** (single source of truth · complete
+  for what deploys · collision-free · no shared default); the kit mandates **THAT** you declare,
+  **never WHICH**. **No canonical declaration → the deploy is refused** (fail-closed §3). The
+  concrete numbers/ranges (and any cross-system band map) are L2/L3, never this neutral core.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Template (recommended, not mandated):** `setup/templates/ports/` — a `ports.json`
+    manifest + README; an instance MAY use a `custom` form that satisfies §2.
+  - **Gate:** copy `tools/check-ports.mjs` (+ `tools/ports.config.json`) and wire it
+    **fail-closed** into your deploy / CI / launch path — present+valid → proceed, absent →
+    refuse. Also runs on `devkit-doctor`.
+- **Verificar:**
+  - `deploys:true` with no canonical declaration → the gate **refuses** (exit 1); the
+    recommended form also rejects two services sharing a port; `deploys:false` → conscious N-A.
+  - The canon names no product/vendor/number (fire-test); the numbers live only in the L2/L3 binding.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
