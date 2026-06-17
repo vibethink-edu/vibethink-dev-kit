@@ -133,3 +133,15 @@ A periodic verifier that relies on someone remembering to run it will lapse. It 
 ### §8.5 — Precedent
 
 A health verifier guarded by two hand-maintained allowlists read **GREEN** while a control-plane object was world-writable through the data API. The allowlists hid exactly the most critical objects; a third narrow filter (elevated-privilege only) hid a large class of best-practice gaps and reported "0". The defect was caught by the **provider's external advisor**, not the project's own ritual — which had also lapsed (no run in ~2 months). Fix: every check rewritten to classify by observed exposure (§8.1), aligned to the external advisor (§8.2), graded by real risk (§8.3), and put on a self-triggered cadence (§8.4). The L3 incarnation lives in the consuming repo's DB-health canon.
+
+### §8.6 — Declare the coverage surface: what is not scanned is un-looked-at, not green *(SEALED 2026-06-17 by the Principal Architect — "go"; from a consumer's identifier-language gate finding · PR #144 · D-012)*
+
+§8.1 names false-green by a stale **exemption** — the gate looked, but an allowlist told it to ignore what it saw. This section names the sibling failure mode: false-green by **un-scanned surface** — the gate never looked at the place the defect lives, and its silence reads as a pass.
+
+> **A gate declares the surface it covers. What it does not cover is not green — it is un-looked-at.** A green verdict means only "no defect in the surface I scanned"; it asserts nothing about surfaces outside that scan. Treating an un-scanned surface as clean manufactures the same false confidence as a stale allowlist (§8.1) — by omission instead of exemption.
+
+- **A gate's coverage surface is explicit, not implied.** The gate (or its binding) states which inputs / paths / object-classes it scans, so a reader can tell a true "clean" from "never looked there."
+- **When a defect class can appear on more than one surface, the gate is surface-complete or it declares the gap.** A gate that checks one surface of a multi-surface rule — and reports GREEN — is asserting a clean it did not verify. Either it covers every declared surface of the rule, or it names the un-covered surfaces as out of scope. Silence is not coverage.
+- **A passing partial gate is a worse signal than a missing gate.** A missing gate invites a check; a green partial gate closes the question falsely (the §8 root reason).
+
+This is the unifying lens behind several sibling failure modes the kit already names: a toolchain that never executed (`CANON-TESTING-MINIMUM-BAR-001` §6.1, *silent false green*); an integration self-test alive against the dev seed and dead against the deployed environment (`CANON-TESTING-MINIMUM-BAR-001` §6.2, *env-portable*); a naming gate green on the schema while another identifier surface drifts unscanned (`CANON-NAMING-CONVENTIONS-001` §8, *surface-complete*). Each is a coverage gap that read as a pass. The concrete surfaces a given gate must cover are per-repo binding; the **declare-your-surface, partial-is-not-green** rule is universal.

@@ -16,10 +16,11 @@ When a branch, commit, file, ADR, or canon is named ad-hoc, three signals are lo
 
 Convention restores those signals at the **lowest cost possible**: pattern compliance at creation time, mechanically verifiable.
 
-## 2. The eight conventions
+## 2. The nine conventions
 
 | Artifact | Pattern | Required parts | Forbidden |
 |---|---|---|---|
+| **Identifiers** (schema · routes/slugs · file/dir names · config/env keys) | one declared identifier language; data/UI language stays in values & strings | a single identifier language across **every** surface | mixing the identifier language with the data/UI language; enforcing the rule on one surface only |
 | **Branches** | `{author}/{type}-{description}` | author tag · type · slug | bare names (`feature-x`); spaces; date-only prefixes |
 | **Commits** | Conventional Commits (`type(scope): description`) | type · description | unrelated message; "wip"; "fix"; "update" alone |
 | **Files (docs)** | `{TYPE}_{slug}_{YYYY-MM-DD}.md` (when dated) OR `{TOPIC}-{slug}.md` | type prefix · slug · date (when temporal) | no prefix; ambiguous casing mixing |
@@ -88,7 +89,17 @@ Per-repo binding declares the date format (`YYYY-MM-DD` recommended, `YYYYMMDD` 
 
 This canon itself is `CANON-NAMING-CONVENTIONS-001.md` — the first canon in the `NAMING-CONVENTIONS` domain.
 
-## 8. The "never" list (mechanical violations)
+## 8. Identifier language — detail *(SEALED 2026-06-17 by the Principal Architect — "go"; from a consumer's identifier-language gate finding · PR #144 · D-012)*
+
+> **Identifiers are written in one declared language; the natural/local language of the data lives only in data values and user-facing strings — never in identifiers.**
+
+An *identifier* is a name the machine keys on: a table/column name, a route or URL slug, a file or directory name, a config/env key, a code symbol. A *value* is content the machine carries: a row's data, a translated label, a rendered string. Mixing the two languages **in identifiers** is the drift this convention prevents — a schema in one language and route slugs in another, or identifiers that switch language by whoever wrote them, lose the single-language searchability and review consistency that keep a codebase legible to every contributor and tool.
+
+- **One declared identifier language.** The repo declares the single language all identifiers use (English is the de-facto default for source identifiers across most ecosystems; the repo may declare otherwise). Every identifier surface uses it.
+- **The data/UI language is orthogonal.** A product serving a local-language audience keeps that language where it belongs — in **data values** and **user-facing strings** (driven by the i18n layer) — and out of identifiers. A product whose audience reads language X still has identifier-language table/column/route/file names; language X lives in the rows and the rendered copy, not in the schema or the URLs.
+- **The rule is surface-complete, or it lies.** Identifiers live on more than one surface — at minimum: **schema** (tables/columns) · **route/URL slugs** · **file/dir names** · **config/env keys**. A gate that enforces the identifier language on *one* surface (commonly the schema) while another surface drifts in a second language reports a GREEN it did not verify. The per-repo binding (§10) declares the **full set of identifier surfaces** the gate scans; a surface left unscanned is declared out of scope, **not** assumed clean. (This is the naming-domain instance of the cross-cutting coverage rule in `CANON-AUDIT-PROTOCOL` §8.6.)
+
+## 9. The "never" list (mechanical violations)
 
 A repo's CI (or a smoke test) MAY enforce these mechanically:
 
@@ -98,8 +109,9 @@ A repo's CI (or a smoke test) MAY enforce these mechanically:
 - **NEVER rename an ADR file after creation.** Its filename is the immutable identifier.
 - **NEVER commit with a message that doesn't follow Conventional Commits.** No `wip`, `fix typo` (without scope), `update` alone, etc.
 - **NEVER hardcode magic identifiers** when a registry/canon defines them (ports, secrets, tenant keys, etc.).
+- **NEVER write an identifier in the data/UI natural language** (§8). Table/column/route/file/config names use the declared identifier language; the local language belongs in data values and rendered strings.
 
-## 9. Per-repo binding
+## 10. Per-repo binding
 
 A consuming repo declares:
 - The recognized agent tokens for branch naming (e.g. which AI agents work in this repo).
@@ -108,8 +120,9 @@ A consuming repo declares:
 - Whether to enforce mechanically (CI / pre-commit hook) or advisory.
 - The canon domain prefix for L3 canons (e.g. `CANON-{REPO}-{TOPIC}-NNN`) that the repo authors locally.
 - The DB table convention (plural vs singular; required timestamp columns; multi-tenant key field).
+- The declared **identifier language** (§8) **and** the full set of **identifier surfaces** the gate scans — at minimum schema · route/URL slugs · file/dir names · config/env keys. Surfaces not listed are out of scope, not assumed clean (`CANON-AUDIT-PROTOCOL` §8.6).
 
-## 10. Inheritance
+## 11. Inheritance
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits this canon. Per-repo bindings stay in that repo's own layer; they never flow into this neutral core.
 
