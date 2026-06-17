@@ -72,7 +72,7 @@ The minimum bar presumes the tests **actually run**. A workspace whose test scri
 
 Which runner, and any consolidation plan from a legacy mix, are per-repo binding; the **one-live-declared-runner** rule is universal.
 
-### 6.2 — Env-portable integration self-tests *(PROPOSED 2026-06-17 — pending Principal Architect seal; from a consumer's wire-to-cloud finding)*
+### 6.2 — Env-portable integration self-tests *(SEALED 2026-06-17 by the Principal Architect — "GO"; from a consumer's wire-to-cloud finding · PR #142 → `622fb21` · D-011)*
 
 §6.1 guarantees the toolchain is alive. A sibling failure mode it does not name: an
 **integration** self-test can be **alive against the development seed and dead against the

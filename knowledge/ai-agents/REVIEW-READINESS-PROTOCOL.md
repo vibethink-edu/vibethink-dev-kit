@@ -135,7 +135,7 @@ when remote/cloud is the only layer that can give the true signal, for example:
 When choosing remote/cloud first, the agent says why local would not prove the
 question and what post-fix local or gate validation still applies.
 
-### 8.1 Cloud-first for review; the deployed environment is the source of truth *(PROPOSED 2026-06-17 — pending Principal Architect seal; from a consumer's wire-to-cloud friction)*
+### 8.1 Cloud-first for review; the deployed environment is the source of truth *(SEALED 2026-06-17 by the Principal Architect — "GO"; from a consumer's wire-to-cloud friction · PR #142 → `622fb21` · D-011)*
 
 §8 justifies remote/cloud-first when cloud is the only layer that gives the true signal.
 Two sharpenings from real review friction:
