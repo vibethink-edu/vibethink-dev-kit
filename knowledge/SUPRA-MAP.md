@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 34 spines · 73 declared relationships.
+> 35 spines · 76 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -15,6 +15,7 @@ flowchart LR
     CANON_CONTEXT_HYGIENE["#20 context hygiene"]
     CANON_CROSS_AGENT_CONTEXT_LAYERING["#2 cross agent context layering"]
     CANON_MULTI_AGENT_ORCHESTRATION["#4 multi agent orchestration"]
+    CANON_OBSERVABILITY_CLOSED_LOOP_001["observability closed loop"]
     CANON_RUNTIME_POLICY_ENGINE_001["#40 runtime policy engine"]
     CANON_SKILLS_OVER_ROLES["#19 skills over roles"]
   end
@@ -66,6 +67,9 @@ flowchart LR
   CANON_CONTEXT_HYGIENE --- CANON_DEVELOPMENT_PROCESS
   CANON_MULTI_AGENT_ORCHESTRATION --- CANON_DEVELOPMENT_PROCESS
   CANON_MULTI_AGENT_ORCHESTRATION --- CANON_CROSS_AGENT_CONTEXT_LAYERING
+  CANON_OBSERVABILITY_CLOSED_LOOP_001 --- CANON_MULTI_AGENT_ORCHESTRATION
+  CANON_OBSERVABILITY_CLOSED_LOOP_001 --- CANON_RUNTIME_POLICY_ENGINE_001
+  CANON_OBSERVABILITY_CLOSED_LOOP_001 --- CANON_AUDIT_PROTOCOL
   CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_CODER_ORCHESTRATION_001
   CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_MULTI_AGENT_ORCHESTRATION
   CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_DEVELOPMENT_PROCESS
