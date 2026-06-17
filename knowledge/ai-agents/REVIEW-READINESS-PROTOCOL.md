@@ -135,6 +135,34 @@ when remote/cloud is the only layer that can give the true signal, for example:
 When choosing remote/cloud first, the agent says why local would not prove the
 question and what post-fix local or gate validation still applies.
 
+### 8.1 Cloud-first for review; the deployed environment is the source of truth *(PROPOSED 2026-06-17 — pending Principal Architect seal; from a consumer's wire-to-cloud friction)*
+
+§8 justifies remote/cloud-first when cloud is the only layer that gives the true signal.
+Two sharpenings from real review friction:
+
+**The decision rule — code vs review.** Separate *"is this code change safe?"* from *"does
+this look / work right against real data?"*:
+
+- A **code change** (a migration, a feature, a risky edit) runs the full local / CI
+  ceremony — the gates protect the code.
+- A **UAT / UX-refinement / non-destructive review** prefers the **deployed front + the
+  deployed environment** directly, and does **not** burn local CI ceremony (dirty-tree
+  preflights, a local dev server, fixture wiring, local auth) for what is a review against
+  real data — especially where local cannot even reproduce the path (e.g. a front whose
+  session comes only from the deployed origin).
+
+The gates still bite on the **code**; this removes ceremony only from the **review**.
+
+**The deployed environment is the source of truth; a local mirror never competes with it.**
+A local environment exists for destructive testing, migration rehearsal, and offline work —
+it is a **mirror**, kept in sync **toward** the deployed source of truth; drift is corrected
+toward deployed, never the reverse. A reviewer never treats local state as a truth that
+competes with the deployed one.
+
+*(Lifts the agnostic essence of a consumer's migration-testing binding — "deployed = source
+of truth; real-tenant UAT points at it; the local mirror is fallback" — to the supra layer.
+On promotion, folds into `CANON-REVIEW-READINESS-001`.)*
+
 ## 9. Manual Bypass Discipline
 
 A manual bypass is exceptional. It is allowed only after a concrete diagnosis such

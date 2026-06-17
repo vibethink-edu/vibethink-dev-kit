@@ -72,6 +72,27 @@ The minimum bar presumes the tests **actually run**. A workspace whose test scri
 
 Which runner, and any consolidation plan from a legacy mix, are per-repo binding; the **one-live-declared-runner** rule is universal.
 
+### 6.2 — Env-portable integration self-tests *(PROPOSED 2026-06-17 — pending Principal Architect seal; from a consumer's wire-to-cloud finding)*
+
+§6.1 guarantees the toolchain is alive. A sibling failure mode it does not name: an
+**integration** self-test can be **alive against the development seed and dead against the
+deployed environment** — because its fixtures depend on seed data that exists only locally.
+The suite then verifies the integration's *logic* in a seed environment, not its
+*behaviour* in the environment that gives the true signal. The result is **false confidence
+about deployed behaviour**: green at the gate, the deployed path never exercised.
+
+Therefore, an integration self-test **provisions its own fixtures** — ephemeral, in a
+transaction with rollback, or set up and torn down — rather than depending on seed data.
+So it runs against **any** environment (a local mirror *or* the deployed one), and the
+"verified alive" of §6.1 strengthens to **"alive against the environment that gives the
+true signal — the deployed one — not only the dev seed."**
+
+A self-test that cannot run against the deployed environment because its fixtures are
+seed-bound is a §6.2 gap: it proves logic, not deployed behaviour. (This is
+`REVIEW-READINESS-PROTOCOL` §1 — *"test in the layer that gives the true signal"* — applied
+inside the minimum bar.) The concrete fixture mechanism is per-repo binding; the
+**self-provisioning, env-portable** rule is universal.
+
 ## 7. What this canon does NOT do
 
 - It does **not** prescribe a specific testing framework (Jest, Vitest, pytest, Go test, JUnit, whatever the language standard is).
