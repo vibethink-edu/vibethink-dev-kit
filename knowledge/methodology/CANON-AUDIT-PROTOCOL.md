@@ -134,7 +134,7 @@ A periodic verifier that relies on someone remembering to run it will lapse. It 
 
 A health verifier guarded by two hand-maintained allowlists read **GREEN** while a control-plane object was world-writable through the data API. The allowlists hid exactly the most critical objects; a third narrow filter (elevated-privilege only) hid a large class of best-practice gaps and reported "0". The defect was caught by the **provider's external advisor**, not the project's own ritual — which had also lapsed (no run in ~2 months). Fix: every check rewritten to classify by observed exposure (§8.1), aligned to the external advisor (§8.2), graded by real risk (§8.3), and put on a self-triggered cadence (§8.4). The L3 incarnation lives in the consuming repo's DB-health canon.
 
-### §8.6 — Declare the coverage surface: what is not scanned is un-looked-at, not green *(PROPOSED 2026-06-17 by the dev-kit architect — awaiting the Principal Architect's seal; from a consumer's identifier-language gate finding)*
+### §8.6 — Declare the coverage surface: what is not scanned is un-looked-at, not green *(SEALED 2026-06-17 by the Principal Architect — "go"; from a consumer's identifier-language gate finding · PR #144 · D-012)*
 
 §8.1 names false-green by a stale **exemption** — the gate looked, but an allowlist told it to ignore what it saw. This section names the sibling failure mode: false-green by **un-scanned surface** — the gate never looked at the place the defect lives, and its silence reads as a pass.
 

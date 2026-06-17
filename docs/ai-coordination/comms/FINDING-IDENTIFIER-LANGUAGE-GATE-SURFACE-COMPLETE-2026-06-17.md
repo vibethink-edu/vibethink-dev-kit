@@ -4,7 +4,8 @@ from: claude
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: SEALED 2026-06-17 — CANON-NAMING-CONVENTIONS-001 §8 (identifier language + surface-complete) + CANON-AUDIT-PROTOCOL §8.6 (gate-coverage principle), PR #144, D-012. Campus gate-extension + slug rename are the L3 follow-up for the Campus seat.
 needs: review
 priority: normal
 date: 2026-06-17

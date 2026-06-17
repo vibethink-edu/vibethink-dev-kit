@@ -89,7 +89,7 @@ Per-repo binding declares the date format (`YYYY-MM-DD` recommended, `YYYYMMDD` 
 
 This canon itself is `CANON-NAMING-CONVENTIONS-001.md` — the first canon in the `NAMING-CONVENTIONS` domain.
 
-## 8. Identifier language — detail *(PROPOSED 2026-06-17 by the dev-kit architect — awaiting the Principal Architect's seal; from a consumer's identifier-language gate finding)*
+## 8. Identifier language — detail *(SEALED 2026-06-17 by the Principal Architect — "go"; from a consumer's identifier-language gate finding · PR #144 · D-012)*
 
 > **Identifiers are written in one declared language; the natural/local language of the data lives only in data values and user-facing strings — never in identifiers.**
 
