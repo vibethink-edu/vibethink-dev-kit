@@ -94,6 +94,121 @@ The kit ships **no runtime**. It names the pattern so a product builds its engin
 - **Silent ASK side effects.** Applying writes before the human approves (§3).
 - **Dissolving the shared floor.** A runtime engine that lets identity / destruction / secrets / arbitrary-exec through that the static deny (CODER-ORCHESTRATION §7) blocks.
 
+## 11. Worked examples (for the L3 implementer)
+
+These are **agnostic** worked examples — an L3 maps them to its harness, tiers, and
+domain (a product version would name its own concrete records/paths/tiers; the canon
+stays brand-free per the fire-test). They exist so a developer building the engine has
+a concrete target, not just the contract.
+
+**The shape a policy implements** (pseudo — bind types in L3):
+
+```
+policy = {
+  name,
+  on: [ enforcement points it fires on ],          # §2
+  evaluate(event, state) -> result                 # called only on its points
+}
+event  = { point, content, tool_name?, model?, usage?, actor?, labels? }   # engine fills it
+state  = { mutable per-session: counters, risk, cost_usd, labels }          # §5
+result = { verdict: ALLOW | ASK | DENY,            # §3
+           reason?,                                 # shown on ASK, logged on DENY
+           data?,                                   # replacement payload on ALLOW
+           state_updates? }                         # SET/INCREMENT/APPEND on `state`
+```
+
+The engine runs the policies **in order** and composes them per §4 (DENY short-circuits ·
+ASK accumulates + withholds writes · ALLOW continues).
+
+---
+
+**11.1 — Budget runaway → force a tier downgrade**
+*Goal:* stop an agent burning the budget on an expensive tier for cheap work.
+```
+cost_downgrade_gate(hard_usd, soft_usd[], expensive_tiers[]):
+  on: [pre-model]
+  evaluate(e, s):
+    if s.cost_usd >= hard_usd and e.model in expensive_tiers:
+        return DENY("budget hit on an expensive tier — switch to a cheaper tier and retry")
+    if crossed_unapproved_soft(s.cost_usd, soft_usd):
+        return ASK("spend crossed $X — continue?", state_updates=[record approved threshold])
+    return ALLOW
+```
+*Walk-through:* cost = $8, model = expensive, hard = $5 → **DENY** with a steer. The agent
+switches tier and retries → next eval `e.model` is cheap → **ALLOW**. (The prose rule
+"mechanical work → cheaper tier" now *bites* at runtime.)
+
+**11.2 — A session turning risky → escalate**
+*Goal:* catch "this whole session is getting dangerous" — which a flat deny-list can't see.
+```
+risk_score(points{tool->n}, sensitive_labels{label->n}, threshold, guarded_tools[]):
+  on: [tool-call, tool-result]
+  evaluate(e, s):
+    if e.point == tool-call and e.tool_name in guarded_tools and s.risk >= threshold:
+        return ASK("elevated session risk — approve this action?")
+    if e.point == tool-call and points[e.tool_name]:
+        return ALLOW(state_updates=[INCREMENT risk by points[e.tool_name]])
+    if e.point == tool-result and label_in(e.content) :
+        return ALLOW(state_updates=[INCREMENT risk by sensitive_labels[label]])
+    return ALLOW   # abstain
+```
+*Walk-through:* the session reads a sensitive file (+30), then runs a broad search (+10)
+→ `risk = 40 ≥ threshold`. The next guarded tool → **ASK**. The static deny-list saw each
+command in isolation and let them pass; the engine saw the *accumulation*.
+
+**11.3 — An agent leaving its working directory**
+*Goal:* keep an agent inside its sandboxed worktree (the runtime form of the worktree discipline).
+```
+working_dir_gate(allowed_dirs[], action=deny):
+  on: [tool-call]
+  evaluate(e, s):
+    if e.tool_name in shell_tools and parses_a_dir_change(e.content):
+        if target not under allowed_dirs: return DENY|ASK("stay inside your worktree")
+    return ALLOW
+```
+*Walk-through:* the agent runs `cd /other/repo && …` or `worktree add …` outside
+`allowed_dirs` → **DENY**. (Enforces "git -C, not cd" + the read-only main rule at
+runtime — not only at the pre-commit hook.)
+
+**11.4 — Ask the human ONCE (stateful approval)**
+*Goal:* a sensitive action needs human sign-off, but don't re-prompt forever, and never half-apply on a "no".
+```
+gate_sensitive(): on:[tool-call]
+  evaluate(e, s):
+    if is_sensitive(e) and not s.labels["approved:<key>"]:
+        return ASK("approve this sensitive action?", state_updates=[SET approved:<key> on approve])
+    return ALLOW
+```
+*Walk-through:* a migration-apply → **ASK**. The human approves → the approval is recorded
+(routed to the spawn-tree root, §4) → a sub-agent later hitting the same key **does not
+re-ask**. Had the human declined, the ASK's `state_updates` were **withheld** — nothing
+was applied (§3).
+
+**11.5 — Personal data about to reach the model → redact, don't block (ALLOW + replacement)**
+*Goal:* let the work continue but keep sensitive data out of the model request / logs.
+```
+sensitive_content(patterns[]): on:[pre-model, tool-result]
+  evaluate(e, s):
+    masked = redact(e.content, patterns)
+    if masked != e.content: return ALLOW(data=masked)   # substitute the safe version
+    return ALLOW
+```
+*Walk-through:* a tool returns a record with a phone + email; before it enters the prompt,
+the policy returns **ALLOW with a redacted `data`** → the engine substitutes the masked
+content. The agent keeps working; the raw PII never travels.
+
+**11.6 — The user's session policy beats the server's (precedence)**
+*Goal:* a per-session intent overrides a standing server allowance.
+*Setup:* server policy `allow_web_search` (ALLOW). User adds a session policy
+`no_external_calls_today` (DENY on network tools). *Order:* **session → … → server**.
+*Walk-through:* on a web-search tool-call, the **session** policy evaluates first and
+returns **DENY** → short-circuits before the server's ALLOW ever runs. The user's intent
+wins, with no change to the global config.
+
+> **And always — fail-closed (§6):** if any of these policies *throws*, the engine returns
+> **DENY** by default (an advisory-only policy → ALLOW; an approval-gate policy → ASK). A
+> crashed guard never silently lets the action through.
+
 ## Fire-test
 
 This document names no product, vendor, brand, model, or framework. (`ALLOW`/`ASK`/`DENY`, "policy", "sandbox", "PII" are generic governance/security nomenclature, not brand markers.) The motivating prior-art (an OSS meta-harness) is cited as **research**, not depended on.
