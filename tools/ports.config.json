@@ -1,0 +1,5 @@
+{
+  "$comment": "The kit dogfoods CANON-PORT-ASSIGNMENT-001. The dev-kit is markdown + CLI with no runtime services — deploys:false → conscious N-A (the gate reports it, never a failure).",
+  "deploys": false,
+  "declaration": null
+}

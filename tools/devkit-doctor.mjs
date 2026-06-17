@@ -105,6 +105,12 @@ const GATES = [
     targets: ["tools/feature-docs.config.json"],
     fix: "a declared unit is missing a required artifact (requirements/plan/roadmap/log/changelog) — add it, or set the section null for a conscious N-A",
   },
+  {
+    label: "port assignment",
+    engine: "check-ports.mjs",
+    targets: ["tools/ports.config.json"],
+    fix: "a repo that deploys carries no canonical port declaration (fail-closed refusal), or the recommended form shares a port — declare your ports (CANON-PORT-ASSIGNMENT-001 §3), or set deploys:false for a conscious N-A",
+  },
 ];
 
 function firstExisting(paths) {

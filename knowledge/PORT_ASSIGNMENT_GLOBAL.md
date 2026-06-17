@@ -1,11 +1,18 @@
-# Política Global de Puertos — VibeThink (capa metodología · level 2)
+# Política Global de Puertos — VibeThink (binding L2 house)
 
+> ⬆️ **El PRINCIPIO agnóstico vive ahora en `knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md` (L1):**
+> *la instancia declara sus puertos canónicamente; el kit exige QUE los declares, nunca CUÁLES;
+> sin declaración canónica, el deploy se rehúsa (gate fail-closed `check-ports`).* **Este archivo
+> es el binding L2 house de VibeThink** — únicamente los rangos/números concretos del ecosistema
+> (ViTo / WorkBench / Campus). NO es agnóstico y el canon L1 no lo conoce. *(Reubicación física
+> fuera del kit = decisión a/b de Marcelo; vive acá como L2 house hasta entonces.)*
+>
 > **Versión:** 4.0 — DRAFT, awaiting Marcelo canon approval (Rule #4)
-> **Última actualización:** 2026-06-16
-> **Propósito:** Definir el **sistema** de puertos que heredan todos los proyectos VibeThink.
-> **Alcance:** capa metodología (level 2). Esto define el **esquema y las reglas**, no
-> los puertos de un producto concreto. **v4.0** agrega el caso **co-residente** (varios
-> sistemas en una misma workstation) → bandas cross-sistema deterministas y sin solape.
+> **Última actualización:** 2026-06-17
+> **Propósito:** Fijar los **rangos concretos** que usan los sistemas VibeThink co-residentes.
+> **Alcance:** binding L2 house. El **esquema y las reglas** (agnósticos) son del canon L1
+> de arriba; **este doc aporta solo los números** del ecosistema. **v4.0** agrega el caso
+> **co-residente** (varios sistemas en una misma workstation) → bandas cross-sistema deterministas y sin solape.
 
 ---
 

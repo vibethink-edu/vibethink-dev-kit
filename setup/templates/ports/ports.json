@@ -1,0 +1,10 @@
+{
+  "$comment": "RECOMMENDED canonical port declaration (CANON-PORT-ASSIGNMENT-001 §4). Copy to your repo root, rename the system(s), set YOUR numbers. This is the single source of truth for the ports this instance owns. Rules: (1) every long-running service that binds a port appears here; (2) no two services share a port/range; (3) never rely on a tool's shared default. The kit mandates THAT you declare — the numbers are yours. Using your own format instead is fine: set format:'custom' in tools/ports.config.json and own the overlap check yourself.",
+  "systems": {
+    "<your-system>": {
+      "app": "3000-3099",
+      "db": "54321-54329",
+      "preview": "5000-5099"
+    }
+  }
+}

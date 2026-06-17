@@ -13,6 +13,10 @@
     {
       "file": "knowledge/architecture/CANON-VERTICAL-UI-INHERITANCE-001.md",
       "reason": "DRAFT pending Principal Architect seal (added 2026-06-13). Proposed registration as ADOPT piece #32 + inheritance-status row is deferred to the seal (governance numbering is the architect's call). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md",
+      "reason": "PROPOSED 2026-06-17 pending Principal Architect seal (ports instrument: declare-your-ports-not-which + recommended template + fail-closed check-ports gate). Registration as ADOPT piece #41 + inheritance-status row is deferred to the seal, then this exemption is removed (same flow as the runtime-policy spine #40, D-010). Until sealed it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [

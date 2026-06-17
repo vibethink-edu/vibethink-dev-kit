@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 32 spines · 69 declared relationships.
+> 34 spines · 73 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -15,6 +15,7 @@ flowchart LR
     CANON_CONTEXT_HYGIENE["#20 context hygiene"]
     CANON_CROSS_AGENT_CONTEXT_LAYERING["#2 cross agent context layering"]
     CANON_MULTI_AGENT_ORCHESTRATION["#4 multi agent orchestration"]
+    CANON_RUNTIME_POLICY_ENGINE_001["#40 runtime policy engine"]
     CANON_SKILLS_OVER_ROLES["#19 skills over roles"]
   end
   subgraph methodology["methodology (how work is done)"]
@@ -32,6 +33,7 @@ flowchart LR
     CANON_GIT_HYGIENE["#22 git hygiene"]
     CANON_HUMAN_SURFACE_LEGIBILITY_001["#39 human surface legibility"]
     CANON_NAMING_CONVENTIONS_001["#13 naming conventions"]
+    CANON_PORT_ASSIGNMENT_001["port assignment"]
     CANON_PRODUCTION_SAFETY["#30 production safety"]
     CANON_STATE_MIRROR_AND_DECISION_REGISTER_001["#34 state mirror and decision register"]
     CANON_TESTING_GATE["#26 testing gate"]
@@ -64,6 +66,9 @@ flowchart LR
   CANON_CONTEXT_HYGIENE --- CANON_DEVELOPMENT_PROCESS
   CANON_MULTI_AGENT_ORCHESTRATION --- CANON_DEVELOPMENT_PROCESS
   CANON_MULTI_AGENT_ORCHESTRATION --- CANON_CROSS_AGENT_CONTEXT_LAYERING
+  CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_CODER_ORCHESTRATION_001
+  CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_MULTI_AGENT_ORCHESTRATION
+  CANON_RUNTIME_POLICY_ENGINE_001 --- CANON_DEVELOPMENT_PROCESS
   CANON_SKILLS_OVER_ROLES --- CANON_MULTI_AGENT_ORCHESTRATION
   CANON_SKILLS_OVER_ROLES --- CANON_AGENT_SCOPE_DISCIPLINE
   CANON_SKILLS_OVER_ROLES --- CANON_AGENT_COLLABORATION
@@ -99,6 +104,7 @@ flowchart LR
   CANON_HUMAN_SURFACE_LEGIBILITY_001 --- CANON_AUDIT_PROTOCOL
   CANON_NAMING_CONVENTIONS_001 --- CANON_VERSIONING_001
   CANON_NAMING_CONVENTIONS_001 --- CANON_DECISION_DISPOSITION_FOR_GRAPH_INDEXING
+  CANON_PORT_ASSIGNMENT_001 --- CANON_CONFIGURATION_DISCIPLINE
   CANON_PRODUCTION_SAFETY --- CANON_DEV_MODE_DISCIPLINE
   CANON_PRODUCTION_SAFETY --- CANON_GIT_HYGIENE
   CANON_PRODUCTION_SAFETY --- CANON_ARCHITECTURE_REVIEW
