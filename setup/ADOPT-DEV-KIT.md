@@ -1014,6 +1014,34 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   its verdict in the first glance and puts detail behind a flag/toggle; a red names the
   fix, not just "FAILED"; skipped/not-run items are shown, never silently absent.
 
+### 40 — Runtime policy engine (ALLOW/ASK/DENY interception) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ai-agents/CANON-RUNTIME-POLICY-ENGINE-001.md`.
+
+- **Qué:** governance by **runtime interception** — a policy engine evaluates each agent
+  action at typed **enforcement points** (request / pre-model / tool-call / tool-result)
+  and returns **ALLOW / ASK / DENY**, composed across policies (**DENY** short-circuits ·
+  **ASK** accumulates + withholds writes until approval · **ALLOW** continues), carrying
+  **session state** (counters, risk score, cost), with **stacking precedence**
+  (session > agent-spec > server) and **fail-closed** defaults. Names a reusable **pattern
+  menu** (cost/tier downgrade-gate, tier routing, risk-score, working-dir, sandbox,
+  rate-limit, sensitive-content) + worked examples (§11). The **runtime, stateful sibling**
+  of the static allow/deny (Piece #36, coder-orchestration) — shares its airtight floor,
+  never dissolves it.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **The engine is L3.** The kit names only the *contract* (enforcement points, the verdict
+    set, composition + precedence, fail-closed, the state model, the pattern menu) and the
+    worked examples. Each consuming product **builds the engine in code** against the
+    contract, **on its own pain** — the kit ships **no runtime**.
+  - Gate on **tier/capability, never a vendor model id** (fire-test).
+- **Verificar:**
+  - In a product that has built an engine: a broken policy **denies** (fail-closed, not
+    fail-open); a declined/timed-out ASK leaves **no side effects**; the static-deny floor
+    (#36 §7 — identity/destruction/secrets/arbitrary-exec) is never let through by the engine.
+  - The canon names the contract with **no product/vendor/model name** (fire-test).
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`

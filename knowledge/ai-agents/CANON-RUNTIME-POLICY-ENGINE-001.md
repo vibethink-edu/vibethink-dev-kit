@@ -1,6 +1,6 @@
 # CANON-RUNTIME-POLICY-ENGINE-001 — Runtime governance by policy interception (ALLOW / ASK / DENY)
 
-**Status:** PROPOSED 2026-06-16 — drafted by the dev-kit architect from the orchestration prior-art per `ADR-20260616-runtime-policy-engine` (ACCEPTED · `DECISION-REGISTER` D-009). **Seal = the Principal Architect's merge.**
+**Status:** SEALED 2026-06-16 by the Principal Architect (delegated merge — "wow dale"; PR #139 → `47cb2a0`). Drafted from the orchestration prior-art per `ADR-20260616-runtime-policy-engine` (ACCEPTED · D-009). Catalog piece **#40**; `DECISION-REGISTER` **D-010**.
 **Date:** 2026-06-16
 **Scope:** Every repo running AI agents whose actions (tool calls, model requests) warrant runtime governance **beyond a static permission file**. Vendor-neutral, product-neutral, harness-neutral, model-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork. The kit names the **contract**; the **engine is L3** (each product builds it on its own pain).
