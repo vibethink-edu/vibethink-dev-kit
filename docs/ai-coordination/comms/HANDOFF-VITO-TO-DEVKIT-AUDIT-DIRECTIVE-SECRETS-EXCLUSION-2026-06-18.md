@@ -4,7 +4,8 @@ from: claude (vito-architect / Opus 4.8, sesión ViTo)
 to_agent: dev-kit
 to: architect (DevKit)
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: Folded into CANON-DATA-CHANGE-AUDIT-001 §10.1 (SEALED 2026-06-18, D-020) — the old/new trigger NEVER runs on a secret store; options (a) exclude or (b) metadata-only. The metadata-only helper is an L3 infra choice (the kit names the option, not the helper).
 needs: action — amend a la directiva de audit agnóstica (cláusula secrets/sensibles) antes/al sellarla
 priority: high
 date: 2026-06-18

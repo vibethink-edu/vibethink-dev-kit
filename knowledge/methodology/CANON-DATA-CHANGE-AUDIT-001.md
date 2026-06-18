@@ -66,6 +66,37 @@ The audit-trail is append-only, but **not infinitely hot**, and **not** hard-del
 - **Archive ≠ delete.** The spirit is preservation: the history survives, it just moves to cheaper storage. **True deletion of trail rows happens only when a legal obligation requires it** — most commonly a data-subject erasure that legally extends to audit copies (`CANON-DATA-LEGAL-COMPLIANCE-001` §5) — as a **governed, logged exception**, never routine cleanup.
 - **The scheduler is L3.** Whether partition/archive runs via a DB scheduler, an external cron, or a job runner is the repo's binding; the **partition + legal-window + archive-not-delete** discipline is universal.
 
+## §10 — What to audit / what not, and why *(amendment SEALED 2026-06-18 by the Principal Architect — two ViTo-architect triage handoffs; D-020)*
+
+§4 states the principle (audit operational data). This is the **triage matrix** every implementer needs — because *"audit who/what/when"* leaves open *"which tables?"*, and re-classifying by hand is unsafe: in a real triage an auto-classifier-by-name put a `*_api_keys` table into "audit". The directive carries the **classes + the why**; the **concrete table names are L3** (each repo writes its own explicit, reviewed list — never auto-include).
+
+### §10.1 — Secrets / sensitive tables are NEVER captured old/new (SECURITY — the critical item)
+
+> **The generic old/new-capturing trigger MUST NOT run on a secret store or sensitive-value table.** Capturing `old_value → new_value` would **replicate the secret inside the audit log** — even though the log is private, duplicating a secret **outside its store** breaks the minimal-secret-surface principle.
+
+For such tables, one of two **governed** options:
+- **(a) Exclude** from the generic trail — a secret's change is governed by its own control (e.g. a `reason_code` / `ticket_ref` on the mutation path) rather than a value-capturing audit.
+- **(b) Metadata-only** — capture who / when / which table / which operation, **without** `old`/`new` values (a variant trigger that does not read the values).
+
+The old/new trigger is for **operational** tables, **never** a secret store. *(The metadata-only helper, if offered, is an L3 infrastructure choice of the implementer's shared audit infra.)*
+
+### §10.2 — The triage matrix
+
+**AUDIT** — operational / PII / official / financial / consent tables: the business data whose who/what/when matters.
+
+**DO NOT audit** (class → why):
+
+| Class | Why not |
+|---|---|
+| secrets / keys / tokens | the old/new trigger would replicate the secret in the log — **security** (§10.1; the critical item) |
+| connections carrying credentials | may embed tokens → treat as a secret until confirmed metadata-only |
+| logs / queues / events / metering / telemetry | the data **already is** an append-only log; auditing it duplicates + costs (high frequency) |
+| catalogs / static config | not operational data that mutates; their "history" is the repo/seed versioning |
+| jobs / derived / media / caches | recomputable output, not a source of truth |
+| backups / migration ledger / system | snapshots / system, not editable operational data |
+
+Each repo turns these **classes** into an explicit, reviewed table list (L3); the classes + the why are universal. A new table is opted in **consciously**, never auto-included by name.
+
 ## Reference implementation (L3, current)
 
 The first implementer is a consuming product (Campus): a Postgres/Supabase `audit` schema with a single `audit.record_version` table, a generic `SECURITY DEFINER` trigger capturing the authenticated identity, and a helper to enable tracking per table — applied across its operational tables on the shared database, so a sibling product can plug its own tables into the same infrastructure. Named here only as the current reference; the canon names no product in its normative body (fire-test).

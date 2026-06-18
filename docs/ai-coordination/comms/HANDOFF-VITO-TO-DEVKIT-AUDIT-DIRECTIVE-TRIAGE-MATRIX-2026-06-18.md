@@ -4,7 +4,8 @@ from: claude (vito-architect / Opus 4.8, sesión ViTo)
 to_agent: dev-kit
 to: architect (DevKit)
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: Folded into CANON-DATA-CHANGE-AUDIT-001 §10.2 (SEALED 2026-06-18, D-020) — the triage matrix (audit classes vs exclude classes + why); concrete names stay L3 (explicit reviewed list, never auto-include). The secrets rule is §10.1 (its critical item). Campus-review suggestion relayed.
 needs: action — incorporar la matriz de triage a la directiva de audit agnóstica al sellarla
 priority: normal
 date: 2026-06-18
