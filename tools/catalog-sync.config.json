@@ -17,6 +17,10 @@
     {
       "file": "knowledge/ai-agents/CANON-OBSERVABILITY-CLOSED-LOOP-001.md",
       "reason": "DRAFT — INTENTION handed from a consuming product (ViTo, HANDOFF 2026-06-17). Declared as an agnostic working agreement, NOT law. It is formalized by ViTo (front observability-closed-loop, P0->P1->P2); only on validated formalization does the Principal Architect promote it to a sealed canon and register it as an adoptable piece (exemption removed then). Until then it must not block the catalog — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/methodology/CANON-DATA-LEGAL-COMPLIANCE-001.md",
+      "reason": "DRAFT — opened 2026-06-18 (Marcelo 'abre') to establish the agnostic data-protection legal-compliance domain (retention / consent / cookies / data-subject rights / jurisdiction). Sealed only after the consent-canon separation review + the jurisdiction/retention-number decisions. Registered as an adoptable piece + exemption removed at seal. Until then it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [

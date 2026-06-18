@@ -57,6 +57,15 @@ The mechanism, the table list, and the identity wiring are L3; they never flow i
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits this canon and binds its own L3 mechanism.
 
+## §9 — Retention of the trail *(amendment SEALED 2026-06-18 by the Principal Architect — "amend con la cláusula de retención"; D-017)*
+
+The audit-trail is append-only, but **not infinitely hot**, and **not** hard-deleted on a whim:
+
+- **Partition + a hot window + archive.** The trail is partitioned (e.g. monthly) and kept **hot** for an active window; past it, partitions are **archived to cold storage**, never hard-deleted. *(Recommended technical default, illustrative: monthly partition + ~24 months hot → cold archive. The default is the kit's; the binding number is not.)*
+- **The window is a legal requirement, not a technical preference.** How long the trail must be retained is set by `CANON-DATA-LEGAL-COMPLIANCE-001` §2 (retention by data type / jurisdiction) — an **L3 number**, not the kit's. Do not guess the window; bind it to the legal requirement.
+- **Archive ≠ delete.** The spirit is preservation: the history survives, it just moves to cheaper storage. **True deletion of trail rows happens only when a legal obligation requires it** — most commonly a data-subject erasure that legally extends to audit copies (`CANON-DATA-LEGAL-COMPLIANCE-001` §5) — as a **governed, logged exception**, never routine cleanup.
+- **The scheduler is L3.** Whether partition/archive runs via a DB scheduler, an external cron, or a job runner is the repo's binding; the **partition + legal-window + archive-not-delete** discipline is universal.
+
 ## Reference implementation (L3, current)
 
 The first implementer is a consuming product (Campus): a Postgres/Supabase `audit` schema with a single `audit.record_version` table, a generic `SECURITY DEFINER` trigger capturing the authenticated identity, and a helper to enable tracking per table — applied across its operational tables on the shared database, so a sibling product can plug its own tables into the same infrastructure. Named here only as the current reference; the canon names no product in its normative body (fire-test).
