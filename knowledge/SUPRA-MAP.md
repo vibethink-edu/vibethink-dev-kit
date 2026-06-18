@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 37 spines · 80 declared relationships.
+> 38 spines · 84 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -31,6 +31,7 @@ flowchart LR
     CANON_DB_SECURITY_BASELINE_001["#38 db security baseline"]
     CANON_DEV_MODE_DISCIPLINE["#21 dev mode discipline"]
     CANON_DEVELOPMENT_PROCESS["#10a development process"]
+    CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001["documentation artifact standards"]
     CANON_E2E_TEST_USER_DISCIPLINE["#27 e2e test user discipline"]
     CANON_GAP_REPORT["#28 gap report"]
     CANON_GIT_HYGIENE["#22 git hygiene"]
@@ -107,6 +108,10 @@ flowchart LR
   CANON_DB_SECURITY_BASELINE_001 --- CANON_TESTING_GATE
   CANON_DEV_MODE_DISCIPLINE --- CANON_AGENT_COLLABORATION
   CANON_DEVELOPMENT_PROCESS --- CANON_CROSS_AGENT_CONTEXT_LAYERING
+  CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001 --- CANON_VERSIONING_001
+  CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001 --- CANON_NAMING_CONVENTIONS_001
+  CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001 --- CANON_DEVELOPMENT_PROCESS
+  CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001 --- CANON_DECISION_DISPOSITION_FOR_GRAPH_INDEXING
   CANON_E2E_TEST_USER_DISCIPLINE --- CANON_AGENT_SCOPE_DISCIPLINE
   CANON_GAP_REPORT --- CANON_AGENT_COLLABORATION
   CANON_HUMAN_SURFACE_LEGIBILITY_001 --- CANON_MULTI_AGENT_ORCHESTRATION
