@@ -1094,6 +1094,31 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 43 — Data-change audit (who/what/when, full history, generic trail) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DATA-CHANGE-AUDIT-001.md`.
+
+- **Qué:** every system must answer **WHO** changed an operational datum, **WHAT** (old → new),
+  and **WHEN** — **full history**, not the last touch. Via a **generic change-capture audit-trail**
+  (one append-only log + a capture mechanism), **never per-table `updated_by`/`updated_at` columns**
+  (level-0: last-touch only, lossy, inconsistent). Row-lifecycle timestamps stay orthogonal (they
+  are *not* the trail). Scope = operational tables (business · PII · official · money · consent);
+  exclude static config, read-only legacy, high-frequency telemetry. The "who" is a **real
+  authenticated identity**; the trail is **governance-only**, never client-facing.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Mechanism is L3** — the kit mandates the *capability + generic shape*; you build it in your
+    stack (trigger + single audit table · event log · CDC · temporal tables). Declare the audited
+    table set, the identity source, and who may read the trail.
+- **Verificar:**
+  - For an audited table: an UPDATE is reconstructable as who/old→new/when from the trail (not just
+    the latest row); a shared-service write does not erase the actor; the trail is not reachable from
+    a client/tenant surface.
+  - The canon names no engine as *the* mechanism (fire-test); concrete engines are illustration only.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it

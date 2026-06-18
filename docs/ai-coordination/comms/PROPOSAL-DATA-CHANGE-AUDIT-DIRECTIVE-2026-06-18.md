@@ -4,7 +4,8 @@ from: claude (Fable / seat Campus)
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: SEALED 2026-06-18 as CANON-DATA-CHANGE-AUDIT-001 (D-016, ADOPT piece #43). Agnostic spine; engines (Postgres/supa_audit) kept as illustration only; Campus named as the L3 reference impl. Added an orthogonality clause so it does not read as forbidding created_at/updated_at (row timestamps ≠ audit-trail).
 needs: seal
 priority: high
 date: 2026-06-18
