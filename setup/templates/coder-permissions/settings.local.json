@@ -2,7 +2,9 @@
   "permissions": {
     "allow": ["Bash", "Read", "Edit", "Write", "Glob", "Grep"],
     "deny": [
-      "Bash(gh auth:*)",
+      "Bash(gh auth login:*)",
+      "Bash(gh auth switch:*)",
+      "Bash(gh auth logout:*)",
       "Bash(git remote set-url:*)",
       "Bash(git remote add:*)",
       "Bash(rm -rf:*)",

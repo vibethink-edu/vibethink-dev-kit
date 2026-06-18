@@ -42,7 +42,7 @@ hostile one. What actually contains a bad command is the sealed backstop:
 
 | Category | Blocked | Rationale |
 |---|---|---|
-| **Identity** | `gh auth *`, `git remote set-url/add` | dissolving the identity gate / redirecting the push to another remote |
+| **Identity** | `gh auth login/switch/logout`, `git remote set-url/add` | dissolving the identity gate / redirecting the push to another remote — **read-only `gh auth status` stays allowed** (the PASO-0 identity check needs it) |
 | **Destruction** | `rm -rf/-fr/-r`, `git push --force/-f/--force-with-lease`, `git reset --hard`, `git clean -f`, `dd`, `mkfs` | irreversible damage to the tree/history |
 | **Secrets** | reading `.env*`, `.npmrc`, `credentials`, gh `hosts.yml`, `*.pem`, `id_rsa*`; `env`/`printenv`/`export` | leaking the bot's session token or creds into logs |
 | **Cloud-apply** | `supabase db push`, `supabase functions deploy`, `supabase link`, `npm/pnpm publish`, `vercel`, `terraform apply`, `kubectl apply` | mutating production / publishing — irreversible, outside the worktree |
