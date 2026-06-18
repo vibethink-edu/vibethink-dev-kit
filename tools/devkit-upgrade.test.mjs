@@ -142,6 +142,28 @@ test("provision surfaces install-external-tools output", () => {
   );
 });
 
+// 6. Template-instantiation gap is surfaced: a config-backed template (`ports`) with no
+//    consumer target is flagged "not instantiated"; the total is counted; a non-config
+//    template (`adr`) just adds to the count. (--no-pull → canon-delta stays skipped.)
+test("surfaces kit templates + flags a config-template not instantiated", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-test-"));
+  tmpdirs.push(root);
+  const upstream = path.join(root, "upstream");
+  const consumer = path.join(root, "consumer");
+  mkdirSync(path.join(upstream, "setup", "templates", "ports"), { recursive: true });
+  mkdirSync(path.join(upstream, "setup", "templates", "adr"), { recursive: true });
+  mkdirSync(path.join(consumer, "tools"), { recursive: true });
+  writeFileSync(
+    path.join(consumer, "tools", "copy-parity.config.json"),
+    JSON.stringify({ copies: [] })
+  );
+  // consumer has NO tools/ports.config.json → ports is flagged not-instantiated.
+  const { code, out } = run(consumer, upstream);
+  assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
+  assert.match(out, /Kit templates\s+2 available/);
+  assert.match(out, /ports — copy setup\/templates\/ports\//);
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });

@@ -7,7 +7,7 @@
       "class": "A",
       "role": "structural code navigation / local semantic memory (hubs, dead-code, 'what touches X') before blind grep",
       "kind": "pip",
-      "package": "graphifyy",
+      "package": "graphify",
       "cli": "graphify",
       "pin": "0.8.39",
       "acceptInstalled": ">=0.8",
