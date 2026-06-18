@@ -101,6 +101,7 @@ A worktree is a parallel checkout. The discipline that keeps worktrees from beco
 - **Each task MUST have its own unique branch.** Before starting, confirm *which* branch this task uses.
 - **Verify the branch does not already exist** before creating it.
 - **Never reuse an existing branch** without explicit confirmation from the work's owner — silently reusing another contributor's branch is the canonical multi-agent collision.
+- **Unique *and* fresh** *(reinforced 2026-06-18 — D-021)*. A worktree directory is keyed to **one** task by a unique id. If a name/dir **collides with a leftover** (a prior task's dir not cleaned per §5.4), **do not reuse the stale directory** — remove it and recreate **fresh from the current base**. A reused stale worktree silently serves **stale inputs** and blocks the worker (lived evidence: a `037b` launch colliding with a leftover `037` dir served old inputs → coder blocked). Uniqueness prevents the collision; freshness prevents the stale-input failure when one slips through.
 
 ### §5.3 — Placement & readiness
 
