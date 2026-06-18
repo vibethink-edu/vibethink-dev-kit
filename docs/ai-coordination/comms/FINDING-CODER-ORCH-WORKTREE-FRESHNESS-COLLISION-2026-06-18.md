@@ -4,7 +4,8 @@ from: claude (Fable / seat Campus)
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: D-021 (2026-06-18) — reinforced CANON-BRANCH-WORKTREE-LIFECYCLE §5.2 (id-unique AND fresh-on-reuse; a colliding leftover is removed + recreated fresh, never reused stale). Redirected from CODER-ORCHESTRATION §9/§11 (that canon explicitly disclaims worktree ownership) to the worktree spine.
 needs: decision
 priority: low
 date: 2026-06-18

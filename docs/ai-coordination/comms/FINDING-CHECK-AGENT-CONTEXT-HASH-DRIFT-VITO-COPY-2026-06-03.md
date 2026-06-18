@@ -7,7 +7,8 @@ repo: vibethink-dev-kit
 project: vibethink-dev-kit
 target_layer: SUPRA-L1L2
 ref_branch: master
-status: open
+status: actioned
+resolution: RESOLVED/STALE — verified 2026-06-18 the two tools/check-agent-context.mjs are now byte-identical (ViTo re-synced). The copy-parity gate (check-copy-parity + the CI job) now enforces parity, so this manual-drift class is mechanically covered going forward.
 priority: normal
 date: 2026-06-03
 re: dev-kit adoption walk (ViTo PR #2909, 2026-06-03)
