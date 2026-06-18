@@ -29,7 +29,7 @@
  * Exit: 0 ok · 1 a re-sync or pull step failed. Pure Node, zero deps.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -62,9 +62,17 @@ const abs = (root, p) => (isAbsolute(p) ? p : join(root, p));
 
 // ── 1. PULL the kit mount (canon is free by reference) ───────────────────────
 let pull = { done: false, note: "skipped (--no-pull)" };
+let oldHead = null; // the consumer's kit HEAD BEFORE this pull — anchors the canon-delta report
 if (!NO_PULL) {
   try {
     execFileSync("git", ["-C", KIT_ROOT, "fetch", "origin", "--quiet"], { stdio: "pipe" });
+    try {
+      oldHead = execFileSync("git", ["-C", KIT_ROOT, "rev-parse", "HEAD"], {
+        encoding: "utf8",
+      }).trim();
+    } catch {
+      /* no HEAD (shallow / detached) — canon-delta will skip */
+    }
     if (DRY) {
       const behind = execFileSync(
         "git",
@@ -177,6 +185,67 @@ const tools = (lock.tools || []).map((t) => {
   return { name: t.name, pin: t.pin, installed, atPin, behind: installed && !atPin, hint };
 });
 
+// ── 5. CANON-DELTA — what protocol/canon changed since the consumer's last pull ─
+// Mechanically current ≠ knowing what to re-read. Surface the governance changes over
+// the pull range (new DECISION-REGISTER rows + changed canon/runbook files) so the
+// consumer re-reads them instead of acting on stale knowledge. Skipped with --no-pull
+// (no range). Best-effort; never fails the upgrade.
+const canonDelta = { applies: false, decisions: [], changed: [] };
+if (!NO_PULL && (oldHead || DRY)) {
+  const range = DRY ? "HEAD..origin/master" : `${oldHead}..HEAD`;
+  const git = (args) => {
+    try {
+      return execFileSync("git", ["-C", KIT_ROOT, ...args], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+    } catch {
+      return "";
+    }
+  };
+  for (const line of git(["diff", range, "--", "doc/decisions/DECISION-REGISTER.md"]).split(
+    /\r?\n/
+  )) {
+    const m =
+      /^\+\|\s*(D-\d+)\s*\|\s*[^|]*\|\s*\*\*([^*]+)\*\*/.exec(line) ||
+      /^\+\|\s*(D-\d+)\s*\|/.exec(line);
+    if (m) canonDelta.decisions.push(m[2] ? `${m[1]} — ${m[2].trim()}` : m[1]);
+  }
+  for (const line of git(["diff", "--name-status", range, "--", "knowledge", "setup"]).split(
+    /\r?\n/
+  )) {
+    const m = /^([A-Z])\d*\t(.+)$/.exec(line.trim());
+    if (!m) continue;
+    const [, st, p] = m;
+    if (/SUPRA-MAP\.md$/.test(p)) continue; // generated graph — noise, not a re-read
+    if (/CANON-/.test(p) || /RUNBOOK/i.test(p) || p.endsWith("ADOPT-DEV-KIT.md"))
+      canonDelta.changed.push(`${st} ${p}`);
+  }
+  canonDelta.applies = canonDelta.decisions.length > 0 || canonDelta.changed.length > 0;
+}
+
+// ── 6. TEMPLATE-INSTANTIATION — surface kit templates (by-instantiation; upgrade was mute) ─
+// Templates are copied + filled by the consumer (not copy-synced), so the upgrade can't
+// auto-apply them — but it should SURFACE them. For the few with a detectable config
+// target, flag instantiated vs not; the rest are listed by count (copy as needed).
+const TEMPLATE_TARGETS = {
+  ports: "tools/ports.config.json",
+  "feature-docs": "tools/feature-docs.config.json",
+  "identifier-language": "tools/identifier-language.config.json",
+  versioning: "tools/versioning.config.json",
+};
+const templates = { applies: false, count: 0, missing: [] };
+const tplDir = join(UPSTREAM, "setup", "templates");
+if (existsSync(tplDir)) {
+  const names = readdirSync(tplDir).sort();
+  templates.count = names.length;
+  templates.applies = names.length > 0;
+  for (const name of names) {
+    const target = TEMPLATE_TARGETS[name];
+    if (target && !existsSync(join(CWD, target))) templates.missing.push({ name, target });
+  }
+}
+
 const result = {
   repo: basename(CWD),
   mode: DRY ? "dry-run" : "applied",
@@ -184,6 +253,8 @@ const result = {
   resync,
   provision,
   tools: tools.map(({ hint, ...t }) => t),
+  canonDelta,
+  templates,
 };
 
 if (JSON_OUT) {
@@ -218,6 +289,26 @@ out.push(
 );
 for (const t of tools) {
   if (t.behind) out.push(`        ⚠ ${t.name} ${t.installed} → ${t.pin}   run: ${t.hint}`);
+}
+// Canon-delta — the headline: current ≠ knowing what changed. Re-read these.
+if (canonDelta.applies) {
+  out.push(
+    `  ${bold("Canon / protocol")}    ${yellow("⚠ changed — re-read before acting on stale knowledge")}`
+  );
+  for (const d of canonDelta.decisions) out.push(`        • ${d}`);
+  for (const c of canonDelta.changed) out.push(`        ${c}`);
+} else if (!NO_PULL && (pull.done || DRY)) {
+  out.push(
+    `  Canon / protocol   ${green("✓")} no governance changes in this ${DRY ? "range" : "pull"}`
+  );
+}
+// Templates — surface the by-instantiation set + flag config-templates not instantiated.
+if (templates.applies) {
+  out.push(
+    `  Kit templates      ${templates.count} available (by-instantiation)${templates.missing.length ? yellow(` · ${templates.missing.length} not instantiated`) : ""}`
+  );
+  for (const m of templates.missing)
+    out.push(`        ${yellow("○")} ${m.name} — copy setup/templates/${m.name}/ → ${m.target}`);
 }
 if (resync.missingUpstream.length)
   out.push(
