@@ -40,7 +40,9 @@ This canon **owns** what had no agnostic home: the **identity asymmetry**, the *
 - **Owner / maintainer (the architect / coordinator):** reviews and merges. May hold admin — in which case branch protection must still require review, or admins are exempted only **deliberately and documented**.
 - **The lock:** the default branch is protected (PR + review required). When "admins may bypass" is enabled, the owner can push directly but the bot **cannot** — so the bot is the side the lock holds. The executor also cannot self-approve its own PR.
 
-L3 binds the concrete bot account, its permission level, and the forge's branch-protection settings.
+> **Platform note — enforcement is host-dependent** *(amendment SEALED 2026-06-18 — first-heir macOS finding; D-022)*. The lock is a *hard* lock only where the host **enforces** branch protection. On some hosted plans / repo visibilities, enforcement is unavailable or gated behind a **paid org tier** (e.g. on a major host, branch-protection **rulesets on a *private* repo are not enforced** without a paid org plan — the host warns the ruleset "won't be enforced"). Where the host cannot enforce it, the lock degrades to **discipline, not enforcement**. So: **confirm the host actually enforces the protection** before relying on it; if it cannot, the L3 binding (§10) MUST declare the fallback — a **public** repo, an **alternative enforcement**, or an explicit **discipline-only `N-A(reason)`**. The identity asymmetry (bot = propose-only) still holds as a rule; what varies is whether the platform *enforces* it or it rides on discipline.
+
+L3 binds the concrete bot account, its permission level, and the forge's branch-protection settings (and, where the host can't enforce them, the declared fallback).
 
 ---
 
@@ -113,7 +115,7 @@ Per wave, a **non-executor session** prepares the launch surface so launching ea
 
 ## §10 — L3 binding (what the consuming repo owns)
 
-- the concrete **bot account** + its permission level + the forge's **branch-protection** settings (§3)
+- the concrete **bot account** + its permission level + the forge's **branch-protection** settings (§3) — **and, where the host cannot enforce branch protection (e.g. a private repo without an org-tier ruleset plan), the declared fallback posture: public repo · alternative enforcement · discipline-only `N-A(reason)`**
 - the **per-session credential** env-var name + how it is provisioned (§4)
 - the forge CLI's **auth-status** command (§5) and the **events/audit** query (§6)
 - the **shared-foundation order** for the wave (§7); the worktree root convention defers to `CANON-BRANCH-WORKTREE-LIFECYCLE` §5.3
