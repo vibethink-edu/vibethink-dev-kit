@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 35 spines · 76 declared relationships.
+> 36 spines · 78 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -26,6 +26,7 @@ flowchart LR
     CANON_BRANCH_WORKTREE_LIFECYCLE["#23 branch worktree lifecycle"]
     CANON_CHANGE_PATH_AND_DECISION_CLASSES_001["#37 change path and decision classes"]
     CANON_CONFIGURATION_DISCIPLINE["#32 configuration discipline"]
+    CANON_DATA_CHANGE_AUDIT_001["#43 data change audit"]
     CANON_DB_SECURITY_BASELINE_001["#38 db security baseline"]
     CANON_DEV_MODE_DISCIPLINE["#21 dev mode discipline"]
     CANON_DEVELOPMENT_PROCESS["#10a development process"]
@@ -96,6 +97,8 @@ flowchart LR
   CANON_CHANGE_PATH_AND_DECISION_CLASSES_001 --- CANON_STATE_MIRROR_AND_DECISION_REGISTER_001
   CANON_CHANGE_PATH_AND_DECISION_CLASSES_001 --- CANON_AUDIT_PROTOCOL
   CANON_CONFIGURATION_DISCIPLINE --- CANON_PRODUCTION_SAFETY
+  CANON_DATA_CHANGE_AUDIT_001 --- CANON_DB_SECURITY_BASELINE_001
+  CANON_DATA_CHANGE_AUDIT_001 --- CANON_STATE_MIRROR_AND_DECISION_REGISTER_001
   CANON_DB_SECURITY_BASELINE_001 --- CANON_PRODUCTION_SAFETY
   CANON_DB_SECURITY_BASELINE_001 --- CANON_VERTICAL_BOUNDARY_001
   CANON_DB_SECURITY_BASELINE_001 --- CANON_TESTING_GATE
