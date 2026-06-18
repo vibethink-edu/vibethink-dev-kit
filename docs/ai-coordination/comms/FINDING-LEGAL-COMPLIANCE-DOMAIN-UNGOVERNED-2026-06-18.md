@@ -5,7 +5,8 @@ from: claude (Fable / seat Campus)
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: D-017 (2026-06-18). Action 1 DONE — CANON-DATA-LEGAL-COMPLIANCE-001 OPENED as DRAFT (agnostic mechanics; laws/numbers L3; not sealed — pending consent-canon review + jurisdiction/number decisions). Action 2 DONE — CANON-DATA-CHANGE-AUDIT-001 §9 retention SEALED (partition + legal-window + archive-not-delete, window bound to the legal canon). Action 3 (ViTo-architect review of CANON-DATA-CAPTURE-CONSENT-001 for agnostic mechanics to separate) = read-only review delivered separately.
 needs: decision
 priority: high
 date: 2026-06-18
