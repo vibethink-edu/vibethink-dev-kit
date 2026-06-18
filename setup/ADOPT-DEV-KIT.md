@@ -1147,6 +1147,31 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 45 — Documentation-artifact standards (one standard per artifact, bound to SOTA) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001.md` + `setup/templates/`.
+
+- **Qué:** one standard per documentation artifact, each **bound to the recognized external standard a
+  developer already knows** — don't invent. RFC/RFD · **MADR** (ADR) · PRD · SDD/SpecKit · `now/next/later`
+  Roadmap · **Keep a Changelog** · SemVer + Conventional Commits · **Google SRE PRR** · blameless
+  Postmortem · SRE Runbook · **Diátaxis** (the meta-taxonomy for `docs/`) · **C4 / arc42**. Supersedes:
+  **PRDI → PRR**, **ADR → MADR**; **the work-journal (`BITACORA`/`LOG`) is removed** (folded into
+  Changelog + ADR + git — no SOTA, no dev "already knows" it). House-legitimate (no SOTA): Roadmap, UPSTREAM.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Templates shipped:** `setup/templates/{adr (MADR), rfc, prr, postmortem, runbook, diataxis,
+    architecture}` (+ existing changelog/versioning/feature-docs). Copy what you produce; bind the same
+    names across consumers.
+  - **Re-bind:** unify your divergences (ADR naming → MADR; docs root; decisions home; drop any
+    `BITACORA`/`LOG`). Per-repo locations are L3.
+- **Verificar:**
+  - Each artifact you produce maps to a row in §2 and uses the shipped template / bound standard; no
+    `BITACORA`/`LOG` work-journal remains; an ADR follows MADR; a prod ship has a PRR with a rollback section.
+  - The canon names no product/vendor/house-format as a standard (fire-test) — only public external standards.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it

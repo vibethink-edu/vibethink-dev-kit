@@ -1,6 +1,6 @@
 # CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001 — One standard per doc artifact, bound to a recognized external standard (universal · agent-agnostic)
 
-> **Status:** PROPOSED 2026-06-18 — awaiting the Principal Architect's seal. **One open decision must be resolved before seal: the work-journal (§5).**
+> **Status:** SEALED 2026-06-18 by the Principal Architect ("quitarlo" + seal) — D-019. The one open decision (the work-journal, §5) is resolved: **removed**. Fire-test passed (binds to public/recognized external standards; names no product/vendor/house-invention).
 > **Scope:** every repo that produces documentation artifacts (proposals, decisions, specs, changelogs, runbooks, postmortems, architecture docs).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** documentation discipline · binds with `CANON-VERSIONING-001.md`, `CANON-NAMING-CONVENTIONS-001.md` (ADR filename pattern), `CANON-DEVELOPMENT-PROCESS.md` (feature-doc instrument), and `CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md`.
@@ -47,13 +47,13 @@ These have **no** SOTA standard; they are kept because they serve a real need, m
 
 A house artifact is legitimate **only** when no recognized external standard covers its job. The default is always: bind to the standard.
 
-## §5 — OPEN DECISION (resolve before seal): the work-journal
+## §5 — The work-journal is REMOVED *(decided 2026-06-18 by the Principal Architect — "quitarlo")*
 
-The **work-journal** (`BITACORA` / `LOG`) has **no** SOTA standard — no developer "already knows" it — and its content is largely covered by **Changelog** (deltas) + **ADR** (decisions) + **git history**.
+The **work-journal** (`BITACORA` / `LOG`) has **no** SOTA standard — no developer "already knows" it — and its content is covered by **Changelog** (deltas) + **ADR** (decisions) + **git history**. It is therefore **removed**, folded into those three — the purest application of §1 (don't invent where a standard already covers it). This is the cuadro's only *remove*, not *rename*.
 
-- **Recommended:** **REMOVE** it (fold into Changelog + ADR) — the purest application of §1.
-- **If kept:** one name, English (`LOG.md`), across all consumers, scoped to narrative that genuinely has no home in Changelog/ADR/git.
-- **The Principal Architect decides before this canon seals.** (Note: a consumer currently mandates a per-feature work-journal in its feature-lifecycle rule; that rule re-binds per the decision on re-seal.)
+- **No `BITACORA` / `LOG` artifact** in the kit's standard set. Narrative that used to go there: deltas → Changelog; decisions/why → ADR (MADR); chronology → git history.
+- **Kit reconciliations (this seal):** the feature-docs instrument no longer ships `LOG.template.md`; its README + config example drop it; `CANON-DEVELOPMENT-PROCESS` §5 notes the removal.
+- **Consumer reconciliation (their lane, after seal):** a consumer that mandated a per-feature work-journal (ViTo `CANON-FEATURE-LIFECYCLE-TRACKING` / Rule #22) updates that rule on re-bind; WorkBench drops `LOG.md`.
 
 ## §6 — Consumer-binding rule
 

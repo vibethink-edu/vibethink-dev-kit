@@ -79,7 +79,7 @@ session or agent:
 - a **decision record (ADR)** — the *why* behind each architecture / contract /
   behaviour decision (context · decision · alternatives · consequences) **and the
   check that enforces it (§3.1)** so the decision cannot silently drift,
-- an **append-only log** of decisions over time,
+- *(the append-only work-journal was **removed** 2026-06-18 per `CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001` §5 — its content folds into the changelog (deltas) + ADRs (decisions) + git history; do not re-introduce a `BITACORA`/`LOG`),*
 - a **status roadmap**,
 - a **per-unit changelog** (touch a unit → update its changelog in the same change).
 
