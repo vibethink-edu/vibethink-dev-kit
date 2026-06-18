@@ -189,12 +189,14 @@ Node 20+, git, and bash (for the optional shell helpers).
 |---|---|---|
 | **Linux** | ✅ Validated | the kit's own CI runs every engine on each PR |
 | **Windows** | ✅ Validated | a consuming repo runs them daily |
-| **macOS** | 🟡 Expected — pending first green | first Mac heir landing; the one Windows-ism (`check-tools.sh` not probing `python3`) is fixed — a Mac running `devkit-doctor` green flips this to ✅ |
+| **macOS** | ✅ Validated | first Mac heir ran `devkit-upgrade` / `devkit-doctor` green (2026-06-17); the `.sh` parse-smoke now runs in CI (`shell-smoke.test.mjs`) |
 
 > The core is cross-platform by construction (pure Node, `node:path`, LF/CRLF-neutral);
-> the only OS-specific surface is the optional bash/PowerShell helper scripts. macOS is
-> marked **expected, not validated** until a Mac actually runs green — honesty over a
-> checkmark we haven't earned.
+> the only OS-specific surface is the optional bash/PowerShell helper scripts. All three
+> rows are **validated in practice** (Windows daily, macOS by the first heir's green run);
+> CI itself runs Linux-only, so the `.sh` parse-smoke runs there while the `.ps1` path is
+> exercised by hand — a Windows/macOS CI **runner matrix is deferred** (build-on-pain) and
+> re-opened on report (issue #123 disposition).
 
 ---
 
