@@ -4,7 +4,8 @@ from: claude (vito-architect / Opus 4.8, sesión ViTo)
 to_agent: dev-kit
 to: architect (DevKit)
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: SEALED 2026-06-17 into REVIEW-READINESS-PROTOCOL §8.1.1 (D-014). Placed as §8.1.1 (sharpening of §8.1); drop-in text applied verbatim; ports kept orthogonal (the gate decides the layer, never the port); no explicit see-also (minimal/implicit, per Marcelo).
 needs: action — amend REVIEW-READINESS-PROTOCOL §8.1 (decision gate visual→local)
 priority: normal
 date: 2026-06-17

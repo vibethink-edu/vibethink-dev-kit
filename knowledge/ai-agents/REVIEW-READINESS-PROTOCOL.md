@@ -163,6 +163,22 @@ competes with the deployed one.
 of truth; real-tenant UAT points at it; the local mirror is fallback" — to the supra layer.
 On promotion, folds into `CANON-REVIEW-READINESS-001`.)*
 
+### 8.1.1 Sharpening — pure visual iteration runs local *(SEALED 2026-06-17 by the Principal Architect — "GO"; from a ViTo architect handoff sharpening §8.1 · D-014)*
+
+§8.1's *"UAT / UX-refinement → deployed/cloud"* holds when the review needs **real data** or a
+**path that only exists in the deployed origin** (e.g. a session that only the deployed origin
+can issue). It does **not** hold for **pure visual iteration** — colors, layout, spacing, props,
+copy: anything that does **not** need real data. There the deployed/CI path adds **no extra
+signal** and **burns CI/CD on every tweak**, so it runs **local**.
+
+**Decision gate — does this review need real data or a deploy-only path?**
+- **No** → **local** (visual / UX iteration; fastest true signal, zero CI/CD spend).
+- **Yes** → **deployed/cloud** (data fidelity, deploy-only auth/session, edge/scheduled/webhook behavior).
+
+*(Orthogonal, not coupled here: when a review runs local, the repo uses its canonical port from
+the supra port assignment — applied independently. This gate decides the **layer**, never the
+**port**.)*
+
 ## 9. Manual Bypass Discipline
 
 A manual bypass is exceptional. It is allowed only after a concrete diagnosis such
