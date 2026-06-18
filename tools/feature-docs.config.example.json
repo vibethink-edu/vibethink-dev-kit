@@ -4,7 +4,7 @@
   "binding": "AGENTS.md",
   "featureScope": {
     "root": "docs/features",
-    "requiredArtifacts": ["ROADMAP.md", "BITACORA.md", "PRDI.md"]
+    "requiredArtifacts": ["REQUIREMENTS.md", "ROADMAP.md", "CHANGELOG.md"]
   },
   "findings": {
     "location": "docs/ai-coordination/comms"

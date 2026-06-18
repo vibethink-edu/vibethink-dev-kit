@@ -31,7 +31,7 @@ flowchart LR
     CANON_DB_SECURITY_BASELINE_001["#38 db security baseline"]
     CANON_DEV_MODE_DISCIPLINE["#21 dev mode discipline"]
     CANON_DEVELOPMENT_PROCESS["#10a development process"]
-    CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001["documentation artifact standards"]
+    CANON_DOCUMENTATION_ARTIFACT_STANDARDS_001["#45 documentation artifact standards"]
     CANON_E2E_TEST_USER_DISCIPLINE["#27 e2e test user discipline"]
     CANON_GAP_REPORT["#28 gap report"]
     CANON_GIT_HYGIENE["#22 git hygiene"]

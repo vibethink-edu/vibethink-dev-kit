@@ -16,7 +16,7 @@
 > an artifact is missing rather than when someone notices it is missing.**
 
 The cost of an undeclared documentation shape is *re-learning*: a feature coded with
-no durable requirements / plan / log / roadmap / changelog is undiscoverable months
+no durable requirements / plan / roadmap / changelog is undiscoverable months
 later (the code sits in a branch nobody remembers). The artifacts exist so the unit's
 history survives any single session or agent — and the gate exists so "we have the
 artifacts" is a fact on disk, not a hope.
@@ -28,7 +28,6 @@ artifacts" is a fact on disk, not a hope.
 | `REQUIREMENTS.template.md` | §5 *requirements record* | what + why (the levantamiento) | revised as scope firms |
 | `READINESS-PLAN.template.md` | §5 *readiness/deployment plan* + **§5.2 security-concerns** | how it ships + the security gate before approval | revised until approved |
 | `ROADMAP.template.md` | §5 *status roadmap* | phases · % progress · what's next | overwritable (current state) |
-| `LOG.template.md` | §5 *append-only log* | the history / why we got here | **append-only** |
 | `CHANGELOG.template.md` | §5 *per-unit changelog* | what changed, per unit, tied to versioning | append on each change |
 | `FINDING.template.md` | §6 *findings* | an out-of-scope anomaly/risk/opportunity | one file per finding |
 
