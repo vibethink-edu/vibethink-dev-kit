@@ -1,0 +1,30 @@
+{
+  "$comment": "Per-repo binding for the identifier-language gate (CANON-NAMING-CONVENTIONS-001 §8, surface-complete §8.6). Copy to tools/identifier-language.config.json. The engine is agnostic — THIS file holds every locale/layout fact: the declared language, the surfaces to scan, the DB column-type keywords, the admitted vocabulary, and documented exceptions. Bootstrap with `node tools/check-identifier-language.mjs --seed`, then REVIEW the diff (a non-declared-language token is a leak — RENAME it, do not admit it). schemaDirs = dirs of DDL .sql. slugSurfaces = dir trees whose child dir NAMES are identifiers (route slugs, feature dirs); recursive walks the tree, skip removes named subtrees, and `_*` / group `(..)` / param `[..]` folders are always excluded.",
+  "declaredLanguage": "en",
+  "schemaDirs": ["db/migrations"],
+  "columnTypes": [
+    "UUID",
+    "TEXT",
+    "BOOLEAN",
+    "DATE",
+    "TIMESTAMPTZ",
+    "TIMESTAMP",
+    "TIME",
+    "INT",
+    "INTEGER",
+    "BIGINT",
+    "SMALLINT",
+    "NUMERIC",
+    "DECIMAL",
+    "JSONB",
+    "JSON",
+    "SERIAL",
+    "BYTEA"
+  ],
+  "slugSurfaces": [
+    { "dir": "apps/web/src/app", "recursive": true, "skip": ["api"] },
+    { "dir": "apps/web/src/features", "recursive": false }
+  ],
+  "allow": [],
+  "exceptions": {}
+}
