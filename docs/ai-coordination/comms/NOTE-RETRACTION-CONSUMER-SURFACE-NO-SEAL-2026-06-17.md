@@ -4,7 +4,8 @@ from: claude (Fable / seat Campus)
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
+status: actioned
+resolution: ACK 2026-06-18 — consumer-surface NOT sealed (layer error: ViTo governance, not agnostic). The proposal was withdrawn; the kit was never contaminated (0 refs in knowledge/). No kit action.
 needs: ack
 priority: high
 date: 2026-06-17
