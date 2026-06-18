@@ -1,6 +1,6 @@
 # CANON-DATA-LEGAL-COMPLIANCE-001 — Data-protection legal compliance (universal · agent-agnostic)
 
-> **Status:** DRAFT — **opened, not sealed.** Establishes the agnostic *mechanics* of data-protection compliance; the concrete laws, jurisdictions, and retention numbers are L3. Sealed only after (a) the consent-canon separation review (does a consumer's consent canon hold agnostic mechanics to fold here?) and (b) the Principal Architect's jurisdiction/retention-number decisions. **While DRAFT, no agent treats the specific numbers as fixed.**
+> **Status:** SEALED 2026-06-18 by the Principal Architect ("sella") — D-018. Seals the agnostic *mechanics* of data-protection compliance; the concrete laws, jurisdictions, and retention **numbers are L3 by design** (each repo binds them — the canon never holds a number). The consent-canon separation review is done (relay sent to the consumer architect); per-repo legal numbers are an L3/legal-research concern, not a seal blocker. Fire-test passed (no specific law named as *the* law; regimes appear only as illustration).
 > **Scope:** every repo that stores or processes **personal data**.
 > **Home:** the dev-kit (supra-repo). On promotion, inherited by every repo as upstream → fork.
 > **Family:** data-governance discipline · binds with `CANON-DATA-CHANGE-AUDIT-001.md` (the audit-trail is itself subject to §2 retention) · sibling of `CANON-DB-SECURITY-BASELINE-001.md`. A consumer's product-specific consent/capture canon (e.g. a friendship/capture model) is its **L3 binding**, not a replacement for this neutral core.
@@ -54,12 +54,12 @@ The laws, numbers, jurisdictions, and mechanisms are L3; they never flow into th
 
 This kit is the **upstream** of governance. Each repo is a **fork** that inherits this canon and binds its own L3 laws + numbers + mechanisms.
 
-## Open items before seal (DRAFT)
+## Post-seal follow-ups (L3, not seal blockers)
 
-1. **Consent-canon separation review** — assess whether a consumer's product consent canon (e.g. ViTo `CANON-DATA-CAPTURE-CONSENT-001`) holds agnostic legal mechanics that should fold into §3/§5 here (the capture *philosophy* stays L3).
-2. **Jurisdiction + retention numbers** — the Principal Architect / legal research sets the actual windows (e.g. minors' data retention under the applicable regime). Until then §2 numbers are L3-TBD.
+1. **Consent-canon separation (relay sent).** The review is done: a consumer's product consent canon (ViTo `CANON-DATA-CAPTURE-CONSENT-001`) mixes agnostic legal mechanics with its product philosophy. On its next re-seal it refactors to **point here** for the agnostic mechanics — data-subject rights + jurisdiction-bound timelines, portability, transparency/consent-for-new-processing, and the erasure-vs-retention tension — keeping only its L3 numbers + bindings (the capture *philosophy* stays L3). That refactor is the consumer architect's, under the Principal Architect.
+2. **Jurisdiction + retention numbers are L3 by design.** Each repo binds its regime + windows (e.g. minors' data retention under the applicable law) via legal research; the canon never holds the number. Not a seal blocker — it is the steady state.
 
-## Fire-test (intended, on seal)
+## Fire-test
 
 The sealed form names no specific law/jurisdiction as *the* law — those appear only as illustration (GDPR / Habeas Data / LGPD / CCPA), and bind at L3. The agnostic mechanics (retention-by-type, recorded-withdrawable-consent, consented-tracking, data-subject-rights, declared-jurisdiction) are the only normative content.
 
