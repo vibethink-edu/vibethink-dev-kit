@@ -17,6 +17,10 @@
     {
       "file": "knowledge/ai-agents/CANON-OBSERVABILITY-CLOSED-LOOP-001.md",
       "reason": "DRAFT — INTENTION handed from a consuming product (ViTo, HANDOFF 2026-06-17). Declared as an agnostic working agreement, NOT law. It is formalized by ViTo (front observability-closed-loop, P0->P1->P2); only on validated formalization does the Principal Architect promote it to a sealed canon and register it as an adoptable piece (exemption removed then). Until then it must not block the catalog — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/methodology/CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001.md",
+      "reason": "PROPOSED 2026-06-18 (WorkBench-architect handoff; Marcelo principle + GO). Binds each doc artifact to its recognized external standard (MADR/RFC/PRR/Diátaxis/…) + ships templates. NOT yet sealed: one open decision (the work-journal, §5) must be resolved by the Principal Architect first. Registered as an adoptable piece + exemption removed AT SEAL (per kit pattern + handoff item 5: consumers re-bind after seal — registering the piece before seal would make consumer adoption-gates require a row for an unsealed canon). Until then it must not block the catalog — but it is not silently absent either."
     }
   ],
   "statusTokens": [
