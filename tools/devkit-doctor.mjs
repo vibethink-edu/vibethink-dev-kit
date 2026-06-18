@@ -111,6 +111,12 @@ const GATES = [
     targets: ["tools/ports.config.json"],
     fix: "a repo that deploys carries no canonical port declaration (fail-closed refusal), or the recommended form shares a port — declare your ports (CANON-PORT-ASSIGNMENT-001 §3), or set deploys:false for a conscious N-A",
   },
+  {
+    label: "identifier language",
+    engine: "check-identifier-language.mjs",
+    targets: ["tools/identifier-language.config.json"],
+    fix: "an identifier token (schema / route slug / feature dir) is not in the declared vocabulary — rename the leak or admit the term (CANON-NAMING-CONVENTIONS-001 §8, surface-complete §8.6); or remove the config for a conscious N-A",
+  },
 ];
 
 function firstExisting(paths) {

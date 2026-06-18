@@ -8,6 +8,7 @@
     "check-copy-parity.mjs": "1.0",
     "check-feature-docs.mjs": "1.0",
     "check-governance.mjs": "1.0",
+    "check-identifier-language.mjs": "1.0",
     "check-inheritance-claims.mjs": "1.0",
     "check-ports.mjs": "1.0",
     "check-tenant-contamination.mjs": "1.0",

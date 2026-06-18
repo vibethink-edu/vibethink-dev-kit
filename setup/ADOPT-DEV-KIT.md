@@ -1067,6 +1067,33 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 42 — Identifier-language gate (the mechanism for §8, surface-complete) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `tools/check-identifier-language.mjs` + `setup/templates/identifier-language/`.
+**Authority:** `knowledge/methodology/CANON-NAMING-CONVENTIONS-001.md` §8 + `CANON-AUDIT-PROTOCOL` §8.6.
+
+- **Qué:** the **mechanism** for the already-sealed §8 rule (identifiers in one declared
+  language) — a **vocabulary-allowlist** gate, not a forbidden-word denylist (freeze-at-N).
+  Every identifier token must be a **consciously-admitted** vocabulary entry; a leak in
+  another language is a token nobody admitted → it fails. **Surface-complete** (§8.6): scans
+  every declared surface — schema DDL · route/URL slugs · feature/dir names — not just one.
+  Self-maintaining (grows by reviewed PR `--seed` + diff review).
+- **Cómo:**
+  - **Engine is agnostic** — copy `tools/check-identifier-language.mjs`; it knows no product,
+    language, or layout. Every locale/layout fact is **per-repo binding** in
+    `tools/identifier-language.config.json` (declared language · schema dirs · slug surfaces ·
+    column types · vocabulary · exceptions). Template + README: `setup/templates/identifier-language/`.
+  - **Bootstrap:** `node tools/check-identifier-language.mjs --seed` regenerates `allow` from
+    your surfaces — **review the diff** (a non-declared-language token is a leak: RENAME, don't admit).
+  - **Wire** it in CI / pre-push; also runs on `devkit-doctor` (skip-when-no-config).
+- **Verificar:**
+  - An un-admitted token (schema **or** slug surface) → the gate fails (exit 1); a config with
+    zero declared surfaces → setup error (no silent-zero, §8.6); `--seed` writes the vocabulary.
+  - The engine names no product/vendor/language/layout (fire-test); all of that is the binding.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it

@@ -209,6 +209,9 @@ jobs:
       - name: shell tools smoke (bash -n, issue #123)
         run: node tools/shell-smoke.test.mjs
 
+      - name: identifier-language engine tests
+        run: node tools/check-identifier-language.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
