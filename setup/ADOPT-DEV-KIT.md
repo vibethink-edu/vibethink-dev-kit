@@ -1119,6 +1119,34 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 44 — Data-protection legal compliance (retention · consent · cookies · data-subject rights) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DATA-LEGAL-COMPLIANCE-001.md`.
+
+- **Qué:** every system handling **personal data** must honour its data-protection obligations as a
+  governed capability — **retention** by data type (archive past the window, **never** hard-delete),
+  **recorded + withdrawable consent / lawful basis**, **consented cookies/tracking**, **data-subject
+  rights** (access · rectification · erasure / right-to-be-forgotten · portability · objection), and a
+  **declared applicable jurisdiction**. The **mechanics** are universal; the **laws, jurisdictions, and
+  numbers are L3** (GDPR / Habeas Data / LGPD / CCPA = illustration only — the canon holds no number).
+  Binds with Piece #43: the audit-trail itself is subject to this retention, and a legally-required
+  erasure is the one governed exception to "never delete".
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **All numbers + laws are your L3 binding:** declare your jurisdiction(s), the retention window per
+    data class + archive destination, the consent/withdrawal mechanism, the cookie categories + consent
+    surface, and the data-subject-request intake + fulfilment path (incl. erasure reaching the trail).
+  - A product-specific consent/capture canon is an **L3 binding** that points here for the agnostic
+    mechanics — it does not replace this neutral core.
+- **Verificar:**
+  - A data-subject erasure can be fulfilled (incl. the audit-trail where legally due); past the
+    retention window data is **archived, not destroyed**; non-essential tracking does not run without
+    the required consent; each tenant/system has a declared governing jurisdiction.
+  - The canon names no law/jurisdiction as *the* law (fire-test); all of that is the L3 binding.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it

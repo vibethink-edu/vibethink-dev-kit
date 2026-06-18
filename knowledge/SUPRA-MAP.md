@@ -27,7 +27,7 @@ flowchart LR
     CANON_CHANGE_PATH_AND_DECISION_CLASSES_001["#37 change path and decision classes"]
     CANON_CONFIGURATION_DISCIPLINE["#32 configuration discipline"]
     CANON_DATA_CHANGE_AUDIT_001["#43 data change audit"]
-    CANON_DATA_LEGAL_COMPLIANCE_001["data legal compliance"]
+    CANON_DATA_LEGAL_COMPLIANCE_001["#44 data legal compliance"]
     CANON_DB_SECURITY_BASELINE_001["#38 db security baseline"]
     CANON_DEV_MODE_DISCIPLINE["#21 dev mode discipline"]
     CANON_DEVELOPMENT_PROCESS["#10a development process"]
