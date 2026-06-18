@@ -206,6 +206,9 @@ jobs:
       - name: devkit-upgrade engine tests
         run: node tools/devkit-upgrade.test.mjs
 
+      - name: shell tools smoke (bash -n, issue #123)
+        run: node tools/shell-smoke.test.mjs
+
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
     # Producer-only: every spine in knowledge/ must have its catalog piece (or a
