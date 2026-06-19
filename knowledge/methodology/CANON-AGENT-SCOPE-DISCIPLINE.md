@@ -1,8 +1,8 @@
 # CANON-AGENT-SCOPE-DISCIPLINE — Scope lock, layer boundaries & drift prevention (universal · agent-agnostic)
 
-> **Scope:** every repo where one or more agents (AI or human) edit a shared codebase organized across multiple domains.
+> **Scope:** every repo where one or more agents (AI or human) edit a shared codebase organized across multiple domains — **and** workspaces where several independent systems/repos co-reside (the outer ring, §2.1).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization).
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-19: §2.1 the outer ring — multi-system orientation (ground-first + the systems-map), lifted from a consumer's L3.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-AGENT-COLLABORATION` (how an agent works with the human authority) · `CANON-MULTI-AGENT-ORCHESTRATION` (how agents hand work between each other) · `CANON-CROSS-AGENT-CONTEXT-LAYERING` (how agents read the rule layers).
 
@@ -21,6 +21,7 @@ Scope discipline eliminates drift by making scope **explicit, measurable, and en
 Every session begins with a **Scope Card** declared before the first file edit:
 
 ```
+SYSTEM:  {which system/repo + how it runs}   (multi-system workspaces only — §2.1)
 ROLE:    {agent}-{domain}-{role}
 DOMAIN:  {registry sigla}
 SCOPE:   {module / front}
@@ -35,6 +36,19 @@ FILES:   {glob the agent may edit}
 3. The agent may **not** edit files outside the declared `FILES` glob without explicit human authorization.
 4. If the human extends scope ("also fix X in Y"), the agent **updates** the Scope Card to include Y.
 5. The `ROLE`/`DOMAIN` format follows the repo's role registry (an L3 concern).
+
+---
+
+## §2.1 — The outer ring: which system, grounded first (multi-system workspaces)
+
+When several **independent systems/repos co-reside** in one workspace (separate runtimes, ports, owners), the **outermost** scope question comes first — *which system am I in* — before the module/file scope of the Scope Card. Before touching any system's **build / dev / tests / infra**:
+
+1. **Confirm the system.** Its repo/remote + its port/runtime signature. A red build belongs to the system whose repo/port you are looking at — **not** another. Do not attribute one system's failure to another.
+2. **Ground-first — understand how it runs before fixing.** Learn the system's **own** scripts / env / ports. Do **not** run a from-scratch `install`/`build` assuming your own baseline; use **how the system is actually run** by its owner. Acting on infra you have not grounded in is how hours get lost.
+3. **First failed fix → re-evaluate the approach, not the depth.** Ask *right system? do I understand how it runs?* before a second attempt. **Persisting is not progressing** — a second failing attempt of the same shape is the signal to step back, not to push harder.
+4. **The systems-map.** The workspace maintains a map — **each system · its lane/boundary · pointers to its governing canons** — so an agent orients in **minutes**, not by oscillating. Consulting (or asking for) it is orientation, not incompetence.
+
+The **concrete map** (which systems, their ports, the canon paths) is the repo/house **L3 binding** — this section governs only that the map **exists** and that grounding precedes action. *(Build-on-pain origin: an external-portal architecture oscillated for hours despite the governing boundary + topology canons already resolving it; a systems-map pointing at those canons would have cut it to minutes.)*
 
 ---
 
@@ -104,6 +118,7 @@ The repo's operational-state doc carries an **Assignment Registry**: which agent
 ## §7 — The pre-work gate (mandatory before every file edit)
 
 ```
+0. (multi-system) Am I sure WHICH system I'm in, and how it runs? If not → ground-first (§2.1).
 1. Did I declare my Scope Card?
 2. Is this file inside my declared FILES glob?
 3. If no → is the human explicitly asking me to edit it?
@@ -150,6 +165,7 @@ Two disciplines that scope work depends on are **already governed** by `CANON-AG
 
 ## §10 — Rules summary
 
+0. **GROUND-FIRST (multi-system)** — confirm which system you're in + how it runs before touching its infra; keep a systems-map with pointers to each system's canons (§2.1).
 1. **SCOPE CARD** — declare before editing anything.
 2. **LAYER BOUNDARY** — verticals and horizontals never edit each other.
 3. **TASK PROTOCOL** — need another layer? Write a TASK, don't fix it.
