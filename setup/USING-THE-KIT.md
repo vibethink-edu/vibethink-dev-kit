@@ -75,6 +75,18 @@ do these three checks (each ~10s):
 > piece is visible, not silent. To move a default tool to its pin, re-run the
 > provisioner (below); version-forward of a pin is a deliberate PR to the lock.
 
+> **Refresh trigger — a short prompt is enough.** The operator must not have to spell out
+> the recipe above. When the operator asks — **in any phrasing** — to *refresh / update the
+> kit*, the agent runs it as one flow: **(1)** `devkit-upgrade` (pull + canon-delta report);
+> **(2)** re-read the canons the delta flags; **(3)** present a **short adoption card** —
+> *what changed · what needs adopting (config / template / a status-doc row) · a
+> recommendation* — and **wait for GO** (`CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.1:
+> present the choice, don't resolve it silently); **(4)** on GO, wire + run `devkit-doctor`
+> to green. So a short prompt yields a **short menu**, never a silent mass-change. The exact
+> operator phrase is L3 (pin it in your root rules); it is the **intent → recipe** mapping
+> that makes the short prompt work — wire it once so the knowledge lives in the repo, not in
+> the prompt.
+
 ---
 
 ## 1.6 Command cheat-sheet (what you actually run)
