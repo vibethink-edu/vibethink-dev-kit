@@ -118,6 +118,7 @@ server, read the project's port registry and use the assigned block.
 # ✅ ALWAYS commit frequently with descriptive messages
 # ✅ ALWAYS create reports/validations in work/ folder structure
 # ✅ ALWAYS organize temporary files in work/ subdirectories
+# ✅ ALWAYS, on a "refresh / update the kit" request (any phrasing) → run the kit's Refresh trigger (see the on-ramp): upgrade → re-read the change-delta → present a short adoption card + WAIT for GO → on GO, wire + re-run the health board. A short prompt yields a short menu, never a silent mass-change.
 # ❌ NEVER create .md files for every analysis - do analysis in response, only create .md for significant reports
 ```
 
@@ -732,10 +733,14 @@ declares the exact script names (a "quick" check before, fuller checks after).
 
 ---
 
-**Last Updated:** 2026-05-22
-**Version:** 1.3
+**Last Updated:** 2026-06-19
+**Version:** 1.4
 **Maintained by:** the dev-kit (supra-repo upstream)
 **Changelog:**
+- v1.4 (2026-06-19): Added the kit-refresh trigger to Always-Do — a "refresh/update the
+  kit" request maps to the Refresh-trigger recipe (the on-ramp), so the behavior **inherits
+  by reference** instead of being pasted per-repo. Kept neutral (abstract: upgrade /
+  change-delta / health board — concrete tool names stay in the on-ramp / level 2).
 - v1.3 (2026-05-22): Restored level-1 vendor-neutrality (review finding #3) — moved
   concrete kit-access, ports, stack pins, DB example, validation commands, AI
   capability mapping, and the inheritance paths/template to the methodology layer
