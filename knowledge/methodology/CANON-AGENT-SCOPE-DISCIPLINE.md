@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where one or more agents (AI or human) edit a shared codebase organized across multiple domains — **and** workspaces where several independent systems/repos co-reside (the outer ring, §2.1).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-19: §2.1 the outer ring — multi-system orientation (ground-first + the systems-map), lifted from a consumer's L3.**
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-19: §2.1 the outer ring — multi-system orientation (ground-first + the systems-map), lifted from a consumer's L3; + §2.1 item 5 destructive-command ground-check (build-on-pain: a mass `rm` ran against the wrong, full tree).**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-AGENT-COLLABORATION` (how an agent works with the human authority) · `CANON-MULTI-AGENT-ORCHESTRATION` (how agents hand work between each other) · `CANON-CROSS-AGENT-CONTEXT-LAYERING` (how agents read the rule layers).
 
@@ -47,6 +47,7 @@ When several **independent systems/repos co-reside** in one workspace (separate 
 2. **Ground-first — understand how it runs before fixing.** Learn the system's **own** scripts / env / ports. Do **not** run a from-scratch `install`/`build` assuming your own baseline; use **how the system is actually run** by its owner. Acting on infra you have not grounded in is how hours get lost.
 3. **First failed fix → re-evaluate the approach, not the depth.** Ask *right system? do I understand how it runs?* before a second attempt. **Persisting is not progressing** — a second failing attempt of the same shape is the signal to step back, not to push harder.
 4. **The systems-map.** The workspace maintains a map — **each system · its lane/boundary · pointers to its governing canons** — so an agent orients in **minutes**, not by oscillating. Consulting (or asking for) it is orientation, not incompetence.
+5. **A destructive command needs a ground-check, not a baseline assumption.** Before any destructive command (`rm -rf`, recursive delete, force-clean, `git reset --hard`, mass file removal), **confirm you are in the repo you think you are** with a cheap identity signal — the **expected file count**, a **sentinel/marker file**, or the **remote URL**. The most catastrophic ground-first failure is an agent assuming a *fresh / scaffold baseline* and deleting against the **wrong, full tree**. A raw `rm` bypasses every git hook and gate, so the only guard is the agent's pre-destruction check — there is no mechanical net under it. *(Build-on-pain: an agent ran `rm -rf packages` in a full monorepo's main worktree believing it was a ~50-file scaffold — ~1,400 tracked files deleted; recovered only because they were committed.)*
 
 The **concrete map** (which systems, their ports, the canon paths) is the repo/house **L3 binding** — this section governs only that the map **exists** and that grounding precedes action. *(Build-on-pain origin: an external-portal architecture oscillated for hours despite the governing boundary + topology canons already resolving it; a systems-map pointing at those canons would have cut it to minutes.)*
 
@@ -165,7 +166,7 @@ Two disciplines that scope work depends on are **already governed** by `CANON-AG
 
 ## §10 — Rules summary
 
-0. **GROUND-FIRST (multi-system)** — confirm which system you're in + how it runs before touching its infra; keep a systems-map with pointers to each system's canons (§2.1).
+0. **GROUND-FIRST (multi-system)** — confirm which system you're in + how it runs before touching its infra; **before any destructive command (`rm -rf` / reset --hard / mass delete), ground-check the repo identity** (§2.1.5 — a raw `rm` has no mechanical net); keep a systems-map with pointers to each system's canons (§2.1).
 1. **SCOPE CARD** — declare before editing anything.
 2. **LAYER BOUNDARY** — verticals and horizontals never edit each other.
 3. **TASK PROTOCOL** — need another layer? Write a TASK, don't fix it.
