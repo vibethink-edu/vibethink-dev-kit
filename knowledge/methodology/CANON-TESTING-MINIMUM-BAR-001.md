@@ -112,8 +112,12 @@ only the unit in isolation:
 
 This is `CANON-AUDIT-PROTOCOL` §8.6 applied to CI: the consumer build is a coverage surface;
 a gate green on the unit while the consumer surface is un-scanned is a partial gate, not a
-pass. Which consumer + the build command are per-repo binding (the consumer build **is** the
-check — no separate bespoke gate needed); the **exercise-the-consumer** rule is universal.
+pass. Which consumer, the build command, **and where the verification runs**, are per-repo
+binding — the consumer build may run in a hosted CI runner, a pre-push hook, the coder's
+pre-PR verify step, or a manual build before merge; **no hosted runner is required.** The
+rule is that the consumer is exercised **before merge**, not where it runs. The consumer
+build **is** the check — no separate bespoke gate needed; the **exercise-the-consumer** rule
+is universal.
 
 ## 7. What this canon does NOT do
 
