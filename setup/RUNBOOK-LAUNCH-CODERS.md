@@ -80,13 +80,43 @@ if   <worktree for this spec does not exist>:
 # 3) PER-SESSION SETTINGS (§5) — rewritten each launch so the current policy always applies
 <write .<harness>/settings.local.json with the allowlist + deny-guard below>
 
-# 4) LAUNCH the agent with the prompt + the assigned spec
-<start agent>  <prompt-for-this-spec + ">>> YOUR ASSIGNED SPEC: specs/<spec-id>">
+# 4) LAUNCH — FEED THE PROMPT VIA STDIN (not a CLI arg), headless + bypass, deny-guard active
+<prompt-for-this-spec + ">>> YOUR ASSIGNED SPEC: specs/<spec-id>">  |  <runtime> <headless-flag> <bypass-flag>
 ```
+
+**The launch contract (agnostic — derive it, don't improvise step 4):**
+
+1. **Feed the prompt via stdin, never as a CLI argument.** A per-spec prompt is multi-KB; passed
+   as an argument it overflows the command-length limit (shell/OS/runtime) — so it is **piped**
+   (`<prompt> | <runtime> …`). This is command-hygiene (§6) at the launch boundary.
+2. **Headless + bypass, with the deny-guard still biting.** The coder runs unattended over the
+   routine in the runtime's bypass mode; the **DENY** of §5 / `CANON-CODER-ORCHESTRATION-001` §7
+   (identity-change, destruction, secrets, arbitrary-exec) still apply — bypass silences the
+   *allow*-prompts, never the deny-guard.
+
+**Runtimes fall into two classes — same contract, different invocation (the concrete list is L3):**
+
+| Class | What changes | What stays |
+|---|---|---|
+| **1 — API-compatible with the host agent** | only an **env preset** (base URL + auth token + model) | the launcher and the step-4 line are **identical** |
+| **2 — its own CLI** | its **own binary + flags** | the **contract** above (stdin + headless + bypass + worktree) |
+
+> The concrete runtime matrix (which runtimes, their env vars / binaries / flags, and any
+> per-runtime gotcha — e.g. a `--yolo`-style flag that also turns on a sandbox that can fight the
+> worktree/bypass) is a **per-repo L3 binding** — it names vendors, so it lives in the consumer's
+> launch dir, not this neutral runbook (same boundary as the Claude-CLI worked example, §9).
 
 **Prompt selection:** `prompt-<spec-id>` if it exists (a specific spec, e.g. a boundary spec
 with its design gate) → else a **family** prompt (e.g. a shared wiring prompt) → else the
 **base** prompt. Keep boundary specs on their own prompt so the design gate (§7) is explicit.
+
+> **Identity gate (step 1) is an ALLOW-LIST — not a deny-list.** The gate must **positively
+> confirm the active identity IS the bot** ("abort unless active == bot"). Do **not** weaken it
+> to a deny-list ("abort only if active is a human/owner") for the convenience of dropping a
+> bot-login arg: a deny-list is the `CANON-AUDIT-PROTOCOL` §8.1 anti-pattern — an identity that
+> is **neither the bot nor an enumerated human** (a stale token, a third bot, the unexpected)
+> would **pass as the bot**. The frictionless gain is marginal (the bot token is in the env
+> either way); the hole is real. Confirm the bot positively.
 
 ---
 
@@ -170,6 +200,20 @@ Paste a section like this into the launch prompt (lever **a** of
   plan/data-model/tasks and **presents them for approval before writing sensitive code** (the
   **design gate**, `CANON-CODER-ORCHESTRATION-001` §8). Mechanical specs run autonomously
   after a canary. Either way: draft PR, no merge, no self-approve.
+  - **Under a headless launch the design gate is TWO LAUNCHES — there is no live pause.** A
+    headless coder runs to the end; it cannot stop mid-run to ask for the GO. So for a
+    **boundary** spec the gate is materialized as two phases:
+    1. **Plan-only launch** — the coder reads the spec, produces its plan (call-sites, routes,
+       migration plan) as a **durable, reviewable artifact** (a committed plan file, or a draft
+       PR carrying **only** the plan — never just printed to stdout, which is not a gate), and
+       **terminates**.
+    2. *(human reviews the plan and gives the GO)*
+    3. **Implementation launch** — re-launch with the GO to write the sensitive code.
+
+    For **mechanical** specs the single autonomous run + draft PR (the gate lives in the PR
+    review) is enough. This maps 1:1 to §8's boundary/mechanical split — the draft-PR gate
+    alone approves *after* the code is written; the two-phase flow restores §8's *approve the
+    plan before the sensitive code* where the live pause does not exist.
 - **Wave shape** (§9): pieces that **depend** → launch **sequentially** along the spine; pieces
   that are **independent** → **fan out**, one coder per worktree. Dependent coders branch from
   the **latest integration head at launch time** to inherit merged foundations.

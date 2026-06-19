@@ -1201,6 +1201,10 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - **Route from the gate:** your root rules cite `CHANGE-PATH-…` §3.1 — the decision gate
     names the executor and, for a coder, points at this on-ramp. The live forge state
     (bot is low-priv, branch protected) stays your L3 confirmation (`…SAFE-IDENTITY-001` §3).
+    - **Keep the root cite a terse POINTER (lean-root).** When the root rules file is near the
+      cross-agent layering byte budget (`CANON-CROSS-AGENT-CONTEXT-LAYERING` §2/§6), a verbose
+      cite trips the root-budget smoke. Cite the rule in **one line** and put the detail in the
+      launch dir — the root points, it does not carry the dispatch how-to.
 - **Verificar:**
   - `node <kit>/tools/check-coder-launch-readiness.mjs tools/coder-launch-readiness.config.json`
     → `GREEN — coder launch-surface READY` (or names the missing artifact).
