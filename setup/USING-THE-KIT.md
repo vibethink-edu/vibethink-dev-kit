@@ -86,6 +86,16 @@ do these three checks (each ~10s):
 > **inherits by reference** via `AGENTS_UNIVERSAL` (Always-Do) — a consumer wires **nothing**;
 > only the exact operator phrase is optionally pinned in the consumer's root rules (L3). The
 > knowledge lives in the kit, not in the prompt.
+>
+> **Make it automatic for NEW sessions (level 3, optional).** To avoid relying on anyone
+> remembering to refresh, wire the trigger as a **SessionStart hook**
+> (`CANON-CROSS-AGENT-CONTEXT-LAYERING` §9 wiring levels) that runs `devkit-upgrade --dry-run`
+> and surfaces the canon-delta at session start — a fresh session is told *"the kit changed,
+> re-read X"* with no human in the loop. The hook is **per-harness L3**; the manual trigger
+> above is the floor (level 1). **Limit (be honest):** this only helps **new** sessions — a
+> **mid-session** agent's loaded context cannot be refreshed from outside; it must re-read on
+> demand (or pick it up at its next start). One agent refreshing never updates another live
+> agent's context; only the shared kit pull + committed wiring propagate.
 
 ---
 
