@@ -31,7 +31,10 @@ in six steps:
 3. **Specify** — write the contract at the chosen weight: a short briefing, or a
    full spec. Heavier risk → heavier spec. Never quietly skip a level.
 4. **Execute, governed** — the author gives exact orders + a checklist; the builder
-   implements and raises blockers; the author verifies against the checklist. Each
+   implements and raises blockers; the author verifies against the checklist. If the
+   builder is an **autonomous coder**, dispatch it through the coder spine — the launch
+   runbook + identity PREP, never improvised — after confirming the launch-surface is
+   ready (`CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.1). Each
    work-unit declares its **verification type(s)** up front — the verification gate
    (`CANON-TESTING-GATE`) maps the unit's *nature × stakes* to the type(s) required
    (unit · contract · smoke · CLI · self-test · UAT · eval · e2e). The test travels

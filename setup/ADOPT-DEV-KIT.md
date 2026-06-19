@@ -1170,6 +1170,44 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     `BITACORA`/`LOG` work-journal remains; an ADR follows MADR; a prod ship has a PRR with a rollback section.
   - The canon names no product/vendor/house-format as a standard (fire-test) — only public external standards.
 
+### 46 — Launch your first coder (the dispatch on-ramp) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `setup/RUNBOOK-LAUNCH-CODERS.md` + `setup/templates/coder-prompt/` +
+`setup/templates/coder-launch-readiness/` +
+`knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md` §3.1.
+
+- **Qué:** the **on-ramp** that turns the coder-dispatch machinery (Pieces #35/#36) from
+  tribal knowledge into something a repo can stand up from the index. It closes the two
+  facets a consumer hit live: **F1 — no routing** (the decision gate decided methodology
+  but nothing routed "if a bot-coder runs this, dispatch via the runbook"; §3.1 is now
+  the routing link) and **F2 — no readiness check** (an agent could not self-verify "is
+  my launch-surface ready?" so it punted the infra to the human, who became the per-repo
+  verifier). It bundles: the **routing** (§3.1, the gate's third output: executor +
+  dispatch), the **prompt template** (the previously-implicit CONTEXT/MODEL/PIECES/STEP-0
+  IDENTITY/READ-IN-ORDER/HARD-RULES/DESIGN-GATE/DO-NOT structure), and the **readiness
+  check** (the portable half of the §8.7 split; the live forge state stays L3).
+- **Cómo:**
+  - **Read the runbook** `RUNBOOK-LAUNCH-CODERS.md` (§0 mental model → §3 launch anatomy →
+    §9 worked example). Stand up the prerequisites (§1): a low-priv bot, a protected
+    default branch, a per-session credential.
+  - **Copy the prompt template** `setup/templates/coder-prompt/prompt-base.template.txt`
+    → your launch dir; make a `prompt-<spec-id>.txt` per boundary spec.
+  - **Copy the readiness config** `setup/templates/coder-launch-readiness/` →
+    `tools/coder-launch-readiness.config.json`; point it at your launch script,
+    per-session settings, and bot-token env-var name. `devkit-doctor` then shows the
+    **coder launch readiness** line (skip = conscious N-A for a repo that does not launch
+    coders).
+  - **Route from the gate:** your root rules cite `CHANGE-PATH-…` §3.1 — the decision gate
+    names the executor and, for a coder, points at this on-ramp. The live forge state
+    (bot is low-priv, branch protected) stays your L3 confirmation (`…SAFE-IDENTITY-001` §3).
+- **Verificar:**
+  - `node <kit>/tools/check-coder-launch-readiness.mjs tools/coder-launch-readiness.config.json`
+    → `GREEN — coder launch-surface READY` (or names the missing artifact).
+  - A recent coder dispatch was **routed by the gate** (the decision named the executor),
+    used the prompt template, and the agent **self-verified readiness** instead of asking
+    the human to check the infra.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
@@ -1220,6 +1258,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 37 | Change-path & decision classes | ADOPTED / PENDING / N-A | class→authority binding + path-cut thresholds |
 | 38 | DB security baseline (Postgres/Supabase) | ADOPTED / PENDING / N-A(non-postgres) | migrations dir + advisor/lint command + CI gate wiring |
 | 39 | Human-surface legibility | ADOPTED / PENDING / N-A | depth-on-demand mechanism + verdict vocabulary per surface |
+| 46 | Launch your first coder (dispatch on-ramp) | ADOPTED / PENDING / N-A(no coders) | launch script + readiness config + prompt template + §3.1 routing |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
