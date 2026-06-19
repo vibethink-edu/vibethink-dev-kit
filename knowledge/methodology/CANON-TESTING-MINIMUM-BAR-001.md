@@ -93,6 +93,28 @@ seed-bound is a §6.2 gap: it proves logic, not deployed behaviour. (This is
 inside the minimum bar.) The concrete fixture mechanism is per-repo binding; the
 **self-provisioning, env-portable** rule is universal.
 
+### 6.3 — Exercise the consumer, not only the unit *(SEALED 2026-06-18 by the Principal Architect — "GO"; from a consumer's broken-merge-on-green-CI finding · D-026)*
+
+§6.1 guarantees the toolchain ran; §6.2 that it ran against the real environment. A third
+false-green: a unit (a package, a module) **passes in isolation while the build of its real
+consumer breaks**. Two tolerances diverge — a bundler accepts what a type-checker rejects
+(and the reverse: an extensionless import the type-checker accepts can break a bundler); a
+**declared export can point at a file that was never committed** (an ignored directory
+silently dropped the source). The unit's green is then a **false green about the thing that
+ships** — the consumer.
+
+Therefore CI / verification **exercises at least one real consumer of a changed unit**, not
+only the unit in isolation:
+- **≥1 consumer compiles/builds** against the change — the layer that gives the true signal
+  (`REVIEW-READINESS-PROTOCOL` §1).
+- **Declared exports resolve to committed files** — a package's entry points / `exports` map
+  to files actually in the commit, not ignored or missing.
+
+This is `CANON-AUDIT-PROTOCOL` §8.6 applied to CI: the consumer build is a coverage surface;
+a gate green on the unit while the consumer surface is un-scanned is a partial gate, not a
+pass. Which consumer + the build command are per-repo binding (the consumer build **is** the
+check — no separate bespoke gate needed); the **exercise-the-consumer** rule is universal.
+
 ## 7. What this canon does NOT do
 
 - It does **not** prescribe a specific testing framework (Jest, Vitest, pytest, Go test, JUnit, whatever the language standard is).
