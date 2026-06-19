@@ -410,6 +410,18 @@ agent token (`codex-rev` → `codex`) so a role-addressed message still reaches 
 agent's base inbox; the role travels as displayed metadata. An agent picks up its
 inbox regardless of the hat it is asked to wear.
 
+### Naming handoff slots — by role, not by the product that fills them
+
+A coordination or closeout step that hands off to another party names the **role** that
+party plays — `auditor`, `reviewer`, `advisor`, `executor` — **never the agent or product
+that happens to fill it** (a specific model or tool). A role may be filled by a human or
+any agent, and the filler rotates; the slot name must not rotate with it. **Omit a slot
+with no handoff** — never force an empty header. Agent/product tokens are legitimate **only
+in symmetric traceability rosters** where every party is listed alike (e.g. the
+branch-author prefix `{author}/…`, `CANON-NAMING-CONVENTIONS-001` §3) — not as the name of
+a role slot. (This is the closeout-message complement of *Routing of roles* above: there a
+role suffix routes to a base inbox; here a role names the handoff slot.)
+
 ### Implementation note (contract vs engine)
 
 This section is the **contract**. Authoring the fields (the consuming repo's send
