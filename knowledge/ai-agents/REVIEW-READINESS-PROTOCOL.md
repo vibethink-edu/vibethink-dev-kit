@@ -55,6 +55,14 @@ Before asking for review, the agent declares the verification layer used and why
 The default for UI/copy/control changes is local/workspace first, then gate, then
 remote/cloud smoke after deploy. This is a default, not an absolute law.
 
+**Consumer over unit (changed-unit corollary).** When the change is to a *unit* that
+other code consumes (a package, a shared module), the layer that gives the true signal
+is the **build of at least one real consumer**, not the unit in isolation — a unit can
+pass its own tests while the consumer that actually ships breaks (diverging bundler vs
+type-checker tolerances; a declared export pointing at an uncommitted file). The standard
+pattern is *build the affected dependents* of the change. The binding rule and its full
+rationale live in `CANON-TESTING-MINIMUM-BAR-001` §6.3.
+
 ## 4. Fire-Test Before PR
 
 Before opening a pull request for a reviewable change, the agent performs a
