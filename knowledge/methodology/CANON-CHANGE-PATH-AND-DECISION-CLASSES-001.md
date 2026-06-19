@@ -73,6 +73,17 @@ Path (process depth) and class (authority) decide *how much process* and *whose 
 
 A repo with no ready launch-surface does **not** improvise a coder — it stands the surface up first (`RUNBOOK-LAUNCH-CODERS` §1–§3).
 
+**Present the choice, don't resolve it silently (human-in-the-loop).** When a human authority is in the loop, the gate's outputs are **presented as one short decision card and the agent waits for GO** — it does not silently resolve a genuine choice, nor over-explain it. The card carries, in a few lines:
+
+- the **path** (direct / spec-first / design-gate);
+- the **methodology / spec-weight** options the path allows (the concrete set is L3);
+- the **executor** options — a human contributor, an autonomous coder, or the current agent directly;
+- a **recommendation with its one-line reason**, so the authority picks fast (or overrides).
+
+It is presented **verdict-first** (the recommendation up front, depth on demand) and the agent then waits for the authority's GO (the methodology/class seal of `VT-METHOD` / §4 below). This is the human-facing face of the gate — the same shape as the proposal preflight.
+
+> **This is not extra ceremony — it fires only on a genuine fork.** Trivial, reversible, no-contract work takes the **direct** path (§3) and is simply implemented; **no card.** The card appears precisely when path / methodology / executor present a real choice — which is exactly where a silent resolution would either decide something that was the authority's to decide, or bury a short prompt under detail it never asked for.
+
 ---
 
 ## §4 — The decision classes (whose approval)
