@@ -117,6 +117,7 @@ Not every task is equally autonomous. The executor runs free on mechanical work 
 | **Mechanical** (wiring, reports, UI surfaces) | none (a quick canary, then run) | autonomous after the canary | the coordinator verifies the PR; merge delegated |
 
 - **The design gate is not redundant prompting** — it is the **one line the executor does not cross**: writing access-control or sensitive-data logic without the architect's sight. Everything else is autonomous. (This rides on the architect↔executor handoff of `CANON-MULTI-AGENT-ORCHESTRATION` §2.)
+- **Realization depends on the execution mode:** an interactive executor stops live and presents; a **non-interactive (headless) executor has no live pause**, so the gate is realized as a **two-phase plan-then-go launch** (plan-only run → human GO → implementation run) — the mechanics are an L3 launch concern (the launch runbook). Either way the invariant holds: **the plan is approved before the sensitive code is written** — never only the draft PR after it.
 - **The executor proposes, it does not dispose:** it opens a draft PR, never merges, never self-approves. Merge is the coordinator's (delegated) or the authority's (boundary). It does **not** edit the architect's governance instruments — the present-mirror, the decision register (`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`); it reports to the coordination channel and may append to the history log.
 
 ---
