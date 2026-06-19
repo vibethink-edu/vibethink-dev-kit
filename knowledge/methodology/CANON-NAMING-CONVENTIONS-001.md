@@ -110,6 +110,7 @@ A repo's CI (or a smoke test) MAY enforce these mechanically:
 - **NEVER commit with a message that doesn't follow Conventional Commits.** No `wip`, `fix typo` (without scope), `update` alone, etc.
 - **NEVER hardcode magic identifiers** when a registry/canon defines them (ports, secrets, tenant keys, etc.).
 - **NEVER write an identifier in the data/UI natural language** (§8). Table/column/route/file/config names use the declared identifier language; the local language belongs in data values and rendered strings.
+- **NEVER name a coordination/handoff slot by a product/agent name.** Handoff and closeout slots are **role-named** (`auditor` / `reviewer` / `advisor` / `executor` — `CANON-MULTI-AGENT-ORCHESTRATION` §5.1); agent/vendor tokens are legitimate only in the **symmetric branch-author roster** (§3), never as the name of a role slot.
 
 ## 10. Per-repo binding
 
