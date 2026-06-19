@@ -1,0 +1,8 @@
+{
+  "_schema": "VIBETHINK_GATE_INTEGRITY_V1",
+  "_doc": "Drives check-gate-integrity.mjs (CANON-AUDIT-PROTOCOL §8.7a). Copy to tools/gate-integrity.config.json and point auditDir/gatePattern at YOUR gates. It refuses any gate that ships with no test, or a test that only checks the happy path — a gate never shown to go RED is false assurance. Skip-when-no-config: omit the file for a conscious N-A. §8.7b (required/blocking) is your branch-protection job, per-repo — not checked here.",
+  "auditDir": "tools",
+  "gatePattern": "^check-.*\\.mjs$",
+  "testSuffix": ".test.mjs",
+  "exclude": []
+}

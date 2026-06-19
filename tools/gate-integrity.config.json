@@ -1,0 +1,8 @@
+{
+  "_schema": "VIBETHINK_GATE_INTEGRITY_V1",
+  "_doc": "Drives check-gate-integrity.mjs (CANON-AUDIT-PROTOCOL §8.7a). Audits the kit's own gates: every check-*.mjs in tools/ must ship a paired .test.mjs that proves it goes RED on a known-bad input. The meta-gate is itself a check-*.mjs, so it audits itself too. Consumers copy this template and point auditDir/gatePattern at their own gates. Skip-when-no-config: remove this file for a conscious N-A.",
+  "auditDir": "tools",
+  "gatePattern": "^check-.*\\.mjs$",
+  "testSuffix": ".test.mjs",
+  "exclude": []
+}
