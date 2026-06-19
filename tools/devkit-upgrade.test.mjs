@@ -86,7 +86,7 @@ test("in-sync → all in sync, no copy", () => {
   const { consumer, upstream } = scaffold({ upstreamBody: "same\n", localBody: "same\n" });
   const { code, out } = run(consumer, upstream);
   assert.equal(code, 0);
-  assert.match(out, /all 1 in sync/);
+  assert.match(out, /1 in parity/);
 });
 
 // 4. Missing upstream file → exit 1 (a stale config is surfaced, not silent).
@@ -162,6 +162,48 @@ test("surfaces kit templates + flags a config-template not instantiated", () => 
   assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
   assert.match(out, /Kit templates\s+2 available/);
   assert.match(out, /ports — copy setup\/templates\/ports\//);
+});
+
+// 7. An `adapted` copy is EXEMPT — preserved, never re-synced (mirrors the doctor /
+//    check-copy-parity). Re-syncing it would silently REVERT a sanctioned adaptation.
+//    Covers BOTH dry-run and apply (the finding asked whether apply skips or only dry-run).
+test("adapted copy → preserved, never re-synced (dry-run + apply)", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-test-"));
+  tmpdirs.push(root);
+  const upstream = path.join(root, "upstream");
+  const consumer = path.join(root, "consumer");
+  mkdirSync(path.join(upstream, "tools"), { recursive: true });
+  mkdirSync(path.join(consumer, "tools"), { recursive: true });
+  writeFileSync(path.join(upstream, "tools", "engine.mjs"), "UPSTREAM\n", "utf8");
+  writeFileSync(path.join(consumer, "tools", "engine.mjs"), "ADAPTED-LOCAL\n", "utf8");
+  writeFileSync(
+    path.join(consumer, "tools", "copy-parity.config.json"),
+    JSON.stringify({
+      upstreamRoot: "../upstream",
+      copies: [
+        {
+          local: "tools/engine.mjs",
+          upstream: "tools/engine.mjs",
+          adapted: { reason: "consumer layout split", since: "2026-06-11" },
+        },
+      ],
+    })
+  );
+  // dry-run: must NOT report it as would-re-sync.
+  const dry = run(consumer, upstream, ["--dry-run"]);
+  assert.equal(dry.code, 0, `dry-run expected exit 0, got ${dry.code}\n${dry.out}`);
+  assert.doesNotMatch(dry.out, /would re-sync/, "dry-run must not flag an adapted copy as drift");
+  assert.match(dry.out, /adapted \(preserved\)/);
+  // apply: must NOT overwrite the local adaptation.
+  const { code, out } = run(consumer, upstream);
+  assert.equal(code, 0, `apply expected exit 0, got ${code}\n${out}`);
+  assert.equal(
+    localOf(consumer),
+    "ADAPTED-LOCAL\n",
+    "an adapted copy must NOT be re-synced (no silent revert)"
+  );
+  assert.match(out, /adapted \(preserved\)/);
+  assert.doesNotMatch(out, /re-synced 1/);
 });
 
 for (const d of tmpdirs) {

@@ -8,7 +8,9 @@
  *   1. PULL the kit mount (`--ff-only`) — canon updates for free (inherited by reference);
  *   2. RE-SYNC the copy-distributed runnables this repo declares (copy-parity) from the
  *      kit → local — the only step that was manual; the kit is the source of truth, a
- *      local drift in a copied runnable is a bug, so this restores it;
+ *      local drift in a copied runnable is a bug, so this restores it. A copy declared
+ *      `adapted` (a sanctioned bounded adaptation) is EXEMPT — preserved, never re-synced —
+ *      mirroring the doctor / check-copy-parity (re-syncing it would silently revert it);
  *   3. PROVISION missing default tools — runs install-external-tools, which is
  *      install-if-missing + non-blocking, so it provisions ABSENT tools to their pin
  *      and never moves a present tool's version (the evidence-gated pin rule holds for
@@ -100,10 +102,25 @@ if (!NO_PULL) {
 
 // ── 2. RE-SYNC copy-distributed runnables (the only manual step, now a mechanism) ─
 const parityCfg = JSON.parse(readMaybe(join(CWD, PARITY)) || "null");
-const resync = { applies: !!parityCfg, total: 0, drift: [], copied: [], missingUpstream: [] };
+const resync = {
+  applies: !!parityCfg,
+  total: 0,
+  drift: [],
+  copied: [],
+  adapted: [],
+  missingUpstream: [],
+};
 if (parityCfg && Array.isArray(parityCfg.copies)) {
   for (const c of parityCfg.copies) {
     resync.total++;
+    // A declared bounded adaptation (copy-parity §6.1) is EXEMPT — mirror the doctor /
+    // check-copy-parity, which reports it as ADAPTED, never compares it, never fails on it.
+    // Re-syncing it would silently REVERT a sanctioned adaptation. The consumer drops the
+    // `adapted` flag deliberately when it wants the upstream version back — never the upgrade.
+    if (c.adapted) {
+      resync.adapted.push(c.local);
+      continue;
+    }
     const up = abs(UPSTREAM, c.upstream);
     const local = abs(CWD, c.local);
     const upText = readMaybe(up);
@@ -269,14 +286,20 @@ out.push(
 );
 out.push(`  ${"─".repeat(52)}`);
 out.push(`  Canon / kit pull   ${pull.done ? green("✓") : "·"} ${pull.note}`);
+const adaptedNote = resync.adapted.length
+  ? ` · ${yellow(`${resync.adapted.length} adapted (preserved)`)}`
+  : "";
 if (!resync.applies) {
   out.push(`  Copied runnables   · none declared (upstream, or not a consumer)`);
 } else if (resync.drift.length === 0) {
-  out.push(`  Copied runnables   ${green("✓")} all ${resync.total} in sync`);
+  out.push(`  Copied runnables   ${green("✓")} ${resync.total} in parity${adaptedNote}`);
 } else {
   const verb = DRY ? "would re-sync" : "re-synced";
-  out.push(`  Copied runnables   ${green("↻")} ${verb} ${resync.drift.length} / ${resync.total}`);
+  out.push(
+    `  Copied runnables   ${green("↻")} ${verb} ${resync.drift.length} / ${resync.total}${adaptedNote}`
+  );
   for (const f of resync.drift) out.push(`        ↻ ${f}`);
+  for (const f of resync.adapted) out.push(`        ${yellow("◆")} ${f} — adapted, preserved`);
   if (!DRY) out.push(`     → review with: git diff`);
 }
 out.push(`  Provision tools    ${provision.ran ? green("✓") : "·"} ${provision.note}`);
