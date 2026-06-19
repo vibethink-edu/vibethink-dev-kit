@@ -123,6 +123,12 @@ const GATES = [
     targets: ["tools/gate-integrity.config.json"],
     fix: "a gate ships with no test, or a test that only checks the happy path — it has never been shown to go RED, so it is false assurance (CANON-AUDIT-PROTOCOL §8.7a); add a known-bad case that asserts the gate fails; or remove the config for a conscious N-A",
   },
+  {
+    label: "coder launch readiness",
+    engine: "check-coder-launch-readiness.mjs",
+    targets: ["tools/coder-launch-readiness.config.json"],
+    fix: "the coder launch-surface is incomplete (missing launch script / per-session settings / declared bot-token env-var) — an agent cannot self-verify readiness, so it falls to the human (CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 §3.1, F2); stand the surface up (RUNBOOK-LAUNCH-CODERS §1–§3); or remove the config for a conscious N-A (a repo that does not launch coders)",
+  },
 ];
 
 function firstExisting(paths) {

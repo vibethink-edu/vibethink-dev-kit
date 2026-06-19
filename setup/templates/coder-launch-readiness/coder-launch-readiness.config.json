@@ -1,0 +1,8 @@
+{
+  "_schema": "VIBETHINK_CODER_LAUNCH_READINESS_V1",
+  "_doc": "Drives check-coder-launch-readiness.mjs (CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 §3.1, F2). Copy to tools/coder-launch-readiness.config.json and point the paths at YOUR launch surface. The gate verifies the PORTABLE artifacts are present (launch script, per-session settings, bot-token env-var declared, optional prompt dir) so an agent can self-check readiness instead of punting to the human. The live forge state (bot is low-priv, branch protected) is NOT checked here — it stays your L3 confirmation. Skip-when-no-config: omit the file for a conscious N-A (a repo that does not launch coders).",
+  "launchScript": "<path to your launch script, e.g. ops/coder-launch/launch-coder.ps1>",
+  "sessionSettings": "<path to the per-session allowlist/deny, e.g. ops/coder-launch/settings.local.json>",
+  "botTokenEnvVar": "<the bot-token env-var NAME, e.g. GH_TOKEN — the value lives in the session env, never a file>",
+  "promptDir": "<optional: dir holding prompt-*.txt, e.g. ops/coder-launch — remove this key if not used>"
+}

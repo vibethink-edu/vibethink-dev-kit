@@ -57,6 +57,24 @@ Each path then **routes to `CANON-TESTING-GATE`** for the verification type its 
 
 ---
 
+## §3.1 — The third output: who executes, and (for a coder) how it is dispatched
+
+Path (process depth) and class (authority) decide *how much process* and *whose approval*. They do **not** say **who runs the work** — and the gate is incomplete until it does. Name the **executor** as the gate's third output:
+
+- **Human contributor** → the normal contribution flow.
+- **Autonomous coder (a bot executor)** → the work is **dispatched through the coder spine, never improvised**: command-hygiene + the design gate (`CANON-CODER-ORCHESTRATION-001`), the per-session identity + the PREP launch surface (`CANON-CODER-SAFE-IDENTITY-001` §9), instantiated by the launch runbook (`RUNBOOK-LAUNCH-CODERS`). Improvising a coder launch loses exactly the guardrails the spine guarantees — the identity gate, the deny-guard that holds even under bypass, and the boundary design gate.
+
+> **This output is not optional tribal knowledge.** A repo that decides "design-gate path, sealed class" but does not route the boundary work to the coder spine (when a coder runs it) drops the very gate that protects the sensitive code. A competent agent may reach the dispatch pattern from its own memory — but *nothing routed it there*, so a repo whose agent lacks that memory either does not use coders or improvises them, ungoverned. The gate names the executor so the routing lives in the canon, not in someone's head.
+
+**Readiness precondition (coder executor).** Before dispatch, the launch-surface must be **ready**. Split it the way `CANON-AUDIT-PROTOCOL` §8.7 splits a gate:
+
+- **Portable half (self-verifiable):** the launch-surface *artifacts* are present — a launch script, the per-session allowlist/deny settings, and a declared bot-token env-var. An agent verifies this itself (a readiness check) and reports "ready / missing X" **without escalating to the human**.
+- **Non-portable half (L3 confirmation):** the *live forge state* — the bot account is low-privilege, the default branch is protected — which a portable check cannot read. This is the one piece that stays a human/forge confirmation.
+
+A repo with no ready launch-surface does **not** improvise a coder — it stands the surface up first (`RUNBOOK-LAUNCH-CODERS` §1–§3).
+
+---
+
 ## §4 — The decision classes (whose approval)
 
 Independently of the path, every change has a **class** that fixes whose approval it needs:
