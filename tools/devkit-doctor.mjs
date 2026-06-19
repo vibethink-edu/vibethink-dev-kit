@@ -117,6 +117,12 @@ const GATES = [
     targets: ["tools/identifier-language.config.json"],
     fix: "an identifier token (schema / route slug / feature dir) is not in the declared vocabulary — rename the leak or admit the term (CANON-NAMING-CONVENTIONS-001 §8, surface-complete §8.6); or remove the config for a conscious N-A",
   },
+  {
+    label: "gate integrity",
+    engine: "check-gate-integrity.mjs",
+    targets: ["tools/gate-integrity.config.json"],
+    fix: "a gate ships with no test, or a test that only checks the happy path — it has never been shown to go RED, so it is false assurance (CANON-AUDIT-PROTOCOL §8.7a); add a known-bad case that asserts the gate fails; or remove the config for a conscious N-A",
+  },
 ];
 
 function firstExisting(paths) {
