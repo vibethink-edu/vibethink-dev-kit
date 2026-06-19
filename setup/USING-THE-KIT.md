@@ -82,10 +82,10 @@ do these three checks (each ~10s):
 > *what changed · what needs adopting (config / template / a status-doc row) · a
 > recommendation* — and **wait for GO** (`CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.1:
 > present the choice, don't resolve it silently); **(4)** on GO, wire + run `devkit-doctor`
-> to green. So a short prompt yields a **short menu**, never a silent mass-change. The exact
-> operator phrase is L3 (pin it in your root rules); it is the **intent → recipe** mapping
-> that makes the short prompt work — wire it once so the knowledge lives in the repo, not in
-> the prompt.
+> to green. So a short prompt yields a **short menu**, never a silent mass-change. This behavior
+> **inherits by reference** via `AGENTS_UNIVERSAL` (Always-Do) — a consumer wires **nothing**;
+> only the exact operator phrase is optionally pinned in the consumer's root rules (L3). The
+> knowledge lives in the kit, not in the prompt.
 
 ---
 
