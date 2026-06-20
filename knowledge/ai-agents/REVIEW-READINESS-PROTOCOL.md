@@ -47,13 +47,22 @@ Before asking for review, the agent declares the verification layer used and why
 
 | Layer | True signal it gives |
 |---|---|
-| Local/workspace | source diff, local runtime, local route behavior, local UI/copy interaction |
+| Local/workspace | source diff, local runtime, local route/UI/copy behavior, **and the real build/compile + flag/tooling compatibility + deterministic build failures** — run the actual build locally (including experimental flags) before spending a CI cycle |
 | Integration | cross-package behavior, auth bootstrap, service/repository wiring, shared contracts |
 | Remote/cloud | deployed bundle freshness, hosted auth/secrets, tenant data fidelity, edge/CDN behavior, scheduled/background behavior, webhook/OIDC behavior |
-| Gate/CI | reproducible build/test/lint/security result under the repo's automated gate |
+| Gate/CI | reproducible build/test/lint/security result under the repo's automated gate — **and the true signal for resource limits (OOM / timeout / runner-cap)** that local cannot fake unless local is constrained to the runner's envelope |
 
 The default for UI/copy/control changes is local/workspace first, then gate, then
 remote/cloud smoke after deploy. This is a default, not an absolute law.
+
+**Local build is the true signal for "does it compile / does the flag work / does it
+reproduce" — not for resource limits.** Run the real build locally (including experimental
+flags, and the affected dependents below) to answer the **blocking** question *before* a CI
+cycle: it kills the push→red→repush loop and saves paid CI minutes. But Local is **not** a
+faithful signal for **resource** failures (OOM / timeout / runner-cap) **unless you constrain
+local to the runner's envelope** (cap RAM, worker count, cold cache) — otherwise **Gate/CI is
+the true signal** for resource limits. If reproducing locally needs setup **beyond the
+blocking question**, report it and pivot — don't rebuild the runner.
 
 **Consumer over unit (changed-unit corollary).** When the change is to a *unit* that
 other code consumes (a package, a shared module), the layer that gives the true signal
