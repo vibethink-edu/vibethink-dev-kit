@@ -1219,6 +1219,35 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 47 — System migration discipline (legacy → new: provenance · as-built playbook · cutover · governed apply) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-SYSTEM-MIGRATION-DISCIPLINE-001.md`.
+
+- **Qué:** moving a **legacy system → a new one** (data + schema) is a governed discipline, not an
+  ad-hoc load — the operational shape of the recognized standard (expand–contract · schema-migration
+  + backfill · cutover-runbook · ETL data-provenance). Four primitives: **(1) provenance tagging** —
+  every new schema element declares an origin class `DERIVED` / `GREENFIELD` / `SEED` (gate: *nothing
+  without provenance*); **(2) as-built MIGRATION-PLAYBOOK** — one doc per destination, one row per
+  schema change (what · origin · formula/backfill · cutover gotchas), updated in the *same* PR;
+  **(3) cutover-readiness** — `written → verify (positive + NEGATIVE) → apply` with explicit
+  dependency order; **(4) governed apply + record** — hydrated admin cred (never the app runtime cred,
+  never in repo) → surgical per-migration applier (tx + self-test) → apply-ledger (what/when/who/result).
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Mechanism is L3** — declare your playbook (location + row format) and how the origin tag is
+    recorded, the legacy source system(s), the ETL/loader + formula source for `DERIVED`, the
+    credential-hydration path, the apply-ledger format, and the positive/negative verify harness.
+  - **Boundary to honour:** the §6 apply-ledger is **not** the runtime data-change trail of
+    `CANON-DATA-CHANGE-AUDIT-001` (whose §10.2 excludes migration ledgers) — keep both.
+- **Verificar:**
+  - No new schema element exists without an origin class; a `DERIVED` element carries its formula.
+  - The playbook has a row for each schema change (no silent gap); rows landed in the change's own PR.
+  - An apply left a record (what/when/who/result) and was preceded by a negative verify, in order.
+  - The canon names no engine as *the* mechanism (fire-test); concrete engines are illustration only.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
