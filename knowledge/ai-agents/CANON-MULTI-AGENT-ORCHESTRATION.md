@@ -417,7 +417,9 @@ Real failure modes that make a comm silently invisible (2026-05-24 field report)
 
 - **Front-matter is the first line.** A leading HTML comment or blank line before the
   `---` block breaks the parser → the comm appears in no inbox.
-- **Address the base agent token** (`codex`, not `codex-rev`). A role suffix written
+- **Address the base agent token** (`<product>-coder`, not `<product>-coder-rev`). The
+  base token is the agent's **governance identity** (`<product>-<role>` — never a
+  runtime/vendor brand; see `CANON-NAMING-CONVENTIONS-001` §3.1). A role suffix written
   verbatim to `to_agent` is invisible to the base inbox the operator queries; the role
   is metadata (see Routing of roles, below).
 - **Fields are flat** (`ref_pr`, not a nested `ref:` map) — the front-matter parser
@@ -433,9 +435,9 @@ Real failure modes that make a comm silently invisible (2026-05-24 field report)
 
 A role suffix (`-arq`, `-dev`, `-rev`) is a **hint about which hat to wear, not a
 separate inbox.** Routing normalizes a role-suffixed recipient token to its base
-agent token (`codex-rev` → `codex`) so a role-addressed message still reaches the
-agent's base inbox; the role travels as displayed metadata. An agent picks up its
-inbox regardless of the hat it is asked to wear.
+agent token (`<product>-coder-rev` → `<product>-coder`) so a role-addressed message
+still reaches the agent's base inbox; the role travels as displayed metadata. An agent
+picks up its inbox regardless of the hat it is asked to wear.
 
 ### Naming handoff slots — by role, not by the product that fills them
 

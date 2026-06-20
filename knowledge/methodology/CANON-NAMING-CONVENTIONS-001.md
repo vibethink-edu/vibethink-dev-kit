@@ -34,11 +34,25 @@ Convention restores those signals at the **lowest cost possible**: pattern compl
 
 `{author}/{type}-{description}`
 
-- **`{author}`** — agent token (e.g. an AI agent's short identifier) or `feat`/`fix`/`docs`/`chore` for human/unattributed branches. The list of recognized agent tokens is **per-repo binding** (declared in the repo's `tools/inbox.config.json` or equivalent).
+- **`{author}`** — the agent's **governance identity** (§3.1) or `feat`/`fix`/`docs`/`chore` for human/unattributed branches. The list of recognized author tokens is **per-repo binding** (declared in the repo's `tools/inbox.config.json` or equivalent).
 - **`{type}`** — `feat` · `fix` · `docs` · `chore` · `refactor` · `test` · `style` · `perf`. Same set as Conventional Commits §4 — keeps branch types and commit types aligned.
 - **`{description}`** — kebab-case slug, ≤6 words, describing the change. Never use issue numbers as the only descriptor (`fix-123`) — include the description (`fix-auth-redirect-loop-123`).
 
 Worktrees follow the same pattern: `wt-<feature>` or `wt-<author>-<feature>` per-repo binding.
+
+## 3.1 Agent identity vs runtime — the author token is house-named, not a vendor brand
+
+> **An agent's governance identity is `<product>-<role>` (house-named, agnostic) — never the brand of the runtime that executes it.** Identity and runtime are orthogonal.
+
+The token that names an agent across our governance — branch author (§3), addressing/inbox routing, comms authorship, closeout — is the agent's **identity**, formed `<product>-<role>`:
+
+- **`<product>`** — the house product the agent works for (per-repo L3 value).
+- **`<role>`** — the recognized role the agent plays, from the established role vocabulary (`coder`/executor · `architect` · `reviewer` · `auditor` · `advisor` · …; the role-suffix set `-arq`/`-dev`/`-rev` is the per-repo L3 spelling). The pattern is **role-general** — it names *any* agent role, not one specific role.
+
+**Why not the runtime brand.** The tool that runs the agent (a specific vendor CLI/model) is a **runtime**, catalogued in `AI_AGENT_COMPATIBILITY` — it is not the identity. A `<product>-coder` may run on one runtime today and another tomorrow **without changing identity**; conversely the same runtime can host different identities. Anchoring identity to a vendor brand (`<brand>/…` as the author token) couples governance provenance to a tool choice and re-introduces the vendor-name leak this canon forbids elsewhere (§8, §9, Fire-test).
+
+- **Going-forward only.** Identity is a *going-forward* convention; artifacts already created under a prior token (historical branches, comms, decisions) are **immutable record** — never renamed (§6, §9). A per-repo equivalence note (`<old-token>` ≡ `<product>-<role>`) lets readers map the old to the new without churn.
+- **Adoption per role is L3.** The SUPRA pattern covers every role by construction; *which* roles a product mints as identities, and *when*, is a per-repo binding decision (§10) — not a SUPRA mandate.
 
 ## 4. Conventional Commits — the universal contract
 
@@ -110,7 +124,8 @@ A repo's CI (or a smoke test) MAY enforce these mechanically:
 - **NEVER commit with a message that doesn't follow Conventional Commits.** No `wip`, `fix typo` (without scope), `update` alone, etc.
 - **NEVER hardcode magic identifiers** when a registry/canon defines them (ports, secrets, tenant keys, etc.).
 - **NEVER write an identifier in the data/UI natural language** (§8). Table/column/route/file/config names use the declared identifier language; the local language belongs in data values and rendered strings.
-- **NEVER name a coordination/handoff slot by a product/agent name.** Handoff and closeout slots are **role-named** (`auditor` / `reviewer` / `advisor` / `executor` — `CANON-MULTI-AGENT-ORCHESTRATION` §5.1); agent/vendor tokens are legitimate only in the **symmetric branch-author roster** (§3), never as the name of a role slot.
+- **NEVER name a coordination/handoff slot by a product/agent name.** Handoff and closeout slots are **role-named** (`auditor` / `reviewer` / `advisor` / `executor` — `CANON-MULTI-AGENT-ORCHESTRATION` §5.1). An agent's **governance identity** (`<product>-<role>`, §3.1) is legitimate in the **symmetric branch-author roster** (§3) and in addressing — never as the name of a role slot.
+- **NEVER use a runtime/vendor brand as an agent's identity.** The author/addressing token is `<product>-<role>` (§3.1), house-named; the tool that executes it is a **runtime**, catalogued in `AI_AGENT_COMPATIBILITY`, and never the identity (`<brand>/feat-x` as an author token is non-compliant — identity ≠ runtime).
 
 ## 10. Per-repo binding
 

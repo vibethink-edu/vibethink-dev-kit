@@ -25,6 +25,15 @@
 open standard) + per-tool **one-line pointer adapters**. Never N parallel
 rulebooks — that is the drift the layering smoke exists to catch.
 
+> **This matrix lists RUNTIMES, not identities.** Each row is a *tool* (a vendor
+> CLI/model) and the file it loads. An agent's **governance identity** —
+> `<product>-<role>` (`CANON-NAMING-CONVENTIONS-001` §3.1) — is **orthogonal** to its
+> runtime: a `<product>-coder` may run on any tool in this matrix, and swapping the
+> runtime does not change the identity (the branch author, addressing token, and comms
+> authorship stay `<product>-<role>`). So the brand names below are legitimate **here**
+> (this is the runtime catalogue) and nowhere else as an agent's name — identity is
+> house-named, runtime is the tool that executes it.
+
 > **Claude Code — permissions:** beyond the rules adapter, Claude Code gates
 > commands via `settings.json`. To set up a safe allowlist (reduce prompts without
 > opening a hole), see the harness adapter `setup/CLAUDE-CODE-PERMISSIONS.md`. Other
