@@ -210,6 +210,16 @@ Paste a section like this into the launch prompt (lever **a** of
     2. *(human reviews the plan and gives the GO)*
     3. **Implementation launch** — re-launch with the GO to write the sensitive code.
 
+    **The re-launch must be frictionless — phase 1 and phase 2 are two separate runs of the same
+    launcher that share the *worktree*, not a live process** (the worktree, not a running agent,
+    carries the approved plan across the GO). The launcher typically `cd`s into the worktree to run
+    the agent there, so it MUST (a) **return the operator to the invocation directory** afterward
+    (push/pop, not a bare `cd`) and (b) on the **plan** phase **print the exact phase-2 command**.
+    Otherwise the operator is stranded in the worktree, unable to find the launch script to run
+    phase 2 (lived 2026-06-20: after a plan-only run the operator asked *"do I close the bot and run
+    it again?"* and then *"the launch-coder is no longer there"* — it was a bare `cd` into the
+    worktree, and the plan-phase coder had already exited cleanly on its own).
+
     For **mechanical** specs the single autonomous run + draft PR (the gate lives in the PR
     review) is enough. This maps 1:1 to §8's boundary/mechanical split — the draft-PR gate
     alone approves *after* the code is written; the two-phase flow restores §8's *approve the
