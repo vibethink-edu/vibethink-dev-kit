@@ -808,6 +808,11 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   adaptations (upstream-protocol canon §6.1) are legitimate, silent rot is not.
   The judging engine always comes from the kit checkout, never from the
   consumer's own (possibly drifted) copy.
+  - **Boundary — copy-parity is for small, dependency-FREE canonical runnables.** A
+    **shared runtime package** (versioned, with its own deps, consumed by ≥2 repos) is
+    **not** copy-parity'd — it is published to an org-scoped package registry and consumed
+    as a versioned dependency (`ADR-20260619-shared-runtime-package-distribution`). Deps +
+    versioned → registry; dep-free small canonical file → copy-parity.
 - **Cómo:**
   - Declare your copies: drop a `tools/copy-parity.config.json` (start from the
     kit's `copy-parity.example.json`) listing each `local ⇄ upstream` pair, with
