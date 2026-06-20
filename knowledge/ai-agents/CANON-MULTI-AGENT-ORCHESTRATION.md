@@ -166,6 +166,33 @@ engine.)
 > **Mnemonic:** *commit always; push when you can; when you can't, say so — loudly,*
 > *and reconcile when a remote returns.*
 
+## 2.2.2 Closing an executor session — name the discriminating handle
+
+*(Amendment proposed 2026-06-20 — consumer elevation; sealed by the Principal Architect on merge.)*
+
+§2.2 names each branch's **closing state**. A second closeout obligation arises when the work ran
+in a **separate executor session** (a launched coder/agent in its own working context) that the
+**human must close** to free its resources and complete hygiene (`CANON-GIT-HYGIENE`): the closeout
+message must name **which session to close**, by a handle the human can act on **without guessing**.
+
+**Identity is constant — not the discriminator.** An executor's account identity is
+**operator-provisioned** (a credential the human sets at launch, gated by the launcher) and is
+therefore the **same across concurrent executor sessions** — naming it does not tell the human which
+session to close. By §5.1 (*name by the stable slot, never the rotating or constant filler*), the
+discriminating handle is the **task**: its task/spec id + worktree + the launch invocation.
+
+**Two touchpoints:**
+1. **Merge handback** — when the work is ready, frame closure as a **merge** decision named by the
+   **task handle** (task/spec + branch), not a generic "it's ready" (§5.1.A: name the thing, never
+   assume prior context).
+2. **Close handback** — when the human must close the executor session, name the **exact session** by
+   its task handle (task/spec + worktree + launch invocation), **why** (its exit state, §2.2), and
+   **whether it is the only one open** — so the human closes the right session and the post-close
+   hygiene sweep is unambiguous.
+
+A closeout that leaves the human guessing **which session to close** is incomplete in the same way a
+branch left without a declared state is (§2.2).
+
 ## 2.3 Handoff completeness — a handoff that looks complete but isn't
 
 A **handoff** is the durable context one session/agent leaves for the next — broader
