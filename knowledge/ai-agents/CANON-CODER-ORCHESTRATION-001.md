@@ -130,6 +130,18 @@ Not every task is equally autonomous. The executor runs free on mechanical work 
 
 Before scaffolding any piece, **fetch and re-check the current integration branch and in-flight branches/PRs** in that area — branching from a stale head risks duplicating (and degrading) work another executor already landed.
 
+### §9.1 — The Fan-Out Gate (evaluate the wave, don't leave it to memory) *(SEALED 2026-06-19 by the Principal Architect; from a consumer elevation — the wave was described but not forced, so it depended on an agent remembering, and a human had to push with ready independent units.)*
+
+§9 says *which* shape fits; this gate forces the **evaluation** at the dispatch point — the wave is **chosen, not assumed**. Before launching work as a single sequential thread, the executor/coordinator asks one mandatory question:
+
+> **Are there ≥2 units READY and INDEPENDENT? → fan out by default. If not, name the one blocker.**
+
+A unit joins the wave when **all six** hold: **(1) ready** (its spec/inputs exist, no missing design gate) · **(2) independent** (consumes no in-flight output of another unit in the batch) · **(3) no required order** · **(4) integrated base** (branches from the latest integration head → inherits, not duplicates, §7) · **(5) owner** (an executor has capacity) · **(6) human-cost acceptable** (the parallel review/merge load the authority accepts).
+
+When the test passes, **default to the wave — the human should not have to push for it.** Present it as a decision (the wave + the launch set) and proceed on GO — the same present-the-choice discipline as `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.1. Sequencing is the **exception** (a real dependency), declared — never the lazy default.
+
+> **Automation is deferred (build-on-pain) — but tracked, not forgotten.** A `fan-out-readiness` check that surfaces candidates **by machine** (each unit declaring a **structured surface**, the check crossing declared surfaces for independence — prose-mining is fragile, the pilot found) is this gate's **level-3 automation**. **Build it when this manual gate demonstrably fails** (ready, independent units still missed despite §9.1). It is registered with that trigger in `doc/DEFERRED-INSTRUMENTS.md`; until the trigger fires, the manual gate is the floor.
+
 ---
 
 ## §10 — Expectation-of-use vs gate-of-correction
