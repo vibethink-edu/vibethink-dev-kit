@@ -8,6 +8,14 @@
 > Filamos **#528 y #529** demasiado rápido y resultaron **error nuestro** (no bugs) — hubo que cerrarlos con disculpa al autor. Filear en el repo público de otra persona es outward-facing y queda indexado.
 > **Regla:** antes de marcar algo `SENT`, (1) leer el mensaje/`--help`/README del propio tool (F-02 te decía "set GH_TOKEN" y lo arreglaba), (2) asumir **error propio primero**, (3) reproducir en limpio, (4) solo entonces, con OK de Marcelo. **Default: NO filear; convertir en nota operativa nuestra.** El entusiasmo de "colaborar" no justifica ruido en el repo ajeno.
 
+> ## ✅ FILADO A UPSTREAM (2026-06-21) — OK de Marcelo · cuenta org `vibethink-edu` + firma "Marcelo Escallon" + línea transparente de IA
+> Tras re-verificar a fondo (cada finding reproducido corriendo el binario v1.17.0; triage completo en `ENGRAM-VERIFIED-FINDINGS-FOR-ALAN-2026-06-21.md`, lado consumidor), se filaron **3 issues, NO los 8 sueltos**:
+> - **[#531](https://github.com/Gentleman-Programming/engram/issues/531)** — 🔴 `import` DUPLICA observaciones (ignora `sync_id`) → corrupción silenciosa en backup/merge. **El fuerte.**
+> - **[#532](https://github.com/Gentleman-Programming/engram/issues/532)** — update-check pega a GitHub en CADA comando, sin opt-out/throttle (DX). *Refina F-02: el **403** era error nuestro (faltaba `GH_TOKEN`), pero "no hay opt-out de la llamada de red" es válido e independiente.*
+> - **[#533](https://github.com/Gentleman-Programming/engram/issues/533)** — reporte agrupado de **6 menores**: error-wrapping, separadores de path en Windows, **doctor false-positive (=F-03)**, CLI `save` project=NULL, tool-counts stale, `prune` ausente del `--help`.
+>
+> **Estados:** F-03 → `SENT (#533)` · F-04 (FTS) → sigue `DRAFT` (feature baja prio, no filado) · F-01/F-02 → `WITHDRAWN` (el 403 era nuestro; el ángulo válido de F-02 va dentro de #532).
+
 ---
 
 ## F-01 — `setup <agent> --help` EJECUTA el setup en vez de mostrar ayuda · `WITHDRAWN` (#529 cerrado) · NO era bug
