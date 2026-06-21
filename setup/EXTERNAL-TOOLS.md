@@ -4,11 +4,11 @@
 `knowledge/ai-agents/AGENTS_UNIVERSAL.md` §Dev Tooling Baseline; este archivo
 es el ciclo de vida (pins + recetas de instalación) que ese baseline delega.
 
-**Origen:** promovido desde el `EXTERNAL-TOOLS-REGISTRY.md` de WorkBench
-(pregunta abierta en la comms lane del orchestrator desde 2026-05-23;
+**Origen:** promovido desde el `EXTERNAL-TOOLS-REGISTRY.md` de un consumidor
+(pregunta abierta en la comms lane de un consumidor desde 2026-05-23;
 resuelta por el Principal Architect el 2026-06-12: "dev-kit lo debería tener
 default"). Los pins y la evidencia provienen del `EXTERNAL-TOOLS-LOCK.json`
-de WorkBench — verificados, no asumidos.
+de un consumidor — verificados, no asumidos.
 
 ## Las tres barandas (no negociables)
 
@@ -108,7 +108,7 @@ bash setup/check-tools.sh <ruta-al-repo>
 - Uso: `graphify update <subdir>` → escribe `graphify-out/` (indexar el
   subdirectorio donde se trabaja, NO el monorepo entero)
 - `graphify-out/` es cache regenerable: **jamás se commitea** (lección
-  orchestrator 2026-05-23: 2.971 archivos de cache staged)
+  un consumidor 2026-05-23: 2.971 archivos de cache staged)
 - El indexado estructural funciona a CERO tokens, sin backend LLM. El
   enriquecimiento semántico opcional usa Gemini/Ollama — credenciales
   ausentes = gap de backend semántico, NO "graphify no disponible"

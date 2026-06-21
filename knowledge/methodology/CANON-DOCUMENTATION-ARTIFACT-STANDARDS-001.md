@@ -53,7 +53,7 @@ The **work-journal** (`BITACORA` / `LOG`) has **no** SOTA standard — no develo
 
 - **No `BITACORA` / `LOG` artifact** in the kit's standard set. Narrative that used to go there: deltas → Changelog; decisions/why → ADR (MADR); chronology → git history.
 - **Kit reconciliations (this seal):** the feature-docs instrument no longer ships `LOG.template.md`; its README + config example drop it; `CANON-DEVELOPMENT-PROCESS` §5 notes the removal.
-- **Consumer reconciliation (their lane, after seal):** a consumer that mandated a per-feature work-journal (a product-side `CANON-FEATURE-LIFECYCLE-TRACKING` / Rule #22) updates that rule on re-bind; WorkBench drops `LOG.md`.
+- **Consumer reconciliation (their lane, after seal):** a consumer that mandated a per-feature work-journal (a product-side `CANON-FEATURE-LIFECYCLE-TRACKING` / Rule #22) updates that rule on re-bind; another consumer drops `LOG.md`.
 
 ## §6 — Consumer-binding rule
 

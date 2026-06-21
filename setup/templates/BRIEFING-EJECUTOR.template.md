@@ -1,6 +1,6 @@
 # Briefing — Agente EJECUTOR · {{PRODUCTO}} · {{FASE}}
 
-> Plantilla del dev-kit (origen: Campus Fase 1, 2026-06-12). Patrón VT-Method
+> Plantilla del dev-kit (origen: un consumidor, Fase 1, 2026-06-12). Patrón VT-Method
 > Direct Execution: el autor da órdenes exactas + matriz V-xx; el ejecutor
 > implementa y reporta; el autor verifica. **El ejecutor NO decide diseño.**
 

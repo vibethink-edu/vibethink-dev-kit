@@ -86,7 +86,7 @@ This kit is the **upstream** of governance. Each repo is a **fork** that inherit
 
 ## Reference implementation (L3, current)
 
-The first implementer is a consuming product (Campus) migrating from a legacy school system: an as-built `MIGRATION-PLAYBOOK` with one row per schema change (origin class + backfill + cutover gotchas), inline provenance tags on each migration, a documented total-load formula + loader, a cloud-apply runbook (order + verify-then-commit), and real per-migration apply-records. Named here only as the current reference; the canon names no product in its normative body (fire-test).
+The first implementer is a consuming product migrating from a legacy school system: an as-built `MIGRATION-PLAYBOOK` with one row per schema change (origin class + backfill + cutover gotchas), inline provenance tags on each migration, a documented total-load formula + loader, a cloud-apply runbook (order + verify-then-commit), and real per-migration apply-records. Named here only as the current reference; the canon names no product in its normative body (fire-test).
 
 ## Fire-test
 

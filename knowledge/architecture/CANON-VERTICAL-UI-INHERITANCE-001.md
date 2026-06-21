@@ -3,13 +3,13 @@
 > **Status:** DRAFT (pending Principal Architect seal)
 > **Layer:** L2 (house — VibeThink platform governance)
 > **Source:** authored 2026-06-13, distilled from the first vertical's UI contract
-> (`vibethink-campus/docs/UI-FOUNDATION.md`) and the visual-parity Ola. It is the
+> (the vertical's `docs/UI-FOUNDATION.md`) and the visual-parity Ola. It is the
 > normative companion to `CANON-VERTICAL-BOUNDARY-001` (the data/duty boundary,
 > §"Platform-first") and binds with `CANON-NAMING-CONVENTIONS-001` (D-6, code in
 > English).
 
 > **Amendment (proposed 2026-06-20):** adds **Terminology (tenant-overridable, Rule 6)**
-> + the **i18n-string machine gate (Rule 7)** — a consumer elevation: a vertical (Campus)
+> + the **i18n-string machine gate (Rule 7)** — a consumer elevation: a vertical
 > shipped hardcoded user-visible strings to main with **no machine gate** catching them,
 > and the tenant-overridable terminology layer (the "tenant context") was unbound. Seals
 > together with the canon.
@@ -46,7 +46,7 @@ EXTENDS it, it does not rebuild a parallel one.
 2. **Code in English (D-6).** Routes, folders, identifiers, i18n keys = English;
    visible text travels through i18n **values**.
 3. **i18n is per-vertical.** Each vertical declares its own language set (e.g.
-   Campus = **en/es**); it does NOT inherit the supra's full language set unless
+   a 2-language vertical = **en/es**); it does NOT inherit the supra's full language set unless
    it needs to.
 4. **Assistant: surface now, backend later.** The Assist UI is inherited like any
    surface; the real AI agent is wired per vertical in a separate phase
@@ -90,10 +90,10 @@ The canon lives in the dev-kit (supra). Each vertical:
    source). These are the two pieces that make the presentation layer *inherit*
    Rules 2/6/7 — not merely claim them in prose.
 
-> **Worked binding (Campus):** package `@vibethink/ui` (vendored from the
-> orchestrator), tokens `theme-tokens.css` (OKLCH), shell `app-sidebar`/`nav-main`,
+> **Worked binding (a school vertical):** package `@vibethink/ui` (vendored from the
+> supra), tokens `theme-tokens.css` (OKLCH), shell `app-sidebar`/`nav-main`,
 > languages **en/es**, Assist = surface **yes** / AI backend = **"at wire"**. The
-> orchestrator's **People** module is the table pattern that Campus
+> supra's **People** module is the table pattern that the vertical's
 > screens (enrollment, etc.) replicate.
 
 ## Enforcement

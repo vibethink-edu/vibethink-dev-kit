@@ -1,6 +1,6 @@
 # Handoff — Agente ARQUITECTO · {{PRODUCTO}} · {{FASE}}
 
-> Plantilla del dev-kit (origen: Campus Fase 1, 2026-06-12). El arquitecto
+> Plantilla del dev-kit (origen: un consumidor, Fase 1, 2026-06-12). El arquitecto
 > tiene clases de decisión DELEGADAS con rastro ADR; las clases reservadas
 > exigen GO del Principal Architect. Companion: BRIEFING-EJECUTOR.template.md.
 

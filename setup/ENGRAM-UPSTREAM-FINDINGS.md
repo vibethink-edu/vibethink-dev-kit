@@ -32,8 +32,8 @@
 
 > **Re-verificar antes de cualquier cosa (lección F-01/F-02):** la propia salida de `doctor` dice *"use explicit --project/MCP overrides until project naming is consolidated"* → el warning **es guía intencional**, no un flaw. Probablemente NO es finding upstream sino comportamiento correcto que nosotros disparamos. A lo sumo un enhancement opcional, y solo tras confirmar con uso real. Default: nota operativa nuestra, no issue.
 
-**Qué:** al usar deliberadamente un alias corto (`--project vito`) distinto del nombre inferido por git-remote (`vibethink-orchestrator-main`), `engram doctor` marca un **warning permanente**.
-**Repro:** guardar con `--project vito` en un repo cuyo remote infiere otro nombre → `doctor` → warning eterno.
+**Qué:** al usar deliberadamente un alias corto (`--project <alias>`) distinto del nombre inferido por git-remote (`<repo-name>`), `engram doctor` marca un **warning permanente**.
+**Repro:** guardar con `--project <alias>` en un repo cuyo remote infiere otro nombre → `doctor` → warning eterno.
 **Impacto:** no se distingue "deriva accidental" (lo que el check quiere cazar) de "alias declarado a propósito" → el warning pierde valor (cry-wolf).
 **Sugerencia:** permitir **declarar el proyecto canónico por directorio** (un `.engram-project` o entrada de config / alias-map). Si el alias está declarado, no es drift → no warning. Así el check sigue cazando deriva real y respeta el override intencional (que la propia salida de `doctor` recomienda).
 

@@ -1,7 +1,7 @@
 # Baseline .gitignore for a VibeThink heir repo (Piece: onboarding step 0)
 # Copy to the repo root as .gitignore BEFORE the first `pnpm install`.
 # Real incident it prevents: vendored packages' node_modules staged on the
-# first `git add` (Campus onboarding, 2026-06-12).
+# first `git add` (a consumer onboarding, 2026-06-12).
 
 # deps
 node_modules/
@@ -23,6 +23,6 @@ next-env.d.ts
 Thumbs.db
 # graphify — regenerable structural-graph cache (Dev Tooling Baseline,
 # non-blocking). Real incident it prevents: 2971 cache files staged
-# (orchestrator, 2026-05-23).
+# (a consuming repo, 2026-05-23).
 graphify-out/
 **/graphify-out/

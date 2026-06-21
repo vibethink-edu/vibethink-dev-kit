@@ -1,6 +1,6 @@
 # Runbook — Bootstrap on a new machine (agent session)
 
-> Origin: Campus founding day (2026-06-12), tested on Windows Server. Gets any
+> Origin: a consuming product's founding day (2026-06-12), tested on Windows Server. Gets any
 > machine from zero to a working governed session.
 
 ## Steps

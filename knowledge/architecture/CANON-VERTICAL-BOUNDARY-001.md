@@ -3,7 +3,7 @@
 > **Status:** DRAFT (pending Principal Architect seal)
 > **Layer:** L2 (house — VibeThink platform governance)
 > **Source:** Constitución de Verticales, authored 2026-06-12 in the first
-> vertical's repo (`vibethink-campus/docs/architecture/CONSTITUCION_VERTICALES.md`
+> vertical's repo (its `docs/architecture/CONSTITUCION_VERTICALES.md`
 > — keep as the extended reference with worked census). This canon is the
 > normative distillation.
 
@@ -85,7 +85,7 @@ every coder downstream):
 
 A business may START as a core tenant and graduate to a vertical when gates
 ignite. Graduation never migrates the relational half — people, bonds, signals, and
-comms history stays in the core; only the operational app is born and plugged
+comms history stay in the core; only the operational app is born and plugged
 in via the standard contracts. **This only works while the core stays clean** —
 every gate that leaks into core breaks graduation for everyone.
 

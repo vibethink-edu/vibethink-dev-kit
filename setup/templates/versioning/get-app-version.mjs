@@ -2,7 +2,7 @@
 /**
  * get-app-version — reference LIVE version source for a deploy-in-commit app.
  *
- * Donated by the WorkBench architect (elevate-back, G-008) as the reference impl
+ * Donated by a consuming product's architect (elevate-back, G-008) as the reference impl
  * the versioning canon was missing. The point: a version that is COMPUTED can never
  * freeze. Hand-typed version strings rot (an app sat at one number for weeks because
  * nothing forced it to move); a derived one moves with every commit, for free.

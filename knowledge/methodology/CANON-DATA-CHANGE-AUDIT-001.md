@@ -99,7 +99,7 @@ Each repo turns these **classes** into an explicit, reviewed table list (L3); th
 
 ## Reference implementation (L3, current)
 
-The first implementer is a consuming product (Campus): a Postgres/Supabase `audit` schema with a single `audit.record_version` table, a generic `SECURITY DEFINER` trigger capturing the authenticated identity, and a helper to enable tracking per table — applied across its operational tables on the shared database, so a sibling product can plug its own tables into the same infrastructure. Named here only as the current reference; the canon names no product in its normative body (fire-test).
+The first implementer is a consuming product: a Postgres/Supabase `audit` schema with a single `audit.record_version` table, a generic `SECURITY DEFINER` trigger capturing the authenticated identity, and a helper to enable tracking per table — applied across its operational tables on the shared database, so a sibling product can plug its own tables into the same infrastructure. Named here only as the current reference; the canon names no product in its normative body (fire-test).
 
 ## Fire-test
 

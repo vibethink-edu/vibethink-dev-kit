@@ -62,7 +62,7 @@ duplicating; everything else gets its adoption instruction here.
 
 ---
 
-## Step 0 — the machine (before everything; heir finding A-1/A-6/A-7, Campus 2026-06-12)
+## Step 0 — the machine (before everything; heir finding A-1/A-6/A-7, a consuming product 2026-06-12)
 
 The checklist used to assume a ready machine. Real onboardings hit machines with
 no Node, no gh, no git identity. Before mounting anything:
@@ -1375,7 +1375,7 @@ inheritance from scratch, read in this order:
 
 **Provenance.** Written 2026-06-03 to close the inheritance-index gap that the
 2026-05-25 Gemini/Opus methodology audit raised (findings on missing adoption
-runbooks for non-cross-agent pieces) and that the WorkBench second-consumer
+runbooks for non-cross-agent pieces) and that the second-consumer
 moment made concrete (`keyword-reminder.mjs` adopted by one repo,
 `sync-agent-skills.mjs` by another, neither documented).
 **Companion audit:** `doc/AUDIT-DEVKIT-CLEANUP-2026-06-03.md` — refined cleanup
