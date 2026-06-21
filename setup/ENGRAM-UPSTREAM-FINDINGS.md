@@ -6,14 +6,14 @@
 
 ---
 
-## F-01 — `setup <agent> --help` EJECUTA el setup en vez de mostrar ayuda · `DRAFT` · bug
+## F-01 — `setup <agent> --help` EJECUTA el setup en vez de mostrar ayuda · `SENT (#529)` · bug
 
 **Qué:** `engram setup codex --help` **corrió la instalación** (`✓ Installed codex plugin (3 files)`) en vez de imprimir ayuda.
 **Repro:** `engram setup codex --help` → instala, no muestra help.
 **Impacto:** un usuario que pide ayuda termina ejecutando un cambio de config no intencionado.
 **Sugerencia:** reconocer `--help`/`-h` en subcomandos (`setup`, etc.) y cortar antes de ejecutar; o al menos un `--dry-run`.
 
-## F-02 — Update-check en CADA invocación: ruidoso + rate-limited · `DRAFT` · UX
+## F-02 — Update-check en CADA invocación: ruidoso + rate-limited · `SENT (#528)` · UX
 
 **Qué:** casi todo comando imprime `Could not check for updates: GitHub API returned 403 Forbidden. Set GH_TOKEN...`.
 **Repro:** `engram stats` (o cualquiera) sin `GH_TOKEN` → la línea 403 en cada corrida.
