@@ -92,7 +92,9 @@ test("neutrality: clean neutral L1 → '8 l1-neutrality' PASSES", () => {
 
 test("neutrality: word-boundary avoids substring false positives", () => {
   const { out } = runSmoke(
-    baseFiles({ "L1.md": "# neutral\nThe word 'invito' has those letters but is not the brand.\n" }),
+    baseFiles({
+      "L1.md": "# neutral\nThe word 'invito' has those letters but is not the brand.\n",
+    }),
     baseConfig({ brandExclusionPatterns: ["ViTo"], neutralL1Files: ["L1.md"] })
   );
   assert.match(out, /✓ 8 l1-neutrality/, "'vito' inside 'invito' must not match \\bViTo\\b");
@@ -101,6 +103,87 @@ test("neutrality: word-boundary avoids substring false positives", () => {
 test("neutrality: not configured → '8 l1-neutrality' SKIPS (no false fail)", () => {
   const { out } = runSmoke(baseFiles(), baseConfig());
   assert.match(out, /– 8 l1-neutrality/, "check 8 must skip when not configured");
+});
+
+// ── L2 product-neutrality (check 9) ─────────────────────────────────────────
+test("product-neutrality: product name in an L2 canon → '9 l2-product-neutrality' FAILS + exit 1", () => {
+  const { code, out } = runSmoke(
+    baseFiles({ "knowledge/canon.md": "# canon\nThis L2 doc names ViTo as the platform.\n" }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo", "Campus"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+    })
+  );
+  assert.match(
+    out,
+    /✗ 9 l2-product-neutrality/,
+    "check 9 must FAIL on a product name in an L2 doc"
+  );
+  assert.equal(code, 1, "smoke must exit non-zero when a check fails");
+});
+
+test("product-neutrality: clean L2 canon → '9 l2-product-neutrality' PASSES", () => {
+  const { out } = runSmoke(
+    baseFiles({ "knowledge/canon.md": "# canon\nA fully agnostic doc, no product names.\n" }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo", "Campus"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+    })
+  );
+  assert.match(out, /✓ 9 l2-product-neutrality/, "check 9 must PASS on a clean L2 doc");
+});
+
+test("product-neutrality: org name (VibeThink) allowed in L2 → '9 l2-product-neutrality' PASSES", () => {
+  const { out } = runSmoke(
+    baseFiles({
+      "knowledge/canon.md": "# canon\nThe VibeThink VT-Method is the L2 house binding.\n",
+    }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo", "Campus"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+    })
+  );
+  assert.match(
+    out,
+    /✓ 9 l2-product-neutrality/,
+    "org names (VibeThink) must not trip the product scan"
+  );
+});
+
+test("product-neutrality: declared file exception (port registry) is skipped → PASSES", () => {
+  const { out } = runSmoke(
+    baseFiles({ "knowledge/PORTS.md": "# registry\nViTo 3000-3099, Campus 3400-3409.\n" }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo", "Campus"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+      productScanFileExceptions: ["knowledge/PORTS.md"],
+    })
+  );
+  assert.match(out, /✓ 9 l2-product-neutrality/, "a declared file exception must not trip check 9");
+});
+
+test("product-neutrality: declared content exception (verbatim quote) is skipped → PASSES", () => {
+  const { out } = runSmoke(
+    baseFiles({
+      "knowledge/canon.md":
+        '# canon\nQuoting the directive: "keep ViTo out of the agnostic core".\n',
+    }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+      productScanContentExceptions: ["keep ViTo out of the agnostic core"],
+    })
+  );
+  assert.match(
+    out,
+    /✓ 9 l2-product-neutrality/,
+    "a declared content exception must not trip check 9"
+  );
 });
 
 // ── secret-scan ─────────────────────────────────────────────────────────────

@@ -288,8 +288,8 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
   const l1Files = cfg.neutralL1Files || [];
   if (brands.length === 0 || l1Files.length === 0)
     return skip("8 l1-neutrality", "no brandExclusionPatterns / neutralL1Files declared");
-  const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const compiled = brands.map((b) => ({ b, re: new RegExp(`\\b${escape(b)}\\b`, "i") }));
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const compiled = brands.map((b) => ({ b, re: new RegExp(`\\b${escapeRe(b)}\\b`, "i") }));
   const hits = [];
   for (const f of l1Files) {
     if (!exists(f)) {
@@ -315,6 +315,69 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
     fail(
       "8 l1-neutrality",
       `brand/product name(s) in neutral L1: ${hits.slice(0, 20).join(", ")}${hits.length > 20 ? ` (+${hits.length - 20} more)` : ""}`
+    );
+})();
+
+// ── Check 9: L2 product-neutrality (no product brand in the agnostic canon set) ─
+// Counterpart to check 8: the L1 fire-test guards the few neutral cores; this guards
+// the broader L2 canon/doc set (productScanDirs) against PRODUCT names (ViTo/Campus/
+// WorkBench/…). Org names (VibeThink/VT-Method) and the architect's name are allowed
+// here — only product brands are forbidden, so the kit names no product. Declared
+// file/content exceptions (ecosystem port registry, dated research, the one verbatim
+// architect-directive quote) are skipped.
+(() => {
+  const prods = cfg.productExclusionPatterns || [];
+  const dirs = cfg.productScanDirs || [];
+  if (prods.length === 0 || dirs.length === 0)
+    return skip(
+      "9 l2-product-neutrality",
+      "no productExclusionPatterns / productScanDirs declared"
+    );
+  if (tracked.size === 0)
+    return skip("9 l2-product-neutrality", "not a git repo — cannot enumerate tracked files");
+  const exts = new Set(cfg.productScanExtensions || [".md", ".mjs", ".cjs", ".baseline"]);
+  const fileExc = new Set((cfg.productScanFileExceptions || []).map((p) => p.replace(/\\/g, "/")));
+  const contentExc = cfg.productScanContentExceptions || [];
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const compiled = prods.map((b) => ({ b, re: new RegExp(`\\b${escapeRe(b)}\\b`, "i") }));
+  const norm = (p) => p.replace(/\\/g, "/");
+  const hits = [];
+  for (const rel of tracked) {
+    const r = norm(rel);
+    if (!dirs.some((d) => r.startsWith(d.endsWith("/") ? d : `${d}/`))) continue;
+    if (fileExc.has(r)) continue;
+    const ext = path.extname(r).toLowerCase();
+    const base = path.basename(r);
+    if (!exts.has(ext) && !exts.has(base)) continue;
+    const full = path.join(ROOT, r);
+    let st;
+    try {
+      st = fs.statSync(full);
+    } catch {
+      continue;
+    }
+    if (!st.isFile() || st.size > 2 * 1024 * 1024) continue;
+    const lines = fs.readFileSync(full, "utf8").split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (contentExc.some((c) => line.includes(c))) continue;
+      for (const { b, re } of compiled) {
+        if (re.test(line)) {
+          hits.push(`${r}:${i + 1} (${b})`);
+          break;
+        }
+      }
+    }
+  }
+  if (hits.length === 0)
+    pass(
+      "9 l2-product-neutrality",
+      `scanned ${dirs.join(", ")} for ${prods.length} product name(s); none outside declared exceptions`
+    );
+  else
+    fail(
+      "9 l2-product-neutrality",
+      `product name(s) in agnostic canon: ${hits.slice(0, 20).join(", ")}${hits.length > 20 ? ` (+${hits.length - 20} more)` : ""}`
     );
 })();
 

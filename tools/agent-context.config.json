@@ -44,6 +44,15 @@
     "knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md",
     "knowledge/ai-agents/AGENTS_UNIVERSAL.md"
   ],
+  "_productScanNote": "Counterpart to check 8 (the L1 fire-test): guards the broader L2 canon/doc set under productScanDirs against PRODUCT brand names so the dev-kit names no product. Org names (VibeThink, VT-Method) and the architect's name are ALLOWED here — only product brands are forbidden. Declared exceptions: the ecosystem port registry (its job is to name the co-resident systems), the dated research artifact, and the one verbatim architect-directive quote.",
+  "productExclusionPatterns": ["ViTo", "XMS", "Cantor", "Ovitality", "Campus", "WorkBench"],
+  "productScanDirs": ["knowledge", "setup"],
+  "productScanExtensions": [".md", ".mjs", ".cjs", ".js", ".ts", ".baseline", ".ps1", ".sh"],
+  "productScanFileExceptions": [
+    "knowledge/PORT_ASSIGNMENT_GLOBAL.md",
+    "knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md"
+  ],
+  "productScanContentExceptions": ["no se quede atrapada en ViTo lo que puede ser agnóstico"],
   "agentConfigs": [],
   "_agentConfigsNote": "Empty on purpose (criterion #8): the root authority is under the strictest budget (32 KiB) natively, so no per-agent override is required for this kit. A fork whose root exceeds a strict agent's budget MUST declare its tracked override file here (e.g. .codex/config.toml).",
   "ruleNumberPattern": null,
