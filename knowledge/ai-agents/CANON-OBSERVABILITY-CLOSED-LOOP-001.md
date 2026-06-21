@@ -50,7 +50,7 @@ Non-human actors (agents/bots) run **least-privilege**: only what their step nee
 3. **Promotion** — validated → the **Principal Architect seals it** in the dev-kit; it stops being an intention; the product-specific reference is **genericized** (the sealed canon names no product).
 4. **Inheritance** — the verticals adopt it.
 
-> **Current reference implementation: ViTo** (the originating product), front `observability-closed-loop` (P0→P1→P2). Named here only to scope the DRAFT formalization phase; it is removed when the canon is sealed (fire-test).
+> **Current reference implementation: the originating product**, front `observability-closed-loop` (P0→P1→P2). Named here only to scope the DRAFT formalization phase; it is removed when the canon is sealed (fire-test).
 
 ## §8 — Approval
 

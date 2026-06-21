@@ -11,7 +11,7 @@
 
 Every business has two halves. The **relational half** (people, bonds,
 conversation, pulse, scheduling, communication) is ALWAYS served by the
-platform core (ViTo). The **operational half** (domain records with hard rules
+platform core. The **operational half** (domain records with hard rules
 where mistakes cost) SOMETIMES earns a vertical application.
 
 The platform promise this canon protects: *a new tenant of any industry runs on
@@ -84,7 +84,7 @@ every coder downstream):
 ## Graduation (the cheap upgrade)
 
 A business may START as a core tenant and graduate to a vertical when gates
-ignite. Graduation never migrates the relational half — Relations/Heartbeat/
+ignite. Graduation never migrates the relational half — people, bonds, signals, and
 comms history stays in the core; only the operational app is born and plugged
 in via the standard contracts. **This only works while the core stays clean** —
 every gate that leaks into core breaks graduation for everyone.

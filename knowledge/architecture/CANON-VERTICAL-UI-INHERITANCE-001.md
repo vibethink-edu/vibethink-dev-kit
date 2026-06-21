@@ -33,7 +33,7 @@ EXTENDS it, it does not rebuild a parallel one.
 | **Design-system package** | primitives (buttons, tables, cards…), providers, icons | the supra's UI package | **vendored** into the vertical; **parity-gated** (no drift, no fork) |
 | **Theme tokens** | color / radius / typography (OKLCH) | the supra's theme tokens | imported into the vertical's global styles |
 | **App shell** | sidebar + nav + topbar (search, locale, theme) + breadcrumb | the supra's layout components | **adopted**; the vertical supplies its own nav items |
-| **Screen pattern** | list/table surface + filters + states (loading / empty / error) | a reference surface of the supra (e.g. the People/Relations page) | **composed** with the vertical's entities |
+| **Screen pattern** | list/table surface + filters + states (loading / empty / error) | a reference surface of the supra (e.g. a People list page) | **composed** with the vertical's entities |
 | **Assist / AI surface** | assistant panel composed from the chat primitive | the supra's chat component | **inherited surface**; the **AI backend is wired per-vertical** (mock until wired) |
 | **Terminology (tenant-overridable)** | short business labels a tenant may rename (e.g. "guardian" → its local word) | the supra's terminology layer (stable ConceptIDs + an override chain) | **inherited**; the override is resolved from the **tenant in session context** — a tenant renames a term, never a code fork |
 
@@ -93,7 +93,7 @@ The canon lives in the dev-kit (supra). Each vertical:
 > **Worked binding (Campus):** package `@vibethink/ui` (vendored from the
 > orchestrator), tokens `theme-tokens.css` (OKLCH), shell `app-sidebar`/`nav-main`,
 > languages **en/es**, Assist = surface **yes** / AI backend = **"at wire"**. The
-> orchestrator's **People/Relations** module is the table pattern that Campus
+> orchestrator's **People** module is the table pattern that Campus
 > screens (enrollment, etc.) replicate.
 
 ## Enforcement
