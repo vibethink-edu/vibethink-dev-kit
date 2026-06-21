@@ -4,7 +4,7 @@
 **Date:** 2026-06-15
 **Scope:** Repos whose data plane is **PostgreSQL exposed over PostgREST / Supabase** (a REST surface where the `anon` and `authenticated` roles can reach the schema). This canon is **engine-specific by design** — its mechanisms (the `PUBLIC` execute grant, RLS policies, `search_path` pinning, the `anon`/`authenticated`/`service_role` role model, the Supabase Security Advisor) are properties of Postgres + PostgREST. It does **NOT** apply to MySQL, SQL Server, MongoDB, DynamoDB, or any non-Postgres engine — those have their own threat model and must not inherit these rules verbatim. A repo on a non-Postgres engine marks this piece `N-A(non-postgres)`.
 **Companion canons:** [`CANON-PRODUCTION-SAFETY`](./CANON-PRODUCTION-SAFETY.md) (what the shipped artifact must not contain — this canon governs what the *exposed database* must not allow) · [`CANON-VERTICAL-BOUNDARY-001`](../architecture/CANON-VERTICAL-BOUNDARY-001.md) (who owns a shared schema's debt) · [`CANON-TESTING-GATE`](./CANON-TESTING-GATE.md) (gate discipline).
-**Origin:** lifted from ViTo's W3–W7 advisor convergence (2026-06-13 → 2026-06-15). The `PUBLIC`-grant discovery (§3) and the self-test migration discipline (§9) are battle-proven: ViTo's own embedded self-test caught a silent no-op revoke against cloud before it could be declared a success.
+**Origin:** lifted from a consuming product's W3–W7 advisor convergence (2026-06-13 → 2026-06-15). The `PUBLIC`-grant discovery (§3) and the self-test migration discipline (§9) are battle-proven: the product's own embedded self-test caught a silent no-op revoke against cloud before it could be declared a success.
 
 ---
 

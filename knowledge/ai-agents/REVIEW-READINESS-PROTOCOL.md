@@ -180,7 +180,7 @@ competes with the deployed one.
 of truth; real-tenant UAT points at it; the local mirror is fallback" — to the supra layer.
 On promotion, folds into `CANON-REVIEW-READINESS-001`.)*
 
-### 8.1.1 Sharpening — pure visual iteration runs local *(SEALED 2026-06-17 by the Principal Architect — "GO"; from a ViTo architect handoff sharpening §8.1 · D-014)*
+### 8.1.1 Sharpening — pure visual iteration runs local *(SEALED 2026-06-17 by the Principal Architect — "GO"; from a product-architect handoff sharpening §8.1 · D-014)*
 
 §8.1's *"UAT / UX-refinement → deployed/cloud"* holds when the review needs **real data** or a
 **path that only exists in the deployed origin** (e.g. a session that only the deployed origin

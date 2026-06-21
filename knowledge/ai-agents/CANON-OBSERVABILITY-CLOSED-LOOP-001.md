@@ -58,7 +58,7 @@ Canon approved/promoted **only by the Principal Architect**. Domain architects m
 
 ## Provenance
 
-Drafted by a consuming product's architect (ViTo) from a research base (loop-engineering evaluation · observability SOTA · hosted-cost study, 2026-06-17) and handed to the kit as an **intention** via `HANDOFF-DEVKIT-CANON-OBSERVABILITY-CLOSED-LOOP-INTENT-2026-06-17`. It extends the multi-agent orchestration spine with the observability→improvement loop. The DRAFT names an open standard (OpenTelemetry) and the current reference-implementation product (§7) only illustratively / to scope formalization; both are genericized on promotion to sealed canon.
+Drafted by a consuming product's architect from a research base (loop-engineering evaluation · observability SOTA · hosted-cost study, 2026-06-17) and handed to the kit as an **intention** via `HANDOFF-DEVKIT-CANON-OBSERVABILITY-CLOSED-LOOP-INTENT-2026-06-17`. It extends the multi-agent orchestration spine with the observability→improvement loop. The DRAFT names an open standard (OpenTelemetry) and the current reference-implementation product (§7) only illustratively / to scope formalization; both are genericized on promotion to sealed canon.
 
 ## Fire-test (intended, on seal)
 

@@ -149,7 +149,7 @@ server, read the project's port registry and use the assigned block.
   NOT a CI/merge gate: a repo / agent / CI without them still works fully and passes. Do NOT
   let the *use* expectation harden into a *correctness* gate — the documented fallback is
   always a valid path.
-- **Not in the A/B dev-tooling baseline (use-by-default):** agentmemory. *(**Engram — superseded 2026-06-21 by Marcelo:** Engram was previously listed here as "not adopted". That decision was reconsidered and **reverted**: Engram **is adopted**, separately, as a **class-C operator memory tool** — opt-in, per-agent, stateful — see [`setup/EXTERNAL-TOOLS.md`](../../setup/EXTERNAL-TOOLS.md). "Adopted" here means the **use-by-default baseline** (RTK+Graphify); Engram lives at the **operator/lifecycle layer** (§8), is NOT use-by-default, NOT a correctness gate, and NOT a product dependency.)*
+- **Not in the A/B dev-tooling baseline (use-by-default):** agentmemory. *(**Engram — superseded 2026-06-21 by the Principal Architect:** Engram was previously listed here as "not adopted". That decision was reconsidered and **reverted**: Engram **is adopted**, separately, as a **class-C operator memory tool** — opt-in, per-agent, stateful — see [`setup/EXTERNAL-TOOLS.md`](../../setup/EXTERNAL-TOOLS.md). "Adopted" here means the **use-by-default baseline** (RTK+Graphify); Engram lives at the **operator/lifecycle layer** (§8), is NOT use-by-default, NOT a correctness gate, and NOT a product dependency.)*
 - Tool **versions + install lifecycle**: the kit ships the DEFAULT registry at
   `setup/EXTERNAL-TOOLS.md` (pins, recipes, evidence, version-forward). A repo MAY override
   with its own EXTERNAL-TOOLS registry — per-repo lifecycle wins, override declared visibly.

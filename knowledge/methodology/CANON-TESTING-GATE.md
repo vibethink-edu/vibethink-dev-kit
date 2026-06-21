@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that produces changes needing verification — human- or agent-authored.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. (Independent of the ViTo-side vitest-80% decision, which this gate does not impose — "no %-global-coverage".)
+> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. (Independent of a product-side vitest-80% decision, which this gate does not impose — "no %-global-coverage".)
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-TESTING-MINIMUM-BAR` (the floor + the unit row — referenced, not rewritten) · `CANON-ARCHITECTURE-REVIEW` (the independent advisor the Gate escalates to) · the mutation-testing lens companion (when adopted).
 

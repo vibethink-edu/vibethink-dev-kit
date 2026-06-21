@@ -66,7 +66,7 @@ The audit-trail is append-only, but **not infinitely hot**, and **not** hard-del
 - **Archive ≠ delete.** The spirit is preservation: the history survives, it just moves to cheaper storage. **True deletion of trail rows happens only when a legal obligation requires it** — most commonly a data-subject erasure that legally extends to audit copies (`CANON-DATA-LEGAL-COMPLIANCE-001` §5) — as a **governed, logged exception**, never routine cleanup.
 - **The scheduler is L3.** Whether partition/archive runs via a DB scheduler, an external cron, or a job runner is the repo's binding; the **partition + legal-window + archive-not-delete** discipline is universal.
 
-## §10 — What to audit / what not, and why *(amendment SEALED 2026-06-18 by the Principal Architect — two ViTo-architect triage handoffs; D-020)*
+## §10 — What to audit / what not, and why *(amendment SEALED 2026-06-18 by the Principal Architect — two product-architect triage handoffs; D-020)*
 
 §4 states the principle (audit operational data). This is the **triage matrix** every implementer needs — because *"audit who/what/when"* leaves open *"which tables?"*, and re-classifying by hand is unsafe: in a real triage an auto-classifier-by-name put a `*_api_keys` table into "audit". The directive carries the **classes + the why**; the **concrete table names are L3** (each repo writes its own explicit, reviewed list — never auto-include).
 

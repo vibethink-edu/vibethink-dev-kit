@@ -56,7 +56,7 @@ This kit is the **upstream** of governance. Each repo is a **fork** that inherit
 
 ## Post-seal follow-ups (L3, not seal blockers)
 
-1. **Consent-canon separation (relay sent).** The review is done: a consumer's product consent canon (ViTo `CANON-DATA-CAPTURE-CONSENT-001`) mixes agnostic legal mechanics with its product philosophy. On its next re-seal it refactors to **point here** for the agnostic mechanics — data-subject rights + jurisdiction-bound timelines, portability, transparency/consent-for-new-processing, and the erasure-vs-retention tension — keeping only its L3 numbers + bindings (the capture *philosophy* stays L3). That refactor is the consumer architect's, under the Principal Architect.
+1. **Consent-canon separation (relay sent).** The review is done: a consumer's product consent canon (a product-side `CANON-DATA-CAPTURE-CONSENT-001`) mixes agnostic legal mechanics with its product philosophy. On its next re-seal it refactors to **point here** for the agnostic mechanics — data-subject rights + jurisdiction-bound timelines, portability, transparency/consent-for-new-processing, and the erasure-vs-retention tension — keeping only its L3 numbers + bindings (the capture *philosophy* stays L3). That refactor is the consumer architect's, under the Principal Architect.
 2. **Jurisdiction + retention numbers are L3 by design.** Each repo binds its regime + windows (e.g. minors' data retention under the applicable law) via legal research; the canon never holds the number. Not a seal blocker — it is the steady state.
 
 ## Fire-test

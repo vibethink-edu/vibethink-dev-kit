@@ -989,7 +989,7 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   migration discipline (§9); shared-schema fix-ownership boundary (§10).
 - **Cómo:** doc by reference; engine-specific (its mechanisms are Postgres + PostgREST
   properties, not generalizable). Companion to Piece #30 (production-safety governs
-  the shipped *artifact*; this governs the exposed *database*). Lifted from ViTo's
+  the shipped *artifact*; this governs the exposed *database*). Lifted from a consuming product's
   W3–W7 advisor convergence — the §3 `PUBLIC`-grant discovery and §9 self-test
   discipline are battle-proven (the self-test caught a silent no-op against cloud).
 - **Verificar:** the Supabase Security Advisor is wired as a CI/pre-cutover gate
@@ -1421,7 +1421,7 @@ decision-class model lifted to agnostic canon so a new heir inherits it). The
 per-piece adoption table extended to #37.
 
 **Update 2026-06-15 (seal — DB security baseline, Postgres/Supabase).** Sealed by
-the Principal Architect from ViTo's W3–W7 advisor convergence: **1 piece added**
+the Principal Architect from a consuming product's W3–W7 advisor convergence: **1 piece added**
 (#38 db-security-baseline), after a coverage-check (none folded — Piece #30
 production-safety governs the shipped *artifact*; this owns the exposed
 *database*, a distinct surface). Deliberately **engine-specific** (Postgres +

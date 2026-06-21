@@ -53,7 +53,7 @@ The **work-journal** (`BITACORA` / `LOG`) has **no** SOTA standard — no develo
 
 - **No `BITACORA` / `LOG` artifact** in the kit's standard set. Narrative that used to go there: deltas → Changelog; decisions/why → ADR (MADR); chronology → git history.
 - **Kit reconciliations (this seal):** the feature-docs instrument no longer ships `LOG.template.md`; its README + config example drop it; `CANON-DEVELOPMENT-PROCESS` §5 notes the removal.
-- **Consumer reconciliation (their lane, after seal):** a consumer that mandated a per-feature work-journal (ViTo `CANON-FEATURE-LIFECYCLE-TRACKING` / Rule #22) updates that rule on re-bind; WorkBench drops `LOG.md`.
+- **Consumer reconciliation (their lane, after seal):** a consumer that mandated a per-feature work-journal (a product-side `CANON-FEATURE-LIFECYCLE-TRACKING` / Rule #22) updates that rule on re-bind; WorkBench drops `LOG.md`.
 
 ## §6 — Consumer-binding rule
 
@@ -74,4 +74,4 @@ This document names no **product, vendor, or house-invented format** as a standa
 
 ## Provenance
 
-From a cross-consumer review (dev-kit + WorkBench + ViTo vs SOTA, 2026-06-18) that found the doc methodology partly SOTA-aligned, partly house-invented, inconsistent across consumers (`BITACORA` vs `LOG`, `ADR-*` vs `TOPIC-*`). Marcelo's principle: *"prefiero estar ligado a estándares para no inventar o decirle a un developer que aprenda otra cosa que ya maneja."* The fix lives in the supra: one standard per artifact, bound to SOTA; consumers re-bind to the same.
+From a cross-consumer review (dev-kit + consumers vs SOTA, 2026-06-18) that found the doc methodology partly SOTA-aligned, partly house-invented, inconsistent across consumers (`BITACORA` vs `LOG`, `ADR-*` vs `TOPIC-*`). Marcelo's principle: *"prefiero estar ligado a estándares para no inventar o decirle a un developer que aprenda otra cosa que ya maneja."* The fix lives in the supra: one standard per artifact, bound to SOTA; consumers re-bind to the same.
