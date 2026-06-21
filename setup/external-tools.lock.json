@@ -35,6 +35,32 @@
       "telemetryConfig": "~/.config/rtk/config.toml",
       "source": "github.com/rtk-ai/rtk",
       "license": "Apache-2.0"
+    },
+    {
+      "name": "engram",
+      "class": "C",
+      "_classNote": "C = STATEFUL operator tool — holds data (agent memory). Unlike A/B (stateless: absence degrades -> just regenerate), Engram accumulates the agent-shared notebook, so 'absence degrades not breaks' holds for the BINARY (install is non-blocking like A/B) but the DATA is the operator's responsibility: back up with `engram export`, share with `engram sync`. Treat the DB as precious, not cache.",
+      "role": "cross-agent persistent memory (SQLite+FTS5, in-process Go binary) — the agent-shared notebook; query/save learnings across sessions and agents",
+      "kind": "github-release",
+      "cli": "engram",
+      "pin": "1.17.0",
+      "acceptInstalled": ">=1.17",
+      "repo": "Gentleman-Programming/engram",
+      "tag": "v1.17.0",
+      "assets": {
+        "windows-x64": "engram_1.17.0_windows_amd64.zip",
+        "windows-arm64": "engram_1.17.0_windows_arm64.zip",
+        "linux-x64": "engram_1.17.0_linux_amd64.tar.gz",
+        "linux-arm64": "engram_1.17.0_linux_arm64.tar.gz",
+        "macos-x64": "engram_1.17.0_darwin_amd64.tar.gz",
+        "macos-arm64": "engram_1.17.0_darwin_arm64.tar.gz"
+      },
+      "installDirWindows": "~/bin",
+      "knownDirs": ["~/bin", "~/go/bin"],
+      "dataDir": "~/.engram",
+      "stateful": true,
+      "source": "github.com/Gentleman-Programming/engram",
+      "license": "MIT"
     }
   ]
 }

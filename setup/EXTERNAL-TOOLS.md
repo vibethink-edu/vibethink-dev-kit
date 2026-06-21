@@ -47,6 +47,21 @@ bash setup/check-tools.sh <ruta-al-repo>
 |---|---|---|---|---|---|
 | Graphify | A — mission-critical | `0.8.39` | github.com/safishamsi/graphify | MIT | Navegación estructural de código / memoria semántica local (hubs, dead-code, "qué toca X") antes de grep a ciegas |
 | RTK | B — cost/quality multiplier | `0.39.0` | github.com/rtk-ai/rtk | Apache-2.0 | Compresión local de output ruidoso de shell (builds, tests, logs, find) — economía de tokens del agente |
+| Engram | C — **stateful (memoria)** | `1.17.0` | github.com/Gentleman-Programming/engram | MIT | Memoria persistente cross-agente (SQLite+FTS5, binario Go in-process) — el "cuaderno compartido" de los agentes; buscar/guardar lecciones entre sesiones y agentes |
+
+## Engram `1.17.0` — ⚠️ clase C: STATEFUL (distinta a A/B)
+
+> **Por qué clase C y no A/B:** Graphify y RTK son **sin estado** — si faltan, los regenerás, no perdés nada (por eso "ausencia degrada, no rompe" es literal). **Engram GUARDA DATOS** (la memoria de los agentes). La baranda #1 se cumple para el **binario** (instalarlo es non-blocking igual que A/B), pero **los DATOS son responsabilidad del operador**: respaldar con `engram export`, compartir con `engram sync`. Binario perdido → reinstalás; **BD perdida sin respaldo → se pierde memoria**. Tratar la BD como precioso, no como caché.
+>
+> **Engram es de los AGENTES, no de los sistemas.** Los sistemas (ViTo/WorkBench/Campus) tienen sus propias BDs para su trabajo; Engram es el cuaderno compartido de los agentes que trabajan *sobre* ellos. Un sistema NO adopta Engram; sus agentes sí.
+>
+> **Evidencia (ejercitada 2026-06-20):** `engram.exe v1.17.0` instalado en una máquina de la familia; `save`/`search` (FTS5)/`stats`/`doctor`/`export` verdes; **167 memorias reales** importadas a `~/.engram` (`--project vito`). Recall **fuerte con términos técnicos, débil cross-idioma** (FTS literal, sin semántica) — limitación documentada.
+>
+> **Acceso por agente (no es como graphify):** graphify se invoca por CLI y listo. Engram es **memoria compartida**, así que cada agente que deba leer/escribir se enchufa una vez: `engram setup <claude-code|codex|cursor|gemini-cli|…>` (registra su MCP, perfil `agent` = 15 tools). Claude Code en modo CLI (`engram save/search`) evita meter tools al contexto; agentes sin auto-surface propio usan el MCP.
+>
+> **Privacidad (baranda #3):** la BD vive local (`~/.engram`), **datos del operador, nunca en el repo**. Engram chequea updates contra GitHub en cada invocación (ruido 403 sin token) — desactivable; no bloqueante.
+>
+> **Naming de proyecto:** la memoria se particiona por `--project` (ej. `vito`, `campus`). Para que varios agentes compartan el mismo cuaderno, alinear el nombre de proyecto entre ellos.
 
 ## Graphify `0.8.39`
 
