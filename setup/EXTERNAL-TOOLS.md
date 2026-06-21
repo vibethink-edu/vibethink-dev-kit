@@ -62,6 +62,8 @@ bash setup/check-tools.sh <ruta-al-repo>
 > **Privacidad (baranda #3):** la BD vive local (`~/.engram`), **datos del operador, nunca en el repo**. Engram chequea updates contra GitHub en cada invocación (ruido 403 sin token) — desactivable; no bloqueante.
 >
 > **Naming de proyecto:** la memoria se particiona por `--project` (ej. `vito`, `campus`). Para que varios agentes compartan el mismo cuaderno, alinear el nombre de proyecto entre ellos.
+>
+> **Cadencia de upstream: SEMANAL (decisión Marcelo 2026-06-20).** Engram ship rápido (v1.14→v1.17 en días) y es **stateful** — cambios en su formato/sync/CLI nos afectan — así que la verificación *"¿qué cambió?"* es **cada 7 días** (más agresiva que A/B: graphify 30d, rtk 60d). **PRINCIPIO (simple):** *USAR Engram dentro de la suite + trackearlo como upstream semanal.* **NO** reverse-engineer su BD/implementación dentro de WorkBench ni del dev-kit — no copiamos "lo que ya tiene y cómo lo hizo", lo **usamos** y **vigilamos qué cambia**.
 
 ## Graphify `0.8.39`
 
