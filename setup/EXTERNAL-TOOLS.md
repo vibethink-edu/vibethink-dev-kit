@@ -57,13 +57,17 @@ bash setup/check-tools.sh <ruta-al-repo>
 >
 > **Evidencia (ejercitada 2026-06-20):** `engram.exe v1.17.0` instalado en una máquina de la familia; `save`/`search` (FTS5)/`stats`/`doctor`/`export` verdes; **167 memorias reales** importadas a `~/.engram` (`--project vito`). Recall **fuerte con términos técnicos, débil cross-idioma** (FTS literal, sin semántica) — limitación documentada.
 >
-> **Acceso por agente (no es como graphify):** graphify se invoca por CLI y listo. Engram es **memoria compartida**, así que cada agente que deba leer/escribir se enchufa una vez: `engram setup <claude-code|codex|cursor|gemini-cli|…>` (registra su MCP, perfil `agent` = 15 tools). Claude Code en modo CLI (`engram save/search`) evita meter tools al contexto; agentes sin auto-surface propio usan el MCP.
+> **Acceso por agente (no es como graphify):** graphify se invoca por CLI y listo. Engram es **memoria compartida**, así que cada agente que deba leer/escribir se enchufa una vez: `engram setup <claude-code|codex|cursor|gemini-cli|…>` (registra su MCP, perfil `agent` = 15 tools — **nunca el perfil `all`=19, nunca un MCP global por default**: per-agente y perfil mínimo). Claude Code en modo CLI (`engram save/search`) evita meter tools al contexto; agentes sin auto-surface propio usan el MCP.
 >
 > **Privacidad (baranda #3):** la BD vive local (`~/.engram`), **datos del operador, nunca en el repo**. Engram chequea updates contra GitHub en cada invocación (ruido 403 sin token) — desactivable; no bloqueante.
 >
 > **Naming de proyecto:** la memoria se particiona por `--project` (ej. `vito`, `campus`). Para que varios agentes compartan el mismo cuaderno, alinear el nombre de proyecto entre ellos.
 >
 > **Cadencia de upstream: SEMANAL (decisión Marcelo 2026-06-20).** Engram ship rápido (v1.14→v1.17 en días) y es **stateful** — cambios en su formato/sync/CLI nos afectan — así que la verificación *"¿qué cambió?"* es **cada 7 días** (más agresiva que A/B: graphify 30d, rtk 60d). **PRINCIPIO (simple):** *USAR Engram dentro de la suite + trackearlo como upstream semanal.* **NO** reverse-engineer su BD/implementación dentro de WorkBench ni del dev-kit — no copiamos "lo que ya tiene y cómo lo hizo", lo **usamos** y **vigilamos qué cambia**.
+>
+> **Doctrina de adopción — los 2 deltas restantes vs graphify (sello Marcelo 2026-06-20).**
+> - **Solo el binario, NO el ecosistema.** Se adopta el binario `engram` y nada más — **no** `gentle-ai` (su SDD/skills): un framework de opiniones importado sería un **2º framework** compitiendo con el del dev-kit, justo el anti-patrón de capacidad-importada de `CANON-CONTEXT-HYGIENE` §6.2. La herramienta sí; su ecosistema de opiniones no.
+> - **Alimenta, no decide.** Engram es memoria de *recall*: **input advisory, nunca autoridad**. Las decisiones viven en spec/ADR/canon; Engram **nunca overridea un sellado** — en conflicto gana el sellado y el agente reporta la divergencia. Es el principio de `CANON-CONTEXT-HYGIENE` §6 (*ninguna capacidad importada supera la autoridad del repo*) aplicado a la capa de memoria; el recall es punto-en-el-tiempo → verificar contra la fuente viva antes de afirmarlo.
 
 ## Graphify `0.8.39`
 
