@@ -1,7 +1,7 @@
 # Engram — Findings para upstream (colaborar con el autor)
 
 **Upstream:** [Gentleman-Programming/engram](https://github.com/Gentleman-Programming/engram) (Alan Buscaglia) · MIT · pin `1.17.0`
-**Propósito:** log dedicado de hallazgos **dignos de compartir con el autor** (bugs, fricciones, mejoras). Buena ciudadanía: usamos su tool MIT → le devolvemos feedback constructivo. Alimentado por el **review semanal** (`scripts/engram-weekly-review.sh`).
+**Propósito:** log dedicado de hallazgos **dignos de compartir con el autor** (bugs, fricciones, mejoras). Buena ciudadanía: usamos su tool MIT → le devolvemos feedback constructivo. Alimentado por el **review semanal** (`setup/engram-weekly-review.sh` — gobernado, con backup).
 **Cómo se usa:** se acumulan acá como DRAFT; cuando Marcelo da OK, se abren como **issues/PRs** en su repo (acción outward-facing → no se filean sin su luz). Estado por finding: `DRAFT` → `SENT (#issue)` → `RESUELTO`/`WITHDRAWN`.
 
 > ## 🛑 LECCIÓN (2026-06-21) — verificar a fondo ANTES de filear upstream

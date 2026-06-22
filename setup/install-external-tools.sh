@@ -53,28 +53,27 @@ if [ -n "$py" ] && ! command -v "$gcli" >/dev/null 2>&1; then
   fi
 fi
 
-# ── rtk (github release) ───────────────────────────────────────────────
-rpin="$(field rtk pin)"; rtag="$(field rtk tag)"; rrepo="$(field rtk repo)"
-if command -v rtk >/dev/null 2>&1; then
-  summary+=("✓ rtk: ya instalado (PATH) — skip")
-elif [ -z "$plat" ]; then
-  summary+=("⚠ rtk: plataforma no reconocida — ver EXTERNAL-TOOLS.md")
-elif ! command -v gh >/dev/null 2>&1; then
-  summary+=("⚠ rtk: falta 'gh' para descargar el release — degrada, no bloquea")
-else
-  ra="$(asset rtk "$plat")"
-  target="$HOME/.vt-tools/rtk/$rpin"
+# ── github-release tools (rtk, engram, … — loop genérico sobre el lock) ─
+ghnames="$("$py" -c "import json;print(' '.join(t['name'] for t in json.load(open('$lock'))['tools'] if t['kind']=='github-release'))" 2>/dev/null)"
+for name in $ghnames; do
+  cli="$(field "$name" cli)"; pin="$(field "$name" pin)"; tag="$(field "$name" tag)"; repo="$(field "$name" repo)"; idir="$(field "$name" installDir)"
+  if command -v "$cli" >/dev/null 2>&1; then summary+=("✓ $name: ya instalado (PATH) — skip"); continue; fi
+  if [ -z "$plat" ]; then summary+=("⚠ $name: plataforma no reconocida — ver EXTERNAL-TOOLS.md"); continue; fi
+  if ! command -v gh >/dev/null 2>&1; then summary+=("⚠ $name: falta 'gh' para descargar el release — degrada, no bloquea"); continue; fi
+  a="$(asset "$name" "$plat")"
+  target="${idir/#\~/$HOME}"
   mkdir -p "$target"
-  echo "  → instalando rtk $rpin ($ra)..."
-  if gh release download "$rtag" -R "$rrepo" -p "$ra" -D "$target" --clobber; then
-    ( cd "$target" && tar -xzf "$ra" 2>/dev/null ); chmod +x "$target/rtk" 2>/dev/null
-    mkdir -p "$HOME/.config/rtk"
-    [ -f "$HOME/.config/rtk/config.toml" ] || echo "telemetry = false" > "$HOME/.config/rtk/config.toml"
-    summary+=("✓ rtk: instalado $rpin (telemetría OFF) — agregá $target al PATH")
+  echo "  → instalando $name $pin ($a) en $target..."
+  if gh release download "$tag" -R "$repo" -p "$a" -D "$target" --clobber; then
+    ( cd "$target" && tar -xzf "$a" 2>/dev/null ); chmod +x "$target/$cli" 2>/dev/null
+    tcfg="$(field "$name" telemetryConfig)"
+    if [ -n "$tcfg" ]; then tc="${tcfg/#\~/$HOME}"; mkdir -p "$(dirname "$tc")"; [ -f "$tc" ] || echo "telemetry = false" > "$tc"; fi
+    extra=""; [ "$(field "$name" stateful)" = "True" ] && extra=" · STATEFUL: respaldá la BD con 'engram export' (ver engram-weekly-review.sh)"
+    summary+=("✓ $name: instalado $pin — agregá $target al PATH$extra")
   else
-    summary+=("⚠ rtk: descarga falló — degrada, no bloquea")
+    summary+=("⚠ $name: descarga falló — degrada, no bloquea")
   fi
-fi
+done
 
 printf '  Resumen:\n'
 for s in "${summary[@]}"; do printf '    %s\n' "$s"; done

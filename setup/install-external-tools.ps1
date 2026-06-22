@@ -72,7 +72,7 @@ foreach ($t in $lock.tools) {
       if (Get-Command $t.cli -ErrorAction SilentlyContinue) { $found = "PATH" }
       if (-not $found) {
         foreach ($d in $t.knownDirs) {
-          $hit = Get-ChildItem -Path (Expand-Tilde $d) -Recurse -Filter "rtk*" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $hit = Get-ChildItem -Path (Expand-Tilde $d) -Recurse -Filter "$($t.cli)*" -ErrorAction SilentlyContinue | Select-Object -First 1
           if ($hit) { $found = $hit.DirectoryName; break }
         }
       }
@@ -83,16 +83,19 @@ foreach ($t in $lock.tools) {
         if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
           $summary += "⚠ $($t.name): falta 'gh' para descargar el release — degrada, no bloquea (ver EXTERNAL-TOOLS.md)"
         } elseif ($PSCmdlet.ShouldProcess("$($t.tag) ($asset)", "gh release download")) {
-          $target = Expand-Tilde $t.installDirWindows
+          $target = Expand-Tilde $t.installDir
           Write-Host "  → instalando $($t.name) $($t.pin) en $target..."
           New-Item -ItemType Directory -Force -Path $target | Out-Null
           & gh release download $t.tag -R $t.repo -p $asset -D $target --clobber 2>&1 | Out-Host
           if ($LASTEXITCODE -eq 0) {
             Expand-Archive -LiteralPath (Join-Path $target $asset) -DestinationPath $target -Force
-            $tcfg = Expand-Tilde $t.telemetryConfig
-            New-Item -ItemType Directory -Force -Path (Split-Path $tcfg) | Out-Null
-            if (-not (Test-Path $tcfg)) { "telemetry = false" | Out-File -Encoding utf8 $tcfg }
-            $summary += "✓ $($t.name): instalado $($t.pin) (telemetría OFF)"
+            if ($t.telemetryConfig) {
+              $tcfg = Expand-Tilde $t.telemetryConfig
+              New-Item -ItemType Directory -Force -Path (Split-Path $tcfg) | Out-Null
+              if (-not (Test-Path $tcfg)) { "telemetry = false" | Out-File -Encoding utf8 $tcfg }
+            }
+            $extra = if ($t.stateful) { " · STATEFUL: respaldá la BD con 'engram export' (ver engram-weekly-review.sh)" } else { "" }
+            $summary += "✓ $($t.name): instalado $($t.pin)$extra"
           } else { $summary += "⚠ $($t.name): descarga falló — degrada, no bloquea" }
         } else { $summary += "· $($t.name): se instalaría $($t.pin) (dry-run)" }
       }

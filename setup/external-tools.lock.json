@@ -30,7 +30,7 @@
         "macos-x64": "rtk-x86_64-apple-darwin.tar.gz",
         "macos-arm64": "rtk-aarch64-apple-darwin.tar.gz"
       },
-      "installDirWindows": "~/.vt-tools/rtk/0.39.0",
+      "installDir": "~/.vt-tools/rtk/0.39.0",
       "knownDirs": ["~/.vt-tools/rtk", "~/.vtwb-tools/rtk"],
       "telemetryConfig": "~/.config/rtk/config.toml",
       "source": "github.com/rtk-ai/rtk",
@@ -55,7 +55,7 @@
         "macos-x64": "engram_1.17.0_darwin_amd64.tar.gz",
         "macos-arm64": "engram_1.17.0_darwin_arm64.tar.gz"
       },
-      "installDirWindows": "~/bin",
+      "installDir": "~/bin",
       "knownDirs": ["~/bin", "~/go/bin"],
       "dataDir": "~/.engram",
       "stateful": true,
