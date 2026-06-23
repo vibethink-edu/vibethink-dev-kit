@@ -51,7 +51,10 @@ function run({ consumerFiles = {}, upstreamFiles = {}, config, args = [] }) {
   }
   if (config !== undefined) {
     fs.mkdirSync(path.join(consumer, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(consumer, "tools", "copy-parity.config.json"), JSON.stringify(config));
+    fs.writeFileSync(
+      path.join(consumer, "tools", "copy-parity.config.json"),
+      JSON.stringify(config)
+    );
   }
   let code = 0;
   let out = "";
@@ -186,6 +189,100 @@ test("missing upstream root → setup error, exit 2", () => {
   fs.rmSync(base, { recursive: true, force: true });
   assert.equal(code, 2, out);
   assert.match(out, /upstream root does not exist/);
+});
+
+// ── Directory-set entries ──────────────────────────────────────────────────
+
+test("dir: identical tree → GREEN, exit 0, counts files", () => {
+  const { code, out } = run({
+    consumerFiles: {
+      "packages/p/src/a.ts": "export const a=1;\n",
+      "packages/p/src/sub/b.ts": "export const b=2;\n",
+    },
+    upstreamFiles: {
+      "packages/p/src/a.ts": "export const a=1;\n",
+      "packages/p/src/sub/b.ts": "export const b=2;\n",
+    },
+    config: { copies: [{ localDir: "packages/p/src", upstreamDir: "packages/p/src" }] },
+  });
+  assert.equal(code, 0, out);
+  assert.match(out, /GREEN/);
+  assert.match(out, /\(2 files\)/);
+});
+
+test("dir: a drifted file → RED, exit 1, names the file", () => {
+  const { code, out } = run({
+    consumerFiles: { "packages/p/src/a.ts": "export const a=999;\n" },
+    upstreamFiles: { "packages/p/src/a.ts": "export const a=1;\n" },
+    config: { copies: [{ localDir: "packages/p/src", upstreamDir: "packages/p/src" }] },
+  });
+  assert.equal(code, 1, out);
+  assert.match(out, /DRIFT: a\.ts/);
+});
+
+test("dir: file present upstream but missing locally → RED, exit 1 (rot)", () => {
+  const { code, out } = run({
+    consumerFiles: { "packages/p/src/a.ts": "x\n" },
+    upstreamFiles: { "packages/p/src/a.ts": "x\n", "packages/p/src/new.ts": "y\n" },
+    config: { copies: [{ localDir: "packages/p/src", upstreamDir: "packages/p/src" }] },
+  });
+  assert.equal(code, 1, out);
+  assert.match(out, /local MISSING: new\.ts/);
+});
+
+test("dir: extra local file absent upstream → RED, exit 1", () => {
+  const { code, out } = run({
+    consumerFiles: { "packages/p/src/a.ts": "x\n", "packages/p/src/extra.ts": "z\n" },
+    upstreamFiles: { "packages/p/src/a.ts": "x\n" },
+    config: { copies: [{ localDir: "packages/p/src", upstreamDir: "packages/p/src" }] },
+  });
+  assert.equal(code, 1, out);
+  assert.match(out, /extra local \(absent upstream\): extra\.ts/);
+});
+
+test("dir: excluded segment (node_modules) ignored → GREEN, exit 0", () => {
+  const { code, out } = run({
+    consumerFiles: {
+      "packages/p/src/a.ts": "x\n",
+      "packages/p/src/node_modules/junk.ts": "LOCAL\n",
+    },
+    upstreamFiles: { "packages/p/src/a.ts": "x\n" },
+    config: {
+      copies: [
+        { localDir: "packages/p/src", upstreamDir: "packages/p/src", exclude: ["node_modules"] },
+      ],
+    },
+  });
+  assert.equal(code, 0, out);
+  assert.match(out, /GREEN/);
+});
+
+test("dir: CRLF-vs-LF neutral within a tree → GREEN, exit 0", () => {
+  const { code, out } = run({
+    consumerFiles: { "packages/p/src/a.ts": "a();\r\nb();\r\n" },
+    upstreamFiles: { "packages/p/src/a.ts": "a();\nb();\n" },
+    config: { copies: [{ localDir: "packages/p/src", upstreamDir: "packages/p/src" }] },
+  });
+  assert.equal(code, 0, out);
+  assert.match(out, /GREEN/);
+});
+
+test("dir: declared adaptation (with reason) → ADAPTED, exit 0", () => {
+  const { code, out } = run({
+    consumerFiles: { "packages/p/src/a.ts": "LOCAL\n" },
+    upstreamFiles: { "packages/p/src/a.ts": "UPSTREAM\n" },
+    config: {
+      copies: [
+        {
+          localDir: "packages/p/src",
+          upstreamDir: "packages/p/src",
+          adapted: { reason: "consumer fork" },
+        },
+      ],
+    },
+  });
+  assert.equal(code, 0, out);
+  assert.match(out, /ADAPTED \(declared\): consumer fork/);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);
