@@ -3,8 +3,8 @@
 ## 2026-06-24
 
 ### Added
-- **`CANON-TESTING-MINIMUM-BAR-001` §7.1 — Relationship to TDD** (PROPOSED, pending
-  seal) — expands the one-line §7 ("does not mandate test-first / TDD") into the full
+- **`CANON-TESTING-MINIMUM-BAR-001` §7.1 — Relationship to TDD** (SEALED 2026-06-24)
+  — expands the one-line §7 ("does not mandate test-first / TDD") into the full
   distinction: TDD = test-**first** (red→green→refactor, drives design); this bar =
   test-**with** (test ships in the same change + §5 pre-GO before the code). Test-first
   is optional inside the bar, never required, never forbidden; the §5 pre-GO already

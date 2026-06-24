@@ -127,7 +127,7 @@ is universal.
 - It does **not** mandate test-first / TDD — the rule is the test ships **in the same change**, not before the code.
 - It does **not** require test changes for trivial refactors that preserve behavior and add no conditional logic.
 
-### 7.1 — Relationship to TDD: test-**with**, not test-**first** *(PROPOSED — pending seal)*
+### 7.1 — Relationship to TDD: test-**with**, not test-**first** *(SEALED 2026-06-24 by the Principal Architect — "seal")*
 
 The §7 line "does not mandate test-first / TDD" is the most-asked clarification this canon raises; this subsection expands it so the distinction is explicit.
 
