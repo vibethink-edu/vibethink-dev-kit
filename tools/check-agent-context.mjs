@@ -340,6 +340,11 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
   const contentExc = cfg.productScanContentExceptions || [];
   const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const compiled = prods.map((b) => ({ b, re: new RegExp(`\\b${escapeRe(b)}\\b`, "i") }));
+  // Lines marked PROPOSED/DRAFT may name the reference implementation (fire-test:
+  // genericized at seal) — skip them so a draft amendment doesn't false-RED.
+  const draftMarkers = (cfg.productScanDraftMarkers || ["PROPOSED", "DRAFT"]).map(
+    (m) => new RegExp(`\\b${escapeRe(m)}\\b`, "i")
+  );
   const norm = (p) => p.replace(/\\/g, "/");
   const hits = [];
   for (const rel of tracked) {
@@ -361,6 +366,7 @@ const skip = (name, detail) => results.push({ name, ok: true, skipped: true, det
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (contentExc.some((c) => line.includes(c))) continue;
+      if (draftMarkers.some((m) => m.test(line))) continue; // PROPOSED/DRAFT line — ref-impl naming allowed until seal
       for (const { b, re } of compiled) {
         if (re.test(line)) {
           hits.push(`${r}:${i + 1} (${b})`);

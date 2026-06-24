@@ -53,6 +53,8 @@
     "knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md"
   ],
   "productScanContentExceptions": ["no se quede atrapada en ViTo lo que puede ser agnóstico"],
+  "_productScanDraftNote": "Skip lines carrying a draft marker (PROPOSED/DRAFT): the fire-test allows a DRAFT/PROPOSED canon or amendment to name the reference implementation; it is genericized at seal. The SEALED normative body still must be product-free.",
+  "productScanDraftMarkers": ["PROPOSED", "DRAFT"],
   "agentConfigs": [],
   "_agentConfigsNote": "Empty on purpose (criterion #8): the root authority is under the strictest budget (32 KiB) natively, so no per-agent override is required for this kit. A fork whose root exceeds a strict agent's budget MUST declare its tracked override file here (e.g. .codex/config.toml).",
   "ruleNumberPattern": null,

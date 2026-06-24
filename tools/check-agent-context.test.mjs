@@ -186,6 +186,25 @@ test("product-neutrality: declared content exception (verbatim quote) is skipped
   );
 });
 
+test("product-neutrality: a PROPOSED/DRAFT line may name the ref-impl → '9 l2-product-neutrality' PASSES", () => {
+  const { out } = runSmoke(
+    baseFiles({
+      "knowledge/canon.md":
+        "# canon\n**Amendment — PROPOSED (pending seal):** surfaced by ViTo's diagnosis.\n",
+    }),
+    baseConfig({
+      productExclusionPatterns: ["ViTo"],
+      productScanDirs: ["knowledge"],
+      productScanExtensions: [".md"],
+    })
+  );
+  assert.match(
+    out,
+    /✓ 9 l2-product-neutrality/,
+    "a PROPOSED/DRAFT line must not trip check 9 (fire-test allows ref-impl naming in draft)"
+  );
+});
+
 // ── secret-scan ─────────────────────────────────────────────────────────────
 test("secret-scan: fake AWS key shape → '7 secret-scan' FAILS + exit 1", () => {
   const { code, out } = runSmoke(
