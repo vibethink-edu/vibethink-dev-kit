@@ -2,8 +2,8 @@
 
 > **Scope:** every repo that serves a UI and persists any per-user view choice (filter default, panel open/closed, view density, last-selected tab, sort direction).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** DRAFT / PROPOSED — awaiting seal by the Principal Architect. Not yet binding.
-> **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork once sealed.
+> **Status:** SEALED 2026-06-24 by the Principal Architect (Marcelo — explicit closure directive, "ciérralos para iniciar todo"). Binding.
+> **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-CONFIGURATION-DISCIPLINE` (governs where *governed* configuration lives — values that vary by deployment/operator/served-group and are audited; **this canon governs the other side of that boundary**: values that vary only by individual person and are disposable) · `CANON-PRODUCTION-SAFETY` (no dev-affordance/runtime backdoors in the shipped artifact).
 
 ---
@@ -57,4 +57,4 @@ The L3 binding points at this canon as the spine; it does not restate the princi
 
 ## Provenance
 
-DRAFT lifted from a product-side pattern in a school-management vertical (Campus, spec 068 "informe editor"): filter defaults for the report editor were persisted as per-browser preference cookies, with a documented policy (`apps/web/src/lib/ui-prefs.ts`) mirroring the i18n provider's post-hydration read. Two agnostic substances surfaced as worth canonizing: (1) the **storage-layer boundary** between personal disposable UI state and governed audited config — the complement that `CANON-CONFIGURATION-DISCIPLINE` implies but does not name; and (2) the **namespace-neutrality** rule, surfaced when the `vit_pref_` prefix leaked the ViTo brand into Campus and was neutralized to `vt_pref_` (Campus PR #291, 2026-06-24). Coverage-check: `CONFIGURATION-DISCIPLINE` owns the governed side only; `PRODUCTION-SAFETY` owns artifact posture; no existing spine owned the personal-UI-state side of the boundary or the hydration discipline.
+Lifted from a product-side pattern in a school-management vertical (Campus, spec 068 "informe editor"): filter defaults for the report editor were persisted as per-browser preference cookies, with a documented policy (`apps/web/src/lib/ui-prefs.ts`) mirroring the i18n provider's post-hydration read. Two agnostic substances surfaced as worth canonizing: (1) the **storage-layer boundary** between personal disposable UI state and governed audited config — the complement that `CANON-CONFIGURATION-DISCIPLINE` implies but does not name; and (2) the **namespace-neutrality** rule, surfaced when the `vit_pref_` prefix leaked the ViTo brand into Campus and was neutralized to `vt_pref_` (Campus PR #291, 2026-06-24). Coverage-check: `CONFIGURATION-DISCIPLINE` owns the governed side only; `PRODUCTION-SAFETY` owns artifact posture; no existing spine owned the personal-UI-state side of the boundary or the hydration discipline.
