@@ -127,6 +127,22 @@ is universal.
 - It does **not** mandate test-first / TDD — the rule is the test ships **in the same change**, not before the code.
 - It does **not** require test changes for trivial refactors that preserve behavior and add no conditional logic.
 
+### 7.1 — Relationship to TDD: test-**with**, not test-**first** *(PROPOSED — pending seal)*
+
+The §7 line "does not mandate test-first / TDD" is the most-asked clarification this canon raises; this subsection expands it so the distinction is explicit.
+
+**What TDD is.** Test-Driven Development is the discipline of writing a **failing test first**, then the **minimal code** to make it pass, then **refactoring** with the test green — the *red → green → refactor* loop, repeated per small unit of behaviour. The test is authored **before** the implementation and **drives the design**: the test is the unit's mini-specification.
+
+**What this canon mandates instead — test-with.** The bar is that the test ships **in the same change** as the code (§2) and that touching a function adds a test (§4) — it does **not** require the test to be authored before the implementation. The invariant is the *shipped artifact* (code that arrives with its contract), not the *authoring order*.
+
+**Why test-with, not test-first.** Mandating the *red → green → refactor* ritual universally adds ceremony without changing what ships: tested code. The floor's job is to **guarantee the test exists**, at the smallest scope and cost (§8) — not to prescribe when in the author's loop it was written. A fast author (human or agent) that generates implementation and test together satisfies the bar identically to one that wrote the test first.
+
+**TDD is permitted, not forbidden.** Test-first is a **valid technique a team or author MAY adopt** where the design benefit pays off (complex branching, an unclear contract, a bug to reproduce-then-fix). It is **optional inside this bar**, never prohibited.
+
+**The kit already captures TDD's core benefit.** The §5 pre-GO — naming the testable unit, the failure mode, and the test location **before** writing the function — is *test-first thinking*: the design clarity TDD's red step produces, without committing to the full loop. An author who completes the §5 pre-GO has done the part of TDD that improves the design; whether the test file is typed before or alongside the implementation is left to the author.
+
+**In one line:** *TDD prescribes the authoring order (test first, drives design); this bar prescribes the shipped result (test ships with the code) + the §5 pre-GO (design the test before the function). Same destination — code that arrives tested — the lower-ceremony path mandated, test-first available as an option.*
+
 ## 8. The throughline
 
 > **Tests are the contract. Code is the implementation. Shipping code without its contract is shipping IOU.**
