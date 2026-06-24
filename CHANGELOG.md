@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-06-22
+
+### Added
+
+- **`CANON-COMM-INTERNAL-VS-EXTERNAL-001`** (DRAFT) — the internal-vs-external
+  communication axis: the one-line routing rule + the two gates (lightweight
+  internal / heavy external: human-OK + verify-first). Names the distinction that
+  already governed behaviour implicitly; closes the gap that let an agent file
+  premature public issues. A `notify: internal|external` setting is its operational
+  application.
+- **Check 9 (L2 product-neutrality)** in `tools/check-agent-context.mjs` — guards
+  the broader L2 canon/doc set (`knowledge/`, `setup/`) against PRODUCT brand names;
+  the L1 fire-test (check 8) only covered the few neutral cores. Org names
+  (VibeThink/VT-Method) stay allowed. Co-located negative-regression tests; declared
+  exceptions for the ecosystem port registry, a dated research artifact, and one
+  verbatim directive quote.
+- **`setup/engram-weekly-review.sh`** — governed, agnostic Engram operator ritual
+  that **backs up first** (`engram export` → `~/.engram-backups`, keeps last 8) then
+  reviews; parameterized by `ENGRAM_PROJECT` (no product name).
+
+### Changed
+
+- **`setup/install-external-tools.{sh,ps1}`** now loop over the lock's
+  `github-release` tools generically → they **cable Engram too** (not just
+  graphify/rtk; Engram was never installed before). Lock: `installDirWindows` →
+  `installDir` (cross-platform). `.ps1` fix: per-tool CLI filter (was a hardcoded
+  `rtk*`); telemetry step guarded; class-C tools get a "back up the DB" note.
+- **De-productized the kit** — scrubbed every PRODUCT brand name
+  (ViTo/Campus/WorkBench/orchestrator) from normative canon bodies, reference-impl
+  markers, and setup provenance → the kit **names no product**. Three declared
+  exceptions kept (the L2 port registry, a dated research artifact, one verbatim
+  architect-directive quote). Check 9 now machine-guards this going forward.
+
 ## 2026-06-15
 
 ### Added
