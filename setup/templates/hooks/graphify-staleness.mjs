@@ -2,8 +2,8 @@
 /**
  * graphify-staleness.mjs — SessionStart code-graph freshness nudge (TEMPLATE · agnostic).
  *
- * STATUS: PROPOSED (pending seal) — reference template for the operator-tooling freshness
- * standard (setup/EXTERNAL-TOOLS.md § Graphify · Freshness & activación).
+ * STATUS: SEALED 2026-06-27 (Principal Architect) — reference template for the operator-tooling
+ * freshness standard (setup/EXTERNAL-TOOLS.md § Graphify · Freshness & activación).
  *
  * WHY: operator-tools get skipped when their artifact goes stale silently — an agent queries
  * the code graph, sees outdated code, concludes "useless", and stops using it. A passive

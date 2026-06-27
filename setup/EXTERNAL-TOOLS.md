@@ -114,7 +114,7 @@ bash setup/check-tools.sh <ruta-al-repo>
   ausentes = gap de backend semántico, NO "graphify no disponible"
 - Privacidad: indexado 100% local, sin secrets, el grafo no se comparte
 
-> **Freshness & activación (PROPOSED — pending seal).** El uso scoped + no-commit de arriba
+> **Freshness & activación (SEALED 2026-06-27 by the Principal Architect — "sellalo").** El uso scoped + no-commit de arriba
 > resuelve el CÓMO, pero los operator-tools se **omiten en la práctica** cuando el grafo se pone
 > viejo en silencio: el agente lo consulta, ve código desactualizado, concluye "no sirve" y deja
 > de usarlo. *No es disciplina — es freshness + activación.* El nudge pasivo (texto "reach for it")
