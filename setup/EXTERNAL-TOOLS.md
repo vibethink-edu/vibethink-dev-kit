@@ -114,6 +114,34 @@ bash setup/check-tools.sh <ruta-al-repo>
   ausentes = gap de backend semántico, NO "graphify no disponible"
 - Privacidad: indexado 100% local, sin secrets, el grafo no se comparte
 
+> **Freshness & activación (PROPOSED — pending seal).** El uso scoped + no-commit de arriba
+> resuelve el CÓMO, pero los operator-tools se **omiten en la práctica** cuando el grafo se pone
+> viejo en silencio: el agente lo consulta, ve código desactualizado, concluye "no sirve" y deja
+> de usarlo. *No es disciplina — es freshness + activación.* El nudge pasivo (texto "reach for it")
+> es fácil de saltar.
+> - **Estándar: nudge ACTIVO, no pasivo.** Un hook `SessionStart` (fs-only, `exit 0`, nunca
+>   bloquea) detecta que el grafo está stale y **redirige al patrón scoped** — nunca a rebuildear
+>   el monorepo.
+> - **Scoped, NO whole-repo (medido).** `graphify update .` (todo el repo) midió **>9 min,
+>   all-or-nothing, sin terminar** en un repo grande (~12k archivos); `graphify update <subdir>`
+>   midió **~6 s**. El nudge da el comando scoped, jamás auto-rebuildea (caro).
+> - **Safety en el mensaje:** local/no-LLM por default — sin `GEMINI/GOOGLE_API_KEY` no sale
+>   código a un LLM externo (el enriquecimiento semántico SÍ enviaría el código).
+> - **Implementación de referencia:** `scripts/graphify-staleness.mjs` (consumidor) +
+>   `setup/templates/hooks/graphify-staleness.mjs` (template agnóstico) — provisionable por
+>   `install-external-tools` (auto-wire al `settings.json` del consumidor = build-on-pain, después).
+>
+> **Aplica a los 3 operator-tools (no solo graphify) — mismo patrón de nudge activo:**
+> - **engram (memoria · stateful → costo MAYOR: lo no-grabado se pierde):** SessionStart →
+>   recordá *recall* (`engram search <tema>`); al sellar decisión/hallazgo → recordá `engram save`
+>   (no solo en chat).
+> - **rtk (economía de tokens):** trigger distinto — cuando vayas a pipear un build/test largo,
+>   usá `rtk` en vez de `head`/`tail` (se dispara al correr el comando ruidoso, no al inicio).
+>
+> graphify es la **1ra instancia construida**; engram + rtk siguen el mismo estándar (sus hooks
+> concretos = build-on-pain). El principio único: *nudge activo > texto pasivo; el agente que no
+> recibe el recordatorio, omite la herramienta.*
+
 ## RTK `0.39.0`
 
 - Binario: `rtk` · release pineado: `v0.39.0` (asset por plataforma —
