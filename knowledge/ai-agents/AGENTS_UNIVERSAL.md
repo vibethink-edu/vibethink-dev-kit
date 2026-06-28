@@ -163,6 +163,10 @@ server, read the project's port registry and use the assigned block.
   proceed WITHOUT them only after surfacing a visible local-health RED/WARN and saying so in
   your report/PR — e.g. `rtk/graphify unavailable: <reason>`. The only wrong move is a
   silent skip.
+- **Stale session remediation preserves history.** If the binary exists but the live process
+  has an old PATH, do not force a restart as the first answer. Hot-patch that session's PATH
+  with the exact tool directory, then persist PATH for future launches. Restart is only the
+  disposable-session path.
 - **RTK** (token economy): wrap noisy/verbose command output (listings, builds, tests, logs,
   `status`, `find`) with `rtk`. Skip already-compact output (e.g. `git log --oneline`).
 - **Graphify** (code navigation): use for orientation (hubs, what-defines-what, dead-code,

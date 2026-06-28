@@ -53,7 +53,7 @@ try {
 
 if (missing.length) {
   console.log(
-    `🧰 operator-tools NOT loaded: ${missing.join(", ")} (do not resolve by name). Run install-external-tools (or "refresh devkit") — usually the "installed ≠ available" gotcha: the --user Scripts/bin is not on PATH, and an already-open process will NOT pick it up (only a fresh shell/launch). Suspect a stale version → same refresh.`
+    `🧰 operator-tools NOT loaded: ${missing.join(", ")} (do not resolve by name). Run install-external-tools (or "refresh devkit"). If the tool is installed but this session has old PATH, do NOT lose session history first: hot-patch this live shell PATH with the tool directory, then persist PATH for future launches. Suspect a stale version → same refresh.`
   );
 }
 

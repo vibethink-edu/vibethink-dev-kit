@@ -88,8 +88,40 @@ Validation caveat:
 
 - `npm run check` could not run because `biome` is not installed in this checkout
   and there is no local `node_modules`/lockfile present.
-- Full `devkit-doctor` remains RED on current `origin/master` because of pre-existing
-  catalog-coverage gaps for `CANON-COMM-INTERNAL-VS-EXTERNAL-001.md` and
-  `CANON-UI-PREFERENCE-PERSISTENCE-001.md`; those are outside this PR's scope.
+- The catalog-coverage gaps for `CANON-COMM-INTERNAL-VS-EXTERNAL-001.md` and
+  `CANON-UI-PREFERENCE-PERSISTENCE-001.md` were resolved before PR #193 merged:
+  the draft comms canon is explicitly exempt and the sealed UI preference canon is
+  catalogued as Piece #48.
 - `tools/shell-smoke.test.mjs` fails on Windows because the test passes `C:\...`
   paths directly to Bash (`/bin/bash: C:\...: No such file or directory`).
+
+## Follow-up — live PATH hot-patch, not forced restart
+
+Marcelo rejected "restart the session" as the default remediation because live
+agent/coder sessions can carry important conversational and operational history.
+That exposed a missing nuance in the first delivery: persistent PATH fixes only help
+future launches; already-open shells and agents keep their old process environment.
+
+Update delivered in this follow-up:
+
+- `external-tools-health.mjs` now prints live-session remediation for
+  `installed-not-in-path` and `shell-mismatch`:
+  - PowerShell: `$env:Path = '<dir>;' + $env:Path`
+  - cmd.exe: `set "PATH=<dir>;%PATH%"`
+  - Bash/Git Bash: `export PATH="<dir>:$PATH"`
+  - WSL Bash path when the found executable is a Windows path.
+- `check-tools.sh` now prints hot-patch commands and prefers the actual found `.exe`
+  directory over generic expected directories when diagnosing shell mismatch.
+- `AGENTS_UNIVERSAL.md` and `EXTERNAL-TOOLS.md` now say explicitly: if a session has
+  history, hot-patch the live PATH first; restart only when the session is disposable.
+- `operator-tools-health.mjs` now tells agents not to lose session history first when
+  the issue is a stale process PATH.
+
+Validation for the follow-up:
+
+- `node tools/external-tools-health.test.mjs` -> 7/7 passed, including hot-patch
+  remediation assertions.
+- `bash setup/check-tools.sh .` -> prints exact Bash/WSL and PowerShell hot-patch
+  commands for shell-mismatch `.exe` discoveries.
+- `node tools/devkit-doctor.mjs` -> external tools remain non-blocking but loud; the
+  Engram `installed-not-in-path` case now includes live-session PATH commands.
