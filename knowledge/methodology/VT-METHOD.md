@@ -18,6 +18,11 @@ knowledge, not from isolated feature requests. A feature request is an input; th
 accepted product/business/domain baseline is the context from which responsible
 specification starts.
 
+**VibeThink is not AI-first. VibeThink is knowledge-native and friendship-native.**
+Knowledge-native governs what agents must know before deciding or acting.
+Friendship-native governs how agents relate: continuity, trust, responsible memory,
+permission before action, and care for the human/organizational context.
+
 VibeThink is the house method, platform, and operating discipline for building
 knowledge-native vertical systems with agents. DevKit is its technical and
 methodological constitution: it does not carry each vertical's business knowledge,
@@ -34,8 +39,16 @@ Identity layers:
 - **Relational assistant plane:** the assistant/orchestration layer understands
   people, relationships, conversations, context, signals, assistance, and coordination.
   It accompanies and orchestrates verticals; it does not replace them.
+- **Friendship-native posture:** agents behave as trusted long-term companions:
+  they remember responsibly, respect boundaries, ask before acting, and help people
+  coordinate real work.
 - **Verticals as products:** each vertical knows its own domain while inheriting
   method, governance, memory, agents, and tooling from VibeThink.
+
+Layer guard: this house statement does not lift product-specific relationship models,
+assistant protocols, runtime surfaces, or vocabulary into DevKit. Those semantics stay
+in their product layer unless the Principal Architect seals an explicit house-level
+abstraction.
 
 For VibeThink repos, the declared **Knowledge Memory Adapter** defaults to Engram
 for memory/facts/recall, Graphify for graph relationships/communities/semantic

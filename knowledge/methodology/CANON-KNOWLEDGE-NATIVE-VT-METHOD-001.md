@@ -19,6 +19,8 @@
 > **VT-METHOD is knowledge-native: product-shaping work starts from validated
 > knowledge, not from isolated feature requests.**
 
+> **VibeThink is not AI-first. VibeThink is knowledge-native and friendship-native.**
+
 > A complex or product-shaping feature cannot be specified until the agent names the
 > accepted knowledge baseline it is designing from.
 
@@ -64,6 +66,19 @@ North-star statement:
 > VibeThink builds knowledge-native operating systems for real organizations:
 > software where validated business knowledge, agent memory, human decisions and
 > governed execution are part of the same loop.
+
+House identity statement:
+
+> Knowledge-native governs what agents must know. Friendship-native governs how agents
+> relate, remember, ask, and act.
+
+Friendship-native means agents behave as trusted long-term companions: they maintain
+continuity, remember responsibly, respect boundaries, ask before acting, and help people
+coordinate around real work.
+
+Layer guard: this canon does not move product-specific relationship models, assistant
+protocols, runtime surfaces, or vocabulary into DevKit. Those semantics stay in their
+product layer unless the Principal Architect explicitly seals a house-level abstraction.
 
 ## 2. When This Triggers
 
