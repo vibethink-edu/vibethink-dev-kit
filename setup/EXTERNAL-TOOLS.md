@@ -99,7 +99,9 @@ node tools/external-tools-health.mjs --json       # salud de tools registradas e
 > del `--user` site **no estaba en PATH**, así que el CLI `graphify` no resolvía por
 > nombre y el flujo que lo invoca no podía usarlo. Agravante **stale-shell:** un proceso
 > congela su PATH al arrancar, así que arreglar el PATH del registro **no** afecta a los
-> shells ya abiertos — solo un shell/lanzamiento nuevo lo toma. Por eso:
+> shells ya abiertos. Si la sesión tiene historia, **NO se pierde primero la sesión**:
+> se hace **hot-patch del PATH de esa sesión viva** y se deja el PATH persistente para
+> futuros lanzamientos. Por eso:
 > - `install-external-tools.{ps1,sh}` detecta el `Scripts/`/`bin/` real del `--user` site,
 >   lo **antepone al PATH de la sesión** (para que el lanzamiento hijo lo herede) y
 >   **reporta el dir exacto** + el comando para agregarlo de forma persistente.
@@ -108,6 +110,10 @@ node tools/external-tools-health.mjs --json       # salud de tools registradas e
 >   "instalado PERO no en PATH". En Bash/WSL también detectan el caso Windows `.exe`
 >   visible (`graphify.exe`) pero comando canónico invisible (`graphify`) como
 >   **WARN shell mismatch / stale shell**, no como "no instalado".
+> - **Remediación de sesión viva:** el warning debe imprimir el comando exacto para
+>   anteponer el directorio al PATH del proceso actual (`$env:Path = '<dir>;' + $env:Path`
+>   en PowerShell, `export PATH="<dir>:$PATH"` en Bash/Git Bash/WSL). Reiniciar queda
+>   como opción para sesiones descartables, no como única salida.
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):

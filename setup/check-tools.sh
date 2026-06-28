@@ -73,6 +73,59 @@ join_lines() {
   awk 'BEGIN{first=1} { if (!first) printf " ; "; printf "%s", $0; first=0 } END{ print "" }'
 }
 
+first_expected_path() {
+  printf '%s' "$1" | awk -F' ; ' '{print $1}'
+}
+
+bash_path() {
+  p="$1"
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -u "$p" 2>/dev/null && return 0
+  fi
+  case "$p" in
+    [A-Za-z]:\\*)
+      drive="$(printf '%s' "$p" | cut -c1 | tr 'A-Z' 'a-z')"
+      rest="$(printf '%s' "$p" | cut -c4- | tr '\\' '/')"
+      printf '/%s/%s\n' "$drive" "$rest"
+      ;;
+    *) printf '%s\n' "$p" ;;
+  esac
+}
+
+powershell_path() {
+  p="$1"
+  case "$p" in
+    /mnt/[A-Za-z]/*)
+      drive="$(printf '%s' "$p" | cut -d/ -f3 | tr 'a-z' 'A-Z')"
+      rest="$(printf '%s' "$p" | cut -d/ -f4- | tr '/' '\\')"
+      printf '%s:\\%s\n' "$drive" "$rest"
+      ;;
+    /[A-Za-z]/*)
+      drive="$(printf '%s' "$p" | cut -c2 | tr 'a-z' 'A-Z')"
+      rest="$(printf '%s' "$p" | cut -c4- | tr '/' '\\')"
+      printf '%s:\\%s\n' "$drive" "$rest"
+      ;;
+    [A-Za-z]:*) printf '%s\n' "$p" ;;
+    *) return 1 ;;
+  esac
+}
+
+print_hot_patch() {
+  expected="$1"; found_bin="${2:-}"
+  if [ -n "$found_bin" ]; then
+    dir="$(dirname "$found_bin")"
+  else
+    [ -n "$expected" ] || return 0
+    dir="$(first_expected_path "$expected")"
+  fi
+  [ -n "$dir" ] || return 0
+  bdir="$(bash_path "$dir")"
+  echo "    Hot-patch esta sesión Bash/Git Bash/WSL: export PATH=\"$bdir:\$PATH\""
+  psdir="$(powershell_path "$dir" 2>/dev/null || true)"
+  [ -n "$psdir" ] && echo "    PowerShell vivo: \$env:Path = '$psdir;' + \$env:Path"
+  echo "    PATH persistente solo afecta lanzamientos futuros; agentes ya abiertos necesitan este hot-patch en su propia sesión."
+}
+
 state_for_cli() {
   cli="$1"; installed_hint="$2"; known_bin="${3:-}"
   canon="$(canonical_cli "$cli")"
@@ -171,25 +224,29 @@ if [ "$overall" != OK ]; then
 fi
 if [ "$gf_state" = shell-mismatch ]; then
   echo "  ⚠ graphify: '$gf_bin' existe, pero 'graphify' no resuelve en este shell."
-  echo "    Fix: agregá el directorio al PATH de este shell o abrí PowerShell/Codex nuevo."
-  echo "    Stale shell: PATH se congela al abrir la sesión."
+  echo "    Fix: agregá el directorio al PATH de este shell; si la sesión tiene historia, no reinicies primero."
+  echo "    Stale shell: PATH se congela al abrir la sesión; cambios persistentes no actualizan agentes vivos."
   [ -n "$gf_expected" ] && echo "    Expected path(s): $gf_expected"
+  print_hot_patch "$gf_expected" "$gf_bin"
 elif [ "$gf_state" = installed-not-in-path ]; then
   echo "  ✗ graphify: paquete instalado (${gf_ver:-?}) pero CLI no está en PATH."
   [ -n "$gf_expected" ] && echo "    Expected path(s): $gf_expected"
+  print_hot_patch "$gf_expected" "$gf_bin"
 elif [ "$gf_state" = missing ]; then
   echo "  ✗ graphify: herramienta faltante. Fix: bash setup/install-external-tools.sh o pwsh setup/install-external-tools.ps1"
   [ -n "$gf_expected" ] && echo "    Expected path(s): $gf_expected"
 fi
 if [ "$rtk_state" = shell-mismatch ]; then
   echo "  ⚠ RTK: '$rtk_bin' existe, pero 'rtk' no resuelve en este shell."
-  echo "    Fix: agregá el directorio al PATH de este shell o abrí PowerShell/Codex nuevo."
-  echo "    Stale shell: PATH se congela al abrir la sesión."
+  echo "    Fix: agregá el directorio al PATH de este shell; si la sesión tiene historia, no reinicies primero."
+  echo "    Stale shell: PATH se congela al abrir la sesión; cambios persistentes no actualizan agentes vivos."
   [ -n "$rtk_expected" ] && echo "    Expected path(s): $rtk_expected"
+  print_hot_patch "$rtk_expected" "$rtk_bin"
 elif [ "$rtk_state" = installed-not-in-path ]; then
   echo "  ✗ RTK: binario instalado pero CLI no está en PATH."
   [ -n "$rtk_bin" ] && echo "    Found: $rtk_bin"
   [ -n "$rtk_expected" ] && echo "    Expected path(s): $rtk_expected"
+  print_hot_patch "$rtk_expected" "$rtk_bin"
 elif [ "$rtk_state" = missing ]; then
   echo "  ✗ RTK: herramienta faltante. Fix: bash setup/install-external-tools.sh o pwsh setup/install-external-tools.ps1"
   [ -n "$rtk_expected" ] && echo "    Expected path(s): $rtk_expected"

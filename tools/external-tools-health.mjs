@@ -224,6 +224,41 @@ function pythonUserScriptDirs(opts) {
   return uniq(dirs);
 }
 
+function psQuote(s) {
+  return String(s).replace(/'/g, "''");
+}
+
+function bashQuote(s) {
+  return `"${String(s).replace(/(["\\$`])/g, "\\$1")}"`;
+}
+
+function bashPath(p) {
+  const win = String(p || "").match(/^([A-Za-z]):[\\/](.*)$/);
+  if (!win) return p;
+  return `/${win[1].toLowerCase()}/${win[2].replace(/[\\/]+/g, "/")}`;
+}
+
+function wslPath(p) {
+  const win = String(p || "").match(/^([A-Za-z]):[\\/](.*)$/);
+  if (!win) return null;
+  return `/mnt/${win[1].toLowerCase()}/${win[2].replace(/[\\/]+/g, "/")}`;
+}
+
+function hotPatchRemediation(expectedPaths) {
+  const dir = expectedPaths.find(Boolean);
+  if (!dir) return [];
+  const lines = [
+    "if this session has history, do not restart first; hot-patch the live shell PATH",
+    `PowerShell: $env:Path = '${psQuote(dir)};' + $env:Path`,
+    `cmd.exe: set "PATH=${dir};%PATH%"`,
+    `Bash/Git Bash: export PATH=${bashQuote(`${bashPath(dir)}:$PATH`)}`,
+  ];
+  const wsl = wslPath(dir);
+  if (wsl) lines.push(`WSL Bash: export PATH=${bashQuote(`${wsl}:$PATH`)}`);
+  lines.push("persistent PATH fixes only affect future launches; already-open agents need the hot-patch in their own session");
+  return lines;
+}
+
 function remediation(tool, state, expectedPaths) {
   const name = tool.name;
   if (state === "available") return [];
@@ -232,16 +267,19 @@ function remediation(tool, state, expectedPaths) {
     lines.push(
       `shell mismatch: '${tool.cli}' does not resolve in this shell, but a Windows executable does`
     );
-    lines.push("open a fresh PowerShell/Codex session or add the executable directory to this shell PATH");
-    lines.push("stale shell: PATH is captured when the session starts; restart after changing PATH");
+    lines.push("add the executable directory to this shell PATH, or open a fresh launch when session history is disposable");
+    lines.push("stale shell: PATH is captured when the session starts; persistent PATH edits do not update live agents");
   } else if (state === "installed-not-in-path") {
     lines.push(`${name} is installed, but CLI '${tool.cli}' is not in PATH`);
-    lines.push("add one expected directory to PATH, then open a new shell");
+    lines.push("add one expected directory to PATH; hot-patch this live session if restarting would lose history");
   } else {
     lines.push(`${name} is missing`);
     lines.push("run the non-blocking installer: pwsh setup/install-external-tools.ps1 or bash setup/install-external-tools.sh");
   }
   if (expectedPaths.length) lines.push(`expected path(s): ${expectedPaths.join(" ; ")}`);
+  if (state === "shell-mismatch" || state === "installed-not-in-path") {
+    lines.push(...hotPatchRemediation(expectedPaths));
+  }
   return lines;
 }
 

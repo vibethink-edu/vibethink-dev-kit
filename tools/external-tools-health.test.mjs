@@ -107,6 +107,10 @@ test("Windows .exe visible but canonical CLI absent => shell-mismatch WARN", () 
     health.tools.find((t) => t.name === "rtk").remediation.join("\n"),
     /stale shell/i
   );
+  assert.match(
+    health.tools.find((t) => t.name === "rtk").remediation.join("\n"),
+    /hot-patch the live shell PATH/i
+  );
 });
 
 test("pip package present but CLI absent => installed-not-in-path RED", () => {
@@ -138,6 +142,8 @@ test("pip package present but CLI absent => installed-not-in-path RED", () => {
   assert.equal(graphify.state, "installed-not-in-path");
   assert.match(graphify.message, /installed via python3/);
   assert.match(graphify.remediation.join("\n"), /not in PATH/);
+  assert.match(graphify.remediation.join("\n"), /Bash\/Git Bash: export PATH/);
+  assert.match(graphify.remediation.join("\n"), /already-open agents need the hot-patch/);
   assert.ok(graphify.expectedPaths.includes("/home/dev/.local/bin"));
 });
 
