@@ -122,33 +122,37 @@ server, read the project's port registry and use the assigned block.
 # ❌ NEVER create .md files for every analysis - do analysis in response, only create .md for significant reports
 ```
 
-### 🧰 Dev Tooling Baseline — RTK + Graphify (USE BY DEFAULT · graceful fallback · non-blocking)
+### 🧰 Dev Tooling Baseline — RTK + Graphify (USE BY DEFAULT · loud fallback · non-blocking)
 
 > **Status: USE BY DEFAULT — provisioned in every dev environment (owner standard of care);
 > the kit ships the pins + install recipes (`setup/EXTERNAL-TOOLS.md`). A quality/performance
-> enhancement, NEVER a correctness dependency. Non-blocking: no CI gate, no merge gate, no
-> error if absent.**
+> enhancement, NEVER a product-correctness dependency. Non-blocking: no CI gate, no merge
+> gate, no product build/test failure just because absent. Local/session health MUST still
+> surface absence as RED/WARN.**
 >
 > **Mental model: a database index.** A query runs correctly without the index — just slower;
 > you always add it because the gain is worth it. Same here: provision AND use these by default.
-> Their absence DEGRADES the experience (more tokens, blind grep); it does NOT fail anything.
+> Their absence DEGRADES the experience (more tokens, blind grep); it does NOT fail product
+> correctness, but it MUST NOT be silent.
 
 - **Use them by default — expected, not optional.** When provisioned, reach for `rtk` and
   `graphify` as described below instead of going straight to raw/blind commands. The gain
   (tokens, orientation) is why they are the standard of care, not a nicety.
-- **Graceful fallback, documented — never silent.** If the environment cannot provision them
-  (install fails, offline, unsupported platform), proceed WITHOUT them AND say so in your
-  report/PR — e.g. `rtk/graphify unavailable: <reason>`. The only wrong move is a silent skip.
+- **Loud fallback, documented — never silent.** If the environment cannot provision them
+  (install fails, offline, unsupported platform, stale shell, shell mismatch, CLI not in PATH),
+  proceed WITHOUT them only after surfacing a visible local-health RED/WARN and saying so in
+  your report/PR — e.g. `rtk/graphify unavailable: <reason>`. The only wrong move is a
+  silent skip.
 - **RTK** (token economy): wrap noisy/verbose command output (listings, builds, tests, logs,
   `status`, `find`) with `rtk`. Skip already-compact output (e.g. `git log --oneline`).
 - **Graphify** (code navigation): use for orientation (hubs, what-defines-what, dead-code,
   "what touches X") BEFORE blind grep. On-demand, no permanent runtime; index the subdir you
   work in (not the whole monorepo); gitignore `graphify-out/`. Graphify ORIENTS — verify
   authoritative dependencies with `git grep`.
-- **Still NEVER a correctness gate.** "Use by default" is an expectation on agent diligence,
-  NOT a CI/merge gate: a repo / agent / CI without them still works fully and passes. Do NOT
-  let the *use* expectation harden into a *correctness* gate — the documented fallback is
-  always a valid path.
+- **Still NEVER a product-correctness gate.** "Use by default" is an expectation on agent
+  diligence, NOT a CI/merge gate: a repo / agent / CI without them still builds and tests.
+  Do NOT let the *use* expectation harden into a product-correctness gate. Do let launchers,
+  doctor, and session health scream loudly (RED/WARN) when the tools are missing or invisible.
 - **Not in the A/B dev-tooling baseline (use-by-default):** agentmemory. *(**Engram — superseded 2026-06-21 by the Principal Architect:** Engram was previously listed here as "not adopted". That decision was reconsidered and **reverted**: Engram **is adopted**, separately, as a **class-C operator memory tool** — opt-in, per-agent, stateful — see [`setup/EXTERNAL-TOOLS.md`](../../setup/EXTERNAL-TOOLS.md). "Adopted" here means the **use-by-default baseline** (RTK+Graphify); Engram lives at the **operator/lifecycle layer** (§8), is NOT use-by-default, NOT a correctness gate, and NOT a product dependency.)*
 - Tool **versions + install lifecycle**: the kit ships the DEFAULT registry at
   `setup/EXTERNAL-TOOLS.md` (pins, recipes, evidence, version-forward). A repo MAY override

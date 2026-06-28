@@ -21,10 +21,11 @@
  * Exit: 0 = every gate that ran passed · 1 = a gate failed. Skips never fail.
  * Pure Node, zero deps.
  */
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { detectExternalTools, formatExternalToolsHuman } from "./external-tools-health.mjs";
 
 const KIT_TOOLS = dirname(fileURLToPath(import.meta.url));
 const CWD = process.cwd();
@@ -184,23 +185,16 @@ function runAdoption() {
     }
   }
 
-  // 3. The kit's default external tools + a best-effort presence probe.
-  const lock = JSON.parse(readMaybe(join(KIT_ROOT, "setup", "external-tools.lock.json")) || "{}");
-  const tools = (lock.tools || []).map((t) => {
-    let present = null;
-    try {
-      const r = spawnSync(t.cli, ["--version"], {
-        encoding: "utf8",
-        timeout: 4000,
-        stdio: ["ignore", "pipe", "ignore"],
-      });
-      const out = (r.stdout || "").trim().split(/\r?\n/)[0];
-      if ((r.status === 0 || out) && !r.error) present = out ? out.slice(0, 40) : "present";
-    } catch {
-      /* not on PATH → present stays null */
-    }
-    return { name: t.name, cli: t.cli, pin: t.pin, class: t.class, present };
-  });
+  // 3. The kit's default external tools + the same health probe doctor uses.
+  const external = detectExternalTools({ cwd: CWD });
+  const tools = external.tools.map((t) => ({
+    name: t.name,
+    pin: t.pin,
+    class: t.class,
+    state: t.state,
+    severity: t.severity,
+    present: t.severity === "ok" ? `${t.cli} ${t.version || ""}`.trim() : null,
+  }));
 
   // 4. Gates wired here (reuses the gate-config detection — health is the doctor's job).
   const gatesWired = GATES.filter((g) => firstExisting(g.targets)).length;
@@ -214,7 +208,8 @@ function runAdoption() {
         ? "consumer"
         : "no adoption declared",
     pieces: { catalog: roster.length, ...buckets },
-    tools: tools.map(({ cli, ...t }) => t),
+    externalToolsStatus: external.status,
+    tools,
     gatesWired: `${gatesWired}/${GATES.length}`,
   };
 
@@ -243,11 +238,11 @@ function runAdoption() {
     );
   }
   out.push("");
-  out.push(`  Tools (kit defaults · ${"external-tools.lock.json"})`);
+  out.push(`  Tools (kit defaults · ${"external-tools.lock.json"} · health ${external.status})`);
   if (tools.length === 0) out.push("    (none registered)");
   for (const t of tools) {
-    const mark = t.present ? "✓" : "✗";
-    const detail = t.present ? `present (${t.present})` : `not on PATH — pinned ${t.pin}`;
+    const mark = t.severity === "ok" ? "✓" : t.severity === "warn" ? "⚠" : "✗";
+    const detail = t.present ? `present (${t.present})` : `${t.state} — pinned ${t.pin}`;
     out.push(`    ${mark} ${t.name.padEnd(12)} [${t.class}]  ${detail}`);
   }
   out.push("");
@@ -277,6 +272,7 @@ function summarize(out) {
 }
 
 const results = [];
+const externalTools = detectExternalTools({ cwd: CWD });
 for (const g of GATES) {
   const target = firstExisting(g.targets);
   if (!target) {
@@ -320,6 +316,7 @@ if (JSON_OUT) {
     JSON.stringify(
       {
         verdict: ok ? "GREEN" : "RED",
+        externalTools,
         passed: passed.length,
         failed: failed.length,
         ran: ran.length,
@@ -337,8 +334,13 @@ out.push("");
 out.push(`  Dev-Kit Doctor · ${basename(CWD)}`);
 out.push(`  ${"─".repeat(50)}`);
 out.push(
-  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass${failed.length ? `, ${failed.length} to fix` : ", nothing to fix"}`
+  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass${failed.length ? `, ${failed.length} to fix` : ", nothing to fix"} · external tools ${externalTools.status}`
 );
+out.push("");
+out.push("  External Tools");
+for (const line of formatExternalToolsHuman(externalTools).split(/\r?\n/)) {
+  out.push(`    ${line}`);
+}
 out.push("");
 for (const r of ran) {
   const mark = r.status === "pass" ? "✓" : "✗";

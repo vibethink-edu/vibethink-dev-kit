@@ -1,6 +1,6 @@
 # External Tools — Default Dev Tooling (registro a nivel kit)
 
-**Status: DEFAULT · non-blocking** — declarado en
+**Status: DEFAULT · non-blocking para producto · loud para sesión local** — declarado en
 `knowledge/ai-agents/AGENTS_UNIVERSAL.md` §Dev Tooling Baseline; este archivo
 es el ciclo de vida (pins + recetas de instalación) que ese baseline delega.
 
@@ -12,9 +12,12 @@ de un consumidor — verificados, no asumidos.
 
 ## Las tres barandas (no negociables)
 
-1. **DEFAULT ≠ gate.** La ausencia DEGRADA la experiencia (más tokens, grep a
-   ciegas) pero JAMÁS rompe un build, un hook ni CI. No dejar que esto se
-   endurezca en gate con el tiempo (advertencia del propio canon).
+1. **DEFAULT ≠ product gate.** La ausencia DEGRADA la experiencia (más tokens,
+   grep a ciegas) pero JAMÁS rompe un build, un hook de producto ni CI de
+   correctness. **DEFAULT tampoco significa silencioso:** `devkit-doctor`,
+   `check-tools` y los launchers de sesión deben mostrar RED/WARN visible si
+   RTK/Graphify faltan, si el paquete está instalado pero el CLI no está en PATH,
+   o si el shell está stale / ve solo el `.exe`.
 2. **No se vendorea código de terceros.** Se promueve pin + receta + evidencia
    — nunca el binario/fuente dentro del árbol del repo.
 3. **La postura de privacidad viaja con la herramienta.** `graphify-out/`
@@ -26,7 +29,8 @@ de un consumidor — verificados, no asumidos.
 Un heredero **no** necesita seguir las recetas a mano. El kit shippea un
 instalador que lee los pins de [`external-tools.lock.json`](external-tools.lock.json)
 (fuente de verdad legible por máquina), instala lo que falte y saltea lo ya
-presente. **Nunca rompe nada** (DEFAULT ≠ gate; si Python/`gh`/red faltan, degrada y sigue).
+presente. **Nunca rompe producto** (DEFAULT ≠ product gate; si Python/`gh`/red
+faltan, degrada y sigue), pero el verificador de salud local debe chillar.
 
 ```bash
 # Windows
@@ -35,6 +39,8 @@ pwsh setup/install-external-tools.ps1
 bash setup/install-external-tools.sh
 # Verificar qué hay (el par "instalar / verificar")
 bash setup/check-tools.sh <ruta-al-repo>
+bash setup/check-tools.sh --json <ruta-al-repo>   # salida legible por launchers
+node tools/external-tools-health.mjs --json       # solo salud de RTK/Graphify
 ```
 
 > Las tools viven **en la máquina**, nunca en el repo (baranda #2). Un `git clone`
@@ -97,8 +103,11 @@ bash setup/check-tools.sh <ruta-al-repo>
 > - `install-external-tools.{ps1,sh}` detecta el `Scripts/`/`bin/` real del `--user` site,
 >   lo **antepone al PATH de la sesión** (para que el lanzamiento hijo lo herede) y
 >   **reporta el dir exacto** + el comando para agregarlo de forma persistente.
-> - `check-tools.sh` verifica que `graphify` **RESUELVE por nombre** (no solo que el
->   paquete esté instalado) y marca explícito el estado "instalado PERO no en PATH".
+> - `check-tools.sh` y `devkit-doctor` verifican que `graphify` **RESUELVE por nombre**
+>   (no solo que el paquete esté instalado) y marcan explícito el estado
+>   "instalado PERO no en PATH". En Bash/WSL también detectan el caso Windows `.exe`
+>   visible (`graphify.exe`) pero comando canónico invisible (`graphify`) como
+>   **WARN shell mismatch / stale shell**, no como "no instalado".
 
 - Paquete pip: `graphifyy` · CLI: `graphify`
 - **Instalación** (requiere Python 3):
@@ -179,9 +188,13 @@ bash setup/check-tools.sh <ruta-al-repo>
   el ciclo de vida per-repo gana, el override se declara visible.
 - **Version-forward:** los pins solo avanzan editando ESTE archivo vía PR al
   kit, con evidencia de la versión nueva verificada en al menos una máquina.
+- **No adoptado por este baseline:** Engram. Si un consumidor lo usa, es
+  consumer-local hasta que Marcelo dé un GO separado para subirlo al dev-kit.
 
 ## En los briefings de ejecutor
 
 El PASO 0 de un briefing puede incluir el aprovisionamiento como paso
 **OPCIONAL y saltable**: si Python o la descarga fallan, el ejecutor sigue
-sin las herramientas y lo anota en el reporte — nunca es un bloqueo.
+sin las herramientas y lo anota en el reporte — nunca es un bloqueo de producto.
+Lo que no puede hacer es saltear en silencio: el launcher/session health debe
+mostrar RED/WARN y la remediación exacta.
