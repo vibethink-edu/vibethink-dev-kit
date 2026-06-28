@@ -17,6 +17,10 @@ And:
 > Product-shaping work may not start until the agent has retrieved and cited the
 > Accepted Knowledge Baseline through the declared knowledge memory adapter.
 
+And:
+
+> Knowledge-Driven Design (KDD) sits underneath the rest of the product method.
+
 Canonical homes:
 
 - `knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md`
@@ -29,6 +33,16 @@ Canonical homes:
 
 WorkBench remains the L3 consumer. It should not become the canonical source of this
 method; it should bind the DevKit contract to its own objects and UI/runtime.
+
+If WorkBench discovers a reusable KDD gap, route it upstream:
+
+```text
+finding/handoff to DevKit -> DevKit canon/template/gate amendment -> WorkBench L3 adoption
+```
+
+Do not convert a generic KDD rule into WorkBench-local canon first. Temporary local
+implementation is allowed only when labelled local/temporary and linked to the DevKit
+handoff.
 
 Represent an Accepted Knowledge Baseline as a consumable object on:
 

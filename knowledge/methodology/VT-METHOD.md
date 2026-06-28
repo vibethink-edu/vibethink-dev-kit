@@ -18,6 +18,11 @@ knowledge, not from isolated feature requests. A feature request is an input; th
 accepted product/business/domain baseline is the context from which responsible
 specification starts.
 
+**Knowledge-Driven Design (KDD) sits underneath VT-METHOD.** Before a product-shaping
+slice becomes a spec, the agent reconstructs, retrieves, and cites accepted knowledge.
+Everything above KDD — decision gate, specification, execution, review, and learning —
+depends on that baseline being real.
+
 **VibeThink is not AI-first. VibeThink is knowledge-native and friendship-native.**
 Knowledge-native governs what agents must know before deciding or acting.
 Friendship-native governs how agents relate: continuity, trust, responsible memory,
@@ -55,6 +60,11 @@ for memory/facts/recall, Graphify for graph relationships/communities/semantic
 navigation, and versioned Markdown Knowledge Packs as the auditable source of truth.
 Product-shaping work may not start until the agent has retrieved and cited the
 Accepted Knowledge Baseline through that declared adapter.
+
+DevKit is the upstream authority for the reusable KDD pattern. A product repo can expose
+a gap first, but if the gap is generic, the adjustment is made in DevKit before the
+consumer treats it as canon. L3 repos adapt; they do not become the source of reusable
+method law.
 
 ## How VT-Method works — read this first
 
@@ -118,7 +128,7 @@ The key insight: the research never became the health code — it *informed* it.
 |-----------|-------------------|
 | **Governance** | tiered canon (`SEALED → CANON → DRAFT`) under a single Canon Index; one named approver (the Principal Architect) |
 | **Decision gate** | the **3-Gate Preflight**: structural-impact questions (SI count) + author clarity + a security-surface modifier → methodology choice |
-| **Knowledge baseline** | Knowledge-Native VT-METHOD: complex/product-shaping work retrieves and cites an Accepted Knowledge Baseline through the declared Knowledge Memory Adapter before spec; missing baseline triggers a Knowledge Reconstruction Sprint (`CANON-KNOWLEDGE-NATIVE-VT-METHOD-001`) |
+| **KDD / Knowledge baseline** | Knowledge-Driven Design underneath the method: complex/product-shaping work retrieves and cites an Accepted Knowledge Baseline through the declared Knowledge Memory Adapter before spec; missing baseline triggers a Knowledge Reconstruction Sprint (`CANON-KNOWLEDGE-NATIVE-VT-METHOD-001`) |
 | **Specification pipeline** | **Direct Execution** (default — briefing + V-xx matrix) · **structured spec-kit** (complex discovery) · **interchange-spec** (laboratory) |
 | **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel. Each work-unit carries a `Verification: <type(s)>` field selected by the verification gate (`CANON-TESTING-GATE`) — methodology-agnostic: the field lives in the spec's task list *or* in the briefing's V-xx matrix. The test ships in the same change; depth scales with stakes (no global coverage number) |
 | **Lifecycle artifacts** | PRD · deployment/readiness plan · **decision record (ADR)** · append-only log · roadmap · **per-package** changelog |
@@ -141,6 +151,7 @@ The concrete instantiation lives in each product repo and never rises to L1/L2:
 - the product's Knowledge Packs, accepted business/product/domain baselines, and
   concrete adapter health/freshness checks,
 - durable front-memory mechanics and product comms specifics,
+- temporary local KDD experiments while a generic gap is being elevated to DevKit,
 - **any product vocabulary and domain model** (a product's business concepts stay
   entirely in that product's repo).
 

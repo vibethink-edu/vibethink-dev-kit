@@ -1277,15 +1277,16 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
-### 49 — Knowledge-native VT-METHOD (Accepted Knowledge Baseline before product-shaping specs) (L1/L2 bridge)
+### 49 — KDD / Knowledge-native VT-METHOD (Accepted Knowledge Baseline before product-shaping specs) (L1/L2 bridge)
 
 **Layer:** L1 pattern + L2 VibeThink binding.
 **Home:** `knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md`,
 `knowledge/methodology/VT-METHOD.md`, `setup/templates/knowledge-pack/`,
 `tools/check-knowledge-pack.mjs`.
 
-- **Qué:** product-shaping work starts from validated knowledge, not isolated feature
-  requests. A repo reconstructs scattered business/product/domain knowledge into a
+- **Qué:** Knowledge-Driven Design sits underneath product-shaping work: validated
+  knowledge comes before isolated feature requests, specs, and execution. A repo
+  reconstructs scattered business/product/domain knowledge into a
   Candidate Knowledge Pack, gets human/principal validation, promotes it to an Accepted
   Knowledge Baseline, then requires future product-shaping specs to retrieve and cite that
   baseline. DevKit defines the neutral pattern and artifacts; VT-METHOD requires a declared
@@ -1300,6 +1301,9 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     classes, and engine freshness/health checks.
   - Product knowledge stays in the consuming repo. DevKit carries no vertical-specific
     business content.
+  - If the consuming repo discovers a reusable KDD gap, elevate it to DevKit first.
+    Local experiments must be labelled local/temporary until DevKit defines the canon,
+    template, or gate.
 - **Verificar:**
   - `node <kit>/tools/check-knowledge-pack.mjs tools/knowledge-pack.config.json` is GREEN.
   - Product-shaping/complex/AI-assisted/cross-boundary/new-domain features carry a
@@ -1361,7 +1365,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 39 | Human-surface legibility | ADOPTED / PENDING / N-A | depth-on-demand mechanism + verdict vocabulary per surface |
 | 46 | Launch your first coder (dispatch on-ramp) | ADOPTED / PENDING / N-A(no coders) | launch script + readiness config + prompt template + §3.1 routing |
 | 48 | UI preference persistence | ADOPTED / PENDING / N-A(no UI prefs) | client preference helper + namespace + hydration pattern |
-| 49 | Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate config |
+| 49 | KDD / Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate config |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.

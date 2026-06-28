@@ -1,4 +1,4 @@
-# CANON-KNOWLEDGE-NATIVE-VT-METHOD-001 — Product-shaping work starts from accepted knowledge
+# CANON-KNOWLEDGE-NATIVE-VT-METHOD-001 — Knowledge-Driven Design beneath product work
 
 > **Scope:** every repo where agents specify or execute product-shaping work from business,
 > product, regulatory, operational, vocabulary, scenario, or decision knowledge.
@@ -18,6 +18,8 @@
 
 > **VT-METHOD is knowledge-native: product-shaping work starts from validated
 > knowledge, not from isolated feature requests.**
+
+> **Knowledge-Driven Design (KDD) sits underneath the rest of the product method.**
 
 > **VibeThink is not AI-first. VibeThink is knowledge-native and friendship-native.**
 
@@ -41,6 +43,27 @@ For VibeThink, the default adapter profile is:
 
 Engine output is retrieval evidence. The accepted Markdown Knowledge Pack remains
 the authority.
+
+## 1.0. KDD Layer
+
+KDD is the substrate below feature specification, agent execution, product decisions,
+and implementation planning. It means the project first reconstructs and validates what
+is known, then uses that accepted knowledge to shape what should be built.
+
+Order of authority:
+
+```text
+validated knowledge -> decision gate -> specification -> governed execution -> learning back into knowledge
+```
+
+DevKit owns the reusable KDD pattern: canon, artifact roles, templates, gates, adapter
+contract, and adoption path. Product repos consume it as L3 bindings. A consumer may be
+the first place that exposes a missing generic rule, but it is not the canonical home for
+that rule. Generic gaps are elevated to DevKit first, then consumed back down by
+orchestrators, work bench systems, verticals, and future projects.
+
+KDD does not replace governance. It feeds governance with accepted product/business/domain
+understanding so the decision gate and spec are not operating from isolated feature text.
 
 ## 1.1. VibeThink Identity
 
@@ -209,6 +232,15 @@ Each consuming repo declares:
 The L3 binding points to this canon. It does not copy business/product content into the
 dev-kit.
 
+If an L3 repo discovers a reusable gap in this method, the path is:
+
+```text
+finding/handoff to DevKit -> DevKit canon/template/gate amendment -> L3 adoption
+```
+
+The L3 repo may carry a temporary local implementation while the gap is under review,
+but it must label it as local/temporary and must not present it as the reusable canon.
+
 ## 10. Gate
 
 `check-knowledge-pack.mjs` is a structural gate. It verifies the preconditions for review:
@@ -233,6 +265,7 @@ knowledge. Humans/principals review that.
 - Dumping the whole repo into context instead of selecting the accepted baseline.
 - Requiring packs for trivial fixes.
 - Product-specific knowledge lifted into the dev-kit.
+- Consumer-local KDD canon that should have been elevated to DevKit first.
 - Open questions with no owner/status.
 
 ## 12. Prior-Art Check
@@ -260,4 +293,6 @@ Markdown Knowledge Packs as the auditable source of truth.
 Raised by a VibeThink method handoff on 2026-06-28: agents were correctly producing
 feature specs while missing scattered business/product knowledge that existed across
 chats, specs, decisions, findings, and code. Marcelo authorized a Knowledge-Native
-VT-METHOD path: reconstruct first, validate the pack, then specify.
+VT-METHOD path and then sharpened it as KDD beneath everything else: reconstruct first,
+validate the pack, then specify; define the reusable rule in DevKit before any consumer
+turns it into local canon.
