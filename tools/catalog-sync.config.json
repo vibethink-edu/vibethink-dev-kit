@@ -17,6 +17,10 @@
     {
       "file": "knowledge/ai-agents/CANON-OBSERVABILITY-CLOSED-LOOP-001.md",
       "reason": "DRAFT — INTENTION handed from a consuming product (ViTo, HANDOFF 2026-06-17). Declared as an agnostic working agreement, NOT law. It is formalized by ViTo (front observability-closed-loop, P0->P1->P2); only on validated formalization does the Principal Architect promote it to a sealed canon and register it as an adoptable piece (exemption removed then). Until then it must not block the catalog — but it is not silently absent either."
+    },
+    {
+      "file": "knowledge/ai-agents/CANON-COMM-INTERNAL-VS-EXTERNAL-001.md",
+      "reason": "DRAFT pending Principal Architect seal. The internal/external communication axis is proposed agnostic doctrine, but is not yet an adoptable piece; catalog registration waits for the seal. Until then it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [

@@ -44,7 +44,7 @@ flowchart LR
     CANON_SYSTEM_MIGRATION_DISCIPLINE_001["#47 system migration discipline"]
     CANON_TESTING_GATE["#26 testing gate"]
     CANON_TESTING_MINIMUM_BAR_001["#15 testing minimum bar"]
-    CANON_UI_PREFERENCE_PERSISTENCE_001["ui preference persistence"]
+    CANON_UI_PREFERENCE_PERSISTENCE_001["#48 ui preference persistence"]
     CANON_VERSIONING_001["#16 versioning"]
     CANON_VISUAL_BUG_TRIAGE_001["#14 visual bug triage"]
     VT_METHOD["#10b vt method"]

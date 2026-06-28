@@ -1253,6 +1253,30 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 48 — UI preference persistence (personal view-state client-side) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-UI-PREFERENCE-PERSISTENCE-001.md`.
+
+- **Qué:** a per-user, cosmetic, disposable UI preference (filter default, panel open/closed,
+  view density, last-selected tab, sort direction) is client-side state, not governed
+  configuration and not code. The boundary test is simple: if the next person's wrong value
+  would need audit/admin/explanation, it is governed configuration; otherwise it is personal
+  browser state.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Mechanism is L3** — declare the concrete client store/helper, namespace or cookie prefix,
+    bounded lifetime, post-hydration read pattern, and the catalog of preferences that qualify.
+  - Do not restate the principle in product docs; bind the local storage mechanism to the canon.
+- **Verificar:**
+  - UI preference values are persisted in client-side state (cookie or equivalent), not in the
+    governed configuration/settings store.
+  - The client reads preferences post-hydration; the server render uses the system default.
+  - Preference namespaces are neutral and do not leak a product/vendor brand into sibling systems.
+  - Any scanner/lint or code review checks flag personal view-state written to governed config.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
@@ -1302,6 +1326,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 38 | DB security baseline (Postgres/Supabase) | ADOPTED / PENDING / N-A(non-postgres) | migrations dir + advisor/lint command + CI gate wiring |
 | 39 | Human-surface legibility | ADOPTED / PENDING / N-A | depth-on-demand mechanism + verdict vocabulary per surface |
 | 46 | Launch your first coder (dispatch on-ramp) | ADOPTED / PENDING / N-A(no coders) | launch script + readiness config + prompt template + §3.1 routing |
+| 48 | UI preference persistence | ADOPTED / PENDING / N-A(no UI prefs) | client preference helper + namespace + hydration pattern |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
