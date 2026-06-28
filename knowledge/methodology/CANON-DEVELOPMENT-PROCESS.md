@@ -69,6 +69,11 @@ Not every unit traverses all layers: a trivial change may go
 `gate → briefing → implementation → verification`. Research and strategy enter only
 when new intelligence or new direction is needed.
 
+When a unit is product-shaping, domain-heavy, AI-assisted/model-driven, or otherwise
+depends on business/product knowledge, the process includes a **knowledge baseline**
+between the decision gate and specification. L2/L3 bindings define how that baseline
+is reconstructed, accepted, retrieved, and cited.
+
 ## 5. Lifecycle artifacts
 
 Each unit of work carries durable artifacts so its history survives any single

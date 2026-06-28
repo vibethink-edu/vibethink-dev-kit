@@ -23,7 +23,7 @@ If your repo inherits this kit, these problems stop being yours to remember:
 |---|---|
 | *"Did an agent (or a teammate) quietly break our working rules?"* | the **layering smoke** runs on every PR: all agents and humans read the same root rules — no truncated copies, no contradictory parallel rulebooks. |
 | *"Is this copied script three months stale?"* | the **copy-parity gate** compares every copied runnable against its source and goes red on silent drift — you find out at commit time, not in an incident. |
-| *"Where was the rule about X written?"* | one **catalog** (37 pieces, each with *what you inherit · how · how to verify*) and a **one-page contract** — no archaeology across scattered docs. |
+| *"Where was the rule about X written?"* | one **catalog** (each piece with *what you inherit · how · how to verify*) and a **one-page contract** — no archaeology across scattered docs. |
 | *"What did we actually adopt, and what did we skip?"* | your repo carries a **status doc** with a strict vocabulary, and a validator rejects vague claims — adoption is declared, never folklore. |
 | *"Can we deviate without breaking the model?"* | yes — the contract's **override clause**: declare the rule, your replacement, the reason. Visible deviation is legitimate; silent deviation is the only sin. |
 | *"Did someone paste a secret into an agent-to-agent message?"* | the **comms security gate** scans every outbound message fail-closed before it ever travels. |
@@ -126,6 +126,7 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 7 | Paused work lifecycle | Paused work is either declared-with-intent or reapable after N days — nothing floats forever. |
 | 10a | Development process (universal skeleton) | Governance precedes code: slice → decision gate → spec → governed execution → artifacts; **the plan carries a security section**; **suppressing a gate = a registered, expiring exemption**. |
 | 10b | House methodology (L2 binding) | The kit owner's concrete instantiation of the skeleton (gate questions, spec pipeline). Non-house repos: declare N-A and bind 10a natively. |
+| 49 | Knowledge-native VT-METHOD | Product-shaping work retrieves and cites an Accepted Knowledge Baseline through a declared Knowledge Memory Adapter before spec; VibeThink defaults to Engram + Graphify + Markdown truth. |
 | 37 | Change-path & decision classes | Two questions every change answers up front: **which path** (direct / spec-first / design-gate) and **whose approval** (authority-sealed / delegated-with-record / autonomous). Kills the "do I just do it, or spec it, or ask?" guesswork — and canon changes are always authority-sealed. |
 
 ### ✅ Quality: testing and review

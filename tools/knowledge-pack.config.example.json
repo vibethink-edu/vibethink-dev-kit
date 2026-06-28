@@ -1,0 +1,45 @@
+{
+  "$schema": "VIBETHINK_KNOWLEDGE_PACK_CONFIG_V1",
+  "_about": "Consumer-side binding for CANON-KNOWLEDGE-NATIVE-VT-METHOD-001. DevKit defines method/artifacts; L3 declares roots, triggers, adapter, and optional engines.",
+  "knowledgeRoot": "docs/knowledge",
+  "packs": [],
+  "featureRoots": ["docs/features", "specs"],
+  "requiredPackArtifacts": [
+    "PACK-METADATA.md",
+    "BUSINESS-CONTEXT.md",
+    "PRODUCT-CONTEXT.md",
+    "DOMAIN-VOCABULARY.md",
+    "OPERATING-RULES.md",
+    "DECISION-LINKS.md",
+    "WORKED-SCENARIOS.md",
+    "ANTI-EXAMPLES.md",
+    "OPEN-QUESTIONS.md",
+    "SOURCES.md"
+  ],
+  "knowledgeMemoryAdapter": {
+    "name": "vibethink-default",
+    "required": true,
+    "engines": ["engram", "graphify"],
+    "sourceOfTruth": "versioned-markdown",
+    "freshnessCheck": "L3 declares how Engram/Graphify indexes are checked for staleness; stale or unavailable adapters must surface RED/WARN locally."
+  },
+  "featureKnowledgeBaseline": {
+    "sectionName": "Knowledge Baseline",
+    "requiredFor": ["complex", "product-shaping", "ai-assisted", "cross-boundary", "new-domain"],
+    "requireAdapterCitation": true
+  },
+  "engines": {
+    "engram": {
+      "optional": true,
+      "role": "memory/facts/recall engine for cross-session retrieval; not source of truth"
+    },
+    "graphify": {
+      "optional": true,
+      "role": "graph/indexing engine for relationships, communities, and semantic navigation; not source of truth"
+    },
+    "markdown": {
+      "optional": false,
+      "role": "versioned Knowledge Pack files; auditable source of truth"
+    }
+  }
+}

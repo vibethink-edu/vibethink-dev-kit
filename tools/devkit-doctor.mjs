@@ -107,6 +107,12 @@ const GATES = [
     fix: "a declared unit is missing a required artifact (requirements/plan/roadmap/log/changelog) — add it, or set the section null for a conscious N-A",
   },
   {
+    label: "knowledge packs",
+    engine: "check-knowledge-pack.mjs",
+    targets: ["tools/knowledge-pack.config.json"],
+    fix: "a Knowledge Pack is structurally incomplete, the Knowledge Memory Adapter is undeclared, or a product-shaping/complex feature lacks a retrieved+cited Accepted Knowledge Baseline — add/validate the pack, declare the adapter, or mark the feature N-A",
+  },
+  {
     label: "port assignment",
     engine: "check-ports.mjs",
     targets: ["tools/ports.config.json"],

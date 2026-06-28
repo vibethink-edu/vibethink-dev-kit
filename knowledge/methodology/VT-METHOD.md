@@ -13,10 +13,40 @@ VibeThink Method is governance-driven: *canon comes first* — no code without a
 governing source, no spec without canon alignment, no decision without capture. It
 is the L1 process skeleton instantiated the VibeThink way.
 
+**VT-METHOD is knowledge-native:** product-shaping work starts from validated
+knowledge, not from isolated feature requests. A feature request is an input; the
+accepted product/business/domain baseline is the context from which responsible
+specification starts.
+
+VibeThink is the house method, platform, and operating discipline for building
+knowledge-native vertical systems with agents. DevKit is its technical and
+methodological constitution: it does not carry each vertical's business knowledge,
+but it defines how that knowledge is reconstructed, validated, persisted, retrieved,
+and made binding before execution.
+
+Identity layers:
+
+- **VibeThink as method:** the way of building software where business knowledge,
+  decisions, rules, real cases, and operating memory are part of the system.
+- **VibeThink as platform:** DevKit, the work bench layer, Graphify, Engram, the
+  orchestrator, and agents provide memory, traceability, governance, and intelligent
+  assistance.
+- **Relational assistant plane:** the assistant/orchestration layer understands
+  people, relationships, conversations, context, signals, assistance, and coordination.
+  It accompanies and orchestrates verticals; it does not replace them.
+- **Verticals as products:** each vertical knows its own domain while inheriting
+  method, governance, memory, agents, and tooling from VibeThink.
+
+For VibeThink repos, the declared **Knowledge Memory Adapter** defaults to Engram
+for memory/facts/recall, Graphify for graph relationships/communities/semantic
+navigation, and versioned Markdown Knowledge Packs as the auditable source of truth.
+Product-shaping work may not start until the agent has retrieved and cited the
+Accepted Knowledge Baseline through that declared adapter.
+
 ## How VT-Method works — read this first
 
 You have something to build. VT-Method is the path from idea to a verified result,
-in six steps:
+in seven steps:
 
 1. **Slice it** — cut the work into the smallest piece that ships and stands on its own.
 2. **Decision gate** — measure impact and risk: trivial or heavy? That decides how
@@ -28,9 +58,16 @@ in six steps:
    source, or cross-tenant boundary, stop and classify the decision first. If it
    needs an ADR/canon update, write that record before implementation; do not wait
    for the human to request it.
-3. **Specify** — write the contract at the chosen weight: a short briefing, or a
+3. **Knowledge baseline** — for product-shaping, complex, AI-assisted/model-driven,
+   cross-boundary, or new-domain work, reconstruct or cite the accepted Knowledge
+   Baseline before specifying. The baseline must be retrieved and cited through the
+   repo's declared Knowledge Memory Adapter. If no accepted baseline exists, run a
+   Knowledge Reconstruction Sprint: sweep declared sources, produce a Candidate
+   Knowledge Pack, get human/principal validation, and promote it to Accepted
+   Knowledge Baseline. Trivial fixes may declare `Knowledge Baseline: N/A`.
+4. **Specify** — write the contract at the chosen weight: a short briefing, or a
    full spec. Heavier risk → heavier spec. Never quietly skip a level.
-4. **Execute, governed** — the author gives exact orders + a checklist; the builder
+5. **Execute, governed** — the author gives exact orders + a checklist; the builder
    implements and raises blockers; the author verifies against the checklist. If the
    builder is an **autonomous coder**, dispatch it through the coder spine — the launch
    runbook + identity PREP, never improvised — after confirming the launch-surface is
@@ -39,10 +76,12 @@ in six steps:
    (`CANON-TESTING-GATE`) maps the unit's *nature × stakes* to the type(s) required
    (unit · contract · smoke · CLI · self-test · UAT · eval · e2e). The test travels
    in the **same change** as the code it verifies; TDD is permitted, not mandated.
-5. **Leave the trail** — the lifecycle artifacts (requirements, readiness plan,
+6. **Leave the trail** — the lifecycle artifacts (requirements, readiness plan,
    append-only log, roadmap, changelog) so the next person understands without asking.
-6. **Findings** — see something off outside your scope? Record it as a finding —
-   never fix it silently, never lose it.
+7. **Findings / learning** — see something off outside your scope? Record it as a
+   finding — never fix it silently, never lose it. If the work teaches durable
+   product/business knowledge, update or supersede the Knowledge Baseline instead of
+   leaving the lesson in chat.
 
 > **Golden rule:** governance first — canon beats everything, and nothing is built
 > without passing the gate.
@@ -66,6 +105,7 @@ The key insight: the research never became the health code — it *informed* it.
 |-----------|-------------------|
 | **Governance** | tiered canon (`SEALED → CANON → DRAFT`) under a single Canon Index; one named approver (the Principal Architect) |
 | **Decision gate** | the **3-Gate Preflight**: structural-impact questions (SI count) + author clarity + a security-surface modifier → methodology choice |
+| **Knowledge baseline** | Knowledge-Native VT-METHOD: complex/product-shaping work retrieves and cites an Accepted Knowledge Baseline through the declared Knowledge Memory Adapter before spec; missing baseline triggers a Knowledge Reconstruction Sprint (`CANON-KNOWLEDGE-NATIVE-VT-METHOD-001`) |
 | **Specification pipeline** | **Direct Execution** (default — briefing + V-xx matrix) · **structured spec-kit** (complex discovery) · **interchange-spec** (laboratory) |
 | **Governed execution** | author briefing → executor implements → author verifies against the V-xx matrix, over the shared comms channel. Each work-unit carries a `Verification: <type(s)>` field selected by the verification gate (`CANON-TESTING-GATE`) — methodology-agnostic: the field lives in the spec's task list *or* in the briefing's V-xx matrix. The test ships in the same change; depth scales with stakes (no global coverage number) |
 | **Lifecycle artifacts** | PRD · deployment/readiness plan · **decision record (ADR)** · append-only log · roadmap · **per-package** changelog |
@@ -85,6 +125,8 @@ The concrete instantiation lives in each product repo and never rises to L1/L2:
 - the exact decision-gate questions and their impact categories,
 - the specific spec-kit command set and external-tool cherry-picks,
 - the product's own canon set and named-approver identity,
+- the product's Knowledge Packs, accepted business/product/domain baselines, and
+  concrete adapter health/freshness checks,
 - durable front-memory mechanics and product comms specifics,
 - **any product vocabulary and domain model** (a product's business concepts stay
   entirely in that product's repo).
