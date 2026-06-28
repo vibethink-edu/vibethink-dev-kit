@@ -127,9 +127,15 @@ bash setup/check-tools.sh <ruta-al-repo>
 >   midió **~6 s**. El nudge da el comando scoped, jamás auto-rebuildea (caro).
 > - **Safety en el mensaje:** local/no-LLM por default — sin `GEMINI/GOOGLE_API_KEY` no sale
 >   código a un LLM externo (el enriquecimiento semántico SÍ enviaría el código).
-> - **Implementación de referencia:** `scripts/graphify-staleness.mjs` (consumidor) +
->   `setup/templates/hooks/graphify-staleness.mjs` (template agnóstico) — provisionable por
->   `install-external-tools` (auto-wire al `settings.json` del consumidor = build-on-pain, después).
+> - **Dos nudges complementarios (SessionStart):** (a) **freshness del grafo** —
+>   `graphify-staleness.mjs`; (b) **tools cargadas** — `operator-tools-health.mjs` (chequea que
+>   graphify/engram/rtk **resuelvan por nombre**; atrapa el gotcha "instalado ≠ disponible" del
+>   PATH que dejó ejecutores reportando `unavailable`). Ambos: fs/spawn-light, `exit 0`, nunca
+>   bloquean, silenciosos cuando todo está bien.
+> - **Implementación de referencia:** `scripts/{graphify-staleness,operator-tools-health}.mjs`
+>   (consumidor) + `setup/templates/hooks/{graphify-staleness,operator-tools-health}.mjs` (templates
+>   agnósticos) — provisionables por `install-external-tools` (auto-wire al `settings.json` del
+>   consumidor = build-on-pain, después).
 >
 > **Aplica a los 3 operator-tools (no solo graphify) — mismo patrón de nudge activo:**
 > - **engram (memoria · stateful → costo MAYOR: lo no-grabado se pierde):** SessionStart →
