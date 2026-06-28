@@ -166,7 +166,9 @@ verifica · Layer**.
 - **Qué:** the protocol that removes the human from the message bus — addressed
   comms in a shared lane, inbox surfacing per agent, feed for ambient visibility,
   the human-actionable "compass" shape, and the dual-layer router message
-  (human-decides + paste-able agent block).
+  (human-decides + paste-able agent block). It also defines multi-model routing:
+  role, adapter, model, auth mode, capability, gates, evidence, review policy,
+  and human approval stay separate before launching subagents on different models.
 - **Cómo:**
   - Docs **by reference** — your `AGENTS.md` points to the canon, never copies it.
   - Engines **by verbatim copy** — copy `tools/inbox.mjs` and `tools/feed.mjs`
@@ -180,6 +182,10 @@ verifica · Layer**.
     (`from`, `to_agent`, `repo`, `target_layer` when governance, `ref_branch`,
     `tldr`, `action`, `reversible`, `on_no_reply`); first line of the file is the
     `---` block (no leading HTML comment).
+  - **Multi-model routing discipline (§3.2):** if the repo launches subagents on
+    multiple model/runtime routes, bind the local adapter using
+    `setup/templates/multi-model-routing/`; do not collapse the route to a model
+    name.
 - **Verificar:**
   - `node scripts/inbox.mjs <agent>` shows your open items.
   - A test comm round-trips: send → recipient inbox surfaces it → close → inbox
@@ -187,6 +193,8 @@ verifica · Layer**.
   - Schema v2 self-check: pick a recent comm; confirm `to_agent` is a **base
     token** (not `codex-rev`), front-matter is flat (no nested `ref:` map), and
     the file's first non-whitespace line is `---`.
+  - A recent multi-model/subagent launch carries the `ROUTE`, `GATES`, `EVIDENCE`,
+    and `REVIEW` lines required by §3.2.
 
 ### 4 — Session closeout & hygiene scan
 
@@ -497,14 +505,17 @@ verifica · Layer**.
 **Layer:** L1 (neutral).
 **Home:** `knowledge/methodology/CANON-VERSIONING-001.md`.
 
-- **Qué:** the 5-type artifact model — **code packages** (SemVer 2.0 + Changesets), **deployed apps** (CalVer or SemVer with `/healthz` version exposure), **canon docs** (sequential NNN + lifecycle DRAFT→PROPOSED→ACCEPTED→SEALED→AMENDED→SUPERSEDED-BY|DEPRECATED), **ADRs** (immutable filename `ADR-YYYYMMDD-slug` + status transitions PROPOSED→ACCEPTED→SUPERSEDED-BY|DEPRECATED, body immutable after ACCEPTED), **tools/scripts** (SemVer-lite `MAJOR.MINOR`). Universal driver: Conventional Commits with mandatory `!` for breaking changes.
+- **Qué:** the 5-type artifact model — **code packages** (SemVer 2.0 + Changesets), **deployed apps** (CalVer or SemVer with `/healthz` version exposure), **canon docs** (sequential NNN + lifecycle DRAFT→PROPOSED→ACCEPTED→SEALED→AMENDED→SUPERSEDED-BY|DEPRECATED), **ADRs** (immutable filename `ADR-YYYYMMDD-slug` + status transitions PROPOSED→ACCEPTED→SUPERSEDED-BY|DEPRECATED, body immutable after ACCEPTED), **tools/scripts** (SemVer-lite `MAJOR.MINOR`). Universal driver: Conventional Commits with mandatory `!` for breaking changes. The decision gate also carries the mandatory pre-implementation `VERSIONING: ...` verdict (§10.1).
 - **Cómo:**
   - Docs by reference — your `AGENTS.md` points to the canon.
-  - Per-repo binding declared in a single file (e.g. `.versioning.yaml`) with: packages model + manager, apps model + pattern, canons numbering + approver, ADRs folder + pattern + immutability flag, tools model.
+  - Per-repo binding declared in a single file (e.g. `.versioning.yaml`) with: packages model + manager, apps model + pattern, canons numbering + approver, ADRs folder + pattern + immutability flag, tools model, and `impact_gate` statuses.
   - **Tools/scripts — enforcement shipped by the kit (so this norm bites for every heir, not just the kit).** Declare a `tools/versions.json` manifest (the kit's own is the worked example) listing every wired runnable (`tools/`+`setup/`: `.mjs`/`.sh`/`.ps1`) at `MAJOR.MINOR`. The kit's `tools/check-tool-versions.mjs` then verifies every runnable is declared (and no stale/malformed entry), and **`devkit-doctor` runs it automatically** — config-driven: a repo with no manifest is skipped (declare `N-A` if it has no custom runnables), one with a manifest is gated. Run from the mount; nothing copied.
+  - **Versioning Impact — enforcement shipped by the kit.** `tools/check-versioning.mjs` verifies that `tools/versioning.config.json` declares the mandatory `impactGate` vocabulary. The concrete task/PR classifier is L3; the canonical statuses are L1.
   - Optional CI enforcement for the other types: `commitlint`, changeset bot, canon header validation, ADR immutability gate, changelog mandatory, health-endpoint version check. (Canon-doc lifecycle vocabulary is already gated by `catalog-sync` here.)
 - **Verificar:**
   - The per-repo binding file exists and declares each artifact type's model.
+  - A recent task/PR has exactly one pre-implementation line:
+    `VERSIONING: <status> — authority=<binding>; evidence=<paths/surfaces>; required=<artifact-or-reason>`.
   - **`devkit-doctor` shows the `tool versions` gate green** (every wired runnable is in `tools/versions.json`) — or the repo has no custom runnables and consciously declares `N-A`.
   - A recent breaking change in a publishable package carries `!` in its commit message.
   - A recent ADR with status change to `SUPERSEDED-BY` has a body diff of zero lines (only status header touched).

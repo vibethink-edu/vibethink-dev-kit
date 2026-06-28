@@ -2,5 +2,19 @@
   "_about": "This kit's own versioning posture for tools/check-versioning.mjs (CANON-VERSIONING-001). The dev-kit ships NO deployed app and publishes NO package — it is a governance supra-repo consumed by fork. Its canon docs (sequential NNN) and tools (tools/versions.json, check-tool-versions) have their own gates. So apps + packages are a conscious N-A here; the instrument's teeth bite in the CONSUMERS (apps like the workbench). See tools/versioning.config.example.json for a wired consumer.",
   "binding": null,
   "apps": { "model": null, "_na": "the dev-kit is not a deployed app" },
-  "packages": { "model": null, "_na": "the dev-kit publishes no package; it is consumed by fork" }
+  "packages": { "model": null, "_na": "the dev-kit publishes no package; it is consumed by fork" },
+  "impactGate": {
+    "required": true,
+    "authority": "knowledge/methodology/CANON-VERSIONING-001.md#10.1",
+    "statuses": [
+      "VERSIONING: N/A",
+      "VERSIONING: DECLARED-NO-BUMP",
+      "VERSIONING: REQUIRES-CHANGESET",
+      "VERSIONING: REQUIRES-CALVER-DEPLOY",
+      "VERSIONING: REQUIRES-CANON-AMENDMENT",
+      "VERSIONING: REQUIRES-ADR-STATUS-ONLY",
+      "VERSIONING: REQUIRES-TOOL-VERSION",
+      "VERSIONING: BLOCKED-CONFLICT"
+    ]
+  }
 }

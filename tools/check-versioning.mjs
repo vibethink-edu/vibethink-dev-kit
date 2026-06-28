@@ -15,6 +15,9 @@
  *     A model declared with no live source is exactly the frozen-version trap.
  *   - For a package, the declared manifest must exist and carry a `version` field.
  *   - The per-repo binding (canon §10) must exist and be non-empty when declared.
+ *   - The Versioning Impact pre-implementation gate is declared with the canonical
+ *     status vocabulary from canon §10.1. This gate classifies the task/PR before
+ *     execution; the concrete diff classifier is L3.
  *   - A field set to `null` is a CONSCIOUS N-A — reported, never a failure.
  *   - No config at all → the gate does not apply (the doctor skips it).
  *
@@ -25,7 +28,8 @@
  *   {
  *     "binding": ".versioning.yaml" | null,
  *     "apps":     { "model": "calver"|"semver"|null, "versionSource": "tools/get-app-version.mjs"|null, "pattern": "YYYY.MM.DD+sha" },
- *     "packages": { "model": "semver-2.0"|null, "manifest": "package.json" }
+ *     "packages": { "model": "semver-2.0"|null, "manifest": "package.json" },
+ *     "impactGate": { "required": true, "authority": ".versioning.yaml", "statuses": ["VERSIONING: N/A", "..."] }
  *   }
  *
  * Usage:  node tools/check-versioning.mjs [config-path]   (default: tools/versioning.config.json)
@@ -40,6 +44,16 @@ const configPath = process.argv[2] || "tools/versioning.config.json";
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
 const red = (s) => `\x1b[31m${s}\x1b[0m`;
 const bold = (s) => `\x1b[1m${s}\x1b[0m`;
+const VERSIONING_IMPACT_STATUSES = [
+  "VERSIONING: N/A",
+  "VERSIONING: DECLARED-NO-BUMP",
+  "VERSIONING: REQUIRES-CHANGESET",
+  "VERSIONING: REQUIRES-CALVER-DEPLOY",
+  "VERSIONING: REQUIRES-CANON-AMENDMENT",
+  "VERSIONING: REQUIRES-ADR-STATUS-ONLY",
+  "VERSIONING: REQUIRES-TOOL-VERSION",
+  "VERSIONING: BLOCKED-CONFLICT",
+];
 
 function fail(msg) {
   console.error(`✗ check-versioning — ${msg}`);
@@ -145,6 +159,38 @@ if (!pkgs.model) {
   }
 }
 
+// 4. Versioning Impact — mandatory task/PR preflight gate; N/A is a per-task status,
+// not a repo-level skip. The implementation is L3; the contract and vocabulary are L1.
+const impactGate = cfg?.impactGate;
+if (!impactGate || typeof impactGate !== "object") {
+  problems++;
+  console.log(
+    `  ${red("✗")} impact gate            missing — declare the mandatory Versioning Impact preflight gate (use VERSIONING: N/A per task when no artifact is touched)`
+  );
+} else {
+  const statusSet = new Set(Array.isArray(impactGate.statuses) ? impactGate.statuses : []);
+  const missingStatuses = VERSIONING_IMPACT_STATUSES.filter((s) => !statusSet.has(s));
+  if (impactGate.required !== true) {
+    problems++;
+    console.log(
+      `  ${red("✗")} impact gate            required must be true (the gate is mandatory before implementation)`
+    );
+  } else if (!impactGate.authority || typeof impactGate.authority !== "string") {
+    problems++;
+    console.log(
+      `  ${red("✗")} impact gate            authority must point at the repo versioning binding (for example .versioning.yaml)`
+    );
+  } else if (missingStatuses.length) {
+    problems++;
+    console.log(
+      `  ${red("✗")} impact gate            missing canonical status(es): ${missingStatuses.join(", ")}`
+    );
+  } else {
+    wired++;
+    console.log(`  ${green("✓")} impact gate            ${impactGate.authority}`);
+  }
+}
+
 console.log(`\n${bold("─".repeat(60))}`);
 console.log(
   `${bold("Wired:")} ${green(String(wired))}   ${bold("N-A:")} ${na}   ${bold("Not wired:")} ${problems ? red(String(problems)) : "0"}`
@@ -153,14 +199,14 @@ console.log(`${bold("─".repeat(60))}`);
 
 if (problems) {
   console.log(
-    `${red(bold(`\nRED — ${problems} declared versioning model(s) not wired to a live source.`))} (wire the source, or set the model null for a conscious N-A.)\n`
+    `${red(bold(`\nRED — ${problems} versioning declaration problem(s).`))} (wire live sources, declare the impact gate, or set artifact models null for a conscious N-A.)\n`
   );
   process.exit(1);
 }
 console.log(
   green(
     bold(
-      "\nGREEN — every declared versioning model is wired to a live source (CANON-VERSIONING-001).\n"
+      "\nGREEN — every declared versioning model is wired and the impact gate is declared (CANON-VERSIONING-001).\n"
     )
   )
 );

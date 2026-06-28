@@ -30,7 +30,8 @@ source; no decision without capture.
    verifiable, delivering value by itself. (Too big hides risk inside one gate; too
    small fragments the trail. The slice is the unit the gate, the spec, and the
    artifacts all attach to.) Then, before each slice, a **decision gate** measures
-   structural impact and author clarity and selects how much specification ceremony
+   structural impact, author clarity, executor route, and **versioning impact**
+   (`CANON-VERSIONING-001` §10.1), and selects how much specification ceremony
    the work warrants — **presented and waiting for an explicit GO**, never
    self-cleared. A security modifier raises the bar when sensitive surfaces are touched.
 3. **Specification pipeline** — the chosen ceremony produces the contract: a
