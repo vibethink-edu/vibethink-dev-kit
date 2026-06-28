@@ -51,6 +51,10 @@ test("--json → valid shape", () => {
   assert.equal(code, 0);
   const j = JSON.parse(out);
   assert.equal(j.verdict, "GREEN");
+  assert.ok(j.externalTools, "external tools health must be explicit in JSON");
+  assert.equal(j.externalTools.blocking, false, "external tools stay non-blocking for product correctness");
+  assert.ok(j.inheritedBrain, "inherited brain health must be explicit in JSON");
+  assert.match(j.inheritedBrain.status, /^(OK|WARN|RED)$/);
   assert.equal(typeof j.failed, "number");
   assert.ok(Array.isArray(j.gates), "gates must be an array");
 });

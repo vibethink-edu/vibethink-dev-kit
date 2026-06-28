@@ -34,7 +34,7 @@ try {
   const days = Math.floor((Date.now() - fs.statSync(graph).mtimeMs) / 86_400_000);
   if (days > STALE_DAYS) {
     console.log(
-      `🕸️ graphify: the root code graph is ${days}d stale, and a whole-repo refresh is slow (\`graphify update .\` measured >9min on a large repo). To trace/audit an area, do NOT rebuild the monorepo: run \`graphify update <subdir>\` (~seconds, writes a per-area graph) and query that one. Local by default — without GEMINI/GOOGLE_API_KEY no code leaves the machine.`
+      `🕸️ graphify: the root code graph is ${days}d stale. Do NOT read/query it as current. To trace/audit an area, update first with \`graphify update <subdir>\` (~seconds) and query that fresh scoped graph. Do NOT rebuild the monorepo by default (\`graphify update .\` measured >9min on a large repo). Local by default — without GEMINI/GOOGLE_API_KEY no code leaves the machine.`
     );
   }
 } catch (_) {

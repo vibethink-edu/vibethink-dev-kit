@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 38 spines · 84 declared relationships.
+> 41 spines · 89 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -12,6 +12,7 @@ flowchart LR
     CANON_ARCHITECTURE_REVIEW["#24 architecture review"]
     CANON_CODER_ORCHESTRATION_001["#36 coder orchestration"]
     CANON_CODER_SAFE_IDENTITY_001["#35 coder safe identity"]
+    CANON_COMM_INTERNAL_VS_EXTERNAL_001["comm internal vs external"]
     CANON_CONTEXT_HYGIENE["#20 context hygiene"]
     CANON_CROSS_AGENT_CONTEXT_LAYERING["#2 cross agent context layering"]
     CANON_MULTI_AGENT_ORCHESTRATION["#4 multi agent orchestration"]
@@ -40,8 +41,10 @@ flowchart LR
     CANON_PORT_ASSIGNMENT_001["#41 port assignment"]
     CANON_PRODUCTION_SAFETY["#30 production safety"]
     CANON_STATE_MIRROR_AND_DECISION_REGISTER_001["#34 state mirror and decision register"]
+    CANON_SYSTEM_MIGRATION_DISCIPLINE_001["#47 system migration discipline"]
     CANON_TESTING_GATE["#26 testing gate"]
     CANON_TESTING_MINIMUM_BAR_001["#15 testing minimum bar"]
+    CANON_UI_PREFERENCE_PERSISTENCE_001["#48 ui preference persistence"]
     CANON_VERSIONING_001["#16 versioning"]
     CANON_VISUAL_BUG_TRIAGE_001["#14 visual bug triage"]
     VT_METHOD["#10b vt method"]
@@ -127,8 +130,13 @@ flowchart LR
   CANON_STATE_MIRROR_AND_DECISION_REGISTER_001 --- CANON_DEVELOPMENT_PROCESS
   CANON_STATE_MIRROR_AND_DECISION_REGISTER_001 --- CANON_CONTEXT_HYGIENE
   CANON_STATE_MIRROR_AND_DECISION_REGISTER_001 --- CANON_AUDIT_PROTOCOL
+  CANON_SYSTEM_MIGRATION_DISCIPLINE_001 --- CANON_DATA_CHANGE_AUDIT_001
+  CANON_SYSTEM_MIGRATION_DISCIPLINE_001 --- CANON_DATA_LEGAL_COMPLIANCE_001
+  CANON_SYSTEM_MIGRATION_DISCIPLINE_001 --- CANON_DB_SECURITY_BASELINE_001
   CANON_TESTING_MINIMUM_BAR_001 --- CANON_VISUAL_BUG_TRIAGE_001
   CANON_TESTING_MINIMUM_BAR_001 --- CANON_DEVELOPMENT_PROCESS
+  CANON_UI_PREFERENCE_PERSISTENCE_001 --- CANON_CONFIGURATION_DISCIPLINE
+  CANON_UI_PREFERENCE_PERSISTENCE_001 --- CANON_PRODUCTION_SAFETY
   CANON_VERSIONING_001 --- CANON_DECISION_DISPOSITION_FOR_GRAPH_INDEXING
   CANON_VERSIONING_001 --- CANON_DEVELOPMENT_PROCESS
   VT_METHOD --- CANON_DEVELOPMENT_PROCESS
@@ -142,3 +150,5 @@ flowchart LR
 Grouped by `knowledge/` domain. An edge = "these two canons explicitly reference each
 other as companions/siblings" — the seams where one canon says *that concern is owned
 there, not here*.
+
+_Spines with no declared header relationship (standalone): comm internal vs external._
