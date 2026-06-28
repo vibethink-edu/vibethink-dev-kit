@@ -15,8 +15,12 @@
  * Per-repo binding: the TOOLS list (the operator-tools this repo provisions).
  */
 import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 const TOOLS = ["graphify", "engram", "rtk"];
+const ENGRAM_STALE_DAYS = 7;
 const missing = [];
 
 for (const t of TOOLS) {
@@ -27,6 +31,24 @@ for (const t of TOOLS) {
     // but `--version` failed → still "loaded", ignore.
     if (e && e.code === "ENOENT") missing.push(t);
   }
+}
+
+const engramDb = path.join(os.homedir(), ".engram", "engram.db");
+try {
+  if (!fs.existsSync(engramDb)) {
+    console.log(
+      "🧠 engram memory NOT active: ~/.engram/engram.db is missing. Run `engram setup <agent>`, verify `engram save/search`, or restore from `engram export`/sync before relying on recall."
+    );
+  } else {
+    const days = Math.floor((Date.now() - fs.statSync(engramDb).mtimeMs) / 86_400_000);
+    if (days > ENGRAM_STALE_DAYS) {
+      console.log(
+        `🧠 engram memory looks stale (${days}d since DB activity). Do NOT assume recall is current: run \`engram search <topic>\`, \`engram doctor\`, and export/sync before treating memory as healthy.`
+      );
+    }
+  }
+} catch (_) {
+  // never block session start
 }
 
 if (missing.length) {

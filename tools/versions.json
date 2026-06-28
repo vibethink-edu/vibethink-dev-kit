@@ -23,7 +23,7 @@
     "devkit-doctor.mjs": "1.6",
     "devkit-upgrade.mjs": "1.3",
     "engram-weekly-review.sh": "1.0",
-    "external-tools-health.mjs": "1.0",
+    "external-tools-health.mjs": "1.1",
     "feed.mjs": "1.0",
     "graph-canon.mjs": "1.0",
     "inbox.mjs": "1.0",

@@ -131,6 +131,10 @@ node tools/external-tools-health.mjs --json       # salud de tools registradas e
 > - **Estándar: nudge ACTIVO, no pasivo.** Un hook `SessionStart` (fs-only, `exit 0`, nunca
 >   bloquea) detecta que el grafo está stale y **redirige al patrón scoped** — nunca a rebuildear
 >   el monorepo.
+> - **Grafo stale = NO se lee como fuente viva.** Si `graphify-out/graph.json` está
+>   viejo o falta, la sesión debe chillar antes de usarlo: actualizar scoped primero
+>   (`graphify update <subdir>`), y recién ahí consultar. Un grafo viejo orienta con
+>   código viejo; silencio ahí es peor que no tener grafo.
 > - **Scoped, NO whole-repo (medido).** `graphify update .` (todo el repo) midió **>9 min,
 >   all-or-nothing, sin terminar** en un repo grande (~12k archivos); `graphify update <subdir>`
 >   midió **~6 s**. El nudge da el comando scoped, jamás auto-rebuildea (caro).
@@ -149,7 +153,9 @@ node tools/external-tools-health.mjs --json       # salud de tools registradas e
 > **Aplica a los 3 operator-tools (no solo graphify) — mismo patrón de nudge activo:**
 > - **engram (memoria · stateful → costo MAYOR: lo no-grabado se pierde):** SessionStart →
 >   recordá *recall* (`engram search <tema>`); al sellar decisión/hallazgo → recordá `engram save`
->   (no solo en chat).
+>   (no solo en chat). Si la DB `~/.engram` está vieja o no registra actividad reciente, no asumir
+>   recall activo: chillar, correr `engram doctor`, buscar un tema conocido, y respaldar/sincronizar
+>   (`engram export` / `engram sync`) antes de tratar la memoria como saludable.
 > - **rtk (economía de tokens):** trigger distinto — cuando vayas a pipear un build/test largo,
 >   usá `rtk` en vez de `head`/`tail` (se dispara al correr el comando ruidoso, no al inicio).
 >

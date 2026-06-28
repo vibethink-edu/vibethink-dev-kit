@@ -7,7 +7,7 @@
  * the kit expects agents to use by default?
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import os from "node:os";
 import path, { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -61,6 +61,14 @@ function safeExists(p, exists = existsSync) {
     return exists(p);
   } catch {
     return false;
+  }
+}
+
+function safeStat(p) {
+  try {
+    return statSync(p);
+  } catch {
+    return null;
   }
 }
 
@@ -156,6 +164,11 @@ function candidateKnownDirs(tool, env, platform, home) {
   return uniq(dirs);
 }
 
+function candidateDataDirs(tool, env, platform, home) {
+  const homes = userHomes(env, platform, home);
+  return uniq(expandTilde(tool.dataDir || "", homes));
+}
+
 function findInKnownDirs(tool, opts) {
   const exists = opts.exists || existsSync;
   const dirs = candidateKnownDirs(tool, opts.env, opts.platform, opts.home);
@@ -232,6 +245,157 @@ function remediation(tool, state, expectedPaths) {
   return lines;
 }
 
+function severityMax(a, b) {
+  const rank = { ok: 0, warn: 1, error: 2 };
+  return (rank[b] || 0) > (rank[a] || 0) ? b : a;
+}
+
+function daysSince(ms, now = Date.now()) {
+  return Math.floor((now - ms) / 86_400_000);
+}
+
+function newestMtimeUnder(dir, limit = 200) {
+  if (!safeExists(dir)) return null;
+  const stack = [dir];
+  let newest = null;
+  for (let i = 0; i < stack.length && i < limit; i++) {
+    const current = stack[i];
+    let entries = [];
+    try {
+      entries = readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = joinTarget(current, entry.name);
+      if (entry.isDirectory()) stack.push(full);
+      else {
+        const fst = safeStat(full);
+        if (fst && (!newest || fst.mtimeMs > newest.mtimeMs)) newest = { path: full, mtimeMs: fst.mtimeMs };
+      }
+    }
+  }
+  return newest;
+}
+
+function graphifyActivity(tool, result, opts) {
+  if (tool.name !== "graphify") return null;
+  const staleDays = Number(opts.env.GRAPHIFY_STALE_DAYS || 3);
+  const graph = join(opts.cwd, "graphify-out", "graph.json");
+  const st = safeStat(graph);
+  if (!st) {
+    return {
+      status: "WARN",
+      state: "artifact-missing",
+      path: graph,
+      ageDays: null,
+      message: "graphify graph is missing; do not rely on graphify orientation until a scoped graph is built",
+      remediation: [
+        "run graphify update <subdir> before using graphify for code navigation",
+        "do not rebuild the whole monorepo unless that is deliberately scoped and affordable",
+      ],
+    };
+  }
+  const ageDays = daysSince(st.mtimeMs, opts.now);
+  if (ageDays > staleDays) {
+    return {
+      status: "WARN",
+      state: "artifact-stale",
+      path: graph,
+      ageDays,
+      message: `graphify graph is ${ageDays}d old; do not read it as current`,
+      remediation: [
+        `run graphify update <subdir> before relying on graphify (stale threshold: ${staleDays}d)`,
+        "prefer scoped update over graphify update .",
+      ],
+    };
+  }
+  return {
+    status: "OK",
+    state: "artifact-fresh",
+    path: graph,
+    ageDays,
+    message: `graphify graph is fresh (${ageDays}d old)`,
+    remediation: [],
+  };
+}
+
+function engramActivity(tool, result, opts) {
+  if (tool.name !== "engram" && !tool.stateful) return null;
+  const staleDays = Number(opts.env.ENGRAM_STALE_DAYS || 7);
+  const dataDirs = candidateDataDirs(tool, opts.env, opts.platform, opts.home);
+  const existing = dataDirs.find((d) => safeExists(d));
+  if (!existing) {
+    return {
+      status: "WARN",
+      state: "memory-missing",
+      path: dataDirs[0] || null,
+      ageDays: null,
+      message: "engram memory store is missing; recall is not active for this operator",
+      remediation: [
+        "run engram setup for the current agent and verify engram save/search",
+        "if this machine should carry prior memory, restore it from engram export/sync backup",
+      ],
+    };
+  }
+  const newest = newestMtimeUnder(existing);
+  if (!newest) {
+    return {
+      status: "WARN",
+      state: "memory-empty",
+      path: existing,
+      ageDays: null,
+      message: "engram memory store exists but no readable activity was found",
+      remediation: ["run engram doctor and save/search a known fact before relying on recall"],
+    };
+  }
+  const ageDays = daysSince(newest.mtimeMs, opts.now);
+  if (ageDays > staleDays) {
+    return {
+      status: "WARN",
+      state: "memory-stale",
+      path: newest.path,
+      ageDays,
+      message: `engram memory activity is ${ageDays}d old; recall may be stale or inactive`,
+      remediation: [
+        `run engram search <topic> before relying on recall (stale threshold: ${staleDays}d)`,
+        "run engram doctor and export/sync backup before treating memory as healthy",
+      ],
+    };
+  }
+  return {
+    status: "OK",
+    state: "memory-recent",
+    path: newest.path,
+    ageDays,
+    message: `engram memory activity is recent (${ageDays}d old)`,
+    remediation: [],
+  };
+}
+
+function applyActivity(tool, result, opts) {
+  const activity = graphifyActivity(tool, result, opts) || engramActivity(tool, result, opts);
+  if (!activity) return result;
+  const activitySeverity =
+    activity.status === "OK" ? "ok" : activity.status === "WARN" ? "warn" : "error";
+  const severity = severityMax(result.severity, activitySeverity);
+  const state =
+    severity === result.severity && result.severity !== "ok"
+      ? result.state
+      : activity.status === "OK"
+        ? result.state
+        : activity.state;
+  return {
+    ...result,
+    severity,
+    state,
+    message:
+      activity.status === "OK" ? result.message : `${result.message}; ${activity.message}`,
+    remediation: [...(result.remediation || []), ...(activity.remediation || [])],
+    activity,
+  };
+}
+
 function detectTool(tool, opts) {
   const run = opts.run;
   const expectedPaths =
@@ -241,7 +405,7 @@ function detectTool(tool, opts) {
 
   const canonical = runOk(run, tool.cli, ["--version"], opts);
   if (canonical.ok) {
-    return {
+    return applyActivity(tool, {
       name: tool.name,
       cli: tool.cli,
       pin: tool.pin,
@@ -253,14 +417,14 @@ function detectTool(tool, opts) {
       message: `${tool.cli} resolves by canonical name`,
       remediation: [],
       expectedPaths,
-    };
+    }, opts);
   }
 
   const onPath = findExecutableOnPath(tool.cli, opts);
   if (onPath) {
     const suffixed = runOk(run, onPath.path, ["--version"], opts);
     if (suffixed.ok) {
-      return {
+      return applyActivity(tool, {
         name: tool.name,
         cli: tool.cli,
         pin: tool.pin,
@@ -277,14 +441,14 @@ function detectTool(tool, opts) {
           ...expectedPaths,
         ]),
         expectedPaths: uniq([dirnameTarget(onPath.path), ...expectedPaths]),
-      };
+      }, opts);
     }
   }
 
   if (tool.kind === "pip") {
     const pkg = pipShow(tool.package, opts);
     if (pkg.installed) {
-      return {
+      return applyActivity(tool, {
         name: tool.name,
         cli: tool.cli,
         pin: tool.pin,
@@ -296,13 +460,13 @@ function detectTool(tool, opts) {
         message: `${tool.package} ${pkg.version || "?"} installed via ${pkg.via}, but ${tool.cli} is not in PATH`,
         remediation: remediation(tool, "installed-not-in-path", expectedPaths),
         expectedPaths,
-      };
+      }, opts);
     }
   } else {
     const known = findInKnownDirs(tool, opts);
     if (known) {
       const knownRun = runOk(run, known, ["--version"], opts);
-      return {
+      return applyActivity(tool, {
         name: tool.name,
         cli: tool.cli,
         pin: tool.pin,
@@ -314,11 +478,11 @@ function detectTool(tool, opts) {
         message: `${basenameOrPath(known)} exists, but ${tool.cli} is not in PATH`,
         remediation: remediation(tool, "installed-not-in-path", [dirnameTarget(known), ...expectedPaths]),
         expectedPaths: uniq([dirnameTarget(known), ...expectedPaths]),
-      };
+      }, opts);
     }
   }
 
-  return {
+  return applyActivity(tool, {
     name: tool.name,
     cli: tool.cli,
     pin: tool.pin,
@@ -330,7 +494,7 @@ function detectTool(tool, opts) {
     message: `${tool.cli} is not available`,
     remediation: remediation(tool, "missing", expectedPaths),
     expectedPaths,
-  };
+  }, opts);
 }
 
 function basenameOrPath(p) {
@@ -350,6 +514,7 @@ export function detectExternalTools(options = {}) {
     cwd: options.cwd || process.cwd(),
     run: options.run || defaultRun,
     exists: options.exists || existsSync,
+    now: options.now || Date.now(),
   };
   const tools = (lock.tools || []).map((tool) => detectTool(tool, opts));
   const status = tools.some((t) => t.severity === "error")
@@ -382,6 +547,10 @@ export function formatExternalToolsHuman(health, opts = {}) {
     const exe = t.executable ? ` (${t.executable})` : "";
     lines.push(`  ${tmark} ${t.name} [${t.class}] ${t.state}${version}${exe}`);
     lines.push(`      ${t.message}`);
+    if (t.activity && t.activity.status !== "OK") {
+      lines.push(`      activity: ${t.activity.state}${t.activity.ageDays === null ? "" : ` (${t.activity.ageDays}d)`}`);
+      if (t.activity.path) lines.push(`      activity-path: ${t.activity.path}`);
+    }
     for (const fix of t.remediation || []) lines.push(`      fix: ${fix}`);
   }
   return lines.join("\n");
