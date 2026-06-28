@@ -16,6 +16,12 @@ Read, in order, before doing anything:
 3. ../_vibethink-dev-kit/setup/USING-THE-KIT.md         (how to actually use it)
 4. ./AGENTS.md                                          (this repo's root rules)
 
+Then follow ./AGENTS.md to the inherited generic rulebook. Size limit is not an
+excuse to skip it: if it is too large to read wholesale, use targeted search/ranges
+and extract at minimum Dev Tooling Baseline; NO BRAIN, NO WORK; Duty to Flag;
+inheritance/layering; and tool availability/reporting. If the inherited rulebook
+cannot be found or accessed at all, stop loudly per NO BRAIN, NO WORK.
+
 Then do the bootstrap, reporting verdict-first (don't dump):
 - Confirm the layering smoke passes:
   node ../_vibethink-dev-kit/tools/check-agent-context.mjs tools/agent-context.config.json

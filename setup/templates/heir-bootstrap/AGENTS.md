@@ -8,6 +8,13 @@ This repo **inherits the dev-kit's universal authority**:
 **extend** it, they never replace it. When the two conflict on a universal concern,
 the authority wins; for repo-specific concerns, this file wins.
 
+Size limit is not an excuse to skip that inherited rulebook. Read this root
+`AGENTS.md` first, then follow the inherited reference above. If the generic file
+is too large to load wholesale, use focused search/ranges and extract at minimum:
+Dev Tooling Baseline; NO BRAIN, NO WORK; Duty to Flag; inheritance/layering; and
+tool availability/reporting. If the inherited rulebook cannot be found or accessed,
+stop per NO BRAIN, NO WORK.
+
 > New here? Read `../_vibethink-dev-kit/knowledge/START-HERE.md` (2-minute door), then
 > `../_vibethink-dev-kit/setup/USING-THE-KIT.md` (how to actually use the kit).
 

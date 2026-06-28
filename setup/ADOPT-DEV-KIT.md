@@ -132,6 +132,11 @@ verifica · Layer**.
 - **Verificar:** Piece #2's smoke checks that the root rules file stays under the
   most restrictive agent's byte budget; **read** the root file — it should cite
   `AGENTS_UNIVERSAL.md` explicitly and add only repo-specific extensions.
+  If an agent cannot load the inherited file wholesale, it must use focused
+  reads/search/ranges and still extract the critical sections: Dev Tooling
+  Baseline; NO BRAIN, NO WORK; Duty to Flag; inheritance/layering; and tool
+  availability/reporting. Size limit is not a skip. Missing/inaccessible
+  inherited brain is a stop condition.
 
 ### 2 — Cross-agent context layering + the smoke
 

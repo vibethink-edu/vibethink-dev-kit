@@ -70,6 +70,26 @@ base** (the kit / "brain" that holds the standards). If you cannot find it, do
 > The concrete folder names, symlink path, mount script, and IDE steps are
 > org-specific — see the **methodology layer (level 2)**.
 
+**Size limit is not an excuse to skip the brain.** Agents may load the root
+`AGENTS.md` and inherited generic/SUPRA rulebook intelligently: first read the
+repo root `AGENTS.md`, then follow its inherited reference to this file. If this
+file is too large to load wholesale, use targeted search/ranges and extract the
+sections needed for the task. Do **not** pretend the rulebook is unavailable just
+because it is large.
+
+If the inherited rulebook exists but cannot be fully loaded, extract these
+sections at minimum before work:
+
+- `Dev Tooling Baseline`
+- `NO BRAIN, NO WORK`
+- `Duty to Flag`
+- inheritance / layering rules
+- tool availability and reporting rules
+
+Only stop under **NO BRAIN, NO WORK** when the inherited rulebook truly cannot be
+found or accessed. In that case, scream louder than a missing dev tool: do not
+continue on local habits.
+
 ### 🛡️ Quick Operations Reference
 
 **Every project MUST have operational scripts. Find them FIRST:**

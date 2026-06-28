@@ -152,6 +152,154 @@ function readMaybe(p) {
   }
 }
 
+const REQUIRED_BRAIN_SECTIONS = [
+  { id: "dev-tooling-baseline", label: "Dev Tooling Baseline", pattern: /Dev Tooling Baseline/i },
+  { id: "no-brain-no-work", label: "NO BRAIN, NO WORK", pattern: /NO BRAIN,\s*NO WORK/i },
+  { id: "duty-to-flag", label: "Duty to Flag", pattern: /Duty to Flag/i },
+  { id: "inheritance-layering", label: "inheritance/layering", pattern: /Inheritance Model|Cross-Agent Context Layering/i },
+  {
+    id: "tool-availability-reporting",
+    label: "tool availability/reporting",
+    pattern: /tool availability|never silent|RED\/WARN|loud fallback/i,
+  },
+];
+
+function detectInheritedBrain() {
+  const KIT_ROOT = dirname(KIT_TOOLS);
+  const universalPath = join(KIT_ROOT, "knowledge", "ai-agents", "AGENTS_UNIVERSAL.md");
+  const layeringPath = join(
+    KIT_ROOT,
+    "knowledge",
+    "ai-agents",
+    "CANON-CROSS-AGENT-CONTEXT-LAYERING.md"
+  );
+  const rootAgentsPath = join(CWD, "AGENTS.md");
+  const universal = readMaybe(universalPath);
+  const layering = readMaybe(layeringPath);
+  const rootAgents = readMaybe(rootAgentsPath);
+
+  const checks = [];
+  const remediation = [];
+
+  checks.push({
+    id: "universal-rulebook",
+    status: universal ? "ok" : "error",
+    path: universalPath,
+    message: universal
+      ? "inherited universal rulebook reachable"
+      : "inherited universal rulebook missing or inaccessible",
+  });
+  if (!universal) {
+    remediation.push(
+      "mount or clone the dev-kit so knowledge/ai-agents/AGENTS_UNIVERSAL.md is readable; then restart the session"
+    );
+  }
+
+  checks.push({
+    id: "layering-canon",
+    status: layering ? "ok" : "error",
+    path: layeringPath,
+    message: layering
+      ? "cross-agent layering canon reachable"
+      : "cross-agent layering canon missing or inaccessible",
+  });
+  if (!layering) {
+    remediation.push(
+      "restore knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md in the dev-kit mount"
+    );
+  }
+
+  if (CWD === KIT_ROOT && !rootAgents) {
+    checks.push({
+      id: "root-agents",
+      status: "ok",
+      path: rootAgentsPath,
+      message: "upstream kit checkout; heir root AGENTS.md is not expected here",
+    });
+  } else if (rootAgents) {
+    const pointsToUniversal = /AGENTS_UNIVERSAL\.md|inherits? the dev-kit|inherited generic/i.test(
+      rootAgents
+    );
+    checks.push({
+      id: "root-agents",
+      status: pointsToUniversal ? "ok" : "warn",
+      path: rootAgentsPath,
+      message: pointsToUniversal
+        ? "root AGENTS.md is reachable and points to inherited authority"
+        : "root AGENTS.md is reachable but does not clearly point to AGENTS_UNIVERSAL.md",
+    });
+    if (!pointsToUniversal) {
+      remediation.push(
+        "add an explicit AGENTS_UNIVERSAL.md inheritance pointer to the repo root AGENTS.md"
+      );
+    }
+  } else {
+    checks.push({
+      id: "root-agents",
+      status: "warn",
+      path: rootAgentsPath,
+      message: "repo root AGENTS.md missing; agent cannot start from the local root rulebook",
+    });
+    remediation.push(
+      "create repo root AGENTS.md from setup/templates/heir-bootstrap/AGENTS.md and point it to AGENTS_UNIVERSAL.md"
+    );
+  }
+
+  const requiredSections = REQUIRED_BRAIN_SECTIONS.map((section) => ({
+    ...section,
+    present: Boolean(universal && section.pattern.test(universal)),
+  }));
+  for (const section of requiredSections) {
+    checks.push({
+      id: section.id,
+      status: section.present ? "ok" : "error",
+      message: section.present
+        ? `${section.label} section findable`
+        : `${section.label} section missing from inherited rulebook`,
+    });
+  }
+  const missingSections = requiredSections.filter((s) => !s.present);
+  if (missingSections.length) {
+    remediation.push(
+      `restore or repair required inherited sections: ${missingSections.map((s) => s.label).join(", ")}`
+    );
+  }
+
+  const status = checks.some((c) => c.status === "error")
+    ? "RED"
+    : checks.some((c) => c.status === "warn")
+      ? "WARN"
+      : "OK";
+
+  return {
+    status,
+    blocking: false,
+    summary:
+      status === "OK"
+        ? "inherited rulebook reachable"
+        : "inherited brain degraded; missing brain is louder than missing dev tools",
+    checks,
+    requiredSections: requiredSections.map(({ pattern, ...s }) => s),
+    remediation,
+  };
+}
+
+function formatInheritedBrainHuman(brain) {
+  const mark = brain.status === "OK" ? "✓" : brain.status === "WARN" ? "⚠" : "✗";
+  const lines = [`${mark} inherited brain: ${brain.status} — ${brain.summary}`];
+  if (brain.status !== "OK") {
+    lines.push("  Size limit is not a skip: use focused reads/search before claiming unavailable.");
+  }
+  for (const c of brain.checks) {
+    if (c.status === "ok") continue;
+    const cmark = c.status === "warn" ? "⚠" : "✗";
+    lines.push(`  ${cmark} ${c.message}`);
+    if (c.path) lines.push(`      path: ${c.path}`);
+  }
+  for (const fix of brain.remediation) lines.push(`  fix: ${fix}`);
+  return lines.join("\n");
+}
+
 function runAdoption() {
   const KIT_ROOT = dirname(KIT_TOOLS);
   // 1. The roster of pieces, from the kit's catalog (`### N — Title`).
@@ -273,6 +421,7 @@ function summarize(out) {
 
 const results = [];
 const externalTools = detectExternalTools({ cwd: CWD });
+const inheritedBrain = detectInheritedBrain();
 for (const g of GATES) {
   const target = firstExisting(g.targets);
   if (!target) {
@@ -317,6 +466,7 @@ if (JSON_OUT) {
       {
         verdict: ok ? "GREEN" : "RED",
         externalTools,
+        inheritedBrain,
         passed: passed.length,
         failed: failed.length,
         ran: ran.length,
@@ -334,8 +484,13 @@ out.push("");
 out.push(`  Dev-Kit Doctor · ${basename(CWD)}`);
 out.push(`  ${"─".repeat(50)}`);
 out.push(
-  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass${failed.length ? `, ${failed.length} to fix` : ", nothing to fix"} · external tools ${externalTools.status}`
+  `  ${ok ? "✅ GREEN" : "❌ RED"} — ${passed.length}/${ran.length} gates pass${failed.length ? `, ${failed.length} to fix` : ", nothing to fix"} · external tools ${externalTools.status} · inherited brain ${inheritedBrain.status}`
 );
+out.push("");
+out.push("  Inherited Brain");
+for (const line of formatInheritedBrainHuman(inheritedBrain).split(/\r?\n/)) {
+  out.push(`    ${line}`);
+}
 out.push("");
 out.push("  External Tools");
 for (const line of formatExternalToolsHuman(externalTools).split(/\r?\n/)) {

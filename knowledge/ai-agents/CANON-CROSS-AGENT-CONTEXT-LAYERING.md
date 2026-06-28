@@ -31,6 +31,15 @@ the tree, some read root→cwd, some only load on explicit read. Therefore:
 - **Critical, safety, methodology and authority rules live in the root** — in full or as a
   self-sufficient core. Never only in a subdirectory (a subdir file may never load).
 - Subdirectory rules are a **bonus** for sessions scoped to that directory, not the base.
+- **Size budget is a routing problem, not a skip permission.** When the inherited generic
+  rulebook is large, the agent must use focused reads/search/ranges to load the relevant
+  sections. It may not downgrade the inherited rulebook to "optional" or fall back to
+  local habits because a wholesale read is too large.
+- **If reachable, extract the core.** A constrained agent that cannot load the whole
+  inherited rulebook must still extract: Dev Tooling Baseline; NO BRAIN, NO WORK; Duty
+  to Flag; inheritance/layering rules; tool availability/reporting rules.
+- **If unreachable, stop.** A genuinely missing/inaccessible inherited rulebook is a
+  louder local-health failure than a missing operator tool: no brain, no work.
 
 ## 4. Cross-repo artifact isolation
 

@@ -40,7 +40,7 @@ bash setup/install-external-tools.sh
 # Verificar qué hay (el par "instalar / verificar")
 bash setup/check-tools.sh <ruta-al-repo>
 bash setup/check-tools.sh --json <ruta-al-repo>   # salida legible por launchers
-node tools/external-tools-health.mjs --json       # solo salud de RTK/Graphify
+node tools/external-tools-health.mjs --json       # salud de tools registradas en el lock
 ```
 
 > Las tools viven **en la máquina**, nunca en el repo (baranda #2). Un `git clone`
@@ -188,8 +188,10 @@ node tools/external-tools-health.mjs --json       # solo salud de RTK/Graphify
   el ciclo de vida per-repo gana, el override se declara visible.
 - **Version-forward:** los pins solo avanzan editando ESTE archivo vía PR al
   kit, con evidencia de la versión nueva verificada en al menos una máquina.
-- **No adoptado por este baseline:** Engram. Si un consumidor lo usa, es
-  consumer-local hasta que Marcelo dé un GO separado para subirlo al dev-kit.
+- **Engram queda separado del baseline A/B:** está documentado arriba como clase C
+  stateful de operadores/agentes, no como use-by-default A/B, no como correctness
+  gate y no como dependencia de producto. Este cambio de salud local no modifica
+  esa doctrina.
 
 ## En los briefings de ejecutor
 
