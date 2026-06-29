@@ -177,11 +177,32 @@ server, read the project's port registry and use the assigned block.
   diligence, NOT a CI/merge gate: a repo / agent / CI without them still builds and tests.
   Do NOT let the *use* expectation harden into a product-correctness gate. Do let launchers,
   doctor, and session health scream loudly (RED/WARN) when the tools are missing or invisible.
-- **Not in the A/B dev-tooling baseline (use-by-default):** agentmemory. *(**Engram — superseded 2026-06-21 by the Principal Architect:** Engram was previously listed here as "not adopted". That decision was reconsidered and **reverted**: Engram **is adopted**, separately, as a **class-C operator memory tool** — opt-in, per-agent, stateful — see [`setup/EXTERNAL-TOOLS.md`](../../setup/EXTERNAL-TOOLS.md). "Adopted" here means the **use-by-default baseline** (RTK+Graphify); Engram lives at the **operator/lifecycle layer** (§8), is NOT use-by-default, NOT a correctness gate, and NOT a product dependency.)*
+- **Not in the A/B dev-tooling baseline (use-by-default):** agentmemory. *(**Engram — superseded 2026-06-21 by the Principal Architect:** Engram was previously listed here as "not adopted". That decision was reconsidered and **reverted**: Engram **is adopted**, separately, as a **class-C operator memory tool** — opt-in, per-agent, stateful — see [`setup/EXTERNAL-TOOLS.md`](../../setup/EXTERNAL-TOOLS.md). "Adopted" here means the **use-by-default baseline** (RTK+Graphify); Engram lives at the **operator/lifecycle layer** (§8), is NOT use-by-default A/B dev tooling, NOT a product correctness gate, and NOT a product runtime dependency. A house/L2 methodology may still bind Engram as part of its declared Knowledge Memory Adapter; that is separate from this neutral baseline.)*
 - Tool **versions + install lifecycle**: the kit ships the DEFAULT registry at
   `setup/EXTERNAL-TOOLS.md` (pins, recipes, evidence, version-forward). A repo MAY override
   with its own EXTERNAL-TOOLS registry — per-repo lifecycle wins, override declared visibly.
   This layer declares the *use* baseline (use-by-default + documented fallback).
+
+### 🧠 Knowledge Memory Adapter — required for product-shaping VT-METHOD work
+
+For repos using Knowledge-Native VT-METHOD, product-shaping work may not start from
+an isolated feature request. The agent must first retrieve and cite the Accepted
+Knowledge Baseline through the repo's declared Knowledge Memory Adapter.
+
+Minimum rule:
+
+- If the work is product-shaping, complex, AI-assisted/model-driven, cross-boundary,
+  or new-domain, find the repo's Knowledge Pack config/binding.
+- Retrieve the accepted pack through the declared adapter.
+- Cite the accepted pack id/version/path and the adapter in the spec/briefing.
+- If the adapter, index, or inherited pack is missing/stale/unavailable, surface a
+  RED/WARN local-health finding and stop product-shaping execution until the baseline
+  is reachable or the human/principal authorizes a reconstruction sprint.
+
+The house/L2 default adapter profile may bind Engram for memory/facts/recall,
+Graphify for graph relationships/communities/semantic navigation, and versioned
+Markdown Knowledge Packs as the auditable source of truth. Engine output helps
+retrieval; accepted Markdown is the authority.
 
 ### 🗣️ Duty to Flag (CRITICAL — culture law)
 
