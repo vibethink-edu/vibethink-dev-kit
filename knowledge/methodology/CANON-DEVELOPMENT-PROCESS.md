@@ -1,7 +1,7 @@
 # Development Process — neutral core (L1)
 
 > **Status:** CANON (neutral core).
-> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`).
+> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`). · **§8.1 (dual-surface parity / agent-plane-by-design, as a contract-derived execution gate) SEALED 2026-06-29 by Marcelo after independent Opus + Codex reviews converged** (companion: `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md`).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **What this is:** the agnostic *skeleton* of how a unit of work goes from idea to
 > verified implementation. It carries **no brand, product, or methodology name**
@@ -209,7 +209,7 @@ review, and the session-close ritual (`CANON-AGENT-COLLABORATION` §8) check
 completeness — no automated gate can enumerate every dimension for every repo. The
 artifacts of §5 are the durable record that the dimensions were in fact carried.
 
-### 8.1 — Dual-surface parity: human surface AND programmatic surface *(PROPOSED — pending seal)*
+### 8.1 — Dual-surface parity: human surface AND programmatic surface *(SEALED 2026-06-29 by Marcelo, Principal Architect — after independent Opus + Codex reviews converged)*
 
 A **capability** (a feature, module, or operation a user can invoke) is complete only when it is
 reachable by **both** of its audiences: the **human surface** (a UI) **and** the **programmatic
