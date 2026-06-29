@@ -238,6 +238,46 @@ context at all** and codes blind. So:
   prevent. This completes the gate's RED conditions: **lapsed · stale-by-pivot · contradicted ·
   forgotten** — an agent never runs product-shaping against absent, dead, or incoherent knowledge.
 
+### 7.2. Enforcement at dispatch *(PROPOSED — pending seal)*
+
+§7 assumes the feature author and the implementer are the same agent in the same repo. In a
+**dispatch model** — an *orchestrator* assigns a coder/agent that will product-shape in a **target
+repo** — the orchestrator holds the last gate before the implementer touches that repo. That gate
+is a reusable pattern, so it belongs to the spine (not to any single orchestrator's L3; §9, §11).
+
+**Rule.** When product-shaping work is **dispatched**, the **orchestrator** is the Feature-Binding
+(§7) enforcement point: the dispatched task MUST carry a resolvable **Knowledge Baseline** of the
+**target repo**, or an explicit **reconstruction intent**. The dispatch does **not** proceed (RED)
+when the baseline is *forgotten* (absent — §7.1), `candidate`/`rejected`, *lapsed* or
+*stale-by-pivot* (§8.2), or *contradicted* (§6.1) — the same four RED conditions, enforced one hop
+earlier. The only sanctioned bypass is a declared **Knowledge Reconstruction Sprint** (§3).
+
+**Canonical baseline shape (engine-neutral — every orchestrator emits it identically).** The task
+declares **either** a `knowledgeBaseline` object **or** `dispatchIntent: "reconstruction"`:
+
+```
+knowledgeBaseline:
+  packId           # accepted pack id, e.g. "KP-<DOMAIN>-001"
+  version          # e.g. "v1"
+  status           # MUST be "accepted" — candidate/rejected ⇒ RED
+  revalidationDue  # ISO-8601 date | null — a past date ⇒ lapsed (§8.2) ⇒ RED
+  adapter          # retrieval adapter id (engine-neutral; Markdown is source of truth, §8)
+  scope            # the domain/feature this dispatch shapes
+  manifestHash     # OPTIONAL — SHA256 of the accepted source from the freshness manifest (§8.1);
+                   #   present ⇒ the orchestrator MAY verify the target repo's live state (deep check)
+```
+
+The **gate** (§10) gains a dispatch verification: *"a product-shaping dispatch resolves a
+`knowledgeBaseline` (status accepted, not lapsed) of the target repo, or declares
+`dispatchIntent: "reconstruction"`."* `manifestHash` is the lineage edge that lets a deep gate
+confirm the declared baseline matches the target repo's actual accepted source — declared-trust
+without it (structural check), verified-trust with it (semantic check).
+
+**Warn-first must be bounded.** An orchestrator MAY start in **warn-first** (log + audit, no block)
+to avoid breaking in-flight dispatchers, but the window MUST be **declared and finite** —
+`enforceFrom` (a date or release), ceiling **≤ 14 days or 2 releases** — after which it promotes to
+**block**. Indefinite warn-first is not allowed (it is the same as no enforcement).
+
 ## 8. Engine Boundary and Memory Adapter
 
 DevKit defines the method and artifacts. Its L1 core does not depend on any one retrieval
