@@ -220,13 +220,35 @@ so a **UI-only capability is invisible and unusable to an agent** (it cannot cli
 **programmatic-only capability is invisible to a human**. Shipping one surface ships half the unit —
 to the audience that got nothing, it is zero value (the completeness rule above).
 
-- **Declared at architecture time, not retrofitted.** A capability's programmatic surface is designed
-  **as a peer** to its UI. The preflight / decision gate asks *"what is the programmatic surface
-  (CLI/tool/API) of this?"* alongside *"what is the UI?"*. A surface deferred to a follow-up silently
-  never ships.
-- **The form is per-repo binding; the parity is the rule.** The programmatic surface may be a CLI
-  command, an agent tool, an HTTP endpoint, or a server action — each repo binds which forms it uses.
-  What is universal: **a capability does not exist in only one plane.**
+- **The programmatic surface is a plane, not one endpoint — three verbs.** An agent must be able to
+  **read** (query the capability's state), **mutate** (perform its governed actions), and **observe**
+  (subscribe to and/or emit the capability's signals — its event stream). A capability an agent can
+  read but not act on, or act on but cannot observe, is *partial*. The third verb (observe/signal) is
+  the one most often forgotten and is what lets agents react to the system instead of polling it.
+- **Discoverable, not merely present.** The agent must be able to *discover* what the capability
+  offers — its operations, parameters, current state, and emitted signals — from a **machine-readable
+  description**, without out-of-band knowledge. A surface that exists but cannot be discovered is
+  forgotten the moment it leaves the author's head.
+- **Modeled at the data/architecture layer, not wrapped on later.** The agent plane is designed when
+  the **schema and architecture** are designed: what is readable, what is mutable, and what emits a
+  signal are structural decisions, not a wrapper added after the UI works. This is the point of the
+  whole rule — the plane is an *input to the model*, not an afterthought.
+- **Governed mutation.** An agent's mutations carry the same governance as any actor: authorization /
+  scope, **idempotency** (a retried action must not double-apply), and — for tenant-visible or
+  irreversible effects — **proposal/apply separation** (the agent proposes; a governed authority
+  applies). The agent plane never becomes a backdoor around the controls the human surface obeys.
+- **Versioned contract.** The agent contract (what can be read, mutated, observed) is **versioned**
+  like any other interface; a breaking change is a versioned change, not a silent drift.
+- **The gate is the anti-forgetting lock.** The preflight / decision gate does **not** pass a
+  capability, **schema, or architecture change** until its agent plane is declared — *read + mutate +
+  signal + discovery* — **or** it consciously declares "no agent surface" with a recorded reason. A
+  surface "deferred to a follow-up" silently never ships; that is exactly the failure this lock
+  exists to prevent. The lock fires at **design time** (schema/architecture), not at review time.
+- **The form is per-repo binding; the parity is the rule.** Which concrete interface protocol,
+  event-signal contract, machine-readable description format, and spec/preflight tooling a repo uses
+  are **L2/L3 bindings** (this neutral layer names none). What is universal: **a capability does not
+  exist in only one plane, and the agent plane is read + mutate + observe, discoverable and
+  governed.**
 - **Scope.** Applies to **capabilities/components**, not trivial changes, pure-internal helpers, or
   one-off scripts. A capability genuinely meant for a single audience declares that consciously — it
   is not the default; the default is parity.
