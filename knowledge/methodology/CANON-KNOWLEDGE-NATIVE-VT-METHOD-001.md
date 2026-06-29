@@ -238,6 +238,57 @@ context at all** and codes blind. So:
   prevent. This completes the gate's RED conditions: **lapsed · stale-by-pivot · contradicted ·
   forgotten** — an agent never runs product-shaping against absent, dead, or incoherent knowledge.
 
+### 7.2. Enforcement at dispatch — the orchestrator is the gate *(PROPOSED — pending seal)*
+
+When product-shaping work is **dispatched** to an executor — an orchestrator assigns a
+coder/agent that will shape product in a **target repo** — the **orchestrator** is the
+enforcement point for the Feature Binding (§7), because it holds the last gate before the
+executor touches the target. §7/§7.1/§8.2 apply regardless of who launched the work; **dispatch
+is where the binding bites**. (Raised as an L3 finding from a WorkBench orchestrator; elevated
+here because the pattern is reusable by *any* dispatcher, per §9.)
+
+**Canonical Knowledge Baseline (the "carnet").** A dispatch declares its baseline using this
+**canonical shape — defined here so every orchestrator emits it identically**, not as an L3
+invention:
+
+```
+knowledgeBaseline:
+  packId:           <accepted pack id, e.g. wb-orchestration-plane>
+  version:          <semver of the pack>
+  scope:            <the scope this work shapes, in the target repo>
+  status:           accepted            # MUST be `accepted` (never candidate/rejected)
+  revalidationDue:  <date | release>    # §8.2 TTL — MUST NOT be lapsed
+  adapter:          <declared Knowledge Memory Adapter used to retrieve it>
+  sourceRef:        <target-repo-relative path/ref of the accepted pack>
+  contentHash:      <hash of the accepted source snapshot>   # §8.1 integrity
+```
+
+…or, explicitly, `dispatchIntent: reconstruction` — a declared Knowledge Reconstruction Sprint
+(§3) when the target scope has no accepted baseline yet. The shape is the minimum **complete**
+carnet: it lets the gate decide on presence (forgotten), status, lapse, and integrity without
+reading the target repo.
+
+**Escalation — announce, scream, then ask (NOT a blind block).** A dispatch missing a valid
+baseline does not silently block; it escalates in three steps, matching bounded authority
+(*"when the system knows it needs a human, it asks"*):
+
+1. **Announce (warn).** The dispatch is allowed but the missing/`candidate`/lapsed/contradicted
+   baseline is surfaced as a warning **and recorded** (audit/activity). Announce-only applies for
+   an **L3-declared, time-boxed rollout window**.
+2. **Scream (RED).** Past the window the gate goes **RED and loud** — the same failure class as
+   lapsed (§8.2), contradicted (§6.1), and forgotten (§7.1).
+3. **Ask the human (if it still proceeds).** If a dispatch is *still* attempted against a RED
+   baseline, the orchestrator **does not decide on its own** — it **stops and asks the operator**
+   (human-in-the-loop), naming the exact condition (forgotten / lapsed / stale-by-pivot /
+   contradicted) and the options (supply a baseline · declare `reconstruction` · override with a
+   recorded reason). A blind auto-block is wrong; a **governed human decision** is correct.
+
+**Gate (§10 extension).** The dispatch gate verifies that a product-shaping dispatch carries a
+resolvable **canonical** `knowledgeBaseline` whose `status` is `accepted` and whose
+`revalidationDue` is not lapsed — or an explicit `dispatchIntent: reconstruction`. L3 binds only
+the *surface* (the dispatch endpoint/CLI), the announce-window length, and the human-ask channel;
+the **carnet shape and the three-step escalation are canonical here**, shared by every orchestrator.
+
 ## 8. Engine Boundary and Memory Adapter
 
 DevKit defines the method and artifacts. Its L1 core does not depend on any one retrieval
