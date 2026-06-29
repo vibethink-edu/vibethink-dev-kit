@@ -1282,7 +1282,8 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 **Layer:** L1 pattern + L2 VibeThink binding.
 **Home:** `knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md`,
 `knowledge/methodology/VT-METHOD.md`, `setup/templates/knowledge-pack/`,
-`tools/check-knowledge-pack.mjs`.
+`setup/templates/knowledge-memory/`, `tools/check-knowledge-pack.mjs`,
+`tools/check-knowledge-memory-freshness.mjs`, `tools/kdd-refresh.mjs`.
 
 - **Qué:** Knowledge-Driven Design sits underneath product-shaping work: validated
   knowledge comes before isolated feature requests, specs, and execution. A repo
@@ -1296,9 +1297,14 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 - **Cómo:**
   - Doc **by reference** — your `AGENTS.md` points to the canon and VT-METHOD binding.
   - Copy `setup/templates/knowledge-pack/` as the starting shape for L3 Knowledge Packs.
+  - Copy `setup/templates/knowledge-memory/knowledge-memory.config.json` to
+    `tools/knowledge-memory.config.json` and declare the manifest path, accepted source roots,
+    adapter, required/optional index artifacts, and refresh commands.
   - Declare `tools/knowledge-pack.config.json` from `tools/knowledge-pack.config.example.json`:
     knowledge root, feature roots, required artifacts, Knowledge Memory Adapter, trigger
     classes, and engine freshness/health checks.
+  - After refreshing declared engines, run `node <kit>/tools/kdd-refresh.mjs
+    tools/knowledge-memory.config.json` to write the KDD memory manifest.
   - Product knowledge stays in the consuming repo. DevKit carries no vertical-specific
     business content.
   - If the consuming repo discovers a reusable KDD gap, elevate it to DevKit first.
@@ -1306,10 +1312,15 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     template, or gate.
 - **Verificar:**
   - `node <kit>/tools/check-knowledge-pack.mjs tools/knowledge-pack.config.json` is GREEN.
+  - `node <kit>/tools/check-knowledge-memory-freshness.mjs
+    tools/knowledge-memory.config.json` is GREEN, or loudly RED/WARN with exact stale/missing
+    memory.
   - Product-shaping/complex/AI-assisted/cross-boundary/new-domain features carry a
     `Knowledge Baseline` section with an accepted pack reference and adapter citation.
   - Packs include required artifacts, local references resolve, accepted packs name a
     validator, and open questions have owner/status.
+  - The KDD memory manifest fingerprint matches accepted sources; required Graphify/Engram
+    artifacts exist, match the manifest, and are not older than accepted sources when configured.
   - If Engram/Graphify are declared by the L3 adapter and stale/unavailable, local/session
     health surfaces RED/WARN; agents do not silently pretend retrieval succeeded.
 
@@ -1365,7 +1376,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 39 | Human-surface legibility | ADOPTED / PENDING / N-A | depth-on-demand mechanism + verdict vocabulary per surface |
 | 46 | Launch your first coder (dispatch on-ramp) | ADOPTED / PENDING / N-A(no coders) | launch script + readiness config + prompt template + §3.1 routing |
 | 48 | UI preference persistence | ADOPTED / PENDING / N-A(no UI prefs) | client preference helper + namespace + hydration pattern |
-| 49 | KDD / Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate config |
+| 49 | KDD / Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate + freshness manifest |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.

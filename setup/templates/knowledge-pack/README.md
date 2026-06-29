@@ -19,6 +19,8 @@ Accepted Knowledge Baseline only after human/principal validation.
 6. Require future complex/product-shaping features to cite this pack in their
    `Knowledge Baseline` section, including the Knowledge Memory Adapter used to
    retrieve it.
+7. Refresh the declared KDD memory indexes and write the freshness manifest with
+   `tools/kdd-refresh.mjs`.
 
 ## Required Files
 
@@ -42,3 +44,6 @@ In VibeThink repos, the default adapter profile is Engram for memory/facts/recal
 Graphify for graph relationships/communities/semantic navigation, and versioned
 Markdown as the auditable source of truth. Concrete health and freshness checks live
 in the consuming repo's L3 config.
+
+Use `setup/templates/knowledge-memory/` for the manifest-backed freshness check that
+prevents agents from using stale graph/memory indexes after this pack changes.

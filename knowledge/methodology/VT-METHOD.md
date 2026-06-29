@@ -60,6 +60,9 @@ for memory/facts/recall, Graphify for graph relationships/communities/semantic
 navigation, and versioned Markdown Knowledge Packs as the auditable source of truth.
 Product-shaping work may not start until the agent has retrieved and cited the
 Accepted Knowledge Baseline through that declared adapter.
+If the adapter uses derived memory (graph, recall, vector, or search), the KDD memory
+manifest must be fresh; stale derived memory is a RED/WARN local-health condition, not
+acceptable context.
 
 DevKit is the upstream authority for the reusable KDD pattern. A product repo can expose
 a gap first, but if the gap is generic, the adjustment is made in DevKit before the

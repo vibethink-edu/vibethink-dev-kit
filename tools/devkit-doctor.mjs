@@ -113,6 +113,12 @@ const GATES = [
     fix: "a Knowledge Pack is structurally incomplete, the Knowledge Memory Adapter is undeclared, or a product-shaping/complex feature lacks a retrieved+cited Accepted Knowledge Baseline — add/validate the pack, declare the adapter, or mark the feature N-A",
   },
   {
+    label: "KDD memory freshness",
+    engine: "check-knowledge-memory-freshness.mjs",
+    targets: ["tools/knowledge-memory.config.json"],
+    fix: "accepted knowledge changed or a declared memory/graph index is missing/stale — refresh Graphify/Engram/other declared indexes, then run kdd-refresh to update the manifest",
+  },
+  {
     label: "port assignment",
     engine: "check-ports.mjs",
     targets: ["tools/ports.config.json"],

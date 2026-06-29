@@ -249,6 +249,7 @@ const TEMPLATE_TARGETS = {
   ports: "tools/ports.config.json",
   "feature-docs": "tools/feature-docs.config.json",
   "identifier-language": "tools/identifier-language.config.json",
+  "knowledge-memory": "tools/knowledge-memory.config.json",
   versioning: "tools/versioning.config.json",
 };
 const templates = { applies: false, count: 0, missing: [] };

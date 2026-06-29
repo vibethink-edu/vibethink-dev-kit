@@ -65,6 +65,12 @@ orchestrators, work bench systems, verticals, and future projects.
 KDD does not replace governance. It feeds governance with accepted product/business/domain
 understanding so the decision gate and spec are not operating from isolated feature text.
 
+KDD memory freshness is manifest-based. Agents do not trust a graph, recall database, vector
+store, or search index merely because it exists. The consuming repo records which accepted
+sources and adapter/index artifacts were refreshed together. If accepted sources, adapter
+configuration, chunking/extraction/schema settings, or declared index artifacts drift from
+that manifest, local/session health reports RED/WARN before agents use the derived memory.
+
 ## 1.1. VibeThink Identity
 
 VibeThink is the methodological, technical, and operational home for building
@@ -215,6 +221,37 @@ a finding or an amendment candidate, not an override. If the declared adapter is
 or unavailable, the local/session health surface must go RED/WARN; agents do not proceed
 as if retrieval had succeeded.
 
+### 8.1. KDD Refresh and Freshness Manifest
+
+The refresh contract is:
+
+```text
+accepted Knowledge Pack changes
+  -> refresh declared memory/index engines
+  -> write KDD memory manifest
+  -> check freshness before product-shaping retrieval
+```
+
+The manifest records at minimum:
+
+- accepted source roots, files, hashes, and statuses included;
+- declared Knowledge Memory Adapter;
+- index/engine artifact paths, hashes, and required/optional status;
+- generation timestamp and config path.
+
+Consumers may add richer provenance: source IDs, chunker/config hashes, extraction prompt
+hashes, embedding/LLM model IDs, graph algorithm versions, schema versions, and run IDs.
+Those are L3 details, but the DevKit rule is universal: derived memory must be traceable
+to the accepted source snapshot it was built from.
+
+`kdd-refresh.mjs` writes the manifest after the consuming repo refreshes its declared
+indexes. With `--run-indexes`, it may run L3-configured refresh commands first. DevKit
+does not define those commands globally.
+
+`check-knowledge-memory-freshness.mjs` compares the current accepted sources and declared
+index artifacts against the manifest. It goes RED when required memory is missing/stale.
+Optional memory may WARN without blocking product correctness, but it must still be visible.
+
 ## 9. L3 Binding
 
 Each consuming repo declares:
@@ -223,6 +260,8 @@ Each consuming repo declares:
 - feature/spec roots that must cite baselines;
 - required pack artifacts;
 - Knowledge Memory Adapter name/profile, active engines, freshness checks, and fallback;
+- KDD memory manifest path and which index artifacts are required vs optional;
+- refresh commands for L3 engines, if the repo wants `kdd-refresh --run-indexes`;
 - metadata/status vocabulary if adapted;
 - what feature classes trigger the baseline gate;
 - optional engines and their health/freshness checks;
@@ -253,6 +292,14 @@ but it must label it as local/temporary and must not present it as the reusable 
 - feature docs marked as complex/product-shaping/AI-assisted/cross-boundary declare a
   `Knowledge Baseline` section with a resolvable baseline reference and adapter citation.
 
+`check-knowledge-memory-freshness.mjs` is the freshness gate. It verifies:
+
+- the KDD memory manifest exists;
+- the accepted source fingerprint still matches the manifest;
+- the declared adapter has not changed since the manifest;
+- required index artifacts exist and still match the manifest;
+- required index artifacts are not older than accepted sources when configured that way.
+
 It does **not** judge semantic quality, correctness, or completeness of the business
 knowledge. Humans/principals review that.
 
@@ -262,6 +309,7 @@ knowledge. Humans/principals review that.
 - Feature spec first, product understanding later.
 - "The model remembers" as authority.
 - Raw embeddings/graph/memory treated as source of truth without an accepted pack.
+- Retrieval from stale graph/memory/vector/search artifacts after accepted knowledge changed.
 - Dumping the whole repo into context instead of selecting the accepted baseline.
 - Requiring packs for trivial fixes.
 - Product-specific knowledge lifted into the dev-kit.
@@ -280,6 +328,20 @@ context-engineering practice:
 
 The dev-kit adaptation is deliberately lightweight: a pack, a validator, a baseline
 reference, and a structural gate.
+
+The KDD memory freshness harness follows established retrieval/governance patterns:
+
+- W3C PROV models provenance through source entities, production activities, and agents:
+  <https://www.w3.org/TR/prov-overview/>.
+- OpenLineage records pipeline jobs and datasets so derived artifacts can be traced to
+  their inputs: <https://openlineage.io/docs/spec/object-model/>.
+- LangChain and LlamaIndex indexing patterns use source IDs/hashes and ingestion caches to
+  avoid stale or duplicate derived retrieval state:
+  <https://www.langchain.com/blog/syncing-data-sources-to-vector-stores> and
+  <https://developers.llamaindex.ai/python/framework/module_guides/loading/ingestion_pipeline/>.
+- GraphRAG pipelines produce derived documents, text units, entities, relationships,
+  communities, reports, and embeddings; freshness cannot be reduced to "file exists":
+  <https://microsoft.github.io/graphrag/index/default_dataflow/>.
 
 ## Fire-Test
 
