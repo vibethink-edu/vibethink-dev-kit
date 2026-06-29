@@ -161,6 +161,35 @@ test("config declares no surfaces → setup error, exit 2", () => {
   assert.match(out, /no surfaces/);
 });
 
+// 9. File-name surface: a Spanish-named governance file (TABLERO.md) leaks; the canonical
+//    English file (OPS.md) is admitted. Closes the §8 "file names" surface — agents can't
+//    invent a status-board name by whim, the gate forces the declared-language canonical name.
+test("leaked file basename (TABLERO.md) → exit 1; OPS.md admitted", () => {
+  const dir = makeDir();
+  write(dir, "TABLERO.md", "# board\n");
+  write(dir, "OPS.md", "# ops\n");
+  const bad = run(dir, {
+    declaredLanguage: "en",
+    fileSurfaces: [{ dir: ".", recursive: false, extensions: [".md"] }],
+    allow: ["ops"],
+  });
+  assert.equal(bad.code, 1, `expected 1, got ${bad.code}\n${bad.out}`);
+  assert.match(bad.out, /"tablero"/);
+});
+
+// 10. File-name surface admits the declared-language vocabulary → GREEN.
+test("admitted file basenames → exit 0", () => {
+  const dir = makeDir();
+  write(dir, "OPS.md", "# ops\n");
+  write(dir, "CHANGELOG.md", "# changelog\n");
+  const { code, out } = run(dir, {
+    declaredLanguage: "en",
+    fileSurfaces: [{ dir: ".", recursive: false, extensions: [".md"] }],
+    allow: ["ops", "changelog"],
+  });
+  assert.equal(code, 0, `expected 0, got ${code}\n${out}`);
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });

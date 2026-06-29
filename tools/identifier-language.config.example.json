@@ -25,6 +25,9 @@
     { "dir": "apps/web/src/app", "recursive": true, "skip": ["api"] },
     { "dir": "apps/web/src/features", "recursive": false }
   ],
+  "fileSurfaces": [
+    { "dir": ".", "recursive": false, "extensions": [".md"] }
+  ],
   "allow": [],
   "exceptions": {}
 }

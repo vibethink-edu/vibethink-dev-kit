@@ -32,6 +32,9 @@
  *       { "dir": "apps/web/src/app", "recursive": true, "skip": ["api"] },
  *       { "dir": "apps/web/src/features", "recursive": false }
  *     ],
+ *     "fileSurfaces": [                                          // dirs whose FILE basenames are identifiers
+ *       { "dir": ".", "recursive": false, "extensions": [".md"] } // e.g. root governance docs (OPS.md, not TABLERO.md)
+ *     ],
  *     "allow": ["account","person", ...],                        // admitted vocabulary tokens
  *     "exceptions": { "dane": "national-ID acronym (domain term)" }
  *   }
@@ -68,6 +71,7 @@ let cfg = {
   schemaDirs: [],
   columnTypes: [],
   slugSurfaces: [],
+  fileSurfaces: [],
   allow: [],
   exceptions: {},
 };
@@ -160,6 +164,39 @@ function collectSlugTokens(into) {
   }
 }
 
+// ── File-name surfaces: FILE basenames (sans extension) are identifiers ──────────────────
+// Closes the §8 "file/dir names" claim the docstring makes: a Spanish-named governance
+// artifact (e.g. TABLERO.md where the canonical English file is OPS.md) is a basename whose
+// token (`tablero`) is not in the declared vocabulary → it fails, instead of each agent
+// deciding the name by whim. Scope it narrowly in the binding (e.g. root `.md` only) so the
+// dated/descriptive comms lane is not dragged in. `extensions` filters which files count;
+// `recursive` walks; `skip` removes named entries; `_*` files are always excluded.
+function collectFileTokens(into) {
+  for (const s of cfg.fileSurfaces || []) {
+    const base = resolve(s.dir);
+    if (!existsSync(base)) continue;
+    const exts = s.extensions || [];
+    const skip = new Set(s.skip || []);
+    const walk = (dir, crumbs) => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const name = e.name;
+        if (e.isDirectory()) {
+          if (s.recursive && !name.startsWith("_") && !skip.has(name))
+            walk(join(dir, name), [...crumbs, name]);
+          continue;
+        }
+        if (!e.isFile() || name.startsWith("_") || skip.has(name)) continue;
+        const ext = exts.find((x) => name.endsWith(x));
+        if (exts.length && !ext) continue;
+        const baseName = ext ? name.slice(0, -ext.length) : name.replace(/\.[^.]+$/, "");
+        for (const tok of tokensOf(baseName))
+          addToken(into, tok, `${s.dir}/${[...crumbs, name].join("/")}`);
+      }
+    };
+    walk(base, []);
+  }
+}
+
 function addToken(map, tok, source) {
   if (!map.has(tok)) map.set(tok, new Set());
   map.get(tok).add(source);
@@ -169,8 +206,10 @@ function addToken(map, tok, source) {
 const tokenSources = new Map();
 collectSchemaTokens(tokenSources);
 collectSlugTokens(tokenSources);
+collectFileTokens(tokenSources);
 const allTokens = [...tokenSources.keys()].sort();
-const surfaceCount = (cfg.schemaDirs?.length || 0) + (cfg.slugSurfaces?.length || 0);
+const surfaceCount =
+  (cfg.schemaDirs?.length || 0) + (cfg.slugSurfaces?.length || 0) + (cfg.fileSurfaces?.length || 0);
 
 // ── Seed mode: (re)generate the admitted vocabulary from the current surfaces ────────────
 if (SEED) {
