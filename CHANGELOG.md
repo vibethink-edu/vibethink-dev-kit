@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-06-29
+
+### Added
+- **`CANON-DEVELOPMENT-PROCESS.md §8.1` — Dual-surface parity / agent-plane-by-design**
+  (SEALED 2026-06-29, after two independent advisor reviews — Opus + Codex — converged).
+  Every capability has two first-class consumers designed in parallel from the schema/
+  architecture: the human (GUI) and the agent (a programmatic plane: **read + mutate +
+  observe + emit**, plus workflows, discoverable and governed). Sealed as a
+  **contract-derived execution gate**, NOT a declarative preflight: *the preflight routes
+  (decides applicability); the conformance gate enforces* — the plane is **derived** from
+  the same contract as the GUI and **proven by execution** (a probe exercises each verb
+  live, with negative tests + provenance), not by declaration. Companion reference
+  `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md` (strong anchors: MCP · CloudEvents/AsyncAPI ·
+  OpenAPI · Arazzo · Pact; ACI/AXIS/VOIX demoted to exploratory). Agnostic L1 — consumers
+  **inherit** it and bind concrete tooling at L3; they do not replicate it.
+- **`CANON-KNOWLEDGE-NATIVE-VT-METHOD-001` §6.1/§7.1/§7.2/§8.2** (SEALED 2026-06-29):
+  constitution contradiction tie-break + amendment cascade (§6.1), forgotten-context scream
+  (§7.1), enforcement-at-dispatch — orchestrator is the gate (§7.2), baseline validity /
+  business-pivot reconstruction (§8.2).
+
 ## 2026-06-28
 
 ### Added
