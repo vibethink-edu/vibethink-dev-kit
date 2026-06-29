@@ -207,6 +207,11 @@ an agent acting on incoherent knowledge is the failure this method exists to pre
 - **Amendment cascade (coherence is all-or-nothing).** Once truth is decided, **every** conflicting
   artifact — the canon and all affected docs/packs — is amended to agree. A half-amended set is a new
   contradiction; reconciliation is not complete until pack, canon, and docs are mutually coherent.
+  **The cascade does not let an agent auto-edit the canon.** The agent that detects the contradiction
+  *proposes* the amendment; the canon change still goes through the repo's normal canon-approval
+  authority (for VibeThink, Marcelo — the principal authority). "Reality wins → the canon is amended"
+  names the *direction* of the fix, not an automatic write. Safety, security, and constitutional
+  invariants are never silently overridden by a reality-wins claim — they escalate to that authority.
 - **The gate screams.** A **declared, unresolved** contradiction (a conflict logged but not reconciled)
   is a **RED gate** — the same loud failure as any other governance breach. Semantic contradiction
   cannot be fully auto-detected; the gate bites on the *declared-and-open* ones, and surfacing a
@@ -278,6 +283,15 @@ knowledgeBaseline:
 The shape is the minimum **complete** carnet: it lets the gate decide presence (forgotten),
 status, lapse, and integrity without reading the target repo; `manifestHash` is the lineage edge
 for an optional deep check.
+
+**`manifestHash` graduates from optional to required (declared-trust → verified-trust).** While
+`manifestHash` is absent the gate is **structural only** — it trusts the declared `status`/
+`revalidationDue`, so a careless or adversarial task can declare an `accepted`/fresh baseline that
+is not. This is acceptable only until the target repo has a freshness manifest (§8.1). **Once a
+target repo publishes a freshness manifest, `manifestHash` is REQUIRED for dispatches into that
+repo**, and the gate verifies it against the live accepted source (a mismatch ⇒ RED, *stale-by-
+pivot* or tampered). Declared-trust is a bootstrap, not the steady state — a repo that can verify
+must verify.
 
 **Escalation — announce, scream, then ask (NOT a blind block).** A dispatch missing a valid
 baseline does not silently block; it escalates in three steps, matching bounded authority
