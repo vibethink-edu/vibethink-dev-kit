@@ -209,6 +209,28 @@ review, and the session-close ritual (`CANON-AGENT-COLLABORATION` §8) check
 completeness — no automated gate can enumerate every dimension for every repo. The
 artifacts of §5 are the durable record that the dimensions were in fact carried.
 
+### 8.1 — Dual-surface parity: human surface AND programmatic surface *(PROPOSED — pending seal)*
+
+A **capability** (a feature, module, or operation a user can invoke) is complete only when it is
+reachable by **both** of its audiences: the **human surface** (a UI) **and** the **programmatic
+surface** (a CLI, tool, API endpoint, or server action). Neither is second-class.
+
+In an agent-driven workflow this is not optional polish: an **agent operates the machine surface**,
+so a **UI-only capability is invisible and unusable to an agent** (it cannot click), and a
+**programmatic-only capability is invisible to a human**. Shipping one surface ships half the unit —
+to the audience that got nothing, it is zero value (the completeness rule above).
+
+- **Declared at architecture time, not retrofitted.** A capability's programmatic surface is designed
+  **as a peer** to its UI. The preflight / decision gate asks *"what is the programmatic surface
+  (CLI/tool/API) of this?"* alongside *"what is the UI?"*. A surface deferred to a follow-up silently
+  never ships.
+- **The form is per-repo binding; the parity is the rule.** The programmatic surface may be a CLI
+  command, an agent tool, an HTTP endpoint, or a server action — each repo binds which forms it uses.
+  What is universal: **a capability does not exist in only one plane.**
+- **Scope.** Applies to **capabilities/components**, not trivial changes, pure-internal helpers, or
+  one-off scripts. A capability genuinely meant for a single audience declares that consciously — it
+  is not the default; the default is parity.
+
 ---
 
 ## Fire-test
