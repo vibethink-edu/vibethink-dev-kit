@@ -4,7 +4,7 @@
 > product, regulatory, operational, vocabulary, scenario, or decision knowledge.
 > Neutral core with a VibeThink L2 binding. The core does not depend blindly on a
 > specific engine; VT-METHOD requires a declared Knowledge Memory Adapter.
-> **Status:** PROPOSED 2026-06-28 for Principal Architect review. Binding when sealed/merged.
+> **Status:** SEALED 2026-06-28 by the Principal Architect (merge = seal). PR #196 · D-049.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream -> fork.
 > **Companions:** `CANON-DEVELOPMENT-PROCESS.md` (governance precedes code),
 > `VT-METHOD.md` (house L2 flow), `CANON-CONTEXT-HYGIENE.md` (context is selected
