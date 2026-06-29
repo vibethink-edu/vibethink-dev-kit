@@ -185,6 +185,30 @@ If the validator changes the knowledge, the pack is amended before acceptance. I
 is stale, it is superseded or marked candidate again; agents do not silently rely on stale
 product knowledge.
 
+### 6.1. Coherence with the constitution — contradiction tie-break & amendment cascade *(PROPOSED — pending seal)*
+
+Constructing or accepting a Knowledge Pack can surface a **contradiction** between the pack and the
+constitution (canon), or between two governing documents. A contradiction is **never run through**:
+an agent acting on incoherent knowledge is the failure this method exists to prevent.
+
+- **Blocker at acceptance.** A pack with an unresolved contradiction against the canon or another
+  accepted doc **cannot reach `accepted`** — it stays `candidate`, with the conflict recorded as an
+  open question, until reconciled.
+- **Tie-break (which side is truth).** The **constitution/canon is authority on the *how*** (process,
+  principle, vocabulary); the **accepted Knowledge Pack is authority on the *what*** (the current
+  business reality). When they conflict on a **fact about the business** (e.g. a business that sold a
+  product has pivoted to renting it), **reality wins → the canon is amended**. When they conflict on
+  **process or principle**, the canon wins → the pack is corrected. The human/principal authority
+  disambiguates any case that is not clearly one or the other. Work never proceeds on the unresolved
+  conflict.
+- **Amendment cascade (coherence is all-or-nothing).** Once truth is decided, **every** conflicting
+  artifact — the canon and all affected docs/packs — is amended to agree. A half-amended set is a new
+  contradiction; reconciliation is not complete until pack, canon, and docs are mutually coherent.
+- **The gate screams.** A **declared, unresolved** contradiction (a conflict logged but not reconciled)
+  is a **RED gate** — the same loud failure as any other governance breach. Semantic contradiction
+  cannot be fully auto-detected; the gate bites on the *declared-and-open* ones, and surfacing a
+  contradiction is a construction-time obligation, not optional.
+
 ## 7. Feature Binding
 
 A product-shaping feature/spec/briefing carries a `Knowledge Baseline` section before it
@@ -251,6 +275,37 @@ does not define those commands globally.
 `check-knowledge-memory-freshness.mjs` compares the current accepted sources and declared
 index artifacts against the manifest. It goes RED when required memory is missing/stale.
 Optional memory may WARN without blocking product correctness, but it must still be visible.
+
+### 8.2. Baseline validity, business-pivot reconstruction & status *(PROPOSED — pending seal)*
+
+§8.1 freshness is **hash-based**: it catches a *source file that changed*. It does **not** catch a
+baseline that is **semantically dead** — the file is unchanged (hash "fresh") but the world it
+describes has moved (the objective or business model changed and nobody updated the pack). Running
+agents against a confidently-stale baseline is the most dangerous failure mode (industry consensus:
+an unmaintained knowledge base is worse than none; high-relevance semantic staleness is an open
+problem that cannot be auto-detected). The safe mechanism does not pretend to auto-detect it — it
+uses three independent nets:
+
+- **(1) Validity window (TTL).** `accepted` is not forever. A pack carries a **revalidation cadence**
+  (a date or a release boundary). When it lapses, the human/principal authority must re-confirm *"is
+  this still true?"* — re-accept or supersede. Catches the **"nobody ever updated it"** case.
+- **(2) Business-pivot trigger (declared governance event).** A change of objective/business model is
+  a **governance event** that marks the affected baseline **stale-by-pivot**, independent of any file
+  hash. Declaring the pivot **requires a Knowledge Reconstruction Sprint (§3)** on the affected scope
+  **before** any agent does product-shaping work against it. Catches the **"the business changed"** case.
+- **(3) The gate refuses.** When a baseline is **lapsed (TTL)** or **stale-by-pivot (un-reconciled)**,
+  the gate goes **RED and blocks** — the one place a hard block (not a warn) is correct, because
+  running on a dead baseline is catastrophic, not cosmetic.
+
+- **Status surface (`kdd status`).** A safe, read-only command answers *"how is the KDD?"*: per accepted
+  pack — age, revalidation due/lapsed, any declared pivot pending reconciliation, and whether a
+  reconstruction is open. The operator's at-a-glance health of the baseline; the form (`kdd status` / a
+  doctor line / an endpoint) is L3 binding, the **status contract** is universal.
+
+The lifecycle states (§4) gain two transitions: `accepted → lapsed` (TTL) and `accepted →
+stale-by-pivot` (declared business change); both route back through the Reconstruction Sprint (§3) to
+`accepted`. Neither hash-freshness (§8.1) nor these checks can prove a baseline is *true* — only that
+it has not lapsed and no pivot is pending; truth remains a human acceptance.
 
 ## 9. L3 Binding
 
