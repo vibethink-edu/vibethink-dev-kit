@@ -5,6 +5,9 @@
 > Neutral core with a VibeThink L2 binding. The core does not depend blindly on a
 > specific engine; VT-METHOD requires a declared Knowledge Memory Adapter.
 > **Status:** SEALED 2026-06-28 by the Principal Architect (merge = seal). PR #196 · D-049.
+> **Amendments SEALED 2026-06-29 by Marcelo:** §6.1 (constitution contradiction tie-break &
+> amendment cascade), §7.1 (forgotten-context scream), §7.2 (enforcement at dispatch), §8.2
+> (baseline validity, business-pivot reconstruction & status).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream -> fork.
 > **Companions:** `CANON-DEVELOPMENT-PROCESS.md` (governance precedes code),
 > `VT-METHOD.md` (house L2 flow), `CANON-CONTEXT-HYGIENE.md` (context is selected
@@ -185,7 +188,7 @@ If the validator changes the knowledge, the pack is amended before acceptance. I
 is stale, it is superseded or marked candidate again; agents do not silently rely on stale
 product knowledge.
 
-### 6.1. Coherence with the constitution — contradiction tie-break & amendment cascade *(PROPOSED — pending seal)*
+### 6.1. Coherence with the constitution — contradiction tie-break & amendment cascade
 
 Constructing or accepting a Knowledge Pack can surface a **contradiction** between the pack and the
 constitution (canon), or between two governing documents. A contradiction is **never run through**:
@@ -224,7 +227,7 @@ A complex feature with no baseline is incomplete. A baseline link to a candidate
 allowed only when the work is explicitly a knowledge-reconstruction task, not a feature
 implementation.
 
-### 7.1. Loaded, not just cited — the "forgotten context" scream *(PROPOSED — pending seal)*
+### 7.1. Loaded, not just cited — the "forgotten context" scream
 
 The baseline must be **loaded** — read and current at work time — not merely *linkable*. The most
 basic failure is not a stale or contradicted baseline; it is an agent that **never loaded the
@@ -350,7 +353,7 @@ does not define those commands globally.
 index artifacts against the manifest. It goes RED when required memory is missing/stale.
 Optional memory may WARN without blocking product correctness, but it must still be visible.
 
-### 8.2. Baseline validity, business-pivot reconstruction & status *(PROPOSED — pending seal)*
+### 8.2. Baseline validity, business-pivot reconstruction & status
 
 §8.1 freshness is **hash-based**: it catches a *source file that changed*. It does **not** catch a
 baseline that is **semantically dead** — the file is unchanged (hash "fresh") but the world it
