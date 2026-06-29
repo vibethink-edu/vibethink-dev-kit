@@ -240,41 +240,50 @@ context at all** and codes blind. So:
 
 ### 7.2. Enforcement at dispatch — the orchestrator is the gate *(SEALED 2026-06-29 by Marcelo, Principal Architect)*
 
-When product-shaping work is **dispatched** to an executor — an orchestrator assigns a
-coder/agent that will shape product in a **target repo** — the **orchestrator** is the
-enforcement point for the Feature Binding (§7), because it holds the last gate before the
-executor touches the target. §7/§7.1/§8.2 apply regardless of who launched the work; **dispatch
-is where the binding bites**. (Raised as an L3 finding from a WorkBench orchestrator; elevated
-here because the pattern is reusable by *any* dispatcher, per §9.)
+§7 assumes the feature author and the implementer are the same agent in the same repo. In a
+**dispatch model** — an *orchestrator* assigns a coder/agent that will product-shape in a **target
+repo** — the **orchestrator** holds the last gate before the implementer touches that repo, so it
+is the Feature-Binding (§7) enforcement point. The pattern is reusable by *any* dispatcher, so it
+lives in the spine, not in one orchestrator's L3 (§9, §11). *(Converged independently from a
+WorkBench L3 finding and a spine draft; reconciled and sealed here.)*
 
-**Canonical Knowledge Baseline (the "carnet").** A dispatch declares its baseline using this
-**canonical shape — defined here so every orchestrator emits it identically**, not as an L3
-invention:
+**Rule.** A dispatched product-shaping task MUST carry a resolvable **Knowledge Baseline of the
+target repo**, or an explicit **reconstruction intent**. The dispatch does **not** proceed (RED)
+when the baseline is *forgotten* (absent — §7.1), `candidate`/`rejected`, *lapsed* or
+*stale-by-pivot* (§8.2), or *contradicted* (§6.1) — the same four RED conditions, enforced one hop
+earlier. The only sanctioned bypass is a declared **Knowledge Reconstruction Sprint** (§3).
+
+**Canonical baseline shape (the "carnet" — engine-neutral; every orchestrator emits it
+identically, not an L3 invention).** The task declares **either** a `knowledgeBaseline` object
+**or** `dispatchIntent: "reconstruction"`:
 
 ```
 knowledgeBaseline:
-  packId:           <accepted pack id, e.g. wb-orchestration-plane>
-  version:          <semver of the pack>
-  scope:            <the scope this work shapes, in the target repo>
-  status:           accepted            # MUST be `accepted` (never candidate/rejected)
-  revalidationDue:  <date | release>    # §8.2 TTL — MUST NOT be lapsed
-  adapter:          <declared Knowledge Memory Adapter used to retrieve it>
-  sourceRef:        <target-repo-relative path/ref of the accepted pack>
-  contentHash:      <hash of the accepted source snapshot>   # §8.1 integrity
+  packId           # accepted pack id, e.g. "KP-<DOMAIN>-001"
+  version          # e.g. "v1"
+  scope            # the domain/feature this dispatch shapes, in the target repo
+  status           # MUST be "accepted" — candidate/rejected ⇒ RED
+  revalidationDue  # ISO-8601 date | null — a past date ⇒ lapsed (§8.2) ⇒ RED
+  adapter          # declared Knowledge Memory Adapter id (Markdown is source of truth, §8)
+  sourceRef        # target-repo-relative path/ref of the accepted pack
+  manifestHash     # OPTIONAL — SHA256 of the accepted source from the freshness manifest (§8.1).
+                   #   Absent ⇒ declared-trust (structural check). Present ⇒ verified-trust: the
+                   #   orchestrator MAY confirm the declared baseline matches the target repo's
+                   #   live accepted source (deep/semantic check).
 ```
 
-…or, explicitly, `dispatchIntent: reconstruction` — a declared Knowledge Reconstruction Sprint
-(§3) when the target scope has no accepted baseline yet. The shape is the minimum **complete**
-carnet: it lets the gate decide on presence (forgotten), status, lapse, and integrity without
-reading the target repo.
+The shape is the minimum **complete** carnet: it lets the gate decide presence (forgotten),
+status, lapse, and integrity without reading the target repo; `manifestHash` is the lineage edge
+for an optional deep check.
 
 **Escalation — announce, scream, then ask (NOT a blind block).** A dispatch missing a valid
 baseline does not silently block; it escalates in three steps, matching bounded authority
 (*"when the system knows it needs a human, it asks"*):
 
 1. **Announce (warn).** The dispatch is allowed but the missing/`candidate`/lapsed/contradicted
-   baseline is surfaced as a warning **and recorded** (audit/activity). Announce-only applies for
-   an **L3-declared, time-boxed rollout window**.
+   baseline is surfaced as a warning **and recorded** (audit/activity). Announce-only applies for a
+   **declared, finite** window — `enforceFrom` (a date or release), ceiling **≤ 14 days or 2
+   releases**. Indefinite warn-first is not allowed (it equals no enforcement).
 2. **Scream (RED).** Past the window the gate goes **RED and loud** — the same failure class as
    lapsed (§8.2), contradicted (§6.1), and forgotten (§7.1).
 3. **Ask the human (if it still proceeds).** If a dispatch is *still* attempted against a RED
@@ -283,11 +292,11 @@ baseline does not silently block; it escalates in three steps, matching bounded 
    contradicted) and the options (supply a baseline · declare `reconstruction` · override with a
    recorded reason). A blind auto-block is wrong; a **governed human decision** is correct.
 
-**Gate (§10 extension).** The dispatch gate verifies that a product-shaping dispatch carries a
-resolvable **canonical** `knowledgeBaseline` whose `status` is `accepted` and whose
-`revalidationDue` is not lapsed — or an explicit `dispatchIntent: reconstruction`. L3 binds only
-the *surface* (the dispatch endpoint/CLI), the announce-window length, and the human-ask channel;
-the **carnet shape and the three-step escalation are canonical here**, shared by every orchestrator.
+**Gate (§10 extension).** The dispatch gate verifies that a product-shaping dispatch resolves a
+**canonical** `knowledgeBaseline` (status `accepted`, not lapsed) of the target repo, or declares
+`dispatchIntent: "reconstruction"`. L3 binds only the *surface* (the dispatch endpoint/CLI), the
+`enforceFrom` window, and the human-ask channel; the **carnet shape and the three-step escalation
+are canonical here**, shared by every orchestrator.
 
 ## 8. Engine Boundary and Memory Adapter
 
