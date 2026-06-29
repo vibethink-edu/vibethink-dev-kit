@@ -203,6 +203,12 @@ jobs:
       - name: versioning engine tests
         run: node tools/check-versioning.test.mjs
 
+      - name: knowledge-pack engine tests
+        run: node tools/check-knowledge-pack.test.mjs
+
+      - name: KDD memory freshness engine tests
+        run: node tools/check-knowledge-memory-freshness.test.mjs
+
       - name: devkit-upgrade engine tests
         run: node tools/devkit-upgrade.test.mjs
 

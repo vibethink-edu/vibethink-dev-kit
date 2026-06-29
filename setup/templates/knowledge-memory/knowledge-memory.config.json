@@ -1,0 +1,29 @@
+{
+  "$schema": "VIBETHINK_KDD_MEMORY_FRESHNESS_V1",
+  "manifestPath": "docs/knowledge/.kdd-memory-manifest.json",
+  "sourceRoots": ["docs/knowledge", "doc/decisions", "docs/features"],
+  "sourceExtensions": [".md", ".json", ".yaml", ".yml"],
+  "sourcePackStatuses": ["accepted"],
+  "maxManifestAgeDays": 14,
+  "knowledgeMemoryAdapter": {
+    "name": "vibethink-default",
+    "engines": ["engram", "graphify"],
+    "sourceOfTruth": "versioned-markdown"
+  },
+  "indexes": [
+    {
+      "name": "graphify",
+      "required": true,
+      "artifacts": ["graphify-out/graph.json"],
+      "refreshCommand": "graphify update docs/knowledge --no-viz",
+      "requireArtifactNewerThanSources": true
+    },
+    {
+      "name": "engram",
+      "required": true,
+      "artifacts": [".engram/facts.json"],
+      "refreshCommand": "engram ingest docs/knowledge",
+      "requireArtifactNewerThanSources": true
+    }
+  ]
+}

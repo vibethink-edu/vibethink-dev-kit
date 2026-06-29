@@ -26,8 +26,12 @@ Canonical homes:
 - `knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md`
 - `knowledge/methodology/VT-METHOD.md`
 - `setup/templates/knowledge-pack/`
+- `setup/templates/knowledge-memory/`
 - `tools/check-knowledge-pack.mjs`
 - `tools/knowledge-pack.config.example.json`
+- `tools/kdd-refresh.mjs`
+- `tools/check-knowledge-memory-freshness.mjs`
+- `tools/knowledge-memory.config.example.json`
 
 ## L3 adoption expected in WorkBench
 
@@ -80,6 +84,11 @@ path.
 Adopt `tools/check-knowledge-pack.mjs` with a WorkBench-local
 `tools/knowledge-pack.config.json`.
 
+Adopt `tools/check-knowledge-memory-freshness.mjs` with a WorkBench-local
+`tools/knowledge-memory.config.json`. After refreshing Graphify/Engram/other declared
+indexes, run `tools/kdd-refresh.mjs` to write the manifest. Session health should refuse
+to treat stale derived memory as fresh context.
+
 Minimum local/session checks:
 
 - config declares `knowledgeMemoryAdapter`;
@@ -87,6 +96,8 @@ Minimum local/session checks:
 - accepted packs name validator;
 - open questions have owner/status;
 - product-shaping/complex feature docs/cards cite a baseline and adapter;
+- KDD memory manifest fingerprint matches accepted sources;
+- required Graphify/Engram artifacts exist and match the manifest;
 - stale adapter indexes are reported loudly by WorkBench health.
 
 ## Boundary

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-06-28
+
+### Added
+- **KDD / Knowledge-native VT-METHOD** — product-shaping work now starts from an
+  Accepted Knowledge Baseline, not isolated feature requests. Added Knowledge Pack
+  templates, `tools/check-knowledge-pack.mjs`, doctor integration, and Piece #49.
+- **KDD memory freshness harness** — `tools/kdd-refresh.mjs` writes a manifest of
+  accepted source hashes and declared graph/memory index artifacts; `tools/check-knowledge-memory-freshness.mjs`
+  goes RED when accepted knowledge changes but Graphify/Engram/other declared indexes
+  are stale or missing. DevKit remains engine-neutral; L3 declares concrete commands
+  and artifacts.
+
 ## 2026-06-24
 
 ### Added

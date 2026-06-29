@@ -126,7 +126,7 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 7 | Paused work lifecycle | Paused work is either declared-with-intent or reapable after N days — nothing floats forever. |
 | 10a | Development process (universal skeleton) | Governance precedes code: slice → decision gate → spec → governed execution → artifacts; **the plan carries a security section**; **suppressing a gate = a registered, expiring exemption**. |
 | 10b | House methodology (L2 binding) | The kit owner's concrete instantiation of the skeleton (gate questions, spec pipeline). Non-house repos: declare N-A and bind 10a natively. |
-| 49 | KDD / Knowledge-native VT-METHOD | Knowledge-Driven Design sits underneath product work: product-shaping work retrieves and cites an Accepted Knowledge Baseline through a declared Knowledge Memory Adapter before spec; VibeThink defaults to Engram + Graphify + Markdown truth. |
+| 49 | KDD / Knowledge-native VT-METHOD | Knowledge-Driven Design sits underneath product work: product-shaping work retrieves and cites an Accepted Knowledge Baseline through a declared Knowledge Memory Adapter before spec; freshness manifests stop stale graph/memory indexes from silently steering agents. |
 | 37 | Change-path & decision classes | Two questions every change answers up front: **which path** (direct / spec-first / design-gate) and **whose approval** (authority-sealed / delegated-with-record / autonomous). Kills the "do I just do it, or spec it, or ask?" guesswork — and canon changes are always authority-sealed. |
 
 ### ✅ Quality: testing and review
@@ -383,6 +383,7 @@ consumer. **Both are load-bearing.**
 | **copy-parity** | a copied runnable drifting from its source — or an adaptation nobody declared | consumer-side (workflow input or pre-commit) |
 | **comms security** | secrets in outbound agent-to-agent messages | the governed send path, fail-closed |
 | **governance gate** | a declared governance instrument (mirror/log/register) that's missing or empty, or an undeclared decision-class binding (the "no silent default" rule) | `devkit-doctor` + the engine-tests CI job (config-driven; skips if not adopted) |
+| **KDD memory freshness** | accepted knowledge changed while a declared graph/memory/search index still points at an old manifest | `devkit-doctor` + `kdd-refresh` / `check-knowledge-memory-freshness` (config-driven; skips if not adopted) |
 | **canon cross-references** | a markdown link to a missing file, or a "Piece #N" with no such catalog piece — link-rot across the canon web | `devkit-doctor` + CI (producer-side; scans `knowledge/` + `setup/`) |
 | **tool versions** | a wired tool with no declared version (or a stale/malformed entry) in `tools/versions.json` — CANON-VERSIONING-001 §6 | `devkit-doctor` + CI (producer-side) |
 
