@@ -224,6 +224,20 @@ A complex feature with no baseline is incomplete. A baseline link to a candidate
 allowed only when the work is explicitly a knowledge-reconstruction task, not a feature
 implementation.
 
+### 7.1. Loaded, not just cited — the "forgotten context" scream *(PROPOSED — pending seal)*
+
+The baseline must be **loaded** — read and current at work time — not merely *linkable*. The most
+basic failure is not a stale or contradicted baseline; it is an agent that **never loaded the
+context at all** and codes blind. So:
+
+- **Activation, not hope.** A work-start reminder surfaces the scope's accepted baseline (same
+  discipline as operator-tooling freshness: an active nudge beats a passive "remember to read it").
+- **The scream.** Product-shaping that proceeds **without a loaded, non-lapsed, non-contradicted
+  baseline** is *forgotten context* — and is a **RED gate**, the same loud failure as a lapsed (§8.2)
+  or contradicted (§6.1) baseline. *"I didn't load it"* is exactly the failure this binding exists to
+  prevent. This completes the gate's RED conditions: **lapsed · stale-by-pivot · contradicted ·
+  forgotten** — an agent never runs product-shaping against absent, dead, or incoherent knowledge.
+
 ## 8. Engine Boundary and Memory Adapter
 
 DevKit defines the method and artifacts. Its L1 core does not depend on any one retrieval
