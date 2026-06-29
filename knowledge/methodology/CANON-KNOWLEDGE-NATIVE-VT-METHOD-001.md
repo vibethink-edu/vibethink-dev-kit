@@ -238,7 +238,7 @@ context at all** and codes blind. So:
   prevent. This completes the gate's RED conditions: **lapsed · stale-by-pivot · contradicted ·
   forgotten** — an agent never runs product-shaping against absent, dead, or incoherent knowledge.
 
-### 7.2. Enforcement at dispatch — the orchestrator is the gate *(PROPOSED — pending seal)*
+### 7.2. Enforcement at dispatch — the orchestrator is the gate *(SEALED 2026-06-29 by Marcelo, Principal Architect)*
 
 When product-shaping work is **dispatched** to an executor — an orchestrator assigns a
 coder/agent that will shape product in a **target repo** — the **orchestrator** is the
