@@ -33,7 +33,8 @@ independent human/advisor review of the gate design is warranted before sealing.
 | Tool/resource surface + capability discovery (read=resources, mutate=tools) + semantic discovery | **Model Context Protocol (MCP)** (Anthropic, open spec) | established | modelcontextprotocol.io |
 | **Signal/observe** plane — event envelope | **CloudEvents** (CNCF) | established | cloudevents.io |
 | **Signal/observe** plane — event/message catalog + deprecation | **AsyncAPI** (vendor-neutral) | established | asyncapi.com |
-| Read/mutate contract + codegen (the **derivation** source) | **OpenAPI + JSON-Schema** | established | openapis.org |
+| Read/mutate contract + codegen (the **derivation** source) | **OpenAPI 3.1 + JSON-Schema** | established | openapis.org |
+| **Multi-step workflows / intent recipes** (plane is sequences, not lone endpoints) | **Arazzo** (OpenAPI workflows) | established | spec.openapis.org/arazzo |
 | Execution proof of the plane | **Consumer-driven contract tests** (Pact-style) + conformance probe | established | pact.io / general |
 | Structured error contract | **typed problem details** (RFC 7807 / problem+json) | established | RFC 7807 |
 
@@ -88,7 +89,23 @@ discovery" is trivially stubbed. The robust gate, in order of strength:
    architect-approved, logged, audited, and **costlier than complying**.
 
 This supersedes the earlier "spec-driven preflight" framing. The L1 rule (§8.1) now states the
-execution+derivation gate directly.
+**contract-derived execution gate** directly: **the preflight only routes (decides applicability);
+the conformance gate enforces (proves the plane lives).**
+
+### Two independent advisor reviews converged (2026-06-29)
+
+Opus **and** Codex, reviewing independently, both reached *declaration → derivation + execution* —
+strong evidence the fix is right. Codex added, and §8.1 now carries:
+
+- **Split `observe` from `emit`** — emitting a signal is a *mutation-class* action with consequences,
+  not a free side-effect of the observe (subscribe) permission.
+- **Workflows / intent recipes** (Arazzo) — the plane is multi-step sequences, not lone endpoints.
+- **Authorization includes actor delegation** (which agent acts on whose behalf).
+- **Conformance carries negative tests** — unauthorized, replay, stale version, invalid precondition —
+  and verifies **provenance was recorded**, not just the happy path.
+- **Name it a contract-derived execution gate**, never a "declarative preflight."
+
+Reviews persisted: `comms/2026-06-29-REVIEW-OPUS-AGENT-PLANE-GATE.md` (+ Codex review, same disposition).
 
 ## 6. Sources (verify before citing externally)
 

@@ -220,15 +220,18 @@ so a **UI-only capability is invisible and unusable to an agent** (it cannot cli
 **programmatic-only capability is invisible to a human**. Shipping one surface ships half the unit —
 to the audience that got nothing, it is zero value (the completeness rule above).
 
-**The plane — three verbs, fully governed.** An agent must be able to **read** (query the
-capability's state — including cursored/streamed access for large or continuous state), **mutate**
-(perform its governed actions), and **observe** (subscribe to and/or emit the capability's signals —
-its event stream). A capability an agent can read but not act on, or act on but cannot observe, is
-*partial*. The third verb (observe/signal) is the one most often forgotten and is what lets agents
-react to the system instead of polling it. "Governed" is explicit, not implied:
+**The plane — four verbs + workflows, fully governed.** An agent must be able to **read** (query
+state — including cursored/streamed access for large or continuous state), **mutate** (perform
+governed actions), **observe** (subscribe to the capability's signals — a read-class subscription),
+and **emit** (publish a signal — which is a **mutation-class** action with consequences, governed like
+`mutate`, *not* a free side-effect of `observe`). A capability an agent can read but not act on, or
+act on but cannot observe, is *partial*; emit is split from observe because emitting can change the
+world. Beyond single operations, the plane also exposes **multi-step workflows / intent recipes** —
+real capabilities are sequences, not lone endpoints. "Governed" is explicit, not implied:
 
-- **Authorization scoped per verb and per tenant** — which agent may read vs mutate vs receive
-  signals, scoped by tenant and role. (In a multi-tenant system this is the first gap, not a detail.)
+- **Authorization scoped per verb, per tenant, and per actor** — which agent may read vs mutate vs
+  observe vs emit, scoped by tenant and role, **including delegation** (which agent acts on whose
+  behalf). (In a multi-tenant system this is the first gap, not a detail.)
 - **Idempotency and concurrency control on mutate** — agents retry; a replayed action must not
   double-apply, and concurrent writes must be detected (idempotency key + optimistic concurrency).
 - **A propose / dry-run variant of mutate** — preview the effect without applying it; for
@@ -256,14 +259,21 @@ Then the plane **exists by construction** and cannot be stubbed without breaking
 This changes the gate's question from *"did you declare it?"* to *"did you regenerate, and does it
 conform?"* — far harder to fake.
 
-**The gate verifies execution, not declaration — the anti-theatre rule.** A preflight that checks
+**Contract-derived execution gate — the preflight routes, the conformance gate enforces.** This is
+sealed as an *execution conformance* gate, **not** a spec-driven preflight. A preflight that checks
 what you *declared* passes a plane that does not exist (declaration ≠ implementation); declaration
-alone is theatre, and "declare read+mutate+signal+discovery" is trivially gameable with stubs (a
-read returning `{}`, a no-op mutate, a signal that never fires). So the gate pairs intent with
-**proof**: a **conformance probe** exercises each verb against the *live* capability — read returns
-real data, mutate mutates and the effect is verified, signal fires and is observed, discovery
-self-validates against the live surface — held to the same test-quality bar as any test (a happy
-path **and** a failure mode, so the probe itself is not a no-op).
+alone is theatre, and "declare read+mutate+observe+emit+discovery" is trivially gameable with stubs (a
+read returning `{}`, a no-op mutate, a signal that never fires). So the two are split by role:
+
+- the **preflight only routes** — it decides *whether* the rule applies (capability boundary? risk
+  tier? CRUD that can be inferred?); it never certifies the plane;
+- the **conformance gate enforces** — a **probe exercises each verb against the *live* capability**:
+  read returns real fixture-seeded data; mutate changes state and the effect, idempotency, and
+  conflict are verified; **observe** is received by a real subscriber (not a "declared event");
+  **emit** publishes and is observed; discovery round-trips against the live operations; and
+  **provenance is verified as recorded**. It carries **negative cases** too — unauthorized, replay,
+  stale version, invalid precondition — held to the same test-quality bar as any test (happy **and**
+  failure, so the probe is not a no-op).
 
 **Fired at the capability boundary, default-infer, risk-tiered — the anti-bureaucracy rules.** A
 gate that over-triggers becomes rubber-stamped, which breaks it:
@@ -286,8 +296,9 @@ the path of least resistance must be to build the plane, not to skip it.
 **The form is per-repo binding; the parity, the verbs, and the governance are the rule.** Which
 concrete contract/description format, code-generation, event-signal spec, error format, and probe
 tooling a repo uses are **L2/L3 bindings** (this neutral layer names none). What is universal: **a
-capability does not exist in only one plane; the agent plane is read + mutate + observe, discoverable
-and governed; and it is proven by execution, not by declaration.**
+capability does not exist in only one plane; the agent plane is read + mutate + observe + emit (and
+its workflows), discoverable and governed; and it is proven by a contract-derived execution gate, not
+by declaration.**
 
 **Scope.** Applies to **capabilities/surfaces**, not trivial changes, pure-internal helpers, or
 one-off scripts. A capability genuinely meant for a single audience takes the human-approved escape —
