@@ -220,38 +220,78 @@ so a **UI-only capability is invisible and unusable to an agent** (it cannot cli
 **programmatic-only capability is invisible to a human**. Shipping one surface ships half the unit —
 to the audience that got nothing, it is zero value (the completeness rule above).
 
-- **The programmatic surface is a plane, not one endpoint — three verbs.** An agent must be able to
-  **read** (query the capability's state), **mutate** (perform its governed actions), and **observe**
-  (subscribe to and/or emit the capability's signals — its event stream). A capability an agent can
-  read but not act on, or act on but cannot observe, is *partial*. The third verb (observe/signal) is
-  the one most often forgotten and is what lets agents react to the system instead of polling it.
-- **Discoverable, not merely present.** The agent must be able to *discover* what the capability
-  offers — its operations, parameters, current state, and emitted signals — from a **machine-readable
-  description**, without out-of-band knowledge. A surface that exists but cannot be discovered is
-  forgotten the moment it leaves the author's head.
-- **Modeled at the data/architecture layer, not wrapped on later.** The agent plane is designed when
-  the **schema and architecture** are designed: what is readable, what is mutable, and what emits a
-  signal are structural decisions, not a wrapper added after the UI works. This is the point of the
-  whole rule — the plane is an *input to the model*, not an afterthought.
-- **Governed mutation.** An agent's mutations carry the same governance as any actor: authorization /
-  scope, **idempotency** (a retried action must not double-apply), and — for tenant-visible or
-  irreversible effects — **proposal/apply separation** (the agent proposes; a governed authority
-  applies). The agent plane never becomes a backdoor around the controls the human surface obeys.
-- **Versioned contract.** The agent contract (what can be read, mutated, observed) is **versioned**
-  like any other interface; a breaking change is a versioned change, not a silent drift.
-- **The gate is the anti-forgetting lock.** The preflight / decision gate does **not** pass a
-  capability, **schema, or architecture change** until its agent plane is declared — *read + mutate +
-  signal + discovery* — **or** it consciously declares "no agent surface" with a recorded reason. A
-  surface "deferred to a follow-up" silently never ships; that is exactly the failure this lock
-  exists to prevent. The lock fires at **design time** (schema/architecture), not at review time.
-- **The form is per-repo binding; the parity is the rule.** Which concrete interface protocol,
-  event-signal contract, machine-readable description format, and spec/preflight tooling a repo uses
-  are **L2/L3 bindings** (this neutral layer names none). What is universal: **a capability does not
-  exist in only one plane, and the agent plane is read + mutate + observe, discoverable and
-  governed.**
-- **Scope.** Applies to **capabilities/components**, not trivial changes, pure-internal helpers, or
-  one-off scripts. A capability genuinely meant for a single audience declares that consciously — it
-  is not the default; the default is parity.
+**The plane — three verbs, fully governed.** An agent must be able to **read** (query the
+capability's state — including cursored/streamed access for large or continuous state), **mutate**
+(perform its governed actions), and **observe** (subscribe to and/or emit the capability's signals —
+its event stream). A capability an agent can read but not act on, or act on but cannot observe, is
+*partial*. The third verb (observe/signal) is the one most often forgotten and is what lets agents
+react to the system instead of polling it. "Governed" is explicit, not implied:
+
+- **Authorization scoped per verb and per tenant** — which agent may read vs mutate vs receive
+  signals, scoped by tenant and role. (In a multi-tenant system this is the first gap, not a detail.)
+- **Idempotency and concurrency control on mutate** — agents retry; a replayed action must not
+  double-apply, and concurrent writes must be detected (idempotency key + optimistic concurrency).
+- **A propose / dry-run variant of mutate** — preview the effect without applying it; for
+  tenant-visible or irreversible actions the agent *proposes* and a governed authority *applies*.
+- **A structured, typed error contract** — machine-readable status + retryability, not human prose.
+- **Provenance** — every agent mutation records which agent acted and why; mutations are auditable.
+- **Rate / quota limits** — the plane is metered; agents hammer.
+
+**Discoverable — structurally and semantically.** The agent discovers what the capability offers
+from a **machine-readable description**, without out-of-band knowledge — and not just a list of
+operations: the description carries **preconditions, side-effects, and examples**, so an agent knows
+not only *what* exists but *when and how* to use it safely.
+
+**Versioned, with deprecation signalling.** The contract is versioned; **and** a breaking change is
+*signalled* to agents (a deprecation / sunset notice), not merely bumped — an agent must be able to
+learn its contract is ending.
+
+**Modeled at the data/architecture layer, not wrapped on later.** What is readable, mutable, and
+signal-emitting are decided when the **schema and architecture** are decided — the plane is an
+*input to the model*, not an afterthought.
+
+**Derived, not merely declared — the structural anti-gaming.** Wherever possible the agent plane is
+**generated from the same contract/registry as the human surface** (one source → two projections).
+Then the plane **exists by construction** and cannot be stubbed without breaking the human surface.
+This changes the gate's question from *"did you declare it?"* to *"did you regenerate, and does it
+conform?"* — far harder to fake.
+
+**The gate verifies execution, not declaration — the anti-theatre rule.** A preflight that checks
+what you *declared* passes a plane that does not exist (declaration ≠ implementation); declaration
+alone is theatre, and "declare read+mutate+signal+discovery" is trivially gameable with stubs (a
+read returning `{}`, a no-op mutate, a signal that never fires). So the gate pairs intent with
+**proof**: a **conformance probe** exercises each verb against the *live* capability — read returns
+real data, mutate mutates and the effect is verified, signal fires and is observed, discovery
+self-validates against the live surface — held to the same test-quality bar as any test (a happy
+path **and** a failure mode, so the probe itself is not a no-op).
+
+**Fired at the capability boundary, default-infer, risk-tiered — the anti-bureaucracy rules.** A
+gate that over-triggers becomes rubber-stamped, which breaks it:
+
+- **Trigger at the capability/surface boundary** (the capability registry), **not** on raw schema
+  files — internal DTOs, migrations, and refactors are exempt by construction.
+- **Default-infer, not default-block** — for standard CRUD the plane is *derived* from the schema
+  automatically; the gate blocks only when inference fails or a human overrides. Ceremony is the
+  exception, not the rule.
+- **Risk-tiered** — a hard block only for tenant-visible / production capabilities; advisory for
+  internal ones.
+- **Net-value self-test** — if the gate fires more often than it catches a real gap, it is
+  net-negative (governance must accelerate); measure real-plane outcomes vs boilerplate escapes.
+
+**The escape is expensive and human-approved.** "No agent surface" is the biggest gaming vector — a
+reflexive *"internal"* and the author is through. So the escape is **approved by a human/architect
+(never self-declared), logged, and audited**, and is deliberately **more expensive than complying** —
+the path of least resistance must be to build the plane, not to skip it.
+
+**The form is per-repo binding; the parity, the verbs, and the governance are the rule.** Which
+concrete contract/description format, code-generation, event-signal spec, error format, and probe
+tooling a repo uses are **L2/L3 bindings** (this neutral layer names none). What is universal: **a
+capability does not exist in only one plane; the agent plane is read + mutate + observe, discoverable
+and governed; and it is proven by execution, not by declaration.**
+
+**Scope.** Applies to **capabilities/surfaces**, not trivial changes, pure-internal helpers, or
+one-off scripts. A capability genuinely meant for a single audience takes the human-approved escape —
+it is not the default; the default is parity.
 
 ---
 
