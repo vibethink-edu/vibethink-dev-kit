@@ -1,7 +1,7 @@
 # Development Process — neutral core (L1)
 
 > **Status:** CANON (neutral core).
-> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`). · **§8.1 (dual-surface parity / agent-plane-by-design, as a contract-derived execution gate) SEALED 2026-06-29 by the Principal Architect after two independent advisor reviews converged** (companion: `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md`). · **§8.1 outcome-conformance (golden tasks) SEALED 2026-06-29 by the Principal Architect** (the §8.1 outcome slice — verbs prove access, golden tasks prove achievement; tiered + held-out). · **§6.1 (findings are an active, required output — not a passive courtesy) SEALED 2026-06-29 by the Principal Architect** (emission active+required now; absorption stays the gated learning-back loop).
+> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`). · **§8.1 (dual-surface parity / agent-plane-by-design, as a contract-derived execution gate) SEALED 2026-06-29 by the Principal Architect after two independent advisor reviews converged** (companion: `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md`). · **§8.1 outcome-conformance (golden tasks) SEALED 2026-06-29 by the Principal Architect** (the §8.1 outcome slice — verbs prove access, golden tasks prove achievement; tiered + held-out). · **§6.1 (findings are an active, required output — not a passive courtesy) SEALED 2026-06-29 by the Principal Architect** (emission active+required now; absorption stays the gated learning-back loop). · **§8.2 (human governance plane — the human governs by VERIFICATION, not by trust; the verification surface is proven by an injected-falsehood independence probe, the dual of §8.1's contract-derived execution gate) SEALED 2026-06-30 by the Principal Architect after two independent advisor reviews converged** (companion to §8.1; rests on §8.1's record-integrity — a chain, by design; consumes §8.1's provenance, no new recording duty).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **What this is:** the agnostic *skeleton* of how a unit of work goes from idea to
 > verified implementation. It carries **no brand, product, or methodology name**
@@ -351,7 +351,7 @@ by declaration.**
 one-off scripts. A capability genuinely meant for a single audience takes the human-approved escape —
 it is not the default; the default is parity.
 
-### 8.2 — Human governance plane: the human governs by VERIFICATION, not by trust *(PROPOSED 2026-06-30 — companion to §8.1; awaiting two independent advisor reviews + Principal Architect seal)*
+### 8.2 — Human governance plane: the human governs by VERIFICATION, not by trust *(SEALED 2026-06-30 by the Principal Architect — after two independent advisor reviews converged)*
 
 §8.1 gives a capability its **agent plane** — the agent *operates* the machine. §8.2 gives the
 **human plane** its true role once the operator is an agent and the human is the **governor**. §8.2
