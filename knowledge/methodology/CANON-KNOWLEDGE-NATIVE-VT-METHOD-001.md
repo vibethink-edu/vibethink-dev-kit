@@ -7,7 +7,9 @@
 > **Status:** SEALED 2026-06-28 by the Principal Architect (merge = seal). PR #196 · D-049.
 > **Amendments SEALED 2026-06-29 by Marcelo:** §6.1 (constitution contradiction tie-break &
 > amendment cascade), §7.1 (forgotten-context scream), §7.2 (enforcement at dispatch), §8.2
-> (baseline validity, business-pivot reconstruction & status).
+> (baseline validity, business-pivot reconstruction & status), §9.1 (KDD refresh — bringing a
+> consumer current with the spine: spine-first, owner-first, inherit-don't-rebuild, gated, declared,
+> triggered cadence).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream -> fork.
 > **Companions:** `CANON-DEVELOPMENT-PROCESS.md` (governance precedes code),
 > `VT-METHOD.md` (house L2 flow), `CANON-CONTEXT-HYGIENE.md` (context is selected
@@ -426,7 +428,7 @@ finding/handoff to DevKit -> DevKit canon/template/gate amendment -> L3 adoption
 The L3 repo may carry a temporary local implementation while the gap is under review,
 but it must label it as local/temporary and must not present it as the reusable canon.
 
-### 9.1. KDD refresh — bringing a consumer current with the spine *(PROPOSED — pending seal)*
+### 9.1. KDD refresh — bringing a consumer current with the spine *(SEALED 2026-06-29 by the Principal Architect)*
 
 A consumer's KDD is only as current as the **spine it was built against**. "KDD refresh" is the
 standard procedure to bring a consumer's KDD current with the dev-kit, and it has a **mandatory
