@@ -1,7 +1,7 @@
 # Development Process — neutral core (L1)
 
 > **Status:** CANON (neutral core).
-> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`). · **§8.1 (dual-surface parity / agent-plane-by-design, as a contract-derived execution gate) SEALED 2026-06-29 by the Principal Architect after two independent advisor reviews converged** (companion: `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md`).
+> **Seal log:** §7 (method canons are SOTA-informed) and §8 (completeness & full ownership of a unit) amendments **seal-confirmed by the Principal Architect 2026-06-05** ("SEAL DALE"). · **§5.1 (examples are first-class artifacts) amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#21)** (lifted from a product-side canon, `CANON-EXAMPLES-FIRST-001`). · **§8.1 (dual-surface parity / agent-plane-by-design, as a contract-derived execution gate) SEALED 2026-06-29 by the Principal Architect after two independent advisor reviews converged** (companion: `REFERENCE-AGENT-PLANE-STANDARDS-MAPPING.md`). · **§8.1 outcome-conformance (golden tasks) SEALED 2026-06-29 by the Principal Architect** (the §8.1 outcome slice — verbs prove access, golden tasks prove achievement; tiered + held-out). · **§6.1 (findings are an active, required output — not a passive courtesy) SEALED 2026-06-29 by the Principal Architect** (emission active+required now; absorption stays the gated learning-back loop).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **What this is:** the agnostic *skeleton* of how a unit of work goes from idea to
 > verified implementation. It carries **no brand, product, or methodology name**
@@ -125,7 +125,7 @@ An anomaly, risk, or opportunity **outside the current scope** is recorded as a
 typed **finding** (category · location · why · suggested action) — never silently
 fixed and never lost. Security findings escalate to the named authority immediately.
 
-### 6.1 — Findings are an active, required output — not a passive courtesy *(PROPOSED — pending seal)*
+### 6.1 — Findings are an active, required output — not a passive courtesy *(SEALED 2026-06-29 by the Principal Architect)*
 
 The rule above is necessary but **passive**: it fires only if an agent happens to notice and
 bother. The common failure is the agent that merely **obeys** the task — does exactly what it was
@@ -301,7 +301,7 @@ read returning `{}`, a no-op mutate, a signal that never fires). So the two are 
   stale version, invalid precondition — held to the same test-quality bar as any test (happy **and**
   failure, so the probe is not a no-op).
 
-**Outcome conformance — golden tasks (proves achievement, not just access)** *(PROPOSED — pending seal)*.
+**Outcome conformance — golden tasks (proves achievement, not just access)** *(SEALED 2026-06-29 by the Principal Architect)*.
 The verb-level probe proves each door *opens*; it does not prove an agent *achieves the capability's
 goal end-to-end*. So a capability also declares a small set of **golden tasks** — canonical end-to-end
 agent tasks that drive read+mutate+observe+emit toward a **verified outcome** (e.g. *perform the action
