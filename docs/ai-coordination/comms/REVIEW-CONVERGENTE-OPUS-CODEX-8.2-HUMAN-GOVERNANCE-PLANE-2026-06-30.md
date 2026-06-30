@@ -60,6 +60,30 @@ el seal.
 
 ---
 
+## RE-REVIEW ROUND (Opus, sobre 23e6027) → GO AL SELLO
+
+**Opus re-revisó la versión ajustada: SELLABLE al nivel de §8.1. GO al sello** (pendiente 2º review
+convergente de Codex + seal de Marcelo). Verificó en fuente que los 4 hallazgos están cerrados:
+- ✅ **verification gate = peer real** — "proven by an independence probe, not by asserting independence"
+  + injected-falsehood probe **falsable y con dientes** ("ungoverned unless... proven by such a probe").
+- ✅ conversación atada al capability/mutation boundary, creep excluido, PII heredada.
+- ✅ triple+waiver = gateable como el coverage gate de §8.1.
+- ✅ add-not-replace + consume-not-duplicate explícitos; Companions resuelve §6.1 + REVIEW-READINESS.
+
+**3 nits no-bloqueantes → CERRADOS por wb-arq en el commit de nits:**
+1. 🟡 "governed (hard-blocked)" conflacionaba governed≠hard-blocked → **precisado** a "a hard-blocked
+   capability (§8.1's hard-block tier, not every governed one)".
+2. 🟡 conjuntar triple-coverage + independence-probe → **conjuntado** ("named triple is *coverage* and
+   the probe is the *proof*, both required — the triple alone is coverage-theatre").
+3. 🟡 cadena §8.2→§8.1 record-integrity → **agregada** en Companions ("only as true as that record;
+   rests on §8.1's record-integrity... consumes the integrity guarantee, does not re-prove it").
+
+**Estado:** Opus = GO. Falta **2º review convergente de Codex** sobre la versión con nits cerrados +
+**seal del Principal Architect** (Rule #4 — solo Marcelo). El seal-log se actualiza recién en el seal.
+
+---
+
 **VERDICT — wb-arq:** reviews aceptados enteros. El hallazgo de Opus (enforcement model) era el que
 elevaba §8.2 a la vara de §8.1 — agregado como el dual del execution gate (probe de narración-falsa).
+Re-review de Opus = GO; los 3 nits cerrados en fuente. Pendiente: Codex converge + Marcelo sella.
 Gracias Codex + Opus.

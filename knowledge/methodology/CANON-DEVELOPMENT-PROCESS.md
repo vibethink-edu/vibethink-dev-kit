@@ -400,12 +400,15 @@ knowledge it relies on fresh? is the operator within its authority and applicabl
 quota / rate)?* This is **the builder does not grade** (*el que construye no califica*) applied to the
 human↔agent boundary: the governor does not certify on the operator's say-so. **L2/L3 bindings must
 name, per hard-blocked / agent-operated capability, the triple — *machine truth source → verification
-surface/query → audit trace*; its absence requires an explicit, logged waiver** (the same expensive,
+surface/query → audit trace* — **and** the surface must **pass the independence probe** above; the
+named triple is *coverage* and the probe is the *proof*, **both required** (the triple alone is
+coverage-theatre). The absence of either requires an explicit, logged waiver** (the same expensive,
 human-approved escape as §8.1).
 
 **The governing conversation is auditable — at the capability/mutation boundary, not in general.** Only
 the part of the conversation that *governs* — instructions, decisions, and approvals that **authorize or
-modify an agent operation on a governed (hard-blocked) capability** — is auditable; ordinary chat,
+modify an agent operation on a hard-blocked capability** (§8.1's hard-block tier, not every governed
+one) — is auditable; ordinary chat,
 brainstorming, and exploration are **not**. The trigger is the **same capability/mutation boundary §8.1
 fires at**, not "conversation" in general. *What was authorized, what the agent did, and what the human
 verified* form an auditable trace — which **inherits the system's secrets/PII governance**: it must not
@@ -419,7 +422,10 @@ independent of the agent, proven by an injected-falsehood probe; every agent-ope
 independently verifiable by the human who governs it; and the governing conversation, at the capability
 boundary, is auditable.**
 
-**Companions.** §8.2 *consumes* §8.1's recorded provenance (no new recording duty). It *qualifies* §6.1:
+**Companions.** §8.2 *consumes* §8.1's recorded provenance (no new recording duty) — and is **only as
+true as that record**: it **rests on §8.1's record-integrity** (a chain, by design — if a false
+provenance could be recorded, the surface would faithfully show a false truth; §8.2 consumes §8.1's
+integrity guarantee, it does not re-prove it). It *qualifies* §6.1:
 a finding is the **agent's word** (a required active output) — §8.2 says the governor must not have to
 *trust* that word; the verification is **independent machine-truth**. And it is the architectural
 mandate beneath `REVIEW-READINESS-PROTOCOL`: §8.2 makes the system *expose* verifiable truth; that
