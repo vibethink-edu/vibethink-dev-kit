@@ -125,6 +125,32 @@ An anomaly, risk, or opportunity **outside the current scope** is recorded as a
 typed **finding** (category · location · why · suggested action) — never silently
 fixed and never lost. Security findings escalate to the named authority immediately.
 
+### 6.1 — Findings are an active, required output — not a passive courtesy *(PROPOSED — pending seal)*
+
+The rule above is necessary but **passive**: it fires only if an agent happens to notice and
+bother. The common failure is the agent that merely **obeys** the task — does exactly what it was
+told and stays silent — so the system never learns from what that agent saw. **Obedience is the
+floor; surfacing what you saw is the value.** Therefore finding-emission is made active and required:
+
+- **Required at close, not optional.** Closing a unit of work emits its findings — **or an explicit
+  "no findings"**. Silence is never accepted as "looked and found nothing": zero findings is a valid
+  *stated* outcome; an **absent** findings step is an incomplete close.
+- **Active, not hoped-for.** The close prompts for them — *"what friction, gap, risk, or opportunity
+  did this surface?"* — the same activation-not-hope discipline the rest of the method uses (a rule
+  with no prompt is a suggestion). The concrete prompt/hook and where findings land are **L2/L3
+  bindings**; this neutral layer defines only that the prompt exists and the output is required.
+- **Cheap to emit, governed to absorb.** Emitting a finding is free and immediate (above). **Absorbing**
+  a finding into the method, the tools, or the knowledge is a **separate, governed loop** — findings
+  accumulate, are periodically harvested into *proposed* improvements, and an improvement reaches the
+  rules only through the same human-validated, evidence-bound gate as any learning-back: **proposer ≠
+  validator**, a finding is **candidate** input (never an accepted rule) until the named authority
+  validates, and **net-value is tracked** (accepted-vs-noise) so a flood of low-value findings does not
+  drown the signal or exhaust the validator. The emission half is safe and required now; the absorption
+  half is gated.
+
+This makes self-improvement a **standing obligation of every agent and every consumer**, inherited
+with the rest of this neutral core — not a favour that depends on an agent remembering to be helpful.
+
 ## 7. Method and engineering canons are state-of-the-art-informed
 
 **Scope:** this section governs **method and engineering canons** — those about *how
