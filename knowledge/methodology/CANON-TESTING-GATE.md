@@ -81,6 +81,13 @@ For AI behaviour, deterministic equality does not apply (the output varies). The
 
 > **The rubric is not invented — for governed AI behaviour, the rubric *is* the canon-contract.** What the behaviour promises (per the governing canon/spec) is exactly what the eval scores. For ungoverned AI behaviour (no contract), the eval uses an ad-hoc rubric declared in the work-unit. This reuses the contract machinery (§4) and avoids fabricated criteria.
 
+> **Knowledge precondition (coherence seam — the eval is not the only gate on AI work).** AI-assisted /
+> model-driven work also cannot be **specified** until its Accepted Knowledge Baseline exists
+> (`CANON-KNOWLEDGE-NATIVE-VT-METHOD-001 §2 — When This Triggers` lists "AI-assisted/model-driven" as a
+> trigger). The two gates compose and fire at different times: the **baseline gates the spec** (can this
+> be specified at all?), the **eval gates verification** (does the behaviour score against its rubric?).
+> The Testing Gate names the eval; it does not replace the baseline — both apply to AI work.
+
 ---
 
 ## §8 — Escalation to an independent advisor
