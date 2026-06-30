@@ -426,6 +426,42 @@ finding/handoff to DevKit -> DevKit canon/template/gate amendment -> L3 adoption
 The L3 repo may carry a temporary local implementation while the gap is under review,
 but it must label it as local/temporary and must not present it as the reusable canon.
 
+### 9.1. KDD refresh — bringing a consumer current with the spine *(PROPOSED — pending seal)*
+
+A consumer's KDD is only as current as the **spine it was built against**. "KDD refresh" is the
+standard procedure to bring a consumer's KDD current with the dev-kit, and it has a **mandatory
+order** — the common failures all come from doing it out of order:
+
+1. **Spine first — never build or refresh KDD against a stale mount.** Before creating or amending any
+   KDD artifact (config, pack, gate wiring), bring the consumer's dev-kit mount current (`pull
+   --ff-only`). Canon is inherited **by reference**, so a stale mount silently binds **stale rules** —
+   a pack reconstructed against an old spine inherits old method, old vocabulary, old gates. *(A mount
+   sitting on a feature branch instead of the released line is the same failure: the consumer is not
+   on the spine's truth.)*
+2. **Owner-first — check for in-flight work before you touch.** KDD setup for a consumer is frequently
+   **already in flight** (an open PR, a branch, a partial pack). Before adding a config or a pack,
+   check open PRs / branches / existing artifacts; if the effort is owned, **coordinate or hand off —
+   do not duplicate or overwrite.** A second config or a re-authored in-progress pack is collision,
+   not contribution. (Same owner-first discipline as branch/worktree ownership.)
+3. **Inherit, don't rebuild — the instruments are the spine's.** The KDD *machinery* — the config
+   shape, the structural and freshness gates, the refresh tool, the freshness manifest, the method
+   rules — lives in the spine. The consumer **binds** it at L3 (its own config, packs, paths); it does
+   **not** reimplement it. A consumer rebuilding spine tooling it could have inherited is the
+   consumer-local anti-pattern (§9, §11). When the spine's KDD pieces advance (a new rule, new
+   tooling), the consumer **inherits the advance** — it does not re-derive it.
+4. **Re-run the gates — green is the definition of refreshed.** After a refresh: copy-parity (copied
+   runnables match the kit), the structural pack gate, the freshness gate, and adoption-claims (honest
+   and catalog-complete). The refresh is done when those are **green** — not when files were touched.
+5. **Declare the adoption.** A refresh that adds or advances a KDD piece updates the consumer's
+   adoption status so the spine's catalog-completeness reflects it. An undeclared adoption is invisible
+   to the next refresh.
+6. **Cadence — triggered, not hoped-for.** A consumer refreshes when the spine's KDD pieces advance,
+   surfaced **actively** (a spine-freshness signal — *"the kit is behind"*), not left to chance. A
+   consumer that builds knowledge for weeks against a frozen spine drifts silently.
+
+This makes "KDD refresh" a **defined, ordered, gated** procedure inherited by every consumer — not an
+ad-hoc *"pull and hope."*
+
 ## 10. Gate
 
 `check-knowledge-pack.mjs` is a structural gate. It verifies the preconditions for review:
