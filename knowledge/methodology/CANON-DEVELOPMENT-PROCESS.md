@@ -275,6 +275,27 @@ read returning `{}`, a no-op mutate, a signal that never fires). So the two are 
   stale version, invalid precondition — held to the same test-quality bar as any test (happy **and**
   failure, so the probe is not a no-op).
 
+**Outcome conformance — golden tasks (proves achievement, not just access)** *(PROPOSED — pending seal)*.
+The verb-level probe proves each door *opens*; it does not prove an agent *achieves the capability's
+goal end-to-end*. So a capability also declares a small set of **golden tasks** — canonical end-to-end
+agent tasks that drive read+mutate+observe+emit toward a **verified outcome** (e.g. *perform the action
+and confirm the effect actually happened, is attributed, and is observable*), asserting the **result**,
+not the sequence of calls:
+
+- **Held-out authorship** — golden tasks are authored by someone other than the capability's
+  implementer (the same builder-doesn't-grade discipline as the probe); otherwise they overfit the
+  implementation and become theatre.
+- **Tiered, not everywhere** — a **smoke** golden task at the gate (the capability's most critical
+  path), the **full** set on a scheduled run, and **required** only for the high-risk tiers
+  (agent-facing, tenant-visible/production, or a capability with a recent regression). Low-risk and
+  internal capabilities are exempt by default — the same anti-bureaucracy posture as the rest of §8.1.
+- **It is the outcome layer the execution probe pointed at but did not reach** — verb conformance
+  says the plane *exists and runs*; golden tasks say the agent *gets the job done*. A capability whose
+  verbs pass but whose golden task fails is not done.
+
+The concrete task format, the runner, and where tasks live are **L2/L3 bindings** (this neutral layer
+names none).
+
 **Fired at the capability boundary, default-infer, risk-tiered — the anti-bureaucracy rules.** A
 gate that over-triggers becomes rubber-stamped, which breaks it:
 
