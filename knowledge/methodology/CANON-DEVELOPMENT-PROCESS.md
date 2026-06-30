@@ -354,47 +354,77 @@ it is not the default; the default is parity.
 ### 8.2 — Human governance plane: the human governs by VERIFICATION, not by trust *(PROPOSED 2026-06-30 — companion to §8.1; awaiting two independent advisor reviews + Principal Architect seal)*
 
 §8.1 gives a capability its **agent plane** — the agent *operates* the machine. §8.2 gives the
-**human plane** its true role once the operator is an agent and the human is the **governor**.
+**human plane** its true role once the operator is an agent and the human is the **governor**. §8.2
+**adds** the governor's plane; it does **not** remove §8.1's human-operating surface — the dual-surface
+parity of §8.1 still holds. The *operating* human (who may click) and the *governing* human (who
+verifies) are two distinct roles; this section is about the second.
 
 When agents operate the machine, the governing human does **not** drive it by clicking — the human
-**governs by instruction** (directing agents, in conversation) and **verifies independently**. So the
-"human surface" of §8.1, for the governing human, is **not an operating surface — it is a
-VERIFICATION surface**: its job is to show the **machine's truth** about what an agent did or claims,
-so the human can govern **without having to trust the agent's own report**.
+**governs by instruction** (directing agents) and **verifies independently**. So the human plane, *for
+the governing human*, is **not an operating surface — it is a VERIFICATION surface**: its job is to show
+the **machine's truth** about what an agent did or claims, so the human can govern **without having to
+trust the agent's own report**.
 
 **Govern by verification, not by trust — the inversion.** The dominant pattern is "the human operates
 the UI, the AI assists." When the agent is the operator, this inverts: **the agent operates; the human
 governs by conversation and verifies by an independent surface.** That verification surface is
-therefore first-class, not an afterthought — it is how a human stays *in command of* agents rather than
-merely *watching* them.
+first-class, not an afterthought — it is how a human stays *in command of* agents rather than merely
+*watching* them.
 
 **Verification must be INDEPENDENT of the agent's word — echoing the agent is theatre.** §8.1's
 "declaration is theatre" has a twin here: a "verification" surface that merely re-displays the agent's
-own summary verifies nothing — it is the same failure as circular provenance (the agent narrating its
-own success). The surface must read the **machine's recorded truth** from the same governed source the
-operation wrote — the provenance/audit record, the *executed* result of the conformance gate, the
-freshness manifest — **not** the agent's narration. If the human can only learn what happened from the
-agent that did it, the human cannot govern it.
+own summary verifies nothing — the same failure as circular provenance (the agent narrating its own
+success). The surface must read the **machine's recorded truth** from the same governed source the
+operation wrote — **the provenance/audit record §8.1 already requires, the *executed* result of the
+conformance gate, the freshness manifest** — **not** the agent's narration. §8.2 **consumes** the
+provenance §8.1 already records; it adds the human's independent *projection* of that truth, **not** a
+new recording obligation.
 
-**Every agent-operated capability surfaces a human-verifiable truth.** This is the dual of §8.1's
-parity: just as a capability is *incomplete* if an agent cannot operate it, it is *ungoverned* if the
-human cannot independently verify it. For each agent-operated capability — a hard-blocked one above all
-— the human must be able to see, from the machine: *did the action happen and record provenance? did
-the governing gate actually pass (executed, not declared)? is the derived knowledge it relies on fresh?
-is the operator within its authority and budget?* This is **"el que construye no califica" applied to
-the human↔agent boundary**: the governor does not certify on the operator's say-so.
+**Proven by an independence probe, not by asserting independence — the verification gate (the dual of
+§8.1's execution gate).** A surface that *claims* to show machine-truth can itself be theatre: it may
+quietly echo the agent. So the surface is proven the way the agent plane is — **by execution against an
+injected lie.** The check feeds the verification surface a **fabricated agent narration** (a false
+"succeeded" / "fresh" / "passed") and confirms the surface **still shows the machine's recorded state**,
+unmoved by the agent's claim. A capability is *ungoverned* unless its truth is independently
+surfaceable **and** that surface is **proven, by such an injected-falsehood probe, to read the machine
+and not the narration.** Just as §8.1 is "proven by a contract-derived execution gate, not by
+declaration," §8.2 is **proven by an independence probe, not by asserting independence** — else §8.2
+falls into the very theatre it names.
 
-**The conversation that governs is itself a governed, auditable surface.** If the human governs by
-instructing agents, the instruction → action → verification loop is part of the governed system, not a
-side channel — *what was asked, what the agent did, and what the human verified* form an auditable
-trace, not ephemeral chat.
+**Every agent-operated capability surfaces a human-verifiable truth — and L2/L3 must name it.** This is
+the dual of §8.1's parity: just as a capability is *incomplete* if an agent cannot operate it, it is
+*ungoverned* if the human cannot independently verify it. For each agent-operated capability — a
+hard-blocked one above all — the human must be able to see, from the machine: *did the action happen and
+record provenance? did the governing gate actually pass (executed, not declared)? is the derived
+knowledge it relies on fresh? is the operator within its authority and applicable limits (budget /
+quota / rate)?* This is **the builder does not grade** (*el que construye no califica*) applied to the
+human↔agent boundary: the governor does not certify on the operator's say-so. **L2/L3 bindings must
+name, per hard-blocked / agent-operated capability, the triple — *machine truth source → verification
+surface/query → audit trace*; its absence requires an explicit, logged waiver** (the same expensive,
+human-approved escape as §8.1).
 
-**The form is per-repo binding; the inversion and the independence are the rule.** Which concrete
-surfaces a repo uses — health cards, audit timelines, governance dashboards, a conversation home — are
-**L2/L3 bindings** (this neutral layer names none). What is universal: **when an agent operates a
-capability, the human plane is a verification surface that shows the machine's truth independent of the
-agent; every agent-operated capability is independently verifiable by the human who governs it; and the
-governing conversation is auditable.**
+**The governing conversation is auditable — at the capability/mutation boundary, not in general.** Only
+the part of the conversation that *governs* — instructions, decisions, and approvals that **authorize or
+modify an agent operation on a governed (hard-blocked) capability** — is auditable; ordinary chat,
+brainstorming, and exploration are **not**. The trigger is the **same capability/mutation boundary §8.1
+fires at**, not "conversation" in general. *What was authorized, what the agent did, and what the human
+verified* form an auditable trace — which **inherits the system's secrets/PII governance**: it must not
+record raw secrets or sensitive payloads.
+
+**The form is per-repo binding; the inversion, the independence, and the proof are the rule.** Which
+concrete surfaces a repo uses — health cards, audit timelines, governance dashboards, a conversation
+home — are **L2/L3 bindings** (this neutral layer names none). What is universal: **when an agent
+operates a capability, the human plane is a verification surface that shows the machine's truth
+independent of the agent, proven by an injected-falsehood probe; every agent-operated capability is
+independently verifiable by the human who governs it; and the governing conversation, at the capability
+boundary, is auditable.**
+
+**Companions.** §8.2 *consumes* §8.1's recorded provenance (no new recording duty). It *qualifies* §6.1:
+a finding is the **agent's word** (a required active output) — §8.2 says the governor must not have to
+*trust* that word; the verification is **independent machine-truth**. And it is the architectural
+mandate beneath `REVIEW-READINESS-PROTOCOL`: §8.2 makes the system *expose* verifiable truth; that
+protocol is the human discipline of *using* it (test the true signal, watch the gates yourself, don't
+trust the report).
 
 **Scope.** Applies wherever an agent operates a capability on a human's behalf (the §8.1 capabilities
 first). A capability with no agent operator needs neither the agent plane (§8.1) nor an
