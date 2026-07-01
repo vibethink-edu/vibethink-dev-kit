@@ -121,6 +121,7 @@ Path (process depth) and class (authority) are chosen **independently**, then sa
 - the repo's **path-cut thresholds** — what counts as "trivial/reversible" for direct, what counts as a "contract" for spec-first, and which surfaces are "boundary" for design-gate.
 - **where approvals are recorded** — the decision register instance (`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001` §8) and the ADR store.
 - any **mechanical enforcement** (a check that a boundary-touching diff carries a design-gate approval; a check that a canon change carries an authority seal).
+- the heir **wires the portable routing-card readiness check** ([`REFERENCE-ROUTING-CARD-READINESS-001`](./REFERENCE-ROUTING-CARD-READINESS-001.md)) over its decision-register instance, and declares its **non-trivial predicate** and whether `NOT-ROUTED` **warns or blocks**. This is the portable half of §3.1's routing card — the kit ships the trace contract + check; the heir keeps predicate, class list, and teeth here.
 
 The L3 binding **points at this canon as the spine** — it instantiates the classes and thresholds; it does not re-write the three paths, the cut, or the class shape. If it repeats them, it drifts.
 
@@ -145,3 +146,5 @@ Forced by a recurring question from inheriting repos: *"does this go direct, spe
 **Fire-test:** vendor/product/agent/tool-neutral — names no product, vendor, agent harness, person, or concrete class. PASS.
 
 **SEALED 2026-06-15 by the Principal Architect (merge = seal).**
+
+**Amendment 2026-06-30 — sealed by the named authority:** §6 gains the L3-binding bullet wiring the **portable routing-card readiness check** ([`REFERENCE-ROUTING-CARD-READINESS-001`](./REFERENCE-ROUTING-CARD-READINESS-001.md)) — the portable half of §3.1's routing card, forced by a field observation that non-trivial work advanced with no card emitted (the ¶67 gap). The principle (§1–§5, §3.1) is unchanged; only the L3-binding pointer is added.

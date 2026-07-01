@@ -1,6 +1,6 @@
 # REFERENCE-ROUTING-CARD-READINESS-001 — Portable readiness check for the change-path routing card
 
-**Status:** **PROPOSED** — drafted by the Principal Architect. It becomes spine only when the named authority **seals** it. Until then it is a reviewable draft; no heir wires it yet.
+**Status:** **SEALED 2026-06-30 by the named authority** — drafted by the Principal Architect, approved and sealed by the chief architect. The §6 L3-binding pointer in `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` is applied. Heirs may now wire it (declaring their L3 predicate + teeth).
 **Date:** 2026-06-30
 **Scope:** Every repo that inherits `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.1 (the routing decision-card). Vendor-neutral, product-neutral, harness-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -110,13 +110,13 @@ Pass = the check reports all three cleanly against the heir's real register inst
 
 ---
 
-## §6 — PROPOSED canon pointer (for the named authority to seal — NOT applied here)
+## §6 — Canon pointer (APPLIED — sealed 2026-06-30)
 
-This reference does **not** edit the sealed canon. The following one-line addition to `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §6 (L3 binding) is offered **PROPOSED**, to be sealed only by the named authority:
+The L3-binding pointer is now **applied and sealed** in `CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §6:
 
-> *(§6, add to the L3 bullets)* — the heir **wires the portable routing-card readiness check** (`REFERENCE-ROUTING-CARD-READINESS-001`) over its decision-register instance, and declares its **non-trivial predicate** and whether `NOT-ROUTED` **warns or blocks**.
+> *(§6, L3 bullets)* — the heir **wires the portable routing-card readiness check** (`REFERENCE-ROUTING-CARD-READINESS-001`) over its decision-register instance, and declares its **non-trivial predicate** and whether `NOT-ROUTED` **warns or blocks**.
 
-Sealing that line makes the instrument part of the inheritance contract. Until sealed, heirs may fire-test but do not treat it as required.
+The instrument is now part of the inheritance contract. Heirs wire it and declare their L3 predicate + teeth; a first consumer fire-tests (§5) before family-wide reliance.
 
 ---
 
@@ -126,4 +126,4 @@ Forced by a field observation from an inheriting repo (2026-06-30): non-trivial 
 
 **Fire-test:** vendor/product/agent/tool/person-neutral — names no product, vendor, agent harness, person, or concrete class. PASS.
 
-**PROPOSED 2026-06-30 by the Principal Architect — awaiting seal by the named authority.**
+**SEALED 2026-06-30 by the named authority** (drafted by the Principal Architect; approved by the chief architect).
