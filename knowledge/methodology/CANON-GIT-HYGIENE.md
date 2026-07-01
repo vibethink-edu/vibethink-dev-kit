@@ -77,6 +77,13 @@ The L3 binding (§6) declares which hooks it runs and labels each **L1-generic**
 
 Operator tools that maintain a derived index (code graph, search index, knowledge index) go stale and need refreshing — but the refresh **MUST NOT** be an **expensive, silent, automatic rebuild** triggered by a routine git event (e.g. a full-repo graph rebuild on every `post-checkout`). The recommended pattern is a **SessionStart nudge**: non-blocking, exit 0, that reports "index N days stale / tool missing" and **recommends the concrete scoped command** (§2.6), leaving the rebuild to the operator. If a repo does wire an automatic refresh, it **MUST** (a) be scoped/incremental, not a full rebuild, and (b) emit an explicit message stating it is running, its expected cost, and how to disable it. Silent expensive background work on checkout burns CPU and confuses.
 
+> **PROPOSED 2026-07-01 (awaiting seal) — three freshness dimensions, do not conflate.** A "refresh" spans three **orthogonal** states, and reporting them as one gives a false sense of freshness:
+> 1. **Inheritance freshness** — the kit's rules/canons/tools are current in the consuming repo.
+> 2. **External-tool availability** — the operator tool is installed and runnable (at its pin).
+> 3. **External-tool artifact freshness** — the tool's derived output (code graph, search index, memory) is current.
+>
+> A repo can be fresh on (1)+(2) and **stale on (3)** — the "false-fresh" trap. The refresh mechanism **MUST report the three separately**, never collapse them into a single "up to date". Refreshing a derived artifact is **explicit, scoped, and opt-in** (e.g. a `--with-<tool> <scope>` flag, or the tool's own scoped command) — never an automatic full rebuild (per the rule above). A stale-artifact signal is **session/tooling health, not a product blocker**: it never fails a build or gate.
+
 ---
 
 ## §3 — Agent workflow (4 steps, every session)
