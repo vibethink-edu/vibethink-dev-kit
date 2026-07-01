@@ -10,7 +10,7 @@
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -204,6 +204,76 @@ test("adapted copy → preserved, never re-synced (dry-run + apply)", () => {
   );
   assert.match(out, /adapted \(preserved\)/);
   assert.doesNotMatch(out, /re-synced 1/);
+});
+
+// A temp upstream declaring an artifact-bearing tool (cli:node so it's always "installed",
+// making the artifact mtime the thing under test) + a consumer whose artifact has a
+// controlled age (null = not built).
+function scaffoldArtifact({ ageDays }) {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-art-"));
+  tmpdirs.push(root);
+  const upstream = path.join(root, "upstream");
+  const consumer = path.join(root, "consumer");
+  mkdirSync(path.join(upstream, "setup"), { recursive: true });
+  mkdirSync(path.join(consumer, "tools"), { recursive: true });
+  writeFileSync(
+    path.join(upstream, "setup", "external-tools.lock.json"),
+    JSON.stringify({
+      tools: [
+        {
+          name: "graphtest",
+          cli: "node",
+          pin: "v",
+          artifact: { path: "art/graph.json", staleDays: 7, refresh: "graphtest update <scope>" },
+        },
+      ],
+    })
+  );
+  writeFileSync(path.join(consumer, "tools", "copy-parity.config.json"), JSON.stringify({ copies: [] }));
+  if (ageDays !== null) {
+    mkdirSync(path.join(consumer, "art"), { recursive: true });
+    const f = path.join(consumer, "art", "graph.json");
+    writeFileSync(f, "{}\n");
+    const when = new Date(Date.now() - ageDays * 86400000);
+    utimesSync(f, when, when);
+  }
+  return { upstream, consumer };
+}
+
+// 8. artifact freshness (dim 3) — a STALE derived artifact is surfaced with the scoped
+//    refresh command, and it is HEALTH not a blocker (exit 0). The false-fresh fix.
+test("artifact stale → '⚠ STALE' + scoped refresh, exit 0 (not a blocker)", () => {
+  const { consumer, upstream } = scaffoldArtifact({ ageDays: 30 });
+  const { code, out } = run(consumer, upstream);
+  assert.equal(code, 0, `a stale artifact must NOT fail the upgrade (health, not blocker)\n${out}`);
+  assert.match(out, /STALE/, "must surface the stale artifact");
+  assert.match(out, /graphtest update <scope>/, "must recommend the tool's scoped refresh");
+});
+
+// 9. artifact freshness — a fresh artifact is reported fresh, not flagged.
+test("artifact fresh → reported fresh, no STALE", () => {
+  const { consumer, upstream } = scaffoldArtifact({ ageDays: 1 });
+  const { code, out } = run(consumer, upstream);
+  assert.equal(code, 0);
+  assert.match(out, /fresh/);
+  assert.doesNotMatch(out, /STALE/);
+});
+
+// 10. artifact freshness — a not-built artifact is surfaced (not silently "fresh").
+test("artifact missing → 'not built' + scoped refresh", () => {
+  const { consumer, upstream } = scaffoldArtifact({ ageDays: null });
+  const { code, out } = run(consumer, upstream);
+  assert.equal(code, 0);
+  assert.match(out, /not built/);
+});
+
+// 11. opt-in --with-<tool> <scope> is explicit + scoped and only previews in dry-run —
+//     never a default full rebuild.
+test("--with-graphtest <scope> (dry-run) → 'would run' scoped, never a default rebuild", () => {
+  const { consumer, upstream } = scaffoldArtifact({ ageDays: 30 });
+  const { code, out } = run(consumer, upstream, ["--dry-run", "--with-graphtest", "apps/x"]);
+  assert.equal(code, 0);
+  assert.match(out, /would run: graphtest update apps\/x/);
 });
 
 for (const d of tmpdirs) {

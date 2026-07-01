@@ -31,7 +31,7 @@
  * Exit: 0 ok · 1 a re-sync or pull step failed. Pure Node, zero deps.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -202,6 +202,68 @@ const tools = (lock.tools || []).map((t) => {
   return { name: t.name, pin: t.pin, installed, atPin, behind: installed && !atPin, hint };
 });
 
+// ── 4b. TOOL-ARTIFACT FRESHNESS (dimension 3) — is a tool's DERIVED output current? ──
+// Distinct from availability (dim 2): a tool can be installed and at pin yet its per-repo
+// derived artifact (a code graph, a search index) is stale. REPORT it; NEVER rebuild here.
+// An artifact refresh is expensive → it stays explicit + scoped (--with-<tool> <scope>, or
+// the tool's own scoped command). A stale artifact is session/tooling HEALTH, not a product
+// blocker: it never changes the exit code. Tools declare `artifact { path, staleDays, refresh }`
+// in the lock; a tool with no `artifact` (stateless, or stateful-but-not-mtime-stale) is skipped.
+const nowMs = Date.now();
+const artifacts = (lock.tools || [])
+  .filter((t) => t.artifact && t.artifact.path)
+  .map((t) => {
+    const installed = tools.find((x) => x.name === t.name)?.installed || null;
+    const p = join(CWD, t.artifact.path);
+    let state = "unknown";
+    let ageDays = null;
+    const staleDays = t.artifact.staleDays ?? 7;
+    if (!installed) state = "tool-absent";
+    else if (!existsSync(p)) state = "missing";
+    else {
+      try {
+        ageDays = Math.floor((nowMs - statSync(p).mtimeMs) / 86400000);
+        state = ageDays > staleDays ? "stale" : "fresh";
+      } catch {
+        state = "unknown";
+      }
+    }
+    return { name: t.name, path: t.artifact.path, state, ageDays, staleDays, refresh: t.artifact.refresh || "" };
+  });
+
+// ── 4c. OPT-IN scoped artifact refresh (--with-<tool> <scope>) — explicit, never default ──
+// Never runs unless the operator asks. Scoped (the tool's `<scope>` placeholder) — never a
+// full auto-rebuild. Skipped in --dry-run (preview only). Failure never fails the upgrade.
+const withRefreshes = [];
+for (let i = 0; i < argv.length; i++) {
+  const m = /^--with-(.+)$/.exec(argv[i]);
+  if (!m) continue;
+  const toolName = m[1];
+  const scope = argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : ".";
+  const t = (lock.tools || []).find((x) => x.name === toolName && x.artifact?.refresh);
+  if (!t) {
+    withRefreshes.push({ name: toolName, ran: false, note: "no artifact-refresh declared for this tool" });
+    continue;
+  }
+  const cmd = t.artifact.refresh.replace(/<scope>/g, scope);
+  if (DRY) {
+    withRefreshes.push({ name: toolName, ran: false, note: `would run: ${cmd}` });
+    continue;
+  }
+  const parts = cmd.split(/\s+/).filter(Boolean);
+  try {
+    const r = spawnSync(parts[0], parts.slice(1), {
+      cwd: CWD,
+      encoding: "utf8",
+      timeout: 300000,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    withRefreshes.push({ name: toolName, ran: !r.error, note: r.error ? `failed — ${parts[0]} unavailable` : `ran: ${cmd}` });
+  } catch {
+    withRefreshes.push({ name: toolName, ran: false, note: `failed to run: ${cmd}` });
+  }
+}
+
 // ── 5. CANON-DELTA — what protocol/canon changed since the consumer's last pull ─
 // Mechanically current ≠ knowing what to re-read. Surface the governance changes over
 // the pull range (new DECISION-REGISTER rows + changed canon/runbook files) so the
@@ -271,6 +333,8 @@ const result = {
   resync,
   provision,
   tools: tools.map(({ hint, ...t }) => t),
+  artifacts,
+  withRefreshes,
   canonDelta,
   templates,
 };
@@ -286,6 +350,8 @@ out.push(
   `  ${bold(`Dev-Kit Upgrade · ${result.repo}`)}   [${DRY ? yellow("DRY-RUN") : green("APPLIED")}]`
 );
 out.push(`  ${"─".repeat(52)}`);
+// ① INHERITANCE FRESHNESS — kit rules / canons / tools current in this repo
+out.push(`  ${bold("① INHERITANCE FRESHNESS")}   (kit rules / canons / tools current here)`);
 out.push(`  Canon / kit pull   ${pull.done ? green("✓") : "·"} ${pull.note}`);
 const adaptedNote = resync.adapted.length
   ? ` · ${yellow(`${resync.adapted.length} adapted (preserved)`)}`
@@ -303,17 +369,6 @@ if (!resync.applies) {
   for (const f of resync.adapted) out.push(`        ${yellow("◆")} ${f} — adapted, preserved`);
   if (!DRY) out.push(`     → review with: git diff`);
 }
-out.push(`  Provision tools    ${provision.ran ? green("✓") : "·"} ${provision.note}`);
-if (provision.output)
-  for (const line of provision.output.split(/\r?\n/))
-    if (line.trim()) out.push(`      ${line.trim()}`);
-const drifted = tools.filter((t) => t.behind);
-out.push(
-  `  Tools (to pin)     ${drifted.length === 0 ? green("✓ all at pin / absent") : yellow(`${drifted.length} behind`)}`
-);
-for (const t of tools) {
-  if (t.behind) out.push(`        ⚠ ${t.name} ${t.installed} → ${t.pin}   run: ${t.hint}`);
-}
 // Canon-delta — the headline: current ≠ knowing what changed. Re-read these.
 if (canonDelta.applies) {
   out.push(
@@ -326,13 +381,47 @@ if (canonDelta.applies) {
     `  Canon / protocol   ${green("✓")} no governance changes in this ${DRY ? "range" : "pull"}`
   );
 }
-// Templates — surface the by-instantiation set + flag config-templates not instantiated.
 if (templates.applies) {
   out.push(
     `  Kit templates      ${templates.count} available (by-instantiation)${templates.missing.length ? yellow(` · ${templates.missing.length} not instantiated`) : ""}`
   );
   for (const m of templates.missing)
     out.push(`        ${yellow("○")} ${m.name} — copy setup/templates/${m.name}/ → ${m.target}`);
+}
+
+// ② TOOL AVAILABILITY — operator tools installed & at pin
+out.push("");
+out.push(`  ${bold("② TOOL AVAILABILITY")}     (operator tools installed & at pin)`);
+out.push(`  Provision tools    ${provision.ran ? green("✓") : "·"} ${provision.note}`);
+if (provision.output)
+  for (const line of provision.output.split(/\r?\n/))
+    if (line.trim()) out.push(`      ${line.trim()}`);
+const drifted = tools.filter((t) => t.behind);
+out.push(
+  `  Tools (to pin)     ${drifted.length === 0 ? green("✓ all at pin / absent") : yellow(`${drifted.length} behind`)}`
+);
+for (const t of tools) {
+  if (t.behind) out.push(`        ⚠ ${t.name} ${t.installed} → ${t.pin}   run: ${t.hint}`);
+}
+
+// ③ TOOL-ARTIFACT FRESHNESS — derived index current (health, not a product blocker)
+out.push("");
+out.push(`  ${bold("③ TOOL-ARTIFACT FRESHNESS")} (derived index current — health, not a blocker)`);
+if (artifacts.length === 0) {
+  out.push(`  · no artifact-bearing tools declared`);
+} else {
+  for (const a of artifacts) {
+    const label = `  ${a.name.padEnd(15)}`;
+    if (a.state === "fresh") out.push(`${label}${green("✓")} fresh (${a.ageDays}d) — ${a.path}`);
+    else if (a.state === "stale")
+      out.push(`${label}${yellow("⚠")} STALE (${a.ageDays}d > ${a.staleDays}d) → ${a.refresh}`);
+    else if (a.state === "missing") out.push(`${label}${yellow("○")} not built → ${a.refresh}`);
+    else out.push(`${label}· ${a.state === "tool-absent" ? "tool not installed" : "unknown"}`);
+  }
+  out.push(`     → refresh is explicit & scoped: --with-<tool> <scope>  (never a full auto-rebuild)`);
+}
+for (const w of withRefreshes) {
+  out.push(`  ${`--with-${w.name}`.padEnd(17)}${w.ran ? green("✓") : "·"} ${w.note}`);
 }
 if (resync.missingUpstream.length)
   out.push(
