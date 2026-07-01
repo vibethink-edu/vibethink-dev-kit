@@ -54,6 +54,29 @@ Scripts, tools, and agents **MUST NOT** write temporary files to the repository 
 
 The consuming repo's L3 binding names the designated temp directories.
 
+### 2.6 Actionable close-out (every hygiene report/gate ends with a next step)
+
+Every hygiene mechanism — a preflight gate, a session scan, a freshness nudge — **MUST** close its output with an **actionable recommendation**, not just a diagnosis. The recommendation carries three things:
+
+- the **next step** — the concrete command or action to take;
+- whether it **blocks or only warns** — a gate that bites vs an advisory;
+- the **disposition** — proceed / clean / separate scope / hand off / run health / pause.
+
+A report that only states "the tree is dirty" forces the reader to rediscover the remedy every time; one that says "not clean → run *<the repo's scope-split command>*, then *<its pre-commit command>*" is self-completing. **The specific commands are L3** (§6): the kit ships the requirement and a slot; the consuming repo injects its own command names. Same shape as the readiness checks elsewhere in the spine — *report + recommend*, never a bare flag.
+
+### 2.7 Hook layering: L1-generic vs L3-example
+
+Commit/checkout hooks fall in two classes, and a binding **MUST NOT** present an L3 hook as if it were universal:
+
+- **L1-generic** (inheritable as-is): commit-message linting (conventional-commit shape), the dirty-start preflight (§2.1), LF normalization (§2.2), the no-root-write floor (§2.5).
+- **L3-example** (product-specific — shown as examples, NOT universal): agent-context validation config, i18n / hardcoded-string scans, product schema checks, framework-specific gates. These are legitimate and encouraged **as the consuming repo's own binding**, but the kit documents them as *examples of an L3 hook*, not part of the universal set.
+
+The L3 binding (§6) declares which hooks it runs and labels each **L1-generic** or **L3-local**.
+
+### 2.8 Operator-tool freshness: nudge, don't auto-rebuild
+
+Operator tools that maintain a derived index (code graph, search index, knowledge index) go stale and need refreshing — but the refresh **MUST NOT** be an **expensive, silent, automatic rebuild** triggered by a routine git event (e.g. a full-repo graph rebuild on every `post-checkout`). The recommended pattern is a **SessionStart nudge**: non-blocking, exit 0, that reports "index N days stale / tool missing" and **recommends the concrete scoped command** (§2.6), leaving the rebuild to the operator. If a repo does wire an automatic refresh, it **MUST** (a) be scoped/incremental, not a full rebuild, and (b) emit an explicit message stating it is running, its expected cost, and how to disable it. Silent expensive background work on checkout burns CPU and confuses.
+
 ---
 
 ## §3 — Agent workflow (4 steps, every session)
@@ -159,5 +182,7 @@ This canon was lifted from a product-side `docs/canon/processes/GIT_HYGIENE_PROT
 **Amendment 2026-05-25 (Cluster C-4 reconciliation):** §2.4 (No forced hook bypass), §2.5 (Clean Floor / root write prohibition), four new entries in §4 anti-patterns (force-push to main, rebase published commits, overnight rebase, commented-out code, silent `--no-verify`, root write), §7 (All changes via PR governance rule), and §8 (L3 binding override clause — applies to every Dev-Kit spine canon) were lifted from a product-side `CANON-REPO-HYGIENE-001.md` (status ACTIVE) where they had been trapped at L3 despite being agnostic. The product-side `CANON-REPO-HYGIENE-001.md` was consolidated into `processes/GIT_HYGIENE_PROTOCOL.md` (the existing L3 binding) and superseded — the two duplicate product-side hygiene canons collapsed into one L3 binding pointing at this spine.
 
 The **§8 override clause** is the meta-mechanism for handling exceptions across all spine canons — defined here once because git-hygiene is the most foundational, but applicable to every L3 binding.
+
+**Amendment 2026-07-01 — sealed by the named authority:** §2.6 (actionable close-out — every hygiene report/gate ends with next-step + blocks-or-warns + disposition; the concrete commands are L3), §2.7 (hook layering — L1-generic vs L3-example; a binding must not present an L3 hook as universal), §2.8 (operator-tool freshness — a SessionStart nudge over an expensive silent auto-rebuild on routine git events). Triggered by a consumer's field review of the inherited hygiene hooks. Two companion code findings landed in `tools/session-hygiene-scan.mjs` the same day (`cb59112`): precise "no mutation" wording (the squash probe creates a temporary dangling object via `commit-tree`), and a new `local-only` WARN state for a no-upstream branch whose commits have not travelled.
 
 **Amendment 2026-06-11 — authorized by the Principal Architect:** §8's content was **promoted** to `setup/INHERITANCE-CONTRACT.md` §4 (the heir's one-page contract: mechanism · declare · never-duplicate · override-visibly · declared-adaptation · no-silent-deviation). §8 here is now a pointer; the mechanism is unchanged. Rationale: the clause always applied to every spine, and discoverability beats historical placement — an heir looks for deviation rules in the inheritance contract, not inside the git-hygiene spine.
