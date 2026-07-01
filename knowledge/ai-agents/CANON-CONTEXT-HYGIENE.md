@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where coding agents (and the humans operating them) run sessions.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed.
+> **Status:** SEALED 2026-06-05 by the Principal Architect — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings (do not duplicate):** `CANON-CROSS-AGENT-CONTEXT-LAYERING` (which layered rules an agent *reads*) · `CANON-MULTI-AGENT-ORCHESTRATION` (§2.2 session closeout states · §2.3 handoff completeness — this canon **references** those for the close/handoff, it does not re-derive them). **This canon governs the third thing: how an agent keeps its own context window healthy *during* a session.**
 > **SOTA-informed (`CANON-DEVELOPMENT-PROCESS §7`):** prior-art — context engineering as a first-class discipline (more context ≠ better; quality degrades past a fill threshold), fresh-context-per-phase to kill cross-phase drift, and progressive disclosure as the scalable answer to context bloat. Patterns extracted, not a tool adopted.

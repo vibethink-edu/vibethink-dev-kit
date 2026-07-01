@@ -70,7 +70,7 @@ A self-verifiable check with **exactly the ¶71 contract** — it reports, it do
 
 ---
 
-## §4 — Reference skeleton (PROPOSED — reference only, not a shipped tool yet)
+## §4 — Reference skeleton (reference only — not a shipped tool yet)
 
 Neutral pseudocode. An heir adapts `isNonTrivial()` and `readRegister()` to its L3 instances; the kit does not presume either.
 

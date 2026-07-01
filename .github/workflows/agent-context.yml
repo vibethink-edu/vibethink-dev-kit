@@ -127,7 +127,7 @@ jobs:
         run: node _devkit/tools/check-copy-parity.mjs "${{ inputs.parity-config-path }}" --upstream-root _devkit
 
   engine-tests:
-    name: inbox / feed engine tests
+    name: engine tests (all tools/*.test.mjs, glob)
     # The engine is tested once, at its source. Forks consume it; they don't re-test it.
     if: github.repository == 'vibethink-edu/vibethink-dev-kit'
     runs-on: ubuntu-latest
@@ -146,77 +146,30 @@ jobs:
           # never installs it. Disable the auto cache: these jobs don't need it.
           package-manager-cache: false
 
-      - name: inbox tests
-        run: node tools/inbox.test.mjs
+      # ALL co-located engine tests, discovered by glob — list-free by design.
+      # A manually-maintained step list silently skips any test it forgets (the
+      # 2026-07-01 maturity audit found 7 of 28 test files never ran here).
+      # Glob discovery makes "the test exists" and "CI runs it" the same fact.
+      - name: all engine tests (tools/*.test.mjs — glob, cannot silently skip)
+        run: |
+          set -e
+          count=0
+          for t in tools/*.test.mjs; do
+            echo "────────────────────────────── $t"
+            node "$t"
+            count=$((count+1))
+          done
+          echo "✓ ran $count test file(s) by glob"
 
-      - name: feed tests
-        run: node tools/feed.test.mjs
-
-      - name: copy-parity tests
-        run: node tools/check-copy-parity.test.mjs
-
-      - name: catalog-sync tests
-        run: node tools/check-catalog-sync.test.mjs
-
-      - name: comms-send tests
-        run: node tools/comms-send.test.mjs
-
-      - name: comms-security-gate tests
-        run: node tools/comms-security-gate.test.mjs
-
-      - name: comms-sync tests
-        run: node tools/comms-sync.test.mjs
-
-      - name: inheritance-claims tests
-        run: node tools/check-inheritance-claims.test.mjs
-
-      - name: tenant-contamination tests
-        run: node tools/check-tenant-contamination.test.mjs
-
-      - name: keyword-reminder tests
-        run: node tools/keyword-reminder.test.mjs
-
-      - name: devkit-doctor tests
-        run: node tools/devkit-doctor.test.mjs
-
-      - name: governance gate tests
-        run: node tools/check-governance.test.mjs
-
-      - name: supra-map fresh + sound
-        run: node tools/graph-canon.test.mjs
-
+      # Engine self-runs that are gates (not tests) — kept as explicit steps.
       - name: canon cross-reference integrity
         run: node tools/check-canon-links.mjs
-
-      - name: canon-links engine tests
-        run: node tools/check-canon-links.test.mjs
 
       - name: tool versions declared
         run: node tools/check-tool-versions.mjs
 
-      - name: tool-versions engine tests
-        run: node tools/check-tool-versions.test.mjs
-
       - name: app/package versioning wired
         run: node tools/check-versioning.mjs
-
-      - name: versioning engine tests
-        run: node tools/check-versioning.test.mjs
-
-      - name: knowledge-pack engine tests
-        run: node tools/check-knowledge-pack.test.mjs
-
-      - name: KDD memory freshness engine tests
-        run: node tools/check-knowledge-memory-freshness.test.mjs
-
-      - name: devkit-upgrade engine tests
-        run: node tools/devkit-upgrade.test.mjs
-
-      - name: shell tools smoke (bash -n, issue #123)
-        run: node tools/shell-smoke.test.mjs
-
-      - name: identifier-language engine tests
-        run: node tools/check-identifier-language.test.mjs
 
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)

@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where one or more agents (AI or human) edit a shared codebase organized across multiple domains — **and** workspaces where several independent systems/repos co-reside (the outer ring, §2.1).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-19: §2.1 the outer ring — multi-system orientation (ground-first + the systems-map), lifted from a consumer's L3; + §2.1 item 5 destructive-command ground-check (build-on-pain: a mass `rm` ran against the wrong, full tree).**
+> **Status:** SEALED 2026-06-05 by the Principal Architect — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-19: §2.1 the outer ring — multi-system orientation (ground-first + the systems-map), lifted from a consumer's L3; + §2.1 item 5 destructive-command ground-check (build-on-pain: a mass `rm` ran against the wrong, full tree).**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-AGENT-COLLABORATION` (how an agent works with the human authority) · `CANON-MULTI-AGENT-ORCHESTRATION` (how agents hand work between each other) · `CANON-CROSS-AGENT-CONTEXT-LAYERING` (how agents read the rule layers).
 

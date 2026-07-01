@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that audits its own canon, features, or surfaces for truthfulness and follow-through.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. **§8 (Verifier integrity) added + SEALED 2026-06-13 by Marcelo.**
+> **Status:** SEALED 2026-06-05 by the Principal Architect — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. **§8 (Verifier integrity) added + SEALED 2026-06-13 by the Principal Architect.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling (do not duplicate):** `CANON-ARCHITECTURE-REVIEW` — that canon is the *verdict on a system's architecture* (is the design sound, what are the gaps). **This canon is a different object: the audit of *artifacts* (canon, features, surfaces) for *truthfulness*, and the *disposition* that carries every finding to closure.** Review asks "is it sound?"; audit asks "does it lie, and did we act on what we found?"
 > **SOTA-informed (`CANON-DEVELOPMENT-PROCESS §7`):** prior-art for the two halves — *claims/documentation auditing* (does the artifact assert a present truth it cannot back?) and *finding-lifecycle / triage disposition* (issue states carried to closure, definition-of-done for findings). Patterns extracted, not a tool adopted.
@@ -107,7 +107,7 @@ An audit names its **primary auditor** and an **independent second** (the one wh
 
 ## §8 — Verifier integrity: an automated gate must not lie either
 
-> *(Amendment §8 — **SEALED 2026-06-13 by Marcelo** (Principal Architect), "dale". Drafted from a security-sweep precedent; §8.5.)*
+> *(Amendment §8 — **SEALED 2026-06-13 by the Principal Architect** (Principal Architect), "dale". Drafted from a security-sweep precedent; §8.5.)*
 
 > **§1 asks whether an *artifact* lies. This section extends the same question to the *verifier* itself.** An automated gate (linter, health check, scanner, CI rule) can read **GREEN while the very defect it exists to catch silently persists.** A green gate that is wrong is worse than no gate — it manufactures false confidence.
 

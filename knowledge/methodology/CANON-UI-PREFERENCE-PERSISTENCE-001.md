@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that serves a UI and persists any per-user view choice (filter default, panel open/closed, view density, last-selected tab, sort direction).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-24 by the Principal Architect (Marcelo — explicit closure directive, "ciérralos para iniciar todo"). Binding.
+> **Status:** SEALED 2026-06-24 by the Principal Architect (the chief architect — explicit closure directive, "ciérralos para iniciar todo"). Binding.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-CONFIGURATION-DISCIPLINE` (governs where *governed* configuration lives — values that vary by deployment/operator/served-group and are audited; **this canon governs the other side of that boundary**: values that vary only by individual person and are disposable) · `CANON-PRODUCTION-SAFETY` (no dev-affordance/runtime backdoors in the shipped artifact).
 

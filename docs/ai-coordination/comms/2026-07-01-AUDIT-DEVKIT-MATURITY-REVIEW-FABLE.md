@@ -48,3 +48,11 @@ CI glob-run all `tools/*.test.mjs` · configure l1-neutrality (incl. person name
 
 ## Keep / do not over-engineer
 devkit-doctor (verdict-first, skip-never-silent) · check-knowledge-pack's honest structural-only scope · USING-THE-KIT on-ramp · the recent family (routing-card / 3-dimensions / operator catalog / §2.6-2.8) — let Campus/WB fire-test before touching again · the copy-parity `adapted` model.
+
+---
+
+## CORRECTION (2026-07-01, same day — evidence discipline)
+
+**F-01 was partially WRONG.** The claim "l1-neutrality gate runs unconfigured" came from running `check-agent-context.mjs` from the wrong cwd (a consumer repo / without the kit's config), which printed the skip lines. Run correctly from the kit, the gate was **GREEN and configured** (7 neutral L1 files, 10 brand patterns incl. the personal name). The **valid residue** of F-01: only 7 of ~29 self-declared-neutral L1 canons were under the fire-test, so seal-line personal names in the other 22 were never scanned.
+
+**Fix applied (PR-1):** neutralL1Files expanded 7 → 29; personal-name sweep applied ONLY to those L1 files (comms/ + decision register keep names — legitimate historical record, per the requester's nuance); `CANON-UPSTREAM-PROTOCOL` deliberately left out (verbatim product-naming quote — PR-2). Auditor lesson recorded: **run the gate the way the consumer runs it before calling it broken.**

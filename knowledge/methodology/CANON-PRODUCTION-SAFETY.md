@@ -1,6 +1,6 @@
 # CANON-PRODUCTION-SAFETY — What the production artifact must not contain (universal · agent-agnostic)
 
-**Status:** SEALED 2026-06-06 by Marcelo (Principal Architect) — agnostic-lift A#18
+**Status:** SEALED 2026-06-06 by the Principal Architect — agnostic-lift A#18
 **Date:** 2026-06-06
 **Scope:** Every repo that ships a production artifact — a web page, an app bundle, a service image, a binary. Cross-product (agnostic).
 **Companion canons:** [`CANON-DEV-MODE-DISCIPLINE`](./CANON-DEV-MODE-DISCIPLINE.md) (how to operate *while* pre-production — tempo; this canon governs the *boundary* of what ships, independent of mode) · [`CANON-GIT-HYGIENE`](./CANON-GIT-HYGIENE.md) (dev-session hygiene) · [`CANON-ARCHITECTURE-REVIEW`](../ai-agents/CANON-ARCHITECTURE-REVIEW.md) (a production-visible diagnostic is a product feature it reviews).
@@ -96,4 +96,4 @@ Lifted from a product-side `CANON-DEBUG-GOVERNANCE-001` ("Zero Footprint Debug T
 
 **Coverage-check (agnostic-lift A#18):** the principle is **mode-independent** (it constrains the shipped artifact in every mode), so it does not fit `CANON-DEV-MODE-DISCIPLINE` (which governs *tempo while pre-production*); `CANON-GIT-HYGIENE` is dev-session hygiene; no production-safety / release-hardening home existed. This thin spine creates that home — designed to **grow** as further production-hardening rules are lifted. The product-side canon restructures to a thin L3 binding pointing here.
 
-**SEALED 2026-06-06 by Marcelo** (Rule #4 — Principal Architect approval given).
+**SEALED 2026-06-06 by the Principal Architect** (Rule #4 — Principal Architect approval given).
