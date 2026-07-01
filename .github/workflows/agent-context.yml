@@ -19,6 +19,16 @@ name: agent-context
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      golden-agent:
+        description: >-
+          Agent preset (tools/golden-tasks.config.json) for the LIVE behavioral
+          golden-task battery. Live runs spend tokens — this job exists so a human
+          fires the battery deliberately after a constitution change
+          (REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001 §2).
+        type: string
+        default: claude
   workflow_call:
     inputs:
       config-path:
@@ -170,6 +180,59 @@ jobs:
 
       - name: app/package versioning wired
         run: node tools/check-versioning.mjs
+
+  golden-tasks-live:
+    name: behavioral golden tasks (LIVE agent — dispatch only)
+    # The live layer of REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001: a real fresh agent
+    # driven through the trap battery. It spends tokens, so it NEVER runs on
+    # push/PR — a human dispatches it after a constitution change. The free,
+    # deterministic layer (golden-tasks.test.mjs with scripted fake agents) already
+    # runs on every push via the engine-tests glob above.
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'vibethink-edu/vibethink-dev-kit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Guard — only CI-wired presets
+        # The RUNNER is preset-agnostic; this JOB wires one preset's CLI+credential
+        # (v1: the default). Dispatching an unwired preset must be a loud RED with
+        # the local alternative, not a confusing install/runtime failure
+        # (review finding P2, PR #216).
+        if: inputs.golden-agent != 'claude'
+        run: |
+          echo "RED — preset '${{ inputs.golden-agent }}' is not wired in this CI job (v1 wires only the default preset)."
+          echo "Run it locally instead: npm run golden:tasks -- --agent ${{ inputs.golden-agent }}"
+          echo "Or wire its CLI install + credential as additional steps here."
+          exit 1
+
+      - name: Require the agent credential
+        # A dispatched live run without a credential must be RED, not skipped —
+        # the human asked for a behavioral verdict and is not getting one.
+        env:
+          HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" != "true" ]; then
+            echo "RED — golden-tasks-live was dispatched but no ANTHROPIC_API_KEY secret is configured for the '${{ inputs.golden-agent }}' preset."
+            exit 1
+          fi
+
+      - name: Install the agent CLI
+        # v1 of this job wires only the default preset's CLI. Other presets in
+        # tools/golden-tasks.config.json run locally (npm run golden:tasks --
+        # --agent <name>); add their install+credential here when needed.
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run the live battery
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node tools/golden-tasks.mjs run --agent "${{ inputs.golden-agent }}"
 
   catalog-sync:
     name: catalog-sync (Maintenance rule bites)
