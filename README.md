@@ -99,7 +99,7 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 2 | Context layering + smoke | Every agent (any vendor) reads the SAME rules via one-line pointers — a robot verifies on each PR that none reads a truncated or contradictory version. |
 | 13 | Naming conventions | How everything is named: branches `{author}/{type}-{description}`, conventional commits, dated ADRs, canon IDs. Never bare names. |
 | 11 | Port assignment scheme | Production <5000, review ≥5000 (prod+2000), all in one registry — never an invented port. |
-| 16 | Versioning | Each artifact type (package, app, canon, ADR, tool) has ITS declared version model; breaking changes marked. |
+| 16 | Versioning | Each artifact type (package, app, canon, ADR, tool) has ITS declared version model; every task/PR declares `VERSIONING: ...` before implementation. |
 
 ### 🤝 How agents work — with you and with each other
 
@@ -127,7 +127,7 @@ Full detail per rule: [`setup/ADOPT-DEV-KIT.md`](setup/ADOPT-DEV-KIT.md).
 | 10a | Development process (universal skeleton) | Governance precedes code: slice → decision gate → spec → governed execution → artifacts; **the plan carries a security section**; **suppressing a gate = a registered, expiring exemption**. |
 | 10b | House methodology (L2 binding) | The kit owner's concrete instantiation of the skeleton (gate questions, spec pipeline). Non-house repos: declare N-A and bind 10a natively. |
 | 49 | KDD / Knowledge-native VT-METHOD | Knowledge-Driven Design sits underneath product work: product-shaping work retrieves and cites an Accepted Knowledge Baseline through a declared Knowledge Memory Adapter before spec; freshness manifests stop stale graph/memory indexes from silently steering agents. |
-| 37 | Change-path & decision classes | Two questions every change answers up front: **which path** (direct / spec-first / design-gate) and **whose approval** (authority-sealed / delegated-with-record / autonomous). Kills the "do I just do it, or spec it, or ask?" guesswork — and canon changes are always authority-sealed. |
+| 37 | Change-path & decision classes | Every change answers path, approval class, executor, and versioning impact up front. Kills the "do I just do it, spec it, ask, or bump?" guesswork — and canon changes are always authority-sealed. |
 
 ### ✅ Quality: testing and review
 

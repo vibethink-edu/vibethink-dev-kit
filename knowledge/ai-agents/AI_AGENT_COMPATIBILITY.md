@@ -40,6 +40,12 @@ rulebooks — that is the drift the layering smoke exists to catch.
 > harnesses: apply the same allowlist-vs-gate principle (`CANON-CODER-ORCHESTRATION-001`
 > §7) to their own config.
 
+> **Multi-model routing:** this matrix is only a compatibility catalogue. It is not
+> a routing policy. A repo that launches subagents on different model/runtime
+> combinations binds that as L3 under `CANON-MULTI-AGENT-ORCHESTRATION` §3.2:
+> role, adapter, model, auth mode, capability, gates, evidence, review policy, and
+> human approval stay separate.
+
 ## Enforcement (gated, not advisory)
 
 The historical caveat "files are suggestions, no real enforcement" is obsolete:

@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.**
+> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.** **Amendment proposed 2026-06-28 — §3.2 Multi-Model Agent Routing; sealed by the Principal Architect on merge.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -275,6 +275,68 @@ lives**. Automation then encodes that understanding.
   machine-verifiable part; judgment still escalates to a human (§2–§3). The
   automation layer **expresses** this protocol — it never forks it, and it never
   becomes a parallel coordination system.
+
+## 3.2 Multi-Model Agent Routing — separate identity from execution
+
+A repo may launch subagents on different model/runtime combinations, but the routing
+decision is governed by repo policy, not by convenience or provider folklore. The
+agent's **role** is the governance identity; the **adapter** and **model** are execution
+choices. Swapping the model never changes who owns the work, what gates apply, or who
+approves the result.
+
+Before launching a subagent with a non-default model/runtime, the launcher records one
+machine-readable route record with these fields:
+
+| Field | Meaning | Rule |
+|---|---|---|
+| `role` | governance role / responsibility being executed | Stable, repo-named, never a vendor/model name |
+| `adapter` | harness/runtime adapter used to launch it | L3 binding; points to the repo's rules adapter |
+| `model` | concrete model/tier selected | L3 value; may change without changing canon |
+| `auth_mode` | which credential/identity class the launched session uses | Must satisfy the repo's safe-identity/auth gate |
+| `capability` | why this model/runtime is appropriate for this task | Named capability class, not vague "better model" prose |
+| `gates` | required stops before/during/after work | Includes decision path/class, safety gates, versioning impact, and any L3 checks |
+| `evidence` | proof the route is valid | Links to policy, config, prior eval, benchmark, or explicit human instruction |
+| `review_policy` | how the output is reviewed | Required reviewer class, independence/fresh-context requirement, and merge authority |
+| `human_approval` | whether the human must approve launch or only review result | Required for judgment gates, new/changed route policies, boundary-class work, and elevated auth |
+
+Routing rules:
+
+1. **Role, adapter, model, and auth mode are separate axes.** A route that says only
+   "use model X" is incomplete. A route that uses a stronger model under a broader
+   credential without naming the auth mode is blocked.
+2. **Capability drives model choice.** The launcher names the capability needed
+   (for example: large-context synthesis, code editing, visual review, cheap parallel
+   exploration, formal verification) and maps it to an allowed model/tier in L3.
+   The model is an implementation detail of that capability, not the identity of the
+   agent.
+3. **Gates travel with the work.** A different model never bypasses the decision gate,
+   safe-identity gate, external-tools health, versioning impact, security/design gate,
+   or review policy. If the chosen route cannot satisfy a gate, the route is invalid.
+4. **Evidence beats preference.** A model route is justified by a config rule, eval,
+   benchmark, prior accepted pattern, or explicit human approval. "It seems smarter"
+   is not evidence.
+5. **Human approval is explicit when judgment changes.** New route policies, elevated
+   auth, boundary-class work, external-cost/spend changes, and any route that changes
+   review independence require human approval before launch.
+6. **Review policy is part of routing.** Stronger generation does not reduce review.
+   High-impact or boundary work may require an independent reviewer or fresh-context
+   advisor, even if the model is strong.
+7. **Conflicts stop.** If role, adapter, model, auth mode, capability, gate, evidence,
+   review policy, or human-approval requirements disagree, the route is blocked until
+   the L3 policy is corrected. Do not infer the safest route silently.
+
+Minimum launch card:
+
+```text
+ROUTE: role=<role>; adapter=<adapter>; model=<model-or-tier>; auth=<auth_mode>; capability=<capability>
+GATES: <decision/versioning/safety/review gates>
+EVIDENCE: <config/eval/human instruction>
+REVIEW: <review policy>; HUMAN_APPROVAL=<required|not-required + reason>
+```
+
+This section defines the universal contract. A consuming repo may implement it as a
+launcher, task-readiness gate, config file, or subagent scheduler, but the L3 adapter
+must cite this section and must not collapse the fields into one "model choice" string.
 
 ## 4. Visibility & interrupt (non-negotiable)
 

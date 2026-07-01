@@ -54,6 +54,24 @@ function run(dir, config) {
   return { code: r.status ?? 1, out: `${r.stdout ?? ""}${r.stderr ?? ""}` };
 }
 
+function impactGate(overrides = {}) {
+  return {
+    required: true,
+    authority: ".versioning.yaml",
+    statuses: [
+      "VERSIONING: N/A",
+      "VERSIONING: DECLARED-NO-BUMP",
+      "VERSIONING: REQUIRES-CHANGESET",
+      "VERSIONING: REQUIRES-CALVER-DEPLOY",
+      "VERSIONING: REQUIRES-CANON-AMENDMENT",
+      "VERSIONING: REQUIRES-ADR-STATUS-ONLY",
+      "VERSIONING: REQUIRES-TOOL-VERSION",
+      "VERSIONING: BLOCKED-CONFLICT",
+    ],
+    ...overrides,
+  };
+}
+
 // 1. All-null → conscious N-A → GREEN.
 test("all models null → N-A, exit 0", () => {
   const dir = makeDir();
@@ -61,6 +79,7 @@ test("all models null → N-A, exit 0", () => {
     binding: null,
     apps: { model: null },
     packages: { model: null },
+    impactGate: impactGate(),
   });
   assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
   assert.match(out, /GREEN/);
@@ -88,7 +107,10 @@ test("app versionSource missing on disk → exit 1", () => {
 test("app versionSource exists → wired, exit 0", () => {
   const dir = makeDir();
   write(dir, "version.mjs", "export const v = 1;\n");
-  const { code, out } = run(dir, { apps: { model: "calver", versionSource: "version.mjs" } });
+  const { code, out } = run(dir, {
+    apps: { model: "calver", versionSource: "version.mjs" },
+    impactGate: impactGate(),
+  });
   assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
   assert.match(out, /GREEN/);
 });
@@ -105,7 +127,10 @@ test("package model declared, manifest missing → exit 1", () => {
 test("package manifest with version → wired, exit 0", () => {
   const dir = makeDir();
   write(dir, "package.json", { name: "x", version: "1.2.3" });
-  const { code, out } = run(dir, { packages: { model: "semver-2.0", manifest: "package.json" } });
+  const { code, out } = run(dir, {
+    packages: { model: "semver-2.0", manifest: "package.json" },
+    impactGate: impactGate(),
+  });
   assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
   assert.match(out, /GREEN/);
 });
@@ -117,12 +142,41 @@ test("binding declared but missing → exit 1", () => {
     binding: ".versioning.yaml",
     apps: { model: null },
     packages: { model: null },
+    impactGate: impactGate(),
   });
   assert.equal(code, 1, `expected exit 1, got ${code}\n${out}`);
   assert.match(out, /missing or empty/);
 });
 
-// 8. No config file at all → setup error (exit 2), not a silent pass.
+// 8. Missing impact gate → RED.
+test("missing impact gate → exit 1", () => {
+  const dir = makeDir();
+  const { code, out } = run(dir, {
+    binding: null,
+    apps: { model: null },
+    packages: { model: null },
+  });
+  assert.equal(code, 1, `expected exit 1, got ${code}\n${out}`);
+  assert.match(out, /impact gate.*missing/i);
+});
+
+// 9. Missing canonical impact status → RED.
+test("impact gate missing canonical status → exit 1", () => {
+  const dir = makeDir();
+  const gate = impactGate({
+    statuses: impactGate().statuses.filter((s) => s !== "VERSIONING: BLOCKED-CONFLICT"),
+  });
+  const { code, out } = run(dir, {
+    binding: null,
+    apps: { model: null },
+    packages: { model: null },
+    impactGate: gate,
+  });
+  assert.equal(code, 1, `expected exit 1, got ${code}\n${out}`);
+  assert.match(out, /BLOCKED-CONFLICT/);
+});
+
+// 10. No config file at all → setup error (exit 2), not a silent pass.
 test("no config file → setup error, exit 2", () => {
   const dir = makeDir();
   const r = spawnSync("node", [TOOL, "versioning.config.json"], { cwd: dir, encoding: "utf8" });

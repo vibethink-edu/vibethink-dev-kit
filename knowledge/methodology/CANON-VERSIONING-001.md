@@ -1,7 +1,8 @@
 # CANON — Versioning (state-of-the-art · universal · agent-agnostic)
 
 > **Scope:** every repo that ships artifacts (code, docs, decisions, runtime). Vendor-neutral, product-neutral, framework-neutral, language-neutral.
-> **Status:** approved (fire-test passed: no product, vendor, brand, framework, language, or methodology name appears here).
+> **Status:** SEALED by the named authority (status normalized 2026-07-01 from the pre-lifecycle "approved" per its own §7.2 vocabulary — audit F-05; fire-test passed: no product, vendor, brand, framework, language, or methodology name appears here).
+> **Amended 2026-07-01 §10.1:** added the mandatory pre-implementation **Versioning Impact** verdict — 8 canonical statuses (incl. `BLOCKED-CONFLICT`, which stops work instead of inferring a bump), read from the repo's local versioning authority; `impact_gate` added to the per-repo binding. The fourth output of the change-path decision gate (`CANON-CHANGE-PATH-AND-DECISION-CLASSES-001` §3.2). Sealed by the named authority on merge (PR #195).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** `CANON-NAMING-CONVENTIONS-001.md` (filename patterns including ADRs), `CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md` (ADR lifecycle), `CANON-DEVELOPMENT-PROCESS.md` (governance precedes code).
 
@@ -163,9 +164,62 @@ adrs:
 tools:
   model: semver-lite
   changelog_recommended: true
+impact_gate:
+  required: true
+  authority: .versioning.yaml
+  statuses:
+    - "VERSIONING: N/A"
+    - "VERSIONING: DECLARED-NO-BUMP"
+    - "VERSIONING: REQUIRES-CHANGESET"
+    - "VERSIONING: REQUIRES-CALVER-DEPLOY"
+    - "VERSIONING: REQUIRES-CANON-AMENDMENT"
+    - "VERSIONING: REQUIRES-ADR-STATUS-ONLY"
+    - "VERSIONING: REQUIRES-TOOL-VERSION"
+    - "VERSIONING: BLOCKED-CONFLICT"
 ```
 
 The fields are illustrative; the **principle** is that each consuming repo declares its versioning posture explicitly, so a fresh agent or contributor can read one file and know how to bump.
+
+### 10.1 Versioning Impact gate — mandatory pre-implementation classification
+
+Every task / PR is classified **before implementation** with exactly one `VERSIONING: ...`
+verdict. This is an output of the repo's decision gate (`CANON-CHANGE-PATH-AND-DECISION-CLASSES-001`),
+not a release afterthought. The verdict is written in the task-readiness card, PR body,
+or equivalent L3 preflight artifact before code changes start.
+
+Canonical verdicts:
+
+| Verdict | Meaning | Required next action |
+|---|---|---|
+| `VERSIONING: N/A` | The change touches no versioned artifact, or only touches an artifact class the repo binding declares N-A. | State the reason; no bump artifact required. |
+| `VERSIONING: DECLARED-NO-BUMP` | The change touches a versioned area but does not change shipped behavior, public contract, deployment identity, canon law, ADR state, or tool contract. | State why no bump is required. |
+| `VERSIONING: REQUIRES-CHANGESET` | The change touches a publishable package, library, adapter, plugin, SDK, or equivalent package surface. | Add the repo's SemVer/package intent artifact (changeset or equivalent) and classify major/minor/patch where the local manager requires it. |
+| `VERSIONING: REQUIRES-CALVER-DEPLOY` | The change touches a deployed app, runtime service, worker, route, deployable UI, or release boundary. | Ensure the CalVer/deploy version source and readiness/changelog path cover the change. |
+| `VERSIONING: REQUIRES-CANON-AMENDMENT` | The change touches canon/law, inheritance rules, or a sealed governance spine. | Follow canon amendment / named authority approval before implementation; never bury as docs-only. |
+| `VERSIONING: REQUIRES-ADR-STATUS-ONLY` | The change touches an accepted ADR. | Only status transitions are allowed; body changes require a new superseding ADR. |
+| `VERSIONING: REQUIRES-TOOL-VERSION` | The change touches tools/scripts/CLI behavior, args, output shape, exit codes, or documented contract. | Update the tool version declaration (`tools/versions.json`, source constant, or L3 equivalent) and changelog when required. |
+| `VERSIONING: BLOCKED-CONFLICT` | The repo's local authority is missing, contradictory, or the diff spans artifact classes whose required versioning path conflicts. | Stop and resolve the authority/binding conflict; do not infer a bump. |
+
+Rules:
+
+1. The gate reads the repo's local versioning authority first: `.versioning.yaml` or
+   an equivalent binding declared by the repo. If that authority is missing or
+   internally contradictory, the verdict is `VERSIONING: BLOCKED-CONFLICT`.
+2. Packages/libraries/adapters/plugins route to SemVer/package impact; app/runtime
+   services route to CalVer/deploy impact; canon routes to amendment authority; ADRs
+   route to status-only immutability; tools/scripts/CLI route to tool-version impact.
+3. If multiple artifact classes are touched, the verdict line carries the highest-risk
+   required status and the evidence lists every secondary obligation. A conflict between
+   local rules is not resolved by guessing; it is `BLOCKED-CONFLICT`.
+4. Tooling absence may be non-blocking for product CI, but local/session/preflight
+   must be loud. A missing classifier is itself a local-health warning; an agent may
+   proceed only after writing the verdict and evidence manually.
+
+Minimum preflight line:
+
+```text
+VERSIONING: <canonical verdict> — authority=<binding>; evidence=<paths/surfaces>; required=<artifact-or-reason>
+```
 
 ## 11. CI enforcement (what bites)
 
@@ -178,6 +232,9 @@ A repo MAY (and is strongly recommended to) wire mechanical enforcement for:
 5. **Changelog mandatory** — PR touching a publishable package without `CHANGELOG.md` update → blocked.
 6. **Health endpoint version check** — CI deploy step verifies `/healthz` returns the expected version + commit hash.
 7. **App/package versioning wired** — `check-versioning` verifies a declared app/package model points at a *live* version source (a derived version, not a hand-typed literal that can freeze), not merely that the model is named. The instrument it checks ships at `setup/templates/versioning/`.
+8. **Versioning Impact gate declared** — `check-versioning` verifies the repo declares the
+   pre-implementation `VERSIONING: ...` gate vocabulary. The concrete diff classifier
+   is L3; the contract and canonical statuses are L1.
 
 Each gate is per-repo enabled in the binding; this canon defines the menu, not the choices.
 
