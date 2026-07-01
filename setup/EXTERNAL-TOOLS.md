@@ -195,6 +195,32 @@ node tools/external-tools-health.mjs --json       # salud de tools registradas e
   equivalente nativo de rtk o saltarlo
 - Privacidad: binario local, sin API keys, sin llamadas LLM
 
+## Las tres dimensiones de frescura (no las confundas)
+
+Un "refresh" abarca **tres estados ortogonales**. Reportarlos como uno solo da un falso "estoy al día" (`CANON-GIT-HYGIENE §2.8`):
+
+| Dimensión | Qué mide | Cómo se chequea | Cómo se refresca |
+|---|---|---|---|
+| **1. Inheritance freshness** | reglas/canons/tools del kit al día en el repo | `devkit-upgrade --dry-run` | `devkit-upgrade` (pull + re-sync) |
+| **2. Tool availability** | el tool está instalado y en su pin | `devkit-upgrade` (sección tools) · `<cli> --version` | `install-external-tools` (install-if-missing) |
+| **3. Tool-artifact freshness** | el **artefacto derivado** del tool está fresco | mtime del artefacto (barato, no reconstruye) | **explícito y scoped** — ver abajo |
+
+**Un repo puede estar fresco en (1)+(2) y stale en (3)** — ese es el "false-fresh". `devkit-upgrade` reporta las tres **por separado**.
+
+**Artefactos derivados por tool:**
+- **Graphify** → `graphify-out/graph.json` (grafo de código per-repo). Refresh scoped: `graphify update <área>` (NUNCA `graphify update .` por default — es caro). Declarado en `external-tools.lock.json` (`artifact: { path, staleDays, refresh }`).
+- **Engram** (clase C stateful) → su DB no es "stale por mtime"; su salud se chequea con `engram doctor`, no acá.
+- **RTK** (clase B stateless) → sin artefacto derivado.
+
+**Refresh del artefacto = explícito, scoped, opt-in.** Nunca automático, nunca full rebuild:
+```
+# reportar frescura (default, no reconstruye):
+node <kit>/tools/devkit-upgrade.mjs --dry-run
+# refrescar un artefacto explícitamente, scoped:
+node <kit>/tools/devkit-upgrade.mjs --with-graphify apps/dashboard
+```
+Un artefacto stale es **salud de sesión/tooling, no blocker de producto**: nunca cambia el exit code ni falla un gate.
+
 ## Herencia y override
 
 - Los herederos consumen este registro **por referencia** (mecanismo estándar
