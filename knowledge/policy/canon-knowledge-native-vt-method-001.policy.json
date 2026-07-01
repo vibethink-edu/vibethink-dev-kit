@@ -1,0 +1,38 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-KNOWLEDGE-NATIVE-VT-METHOD-001",
+  "source": "knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Product-shaping work starts from validated knowledge: an Accepted Knowledge Baseline is named before specification; knowledge lives in governed packs retrieved via a declared adapter.",
+  "rules": [
+    {
+      "id": "KDD-MUST-BASELINE-BEFORE-SPEC",
+      "level": "MUST",
+      "cite": "§1, §2",
+      "rule": "Product-shaping / complex / AI-assisted / cross-boundary / new-domain work names the accepted knowledge baseline it designs from BEFORE specification.",
+      "watch": { "kind": "gate", "ref": "tools/check-knowledge-pack.mjs" }
+    },
+    {
+      "id": "KDD-MUST-FEATURE-BASELINE-SECTION",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "A product-shaping feature/spec/briefing carries a 'Knowledge Baseline' section (pack id/version/path + retrieval adapter + why it applies) before implementation approval.",
+      "watch": { "kind": "gate", "ref": "tools/check-knowledge-pack.mjs" }
+    },
+    {
+      "id": "KDD-MUST-KNOWLEDGE-IN-PACKS",
+      "level": "MUST",
+      "cite": "§4, §5",
+      "rule": "Captured knowledge lives inside a governed pack (required artifacts, metadata with lifecycle status, sources) — not in loose notes beside the packs.",
+      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "kdd-baseline" }
+    },
+    {
+      "id": "KDD-NEVER-BASELINE-FROM-CANDIDATE",
+      "level": "NEVER",
+      "cite": "§7",
+      "rule": "Bind a feature implementation to a candidate (non-accepted) pack — allowed only when the work IS the knowledge-reconstruction task itself.",
+      "watch": { "kind": "none", "note": "declared unwatched — needs pack-status × feature-binding cross-check; growth candidate for check-knowledge-pack" }
+    }
+  ]
+}

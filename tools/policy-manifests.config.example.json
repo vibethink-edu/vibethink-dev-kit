@@ -1,0 +1,6 @@
+{
+  "$comment": "EXAMPLE — copy to tools/policy-manifests.config.json in an heir that maintains its own L3 policy manifests (same VIBETHINK_POLICY_MANIFEST_V1 schema; do NOT sync against this demo, declare your own paths). policyDir holds your *.policy.json projections; canonRoots are scanned for sealed-but-unmanifested law (reported as frontier); requireFor is the coverage ratchet — a canon listed here MUST have a manifest, and the list only ever grows.",
+  "policyDir": "docs/policy",
+  "canonRoots": ["docs/canon"],
+  "requireFor": ["docs/canon/CANON-EXAMPLE-001.md"]
+}

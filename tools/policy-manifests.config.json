@@ -1,0 +1,11 @@
+{
+  "$comment": "Producer config for check-policy-manifests (REFERENCE-POLICY-MANIFESTS-001). requireFor is the coverage RATCHET: once a canon has a manifest it is listed here and may never lose it. Sealed canons not yet listed are reported as the open frontier, not failed — coverage grows canon-by-canon.",
+  "policyDir": "knowledge/policy",
+  "canonRoots": ["knowledge/ai-agents", "knowledge/methodology", "knowledge/architecture"],
+  "requireFor": [
+    "knowledge/methodology/CANON-GIT-HYGIENE.md",
+    "knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md",
+    "knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md",
+    "knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md"
+  ]
+}
