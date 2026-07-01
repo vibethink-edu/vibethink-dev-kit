@@ -82,10 +82,28 @@ Ids only; each is one-shot, evidence-contracted, actionable-close. The **prompt 
 | **task** | `task-size` (path/class/gates) · `task-status` · `coder-needed` (executor routing) |
 | **handoff** | `handoff-full` (route + prepare) · `handoff-local` (shared lane) · `handoff-ext` (external/GitHub) · `finding` (governed out-of-scope finding) |
 | **review** | `review-ready` (is a surface ready for human review?) |
-| **context** | `bootstrap` (cold entry: read the bootstrap family) · `chat-weight` (is this session too heavy?) |
+| **context** | `bootstrap` (cold entry: read the bootstrap family) · `chat-weight` (is this session too heavy? — triage) · `chat-handoff` (roll to a fresh session: emit a self-contained re-entry block to paste into a new chat) |
 | **meta** | `commands-help` (list) · `ops-sync` (§5) |
 
 Product-specific commands (a kit-refresh trigger, knowledge-index freshness, product schema checks) are **L3 extensions**, not part of this core.
+
+> **`chat-weight` vs `chat-handoff`.** `chat-weight` is the lightweight triage — *seguir / resumir aquí / rollover*. `chat-handoff` is the action when the verdict is rollover: it picks the most appropriate handoff and **produces a self-contained re-entry block to paste into a new chat**, so the same work continues (with you or other people) without losing context. Distinct from `handoff-*` (which hand work to a *recipient*): `chat-handoff` optimizes for *rebuild-my-context-to-continue*, not *tell-someone-else-what-to-do*.
+
+---
+
+## §4.1 — Example flows (use cases)
+
+Flows are written with **command ids only** — that keeps them agnostic (the ids are L1; the concrete bodies are L3). They show how commands compose, not what they invoke.
+
+- **Session start → work → close:** `repo-morning` → (`git-scope` if dirty & yours) → … → `session-close`.
+- **Ship one change:** `git-scope` → `git-precommit` → `git-commit` → `git-pushready`.
+- **CI is red:** `ci-status` → `ci-triage` → (`ci-cost` if stuck looping) → `ci-rerun` *only if justified*.
+- **Route a task:** `task-size` → `coder-needed` → (if delegating) `handoff-full`.
+- **Session got heavy:** `chat-weight` → (if rollover) `chat-handoff` → paste its block into a fresh chat.
+- **Before asking a human to review:** `review-ready` → (ready) share · (not) fix first.
+- **Fresh agent enters a repo:** `bootstrap` → `repo-morning`.
+- **Saw something off-scope:** `finding` (don't fix it inline).
+- **Set up / refresh your commands:** `ops-sync`.
 
 ---
 
@@ -117,3 +135,5 @@ Forced by a real operator practice: a tested Espanso command set proved that the
 **Fire-test:** names no first-party product, agent harness, person, package manager, or concrete path; third-party expander tools (Espanso, VS Code, Raycast, …) are named **only as example adapters**, the same way the kit names example runtimes. Layering gate (Check 8/9) GREEN. PASS.
 
 **SEALED 2026-07-01 by the named authority** (drafted by the Principal Architect; rules approved by the chief architect). Adapter templates added the same day.
+
+**Amendment 2026-07-01 (b) — approved by the chief architect:** added `chat-handoff` (§4 context — the rollover companion to `chat-weight`: emit a self-contained re-entry block for a new chat) and §4.1 Example flows (id-only, agnostic use cases). No rule change.
