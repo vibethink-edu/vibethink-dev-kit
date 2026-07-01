@@ -98,7 +98,7 @@ const GATES = [
     label: "app/package versioning",
     engine: "check-versioning.mjs",
     targets: ["tools/versioning.config.json"],
-    fix: "a declared app/package model has no live version source (the frozen-version trap) — wire it, or set the model null for a conscious N-A",
+    fix: "a declared app/package model has no live version source, or the mandatory Versioning Impact gate vocabulary is missing — wire it, or set artifact models null for a conscious N-A",
   },
   {
     label: "feature documentation",

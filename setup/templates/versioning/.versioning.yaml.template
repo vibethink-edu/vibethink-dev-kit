@@ -30,3 +30,19 @@ adrs:
   pattern: ADR-YYYYMMDD-slug
 tools:
   model: semver-lite             # MAJOR.MINOR via tools/versions.json (check-tool-versions)
+
+# Mandatory task/PR preflight (CANON-VERSIONING-001 §10.1).
+# The local adapter may compute this from a diff, but the verdict vocabulary is canonical.
+impact_gate:
+  required: true
+  authority: .versioning.yaml
+  statuses:
+    - "VERSIONING: N/A"
+    - "VERSIONING: DECLARED-NO-BUMP"
+    - "VERSIONING: REQUIRES-CHANGESET"
+    - "VERSIONING: REQUIRES-CALVER-DEPLOY"
+    - "VERSIONING: REQUIRES-CANON-AMENDMENT"
+    - "VERSIONING: REQUIRES-ADR-STATUS-ONLY"
+    - "VERSIONING: REQUIRES-TOOL-VERSION"
+    - "VERSIONING: BLOCKED-CONFLICT"
+  required_preflight_line: "VERSIONING: <status> — authority=<binding>; evidence=<paths/surfaces>; required=<artifact-or-reason>"

@@ -9,5 +9,19 @@
   "packages": {
     "model": "semver-2.0",
     "manifest": "package.json"
+  },
+  "impactGate": {
+    "required": true,
+    "authority": ".versioning.yaml",
+    "statuses": [
+      "VERSIONING: N/A",
+      "VERSIONING: DECLARED-NO-BUMP",
+      "VERSIONING: REQUIRES-CHANGESET",
+      "VERSIONING: REQUIRES-CALVER-DEPLOY",
+      "VERSIONING: REQUIRES-CANON-AMENDMENT",
+      "VERSIONING: REQUIRES-ADR-STATUS-ONLY",
+      "VERSIONING: REQUIRES-TOOL-VERSION",
+      "VERSIONING: BLOCKED-CONFLICT"
+    ]
   }
 }

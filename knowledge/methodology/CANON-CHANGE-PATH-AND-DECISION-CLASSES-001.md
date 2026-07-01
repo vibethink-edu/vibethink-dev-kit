@@ -4,7 +4,7 @@
 **Date:** 2026-06-15
 **Scope:** Every repo where changes of different weight (trivial fixes, contract-bearing units, boundary-class work) flow under a governance authority — human or agent contributors alike. Vendor-neutral, product-neutral, harness-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
-**Companion canons:** [`CANON-DEVELOPMENT-PROCESS`](./CANON-DEVELOPMENT-PROCESS.md) (§3 the document-authority hierarchy + §4 the pipeline layers and "not every unit traverses all layers" — this canon adds the **decision rule** for *which* path, it does not re-derive the layers) · [`CANON-CODER-ORCHESTRATION-001`](../ai-agents/CANON-CODER-ORCHESTRATION-001.md) (§8 the executor design gate boundary-vs-mechanical — this canon places it as one **path** and generalizes it to any contributor) · [`CANON-TESTING-GATE`](./CANON-TESTING-GATE.md) (verification type by complexity × stakes — each path routes here for *how to verify*) · [`CANON-AGENT-COLLABORATION`](./CANON-AGENT-COLLABORATION.md) (the named authority approves; this canon names the **classes** that authority owns) · [`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`](./CANON-STATE-MIRROR-AND-DECISION-REGISTER-001.md) (§6 the decision register — this canon says which classes trigger a register row) · [`CANON-AUDIT-PROTOCOL`](./CANON-AUDIT-PROTOCOL.md) (finding disposition — a separate ledger).
+**Companion canons:** [`CANON-DEVELOPMENT-PROCESS`](./CANON-DEVELOPMENT-PROCESS.md) (§3 the document-authority hierarchy + §4 the pipeline layers and "not every unit traverses all layers" — this canon adds the **decision rule** for *which* path, it does not re-derive the layers) · [`CANON-CODER-ORCHESTRATION-001`](../ai-agents/CANON-CODER-ORCHESTRATION-001.md) (§8 the executor design gate boundary-vs-mechanical — this canon places it as one **path** and generalizes it to any contributor) · [`CANON-TESTING-GATE`](./CANON-TESTING-GATE.md) (verification type by complexity × stakes — each path routes here for *how to verify*) · [`CANON-VERSIONING-001`](./CANON-VERSIONING-001.md) (§10.1 the mandatory Versioning Impact verdict before implementation) · [`CANON-AGENT-COLLABORATION`](./CANON-AGENT-COLLABORATION.md) (the named authority approves; this canon names the **classes** that authority owns) · [`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`](./CANON-STATE-MIRROR-AND-DECISION-REGISTER-001.md) (§6 the decision register — this canon says which classes trigger a register row) · [`CANON-AUDIT-PROTOCOL`](./CANON-AUDIT-PROTOCOL.md) (finding disposition — a separate ledger).
 
 ---
 
@@ -29,6 +29,7 @@ Conflating the two breaks both ways: trivial work drowns in spec ceremony, or bo
 | The document-authority hierarchy (canon > spec > strategy > research); the named authority approves | **`CANON-DEVELOPMENT-PROCESS`** §3 + **`CANON-AGENT-COLLABORATION`** | does **not** restate; §4 names the **classes** that require the authority |
 | The executor **design gate** (boundary stops to present design; mechanical runs autonomous) | **`CANON-CODER-ORCHESTRATION-001`** §8 | does **not** restate; §3 places it as the **design-gate path** and generalizes it beyond executors (humans too) |
 | **Verification** type by complexity × stakes | **`CANON-TESTING-GATE`** | does **not** restate; each path **routes** here for how to verify |
+| **Versioning Impact** (`VERSIONING: ...`) | **`CANON-VERSIONING-001`** §10.1 | does **not** restate the models; the decision gate must carry the versioning verdict before implementation |
 | The **decision register** (authority approvals: who/when/what/channel/evidence) | **`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`** §6 | does **not** restate; §4 says **which classes** trigger a register row |
 | The **ADR** (the *why* of a decision) + decision store | **`CANON-DEVELOPMENT-PROCESS`** §5 | does **not** restate; §4 says a delegated-class change is captured **as** an ADR |
 
@@ -83,6 +84,28 @@ A repo with no ready launch-surface does **not** improvise a coder — it stands
 It is presented **verdict-first** (the recommendation up front, depth on demand) and the agent then waits for the authority's GO (the methodology/class seal of `VT-METHOD` / §4 below). This is the human-facing face of the gate — the same shape as the proposal preflight.
 
 > **This is not extra ceremony — it fires only on a genuine fork.** Trivial, reversible, no-contract work takes the **direct** path (§3) and is simply implemented; **no card.** The card appears precisely when path / methodology / executor present a real choice — which is exactly where a silent resolution would either decide something that was the authority's to decide, or bury a short prompt under detail it never asked for.
+
+---
+
+## §3.2 — The fourth output: Versioning Impact
+
+The gate is incomplete until it says what the change does to versioned artifacts.
+Before implementation, the decision card / task-readiness artifact carries a single
+line from `CANON-VERSIONING-001` §10.1:
+
+```text
+VERSIONING: <canonical verdict> — authority=<binding>; evidence=<paths/surfaces>; required=<artifact-or-reason>
+```
+
+This applies even when the verdict is `VERSIONING: N/A` or
+`VERSIONING: DECLARED-NO-BUMP`; silence is not a declaration. A repo-local adapter
+may compute the verdict from a diff, but it reads the repo's own versioning authority
+(`.versioning.yaml` or equivalent). If that authority is missing or contradictory,
+the output is `VERSIONING: BLOCKED-CONFLICT` and the work stops until the conflict is
+resolved.
+
+The decision gate therefore has four legible outputs: **path**, **class**,
+**executor**, and **versioning impact**.
 
 ---
 
@@ -148,3 +171,5 @@ Forced by a recurring question from inheriting repos: *"does this go direct, spe
 **SEALED 2026-06-15 by the Principal Architect (merge = seal).**
 
 **Amendment 2026-06-30 — sealed by the named authority:** §6 gains the L3-binding bullet wiring the **portable routing-card readiness check** ([`REFERENCE-ROUTING-CARD-READINESS-001`](./REFERENCE-ROUTING-CARD-READINESS-001.md)) — the portable half of §3.1's routing card, forced by a field observation that non-trivial work advanced with no card emitted (the ¶67 gap). The principle (§1–§5, §3.1) is unchanged; only the L3-binding pointer is added.
+
+**Amendment 2026-07-01 — sealed by the named authority (PR #195):** §3.2 adds the **fourth output — Versioning Impact**: before implementation the decision card carries exactly one `VERSIONING: <verdict>` line from `CANON-VERSIONING-001` §10.1 (silence is not a declaration; a missing/contradictory local versioning authority yields `VERSIONING: BLOCKED-CONFLICT` and stops the work). The gate now has four legible outputs: path · class · executor · versioning impact. Companion link added. The principle of §1–§3.1 is unchanged.
