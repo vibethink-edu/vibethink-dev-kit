@@ -1,6 +1,6 @@
 # REFERENCE-POLICY-MANIFESTS-001 — Machine-readable law (policy manifests)
 
-**Status:** PROPOSED — drafted by the Principal Architect (2026-07-01, roadmap item 2); pending the chief architect's seal.
+**Status:** **SEALED 2026-07-01 by the named authority** — drafted by the Principal Architect (roadmap item 2), approved and sealed by the chief architect (register row D-051). Shipped in PR #218 (merge `4fc4e59`) after adversarial review: REQUEST CHANGES (7 findings) -> fixes `45bd6e3` -> APPROVE.
 **Date:** 2026-07-01
 **Scope:** the dev-kit (producer-side projections of its sealed canons) + any heir that maintains manifests over its own L3 law (same schema, own config).
 **Spine:** companion instrument to `REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001` (behavior) — this one makes the LAW itself machine-consumable. No canon principle is reopened; every manifest is a *projection* of prose already sealed.
