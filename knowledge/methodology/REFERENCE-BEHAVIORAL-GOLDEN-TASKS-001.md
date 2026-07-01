@@ -1,6 +1,6 @@
 # REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001 — The constitution's own golden tasks (behavioral outcome conformance)
 
-**Status:** PROPOSED — drafted by the Principal Architect (2026-07-01, roadmap item 1); pending the chief architect's seal.
+**Status:** **SEALED 2026-07-01 by the named authority** — drafted by the Principal Architect (roadmap item 1), approved and sealed by the chief architect (register row D-050). First live run recorded same day: GREEN 4/4 (`2026-07-01-VALIDATION-GOLDEN-TASKS-FIRST-LIVE-RUN-GREEN.md`) — §6.3 standing expectation in force.
 **Date:** 2026-07-01
 **Scope:** the dev-kit (producer-side instrument) + any heir that wants a behavioral battery over its own L3 law.
 **Spine:** this is the instrument `CANON-DEVELOPMENT-PROCESS` §8.1 *outcome conformance — golden tasks* anticipates, applied to the kit's most important capability: **the constitution itself**. The canon principle is not reopened; this ships its instrument.
