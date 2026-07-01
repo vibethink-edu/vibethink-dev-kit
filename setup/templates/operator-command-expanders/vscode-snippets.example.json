@@ -1,0 +1,26 @@
+{
+  "//": "EXAMPLE VS Code snippets adapter — generated from REFERENCE-OPERATOR-COMMAND-CATALOG.",
+  "//scope": "Secondary adapter: fires INSIDE the editor only — NOT guaranteed in extension chat webviews. For chat/webview/terminal inputs use the Espanso adapter.",
+  "//neutral": "Bodies use <placeholders>; your real adapter (L3) fills concrete commands. Additive: merge into your snippets file, do not overwrite existing prefixes; on a clash, alias.",
+  "repo-health": {
+    "prefix": ":repo-health",
+    "description": "Read-only repo health diagnostic (one-shot, evidence-contracted)",
+    "body": [
+      "For this response only, be concrete and plain. This command is ONE-SHOT: it does not change the agent's persona, language, mode, or future responses. Evidence rule: label facts EXECUTED / VERIFIED / INFERENCE / NOT-VERIFIED; for any gate report COMMAND, RESULT, EVIDENCE, INFERENCE, RECOMMENDATION. Run a complete READ-ONLY repo health diagnostic (git status, branches, worktrees, untracked, gates/tests if <pkg> <script> exists, artifacts, secrets, dev-kit health if inherited). Do not modify anything. Close with an actionable RECOMMENDATION; if the next step maps to another command, say it literally, e.g. run :xxx."
+    ]
+  },
+  "git-scope": {
+    "prefix": ":git-scope",
+    "description": "Separate the diff into scopes (one-shot)",
+    "body": [
+      "For this response only, be concrete and plain. This command is ONE-SHOT and does not change persona/language/mode/future responses. Evidence rule: EXECUTED / VERIFIED / INFERENCE / NOT-VERIFIED. Review the full diff and separate scopes: active task vs accidental vs generated vs someone else's work vs 'belongs on another branch/PR'. Do not revert others' changes, do not mix scopes. Close with RECOMMENDATION."
+    ]
+  },
+  "ops-sync": {
+    "prefix": ":ops-sync",
+    "description": "Bring/refresh the operator command catalog into my expander (additive)",
+    "body": [
+      "Read the dev-kit operator command catalog (REFERENCE-OPERATOR-COMMAND-CATALOG) and create/update my command expander ADDITIVELY. Detect my expander or ask. Do NOT delete or replace my existing snippets; on a trigger clash, report it and propose an alias; validate prefix-safety before writing; validate the tool can load the result. Report evidence and close with RECOMMENDATION."
+    ]
+  }
+}
