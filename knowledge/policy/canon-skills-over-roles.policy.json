@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-SKILLS-OVER-ROLES",
+  "source": "knowledge/ai-agents/CANON-SKILLS-OVER-ROLES.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Modern coding agents are executive generalists — composable skills invoked per task replace permanent per-domain role identities, which waste capacity and add bureaucracy without preventing errors.",
+  "rules": [
+    {
+      "id": "SKILL-NEVER-PERMANENT-ROLES",
+      "level": "NEVER",
+      "cite": "§2, §8",
+      "rule": "Never reintroduce permanent per-specialty titles as an agent's identity, mandatory author siglas on artifacts, start-of-task greeting protocols, role-to-role handoff ceremony, 'stay in your lane' as an agent rule, or per-role pre-flight cards — a new permanent role requires an explicit canon amendment, even from the human authority.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SKILL-MUST-PROGRESSIVE-DISCLOSURE",
+      "level": "MUST",
+      "cite": "§5.1",
+      "rule": "The executor starts with only the metadata index (name, description, triggers, not_triggers), loads a single full manifest on trigger match, and opens auxiliary files one at a time on specific request — never the whole folder.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SKILL-MUST-VERIFY-TRIGGERS",
+      "level": "MUST",
+      "cite": "§6.1",
+      "rule": "When a new skill is authorized, its triggers must be verified: non-overlapping with other skills, verifiable by the executor, and carrying explicit not_triggers where ambiguity is possible — ambiguous triggers are a bug of the skill, not the executor.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SKILL-NEVER-WRAP-GENERAL-CODING",
+      "level": "NEVER",
+      "cite": "§11",
+      "rule": "Do not wrap general programming in a skill: skills earn their keep only at Level 3 — sometimes-relevant, repeatable, error-prone, project-specific procedures — while always-relevant conventions live in the always-loaded rules doc.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SKILL-MUST-EVAL-LOAD-BEARING",
+      "level": "MUST",
+      "cite": "§13, §13.4",
+      "rule": "A skill that gates production behavior, governs a constitutional convention, or is loaded broadly must carry an eval set (baseline vs with-skill lift, re-run on change) before it is treated as load-bearing — unmeasured skills in that tier are a finding, not a default.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

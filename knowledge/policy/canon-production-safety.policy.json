@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-PRODUCTION-SAFETY",
+  "source": "knowledge/methodology/CANON-PRODUCTION-SAFETY.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "The production artifact is not the development artifact — development affordances do not exist in production (absent, not hidden), enforced by a gate that fails closed with no exceptions.",
+  "rules": [
+    {
+      "id": "PRODSAFE-NEVER-DEV-AFFORDANCES",
+      "level": "NEVER",
+      "cite": "§2",
+      "rule": "The shipped production artifact contains zero development affordances — no debug/inspector UI, developer shortcuts, config/runtime backdoors, dev-only global APIs, or output intercepts — where zero means not created, not created-but-hidden.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "PRODSAFE-MUST-GATE-BUILD-BOUNDARY",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Enforce the exclusion where the artifact is produced or runs — build-time elimination or a host/origin check that fails closed — never a runtime toggle a user can flip, and no ?debug-style override survives into production.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "PRODSAFE-MUST-DIAG-AS-FEATURE",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Satisfy any genuine production diagnostic need by building a designed, reviewed product feature — never by reusing debug infrastructure or leaving debug tooling on.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "PRODSAFE-MUST-EXPLAIN-DENIALS",
+      "level": "MUST",
+      "cite": "§4.1",
+      "rule": "The production artifact explains its own denials deterministically: every blocking decision emits a stable, machine-readable reason code with PII-safe evidence, classified by severity, correlated by a request-scoped trace id, through a read-only diagnosis surface that never mutates, enforces, or repairs.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "PRODSAFE-MUST-AUTOMATED-GATE",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Verify the exclusion with an automated gate (CI and/or pre-merge/pre-push hook) that fails closed, blocking the merge with an actionable message if a development affordance can reach the production artifact.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "PRODSAFE-NEVER-EXCEPTIONS",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "No exceptions — no just-this-once, no behind-a-flag-for-staging-in-prod, no team-only shortcut; an apparent exception is either a product feature to design or a gap in the gate to close, never a backdoor.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

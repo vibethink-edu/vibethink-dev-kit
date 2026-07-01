@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DATA-LEGAL-COMPLIANCE-001",
+  "source": "knowledge/methodology/CANON-DATA-LEGAL-COMPLIANCE-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Every system handling personal data must honour its data-protection obligations — retention limits, lawful consent, tracking rules, and data-subject rights — as a governed capability, with the concrete laws and numbers bound per repo at L3.",
+  "rules": [
+    {
+      "id": "LEGAL-MUST-RETENTION-BY-DATA-TYPE",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Declare, per class of personal data, a retention window set by the legal requirement for that type and jurisdiction, the archive destination, and the legal basis — past the window, archive cold rather than hard-delete, deleting only when a legal obligation requires it.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGAL-MUST-RECORD-LAWFUL-BASIS",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Record the lawful basis for data that requires it — who/what/when and the scope consented to — keep it withdrawable, and honour withdrawal downstream.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGAL-NEVER-UNCONSENTED-TRACKING",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Run non-essential client-side tracking (cookies, pixels, fingerprinting, analytics) without the consent the jurisdiction requires — tracking is categorized strictly-necessary vs optional and consented where required first.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGAL-MUST-DATA-SUBJECT-RIGHTS",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Be able to fulfil data-subject requests over the personal data held — access, rectification, erasure where legally due, portability, and objection/restriction — with erasure extending to copies and, where legally required, to the audit-trail as a governed, logged exception.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGAL-MUST-DECLARE-JURISDICTION",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Each tenant/system declares its governing jurisdiction(s) — that declaration binds the concrete laws, retention windows, and DSR timelines at L3, and a multi-tenant system may carry different jurisdictions per tenant.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

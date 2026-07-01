@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-STATE-MIRROR-AND-DECISION-REGISTER-001",
+  "source": "knowledge/methodology/CANON-STATE-MIRROR-AND-DECISION-REGISTER-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Governance state lives in three repo instruments — an overwritable present-mirror, an append-only history log, and an append-only authority-approval register — kept true by a mandatory session close ritual.",
+  "rules": [
+    {
+      "id": "MIRROR-MUST-SYNC-AT-CLOSE",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "Every session closes by synchronizing the three instruments to reality: update the present-mirror, append what the session did and why to the log, and add a register row if an authority decision was granted — if you did not update the mirror, you did not close.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIRROR-MUST-CORRECT-MIRROR-TO-REALITY",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "When the present-mirror and reality disagree, reality wins and the mirror is corrected — never the other way around.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIRROR-NEVER-REWRITE-HISTORY",
+      "level": "NEVER",
+      "cite": "§3, §5",
+      "rule": "Never edit away or rewrite entries in the append-only log or the decision register — entries are added below, never edited; only the present-mirror is overwritable.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIRROR-MUST-REGISTER-APPROVAL-IMMEDIATELY",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Record every authority-class approval as a register row the moment it is granted — with who proposed, authority, when, what, channel, and evidence — not reconstructed later.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIRROR-NEVER-COLLAPSE-INSTRUMENTS",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Never collapse the three instruments into one another: merging the mirror into the log loses the single-present view, merging the register into the log loses auditable provenance, and merging the register into the ADR conflates authorization with design rationale.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIRROR-NEVER-RESTATE-SPINE-IN-L3",
+      "level": "NEVER",
+      "cite": "§8",
+      "rule": "The consuming repo's L3 binding instantiates file names, authority classes, channels, and evidence conventions but never re-writes the instrument roles, the mirror-wins rule, the register field set, or the close ritual — repeating them is drift.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

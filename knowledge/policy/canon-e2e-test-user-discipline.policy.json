@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-E2E-TEST-USER-DISCIPLINE",
+  "source": "knowledge/methodology/CANON-E2E-TEST-USER-DISCIPLINE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "E2E tests never touch a real account — every authenticating test creates an ephemeral user for that run and deletes it at the end, without exception.",
+  "rules": [
+    {
+      "id": "E2E-NEVER-REAL-ACCOUNT",
+      "level": "NEVER",
+      "cite": "§1, §3",
+      "rule": "No test may perform a destructive auth action on a real account or reuse a real account as the subject of a test, even read-only, under any circumstance.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "E2E-MUST-EPHEMERAL-LIFECYCLE",
+      "level": "MUST",
+      "cite": "§2, §4",
+      "rule": "Auth tests create an ephemeral user in setup with the canonical format e2e.<test-slug>.<unix-timestamp>@<test-domain> and delete the whole account in teardown — leaving ephemeral users uncleaned is prohibited.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "E2E-NEVER-HARDCODE-REAL-EMAILS",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Do not hardcode real-account emails in test files (**/*.spec.*, **/*.test.*, e2e/**, playwright/**, cypress/** and equivalents), and do not use a service-role/admin credential on the auth store except to create and clean up the test's own ephemeral users.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "E2E-MUST-EPHEMERAL-ELEVATED-ROLES",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Tests needing an elevated role create an ephemeral E2E user with the role assigned at creation time and delete the whole account in teardown — never a team account, not even a test-tenant admin.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "E2E-MUST-WIRE-EXECUTION-GATES",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "Wire a pre-commit/CI governance check that blocks test-file emails on product/client domains lacking the e2e. prefix and destructive auth-admin calls without a matching createUser on the same id, plus a post-run residue check that reports e2e. users older than 24h.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "E2E-MUST-STOP-ON-CONTAMINATION",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "On discovering a test touched a real account: STOP running tests and deploying, document the incident as a FINDING-E2E-USER-CONTAMINATION-<date> with evidence, revert auth-store changes using values authorized by the human authority, and open a hotfix removing the violation.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-AUDIT-PROTOCOL",
+  "source": "knowledge/methodology/CANON-AUDIT-PROTOCOL.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An audit judges whether an artifact lies — not whether the future it describes is built — and every finding is carried to a documented disposition, with the verifiers themselves held to the same no-lying standard.",
+  "rules": [
+    {
+      "id": "AUDIT-NEVER-FAIL-UNBUILT-DESIGN",
+      "level": "NEVER",
+      "cite": "§1, §2",
+      "rule": "Fail or revert a sealed artifact because it describes architecture not yet built — unimplemented future design is a PASS (category 4), an improvement decision, not a fault; only false present-claims and canon contradictions are FAILs.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "AUDIT-MUST-DISPOSITION-EVERY-FINDING",
+      "level": "MUST",
+      "cite": "§4, §4.1",
+      "rule": "Every audit delivery carries a Disposition section with one row per critical finding, appended to the same delivery artifact — nothing stays 'acknowledged but idle'; if it will not be acted on, that is documented too.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "AUDIT-NEVER-FIXED-WITHOUT-LINK",
+      "level": "NEVER",
+      "cite": "§5",
+      "rule": "Close a finding as FIXED with no link to the PR/commit, merge a change citing a finding without updating its disposition, or create an audit delivery with no disposition section.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "AUDIT-NEVER-ALLOWLIST-CLASSIFICATION",
+      "level": "NEVER",
+      "cite": "§8.1",
+      "rule": "Have a verifier judge by a hand-maintained allowlist/exemption set instead of the observed condition — prefer a derived predicate; an unavoidable exemption must be narrow, dated, justified in place, and re-derived.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "AUDIT-MUST-DECLARE-COVERAGE-SURFACE",
+      "level": "MUST",
+      "cite": "§8.6",
+      "rule": "A gate declares the surface it covers explicitly; what it does not scan is un-looked-at, not green — a gate covering one surface of a multi-surface rule is either surface-complete or names the un-covered surfaces as out of scope.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "AUDIT-MUST-GATE-FAIL-KNOWN-BAD",
+      "level": "MUST",
+      "cite": "§8.7",
+      "rule": "A gate is not 'ready' until it is demonstrated to FAIL on a known-bad input — ship it with a known-bad fixture (negative test) that the gate must reject; a gate with no test or a happy-path-only test is refused.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-gate-integrity.mjs"
+      }
+    }
+  ]
+}

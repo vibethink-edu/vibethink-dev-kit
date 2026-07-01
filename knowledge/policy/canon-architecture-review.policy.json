@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-ARCHITECTURE-REVIEW",
+  "source": "knowledge/ai-agents/CANON-ARCHITECTURE-REVIEW.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An advisor reviews an architecture to make criticism accurate — read-only judgment on the system's own category terms, with every finding classified and surviving the correctness/coherence/real-cost filter.",
+  "rules": [
+    {
+      "id": "ARCHREV-NEVER-FOREIGN-FRAME",
+      "level": "NEVER",
+      "cite": "§2",
+      "rule": "An advisor must not default to reviewing the system through the lens of whatever external category it superficially resembles; review the system on its own category's terms, not the reviewer's default category.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ARCHREV-NEVER-MUTATE",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Neither review mode mutates anything — the advisor never reverts, blocks unilaterally, or modifies; it reports and recommends, and the human authority decides on every finding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ARCHREV-MUST-GOVERNING-READS",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Before issuing a verdict, the advisor reads the documents that govern the area under review; a review that skips the governing reads is incomplete and its verdict is treated as provisional, not actionable.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ARCHREV-MUST-HARD-DROP",
+      "level": "MUST",
+      "cite": "§5, §5.1",
+      "rule": "Every finding must be classified by kind and serve at least one of correctness, coherence, or real cost; a finding that serves none is discarded — not kept as an advisory note — and silence on a non-finding is the correct output.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ARCHREV-MUST-ESCALATE-FRESH-CONTEXT",
+      "level": "MUST",
+      "cite": "§3.1",
+      "rule": "Review in-field by default and escalate to a fresh-context advisor (one who did not build the work) when independence outweighs speed — high stakes, ambiguity, suspected blind spots, or in-field review that keeps clearing work that later fails.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ARCHREV-NEVER-APPROVE-CANON",
+      "level": "NEVER",
+      "cite": "§8",
+      "rule": "Advisors provide judgment; they do not approve canon — the human authority is the sole final approver, and domain-architect drafting under authorization does not create a second approval path.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

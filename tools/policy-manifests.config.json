@@ -1,11 +1,43 @@
 {
   "$comment": "Producer config for check-policy-manifests (REFERENCE-POLICY-MANIFESTS-001). requireFor is the coverage RATCHET: once a canon has a manifest it is listed here and may never lose it. Sealed canons not yet listed are reported as the open frontier, not failed — coverage grows canon-by-canon.",
   "policyDir": "knowledge/policy",
-  "canonRoots": ["knowledge/ai-agents", "knowledge/methodology", "knowledge/architecture"],
+  "canonRoots": [
+    "knowledge/ai-agents",
+    "knowledge/methodology",
+    "knowledge/architecture"
+  ],
   "requireFor": [
+    "knowledge/ai-agents/CANON-ARCHITECTURE-REVIEW.md",
+    "knowledge/ai-agents/CANON-CODER-ORCHESTRATION-001.md",
+    "knowledge/ai-agents/CANON-CODER-SAFE-IDENTITY-001.md",
+    "knowledge/ai-agents/CANON-CONTEXT-HYGIENE.md",
+    "knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md",
+    "knowledge/ai-agents/CANON-RUNTIME-POLICY-ENGINE-001.md",
+    "knowledge/ai-agents/CANON-SKILLS-OVER-ROLES.md",
+    "knowledge/architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md",
+    "knowledge/architecture/CANON-UPSTREAM-PROTOCOL.md",
+    "knowledge/methodology/CANON-AGENT-COLLABORATION.md",
+    "knowledge/methodology/CANON-AGENT-SCOPE-DISCIPLINE.md",
+    "knowledge/methodology/CANON-AUDIT-PROTOCOL.md",
+    "knowledge/methodology/CANON-BRANCH-WORKTREE-LIFECYCLE.md",
+    "knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md",
+    "knowledge/methodology/CANON-CONFIGURATION-DISCIPLINE.md",
+    "knowledge/methodology/CANON-DATA-CHANGE-AUDIT-001.md",
+    "knowledge/methodology/CANON-DATA-LEGAL-COMPLIANCE-001.md",
+    "knowledge/methodology/CANON-DB-SECURITY-BASELINE-001.md",
+    "knowledge/methodology/CANON-DEV-MODE-DISCIPLINE.md",
+    "knowledge/methodology/CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001.md",
+    "knowledge/methodology/CANON-E2E-TEST-USER-DISCIPLINE.md",
+    "knowledge/methodology/CANON-GAP-REPORT.md",
     "knowledge/methodology/CANON-GIT-HYGIENE.md",
-    "knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md",
+    "knowledge/methodology/CANON-HUMAN-SURFACE-LEGIBILITY-001.md",
     "knowledge/methodology/CANON-KNOWLEDGE-NATIVE-VT-METHOD-001.md",
-    "knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md"
+    "knowledge/methodology/CANON-PORT-ASSIGNMENT-001.md",
+    "knowledge/methodology/CANON-PRODUCTION-SAFETY.md",
+    "knowledge/methodology/CANON-STATE-MIRROR-AND-DECISION-REGISTER-001.md",
+    "knowledge/methodology/CANON-SYSTEM-MIGRATION-DISCIPLINE-001.md",
+    "knowledge/methodology/CANON-TESTING-GATE.md",
+    "knowledge/methodology/CANON-UI-PREFERENCE-PERSISTENCE-001.md",
+    "knowledge/methodology/CANON-VERSIONING-001.md"
   ]
 }

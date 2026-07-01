@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DEV-MODE-DISCIPLINE",
+  "source": "knowledge/methodology/CANON-DEV-MODE-DISCIPLINE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Before the first real user with live data, deletion is the default operation and ceremony is an operational bug — while governance gates stay fully active.",
+  "rules": [
+    {
+      "id": "DEVMODE-MUST-ASSUME-DEVMODE",
+      "level": "MUST",
+      "cite": "§1",
+      "rule": "Treat DEV-MODE as a declared state: until the human authority explicitly declares the transition to production mode, assume the repo is in DEV-MODE.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DEVMODE-MUST-DELETE-DEFAULT",
+      "level": "MUST",
+      "cite": "§2, §3",
+      "rule": "When finding contaminated, obsolete, or conceptually wrong code/data in DEV-MODE, delete it (files, tables, old APIs, seed data) rather than preserving it behind deprecation markers or data-preservation migrations — asking first only for a test datum that cost the human authority more than 1h to configure.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DEVMODE-NEVER-CEREMONY-REAPPROVAL",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Do not ask the human authority to approve mechanical fixes, deletion of clearly obsolete code, mechanically-equivalent variants, sub-steps of an already-approved plan, or something already approved in a prior turn — one meta-level approval covers execution.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DEVMODE-NEVER-DISABLE-GATES",
+      "level": "NEVER",
+      "cite": "§5",
+      "rule": "DEV-MODE does not disable governance gates (security, forbidden vocabulary, schema/data lifecycle, auth guards, branch/worktree discipline, proposal preflight) — only the tempo changes; the safety gates are not the ceremony being cut.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DEVMODE-MUST-KEEP-CEREMONY-EXCEPTIONS",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "Obtain human-authority approval even in DEV-MODE for operations that touch a sealed canon, the philosophy-root or meta-governance canon, monorepo architecture, a surface the human is manually tuning, or credentials/secrets (even test ones).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

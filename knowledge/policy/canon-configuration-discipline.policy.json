@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-CONFIGURATION-DISCIPLINE",
+  "source": "knowledge/methodology/CANON-CONFIGURATION-DISCIPLINE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Code defines behavior and configuration defines values: any value that can differ between deployments, environments, operators, or served groups lives in a declared resolution layer, never hardcoded.",
+  "rules": [
+    {
+      "id": "CONFIG-NEVER-HARDCODE-VARYING-VALUE",
+      "level": "NEVER",
+      "cite": "§1, §2",
+      "rule": "Hardcode a value that can differ between deployments, environments, operators, or served groups — credentials, service URLs, user-visible text, visual identity, feature flags, limits, or the active provider; a hardcoded configurable value is an architectural bug, not a shortcut.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CONFIG-MUST-LAYERED-RESOLUTION",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Resolve every configurable value through the declared layers most-specific-first (per-group store → platform defaults → environment variables → code default), with code defaults reserved for non-sensitive, non-varying values only.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CONFIG-NEVER-DEFAULT-A-SECRET",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Let a secret reach the code-default layer or invent a default when a secret is absent — the feature fails closed instead.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CONFIG-MUST-LOOK-WHERE-CODE-LOOKS",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Before declaring that a key, secret, or config value 'does not exist', follow the same resolution path the code uses at runtime — read the module's resolver and query the same stores it queries before asking the human.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CONFIG-MUST-HARDCODE-TEST-BEFORE-COMMIT",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Run the one-question hardcode test on any diff before commit — 'if a different deployment/group/operator needed a different value here, would the code have to change?' — and if yes, move the value to the right layer.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

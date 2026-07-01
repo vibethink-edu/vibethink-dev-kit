@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-AGENT-COLLABORATION",
+  "source": "knowledge/methodology/CANON-AGENT-COLLABORATION.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Agent-human collaboration is intuition plus technique persisted in the repo: the agent verifies proposals against canon before presenting, judges severity by behavior not names, and canonizes lessons before closing.",
+  "rules": [
+    {
+      "id": "COLLAB-MUST-REPO-PERSISTENT-MEMORY",
+      "level": "MUST",
+      "cite": "§1",
+      "rule": "Every operational learning, lesson, decision, rule, or feedback that must survive the current session goes into the consuming repo's canon/coordination docs — never only into agent memory.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "COLLAB-MUST-SEVERITY-CHECKLIST",
+      "level": "MUST",
+      "cite": "§3.2",
+      "rule": "Before raising any item to HIGH/CRITICAL, run the 7-question Operational Context Checklist; if all 7 suggest no urgency the item is debt not HIGH, and any HIGH/CRITICAL severity must cite which question justifies it.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "COLLAB-MUST-PREFLIGHT-CONSTITUTIONAL",
+      "level": "MUST",
+      "cite": "§5.3",
+      "rule": "Before presenting any proposal touching a foundational concept, run the four-step preflight in order: identify the governing canons, read them in full, map every proposal element against them, and take the binary decision.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "COLLAB-NEVER-PRESENT-AGAINST-CANON",
+      "level": "NEVER",
+      "cite": "§5.3, §5.5",
+      "rule": "Present a proposal whose element fails the canon check — reformulate or ask the meta-level amendment question instead; an approval obtained against canon is automatically void and 'the human approved it' is never a defense.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "COLLAB-NEVER-OVERCLAIM-TESTED",
+      "level": "NEVER",
+      "cite": "§9.3",
+      "rule": "Report 'tested locally, all pass' when only a smoke test ran — if no realistic fixture exercised the happy path, say so explicitly in the PR body and ask the human authority for a merge decision under that uncertainty.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "COLLAB-MUST-SESSION-CLOSE-RITUAL",
+      "level": "MUST",
+      "cite": "§8.1, §8.4",
+      "rule": "Before closing any session, ask explicitly what was learned that deserves to survive for the next agents and canonize it per the learning-type table, and proactively declare — unprompted — what was done, what was not, and what is honestly missing.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

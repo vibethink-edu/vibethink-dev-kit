@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DATA-CHANGE-AUDIT-001",
+  "source": "knowledge/methodology/CANON-DATA-CHANGE-AUDIT-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Every system must be able to answer, for any operational datum, WHO changed it, WHAT changed (old→new), and WHEN — with the complete history via a generic audit-trail, not per-table columns.",
+  "rules": [
+    {
+      "id": "DCA-MUST-WHO-WHAT-WHEN-FULL-HISTORY",
+      "level": "MUST",
+      "cite": "§1, §2",
+      "rule": "Provide a generic change-capture audit-trail recording every INSERT/UPDATE/DELETE on audited tables as {table, op, row id, old, new, who, when} — uniform, field-level, complete history, in one place, not re-implemented per table.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DCA-NEVER-COLUMNS-AS-AUDIT-TRAIL",
+      "level": "NEVER",
+      "cite": "§2",
+      "rule": "Build the audit-trail out of per-table audit columns (updated_by / updated_at) or mistake row-lifecycle timestamps for it — they store only the last touch and lose field-level before/after and the full history.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DCA-MUST-AUTHENTICATED-ACTOR",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Record as the actor the real authenticated identity behind the change — a privileged/automated path carries (or impersonates under governance) a real attributable identity; anonymous or shared-service writes to audited tables defeat the canon.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DCA-NEVER-EXPOSE-TRAIL-TO-CLIENTS",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "Expose the audit-trail to client/tenant-facing surfaces — it is governance/admin-only, and read access is an explicit, privileged, governed path.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DCA-NEVER-CAPTURE-SECRET-OLD-NEW",
+      "level": "NEVER",
+      "cite": "§10.1",
+      "rule": "Run the generic old/new-capturing trigger on a secret store or sensitive-value table — it would replicate the secret inside the audit log; such tables are excluded or captured metadata-only (who/when/table/op, no values).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DCA-MUST-ARCHIVE-NOT-DELETE",
+      "level": "MUST",
+      "cite": "§9",
+      "rule": "Partition the trail, keep a hot window bound to the legal retention requirement, and archive past partitions to cold storage — true deletion of trail rows happens only when a legal obligation requires it, as a governed, logged exception, never routine cleanup.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

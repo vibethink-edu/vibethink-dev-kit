@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-MULTI-AGENT-ORCHESTRATION",
+  "source": "knowledge/ai-agents/CANON-MULTI-AGENT-ORCHESTRATION.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "The human is not the message bus — machine-verifiable gates are watched by the blocked agent, agent-to-agent handoffs travel as addressed messages in the shared channel, and only judgment gates escalate to the human, who keeps visibility and stop/redirect authority.",
+  "rules": [
+    {
+      "id": "ORCH-NEVER-HUMAN-AS-BUS",
+      "level": "NEVER",
+      "cite": "§1, §2",
+      "rule": "The human is never the transport layer between agents: a handoff is not sent until an addressed comm exists in the shared channel, committed and pushed — a local TASK file, your own memory, notebook, or chat window is not delivery.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ORCH-MUST-DECLARED-EXIT-STATE",
+      "level": "MUST",
+      "cite": "§2.2",
+      "rule": "Every active branch/worktree touched during a session must end in exactly one intentional, declared exit state (PUSHED, READY-PR, DISCARDED, or COMMITTED-LOCAL with its warning); local-only WIP older than the current session is the failure class, and an undeclared branch is treated by anyone else as DISCARDED.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/session-hygiene-scan.mjs"
+      }
+    },
+    {
+      "id": "ORCH-NEVER-AUTO-DECIDE-JUDGMENT",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "An agent never auto-decides a judgment gate: auto-proceeding is safe only for facts a machine can confirm, and if you cannot name the machine check that confirms a condition, it is a judgment gate — escalate it, do not assume it.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ORCH-MUST-ROUTE-RECORD",
+      "level": "MUST",
+      "cite": "§3.2",
+      "rule": "Before launching a subagent with a non-default model/runtime, record one machine-readable route record (role, adapter, model, auth_mode, capability, gates, evidence, review_policy, human_approval) — gates travel with the work, a different model never bypasses them, and conflicting route fields block the launch.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ORCH-MUST-READ-RED-GATE",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "A red machine gate is read, not assumed: read the specific failure line, do not declare a failure pre-existing without confirming it against the baseline, and re-run infrastructure flakes rather than merging around them.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "ORCH-NEVER-SILENCE-AS-APPROVAL",
+      "level": "NEVER",
+      "cite": "§10.1, §11",
+      "rule": "Silence is not approval and opinion is not decision: no agent may treat lack of response as permission to cross a pending boundary, and a decision-bearing message without an explicit marker defaults to OPINION — agents do not infer FINAL_DECISION from context.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

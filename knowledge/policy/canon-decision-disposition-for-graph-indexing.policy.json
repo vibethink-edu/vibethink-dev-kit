@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING",
+  "source": "knowledge/architecture/CANON-DECISION-DISPOSITION-FOR-GRAPH-INDEXING.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Technical decisions are first-class citizens of the repository — every decision affecting architecture, a contract, or behavior is written into the repo in a disposition a knowledge-graph indexer can extract.",
+  "rules": [
+    {
+      "id": "GRAPHDISP-MUST-WRITE-DECISIONS-TO-REPO",
+      "level": "MUST",
+      "cite": "§1",
+      "rule": "Write every decision that affects architecture, a contract, or behavior into the repo in a disposition a knowledge-graph indexer can extract — a decision that lives only in a conversation is lost.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GRAPHDISP-MUST-INDEX-VIA-MARKDOWN-ADR",
+      "level": "MUST",
+      "cite": "§3.2, §4",
+      "rule": "A decision that must be indexable is written in Markdown/ADR — inline code markers are advisory-only for the human reader and never a substitute for the ADR; the inline comment links to the ADR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GRAPHDISP-MUST-CLASSIFY-BEFORE-IMPLEMENTATION",
+      "level": "MUST",
+      "cite": "§3.6, §4",
+      "rule": "When work introduces or expands an architecture, contract, behavior standard, AI-driven behavior, production dependency, runtime/CDN/render source, or cross-tenant boundary, classify the decision before implementing and write the ADR/canon first — surfacing conversational triggers explicitly to the human authority rather than silently proceeding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GRAPHDISP-MUST-CAPTURE-WHY-AND-ALTERNATIVES",
+      "level": "MUST",
+      "cite": "§3.1, §4",
+      "rule": "Every recorded decision carries the explicit why and the rejected alternatives with reasons — the value to a future agent is knowing what not to do, and why.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GRAPHDISP-NEVER-DUPLICATE-DECISION-PLACE",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "One decision has exactly one canonical place — architecture/must-be-indexable decisions live in an ADR or canon and the inline comment links to it; never duplicate the decision across places.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GRAPHDISP-MUST-TAG-RECONSTRUCTED",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Every retrospectively reconstructed decision carries the mandatory tag [RECONSTRUCTED from <source>], distinguishing direct evidence from retroactive inference — and reconstruction is opportunistic and high-value-first, never big-bang.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

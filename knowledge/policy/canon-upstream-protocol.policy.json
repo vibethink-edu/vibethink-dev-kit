@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-UPSTREAM-PROTOCOL",
+  "source": "knowledge/architecture/CANON-UPSTREAM-PROTOCOL.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An unreviewed upstream is invisible technical debt — every adoption, fork, or pin of external code runs a governed protocol, is decided by the human authority, and is captured as an ADR before code lands.",
+  "rules": [
+    {
+      "id": "UPSTREAM-MUST-ADR-BEFORE-CODE",
+      "level": "MUST",
+      "cite": "§2, §3",
+      "rule": "Before adopting, installing, forking, or integrating any substantial third-party dependency, run the 6-step Adoption Protocol, obtain an explicit decision from the consuming repo's human authority, and write the decision as an ADR before any code lands.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-NEVER-COPYLEFT-INTO-REPO",
+      "level": "NEVER",
+      "cite": "§3.1",
+      "rule": "Strong-copyleft (AGPL/GPL) code never enters the repo as a fork or copy — not even one function; it may only be studied for patterns reimplemented from scratch or consumed across a network boundary as an external service.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-DOCUMENT-EVERY-SKIP",
+      "level": "MUST",
+      "cite": "§10, §11",
+      "rule": "Document every skipped upstream version in the baseline-versions doc with package, versions, decision, date, and reason — only 'I looked and decided to skip because X' is a valid skip; an undocumented skip is a finding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-APPLY-SECURITY-PATCHES",
+      "level": "MUST",
+      "cite": "§11",
+      "rule": "Security patches are obligatory without negotiation, per the severity policy: Critical/High CVE same day (overriding every other rule), Medium within one week, Low at the next monthly review.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-NEVER-MIX-UPDATES-IN-ONE-PR",
+      "level": "NEVER",
+      "cite": "§11",
+      "rule": "Never mix updates of multiple upstream repos in a single PR — one update per PR, merged only with a green build and passing test suite, with the baseline doc updated in the same PR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-BAN-GRADE-F-PROVIDERS",
+      "level": "MUST",
+      "cite": "§17",
+      "rule": "Every external (Typology B/C) provider carries a security grade, and grade F blocks all integration work — set on discovery for automatic triggers, recorded and committed immediately as a governance event, with return only via the governed reinstatement path (remediation, confirmation, independent verification, authority approval, probation at grade C).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}
