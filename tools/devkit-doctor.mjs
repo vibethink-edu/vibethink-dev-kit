@@ -142,6 +142,12 @@ const GATES = [
     targets: ["tools/coder-launch-readiness.config.json"],
     fix: "the coder launch-surface is incomplete (missing launch script / per-session settings / declared bot-token env-var) — an agent cannot self-verify readiness, so it falls to the human (CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 §3.1, F2); stand the surface up (RUNBOOK-LAUNCH-CODERS §1–§3); or remove the config for a conscious N-A (a repo that does not launch coders)",
   },
+  {
+    label: "policy manifests (machine law)",
+    engine: "check-policy-manifests.mjs",
+    targets: ["tools/policy-manifests.config.json"],
+    fix: "a machine-readable manifest drifted from its sealed prose (status/§-anchor/watch/coverage) — the prose is the law: align the manifest to it, or amend the prose through its own seal path first (REFERENCE-POLICY-MANIFESTS-001); --verbose names the drift",
+  },
 ];
 
 function firstExisting(paths) {

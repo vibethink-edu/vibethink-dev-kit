@@ -1,0 +1,52 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-GIT-HYGIENE",
+  "source": "knowledge/methodology/CANON-GIT-HYGIENE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Universal git hygiene: clean floor, no history rewrites on shared branches, everything reaches the default branch via PR (comm lane excepted).",
+  "rules": [
+    {
+      "id": "GIT-NEVER-FORCE-PUSH-DEFAULT",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Force-push the default branch — destructive rewrite of the shared timeline. Forbidden without explicit, documented exception.",
+      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "force-push" }
+    },
+    {
+      "id": "GIT-NEVER-REBASE-PUBLISHED",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Rebase commits already pushed and visible to other contributors/CI.",
+      "watch": { "kind": "none", "note": "golden-task growth candidate (reference §3: next incident leaves a trap)" }
+    },
+    {
+      "id": "GIT-NEVER-SILENT-NO-VERIFY",
+      "level": "NEVER",
+      "cite": "§2.4, §4",
+      "rule": "Bypass hooks (--no-verify) without declaring the reason; the dirty-worktree exception exists only through the governed comm-send tool.",
+      "watch": { "kind": "none", "note": "declared unwatched — hook-bypass telemetry is roadmap item 6" }
+    },
+    {
+      "id": "GIT-NEVER-ROOT-WRITE",
+      "level": "NEVER",
+      "cite": "§2.5, §4",
+      "rule": "Emit logs/debug/scratch files at the repo root; use the designated dirs.",
+      "watch": { "kind": "gate", "ref": "tools/session-hygiene-scan.mjs" }
+    },
+    {
+      "id": "GIT-MUST-ALL-VIA-PR",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "Every change merged to the default branch of a multi-contributor repo goes through a PR (or equivalent). Perceived lack of impact is not an excuse. Sole exception: the create-only comm lane pushed by the governed comm-send tool.",
+      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "force-push" }
+    },
+    {
+      "id": "GIT-MUST-CLEAN-START",
+      "level": "MUST",
+      "cite": "§1, §3",
+      "rule": "Start every session from a clean, synced working floor; finish or abort any in-progress rebase/merge before stepping away (§4 overnight anti-pattern).",
+      "watch": { "kind": "gate", "ref": "tools/session-hygiene-scan.mjs" }
+    }
+  ]
+}

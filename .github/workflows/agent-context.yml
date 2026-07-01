@@ -181,6 +181,9 @@ jobs:
       - name: app/package versioning wired
         run: node tools/check-versioning.mjs
 
+      - name: policy manifests faithful to sealed prose
+        run: node tools/check-policy-manifests.mjs tools/policy-manifests.config.json
+
   golden-tasks-live:
     name: behavioral golden tasks (LIVE agent — dispatch only)
     # The live layer of REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001: a real fresh agent
