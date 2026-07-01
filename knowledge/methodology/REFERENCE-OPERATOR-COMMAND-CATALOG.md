@@ -1,6 +1,6 @@
 # REFERENCE-OPERATOR-COMMAND-CATALOG — agnostic operator commands for agents
 
-**Status:** **PROPOSED** — drafted by the Principal Architect. The **rules** (§2) are sealed by the named authority; the catalog set (§4) is a curated reference. Adapter examples ship separately as templates.
+**Status:** **SEALED 2026-07-01 by the named authority** — the **rules** (§2) are binding; the catalog set (§4) is a curated reference. Adapter examples ship as optional templates (`setup/templates/operator-command-expanders/`).
 **Date:** 2026-07-01
 **Scope:** Any repo where a human operator drives agents through short, repeatable operational asks. Vendor-neutral, product-neutral, tool-neutral, language-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -116,4 +116,4 @@ Forced by a real operator practice: a tested Espanso command set proved that the
 
 **Fire-test:** names no first-party product, agent harness, person, package manager, or concrete path; third-party expander tools (Espanso, VS Code, Raycast, …) are named **only as example adapters**, the same way the kit names example runtimes. Layering gate (Check 8/9) GREEN. PASS.
 
-**PROPOSED 2026-07-01 by the Principal Architect — rules await seal by the named authority.**
+**SEALED 2026-07-01 by the named authority** (drafted by the Principal Architect; rules approved by the chief architect). Adapter templates added the same day.
