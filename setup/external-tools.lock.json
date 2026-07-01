@@ -12,7 +12,13 @@
       "pin": "0.8.39",
       "acceptInstalled": ">=0.8",
       "source": "github.com/safishamsi/graphify",
-      "license": "MIT"
+      "license": "MIT",
+      "artifact": {
+        "path": "graphify-out/graph.json",
+        "staleDays": 7,
+        "refresh": "graphify update <scope>",
+        "note": "per-repo derived code graph; refresh is explicit + scoped, never a full auto-rebuild"
+      }
     },
     {
       "name": "rtk",
