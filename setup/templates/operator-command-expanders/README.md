@@ -28,7 +28,7 @@ If you type triggers into an IDE-extension chat input, prefer **Espanso** — ed
 
 ## Files here
 
-- `operator-commands.example.yml` — Espanso example (neutral; uses `<placeholders>` for product commands + a shared `preamble` variable so the one-shot/evidence block is defined once).
+- `operator-commands.example.yml` — Espanso example (neutral; uses `<placeholders>` for product commands + a shared `preamble` variable so the one-shot/evidence block is defined once). **⚠ It is an 11-command DEMO, not the baseline — never sync/compare your adapter against it; the authority is the catalog (`REFERENCE-OPERATOR-COMMAND-CATALOG` §4), which `ops-sync` reconciles against.**
 - `vscode-snippets.example.json` — VS Code snippets example (secondary adapter).
 
 Both are **neutral seeds**. Your real adapter is **L3**: it fills the concrete command bodies (your package-manager scripts, tool paths, canon names). Never commit a product-named adapter into the kit.

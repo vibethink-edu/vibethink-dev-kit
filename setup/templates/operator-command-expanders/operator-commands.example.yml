@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/espanso/espanso/dev/schemas/match.schema.json
 #
-# EXAMPLE Espanso adapter — generated from REFERENCE-OPERATOR-COMMAND-CATALOG (the source of truth).
+# EXAMPLE Espanso adapter — an 11-command DEMO, NOT the baseline.
+# ⚠ Do NOT sync against this file: the full command set + rules live in
+#   REFERENCE-OPERATOR-COMMAND-CATALOG §4 (the source of truth). ops-sync reconciles
+#   against the CATALOG — comparing your local adapter to this demo is meaningless.
 # NEUTRAL SEED: bodies use <placeholders>. Your real adapter (L3) fills concrete commands
 #   (your package-manager scripts, tool paths, canon names). Do NOT commit a product-named file to the kit.
 # ADDITIVE: never delete or overwrite existing user snippets. On a trigger clash, alias — don't replace.
