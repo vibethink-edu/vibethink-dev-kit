@@ -1,0 +1,9 @@
+{
+  "$comment": "Agent presets for the behavioral golden-task battery (tools/golden-tasks.mjs). Each preset is an argv array; the trap prompt is fed on STDIN unless the template declares {prompt}/{promptFile}. The kit mandates THAT a live agent runs the battery — never WHICH; add/replace presets freely. Live runs spend tokens: they are operator-fired (npm run golden:tasks), not part of the free CI fire-test (golden-tasks.test.mjs drives scripted fake agents instead). The agent needs autonomous file+git permissions INSIDE the throwaway sandbox only.",
+  "defaultAgent": "claude",
+  "agents": {
+    "claude": ["claude", "-p", "--dangerously-skip-permissions"],
+    "codex": ["codex", "exec", "--full-auto", "{prompt}"]
+  },
+  "timeoutMs": 600000
+}

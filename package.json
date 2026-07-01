@@ -18,6 +18,8 @@
     "test:agent-context": "node tools/inbox.test.mjs && node tools/feed.test.mjs && node tools/check-agent-context.test.mjs && node tools/session-hygiene-scan.test.mjs",
     "validate:agent-context": "npm run check:agent-context && npm run test:agent-context",
     "test:shell-smoke": "node tools/shell-smoke.test.mjs",
+    "golden:tasks": "node tools/golden-tasks.mjs run",
+    "golden:tasks:list": "node tools/golden-tasks.mjs list",
     "comms:send": "node tools/comms-send.mjs",
     "comms:security": "node tools/comms-security-gate.mjs",
     "comms:sync": "node tools/comms-sync.mjs",
