@@ -200,6 +200,18 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Guard — only CI-wired presets
+        # The RUNNER is preset-agnostic; this JOB wires one preset's CLI+credential
+        # (v1: the default). Dispatching an unwired preset must be a loud RED with
+        # the local alternative, not a confusing install/runtime failure
+        # (review finding P2, PR #216).
+        if: inputs.golden-agent != 'claude'
+        run: |
+          echo "RED — preset '${{ inputs.golden-agent }}' is not wired in this CI job (v1 wires only the default preset)."
+          echo "Run it locally instead: npm run golden:tasks -- --agent ${{ inputs.golden-agent }}"
+          echo "Or wire its CLI install + credential as additional steps here."
+          exit 1
+
       - name: Require the agent credential
         # A dispatched live run without a credential must be RED, not skipped —
         # the human asked for a behavioral verdict and is not getting one.

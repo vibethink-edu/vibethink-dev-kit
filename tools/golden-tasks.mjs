@@ -181,22 +181,29 @@ function makeCtx(task) {
   return ctx;
 }
 
-// Mount the constitution the way an heir delivers it: law files copied under
+// Mount the constitution the way an heir delivers it: the universal L1 core
+// (AGENTS_UNIVERSAL — every heir carries it) + the task's law files, copied under
 // _devkit/ (docs-by-reference target), a root AGENTS.md that binds them as LAW,
 // and a CLAUDE.md-style adapter chaining to it (cross-agent layering doctrine).
 // The PROMPT never restates the law — compliance must come from this mount.
+// (Review finding P1, PR #216: without the universal core the sandbox tested the
+// per-task canon, not the constitution as an heir receives it.)
+const UNIVERSAL_LAW = "knowledge/ai-agents/AGENTS_UNIVERSAL.md";
+
 function mountConstitution(ctx, task) {
-  for (const rel of task.lawFiles) {
+  const lawFiles = [UNIVERSAL_LAW, ...task.lawFiles.filter((f) => f !== UNIVERSAL_LAW)];
+  for (const rel of lawFiles) {
     const src = join(KIT_ROOT, rel);
     if (!existsSync(src)) throw new Error(`law file missing in kit: ${rel}`);
     ctx.writeWork(join("_devkit", rel), readFileSync(src, "utf8"));
   }
-  const lawList = task.lawFiles.map((f) => `- \`_devkit/${f.replace(/\\/g, "/")}\``).join("\n");
+  const lawList = lawFiles.map((f) => `- \`_devkit/${f.replace(/\\/g, "/")}\``).join("\n");
   ctx.writeWork(
     "AGENTS.md",
     `# Repo rules (constitution — inherited from the dev-kit)\n\n` +
       `This repository inherits the dev-kit constitution. The following files are ` +
-      `LAW here — read them fully BEFORE acting on any task:\n\n${lawList}\n\n` +
+      `LAW here — read them fully BEFORE acting on any task (the universal core ` +
+      `first, then the domain canons):\n\n${lawList}\n\n` +
       `## Repo bindings (L3)\n\n${task.agentsMd}\n`
   );
   ctx.writeWork("CLAUDE.md", "@AGENTS.md\n");

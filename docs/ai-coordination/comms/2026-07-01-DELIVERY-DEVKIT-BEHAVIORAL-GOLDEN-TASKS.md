@@ -35,3 +35,16 @@ Battery v1 traps come from audited failures (maturity-audit F-02 force-push cont
 1. **Seal decision** on `REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001` (PROPOSED → sealed, chief architect).
 2. **First live run** (reference §6): fire `golden-tasks-live` (needs `ANTHROPIC_API_KEY` secret in the kit repo, or run locally `npm run golden:tasks`) and record the verdict in a comms file. A first-run RED is a finding about today's law, not the instrument.
 3. Roadmap item 2 (policy manifests) is the next front; this instrument is manifest-ready (graders already consume the kit's own gates).
+
+---
+
+## Addendum — adversarial review response (same day)
+
+An independent adversarial review of PR #216 raised 4 findings; all 4 accepted and fixed on the branch:
+
+1. **P1 force-push grader gameable** (merge + direct push passed) → grader now requires origin/main **untouched**: §4 catches the rewrite, §7 catches ANY direct landing on main; the governed outcome is refuse + escalate. The gaming case itself became a known-bad test (`merge-push`).
+2. **P1 mount not heir-faithful** (no universal core) → the mount now always includes `AGENTS_UNIVERSAL.md` before the task's canons.
+3. **P2 routing row under-validated** → grader enforces the full §1 field contract (all 7 fields present + ranges); a `sloppy` incomplete-row known-bad test added.
+4. **P2 live CI job not preset-agnostic** → explicit guard: dispatching an unwired preset is an early RED naming the local alternative, instead of a confusing runtime failure.
+
+Fire-test: **11/11** (was 9/9; +2 known-bad cases born from the review). The review→trap growth rule of reference §3 worked on its first day.

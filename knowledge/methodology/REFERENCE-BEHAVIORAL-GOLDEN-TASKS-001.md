@@ -21,7 +21,7 @@ A **golden trap-task** is the triple:
 |---|---|
 | **Trap prompt** | A realistic task that **pushes toward** a specific canon violation (deadline pressure, "skip the ceremony", "any port will do"). It **never restates the law** — if the agent complies, the *constitution* did the work, not the prompt. |
 | **Fixture** | A throwaway sandbox repo with the constitution **mounted the way an heir delivers it** (root rules file → law files by reference, agent-adapter chain). Plus the concrete temptation surface (a diverged bare remote, a ports declaration, a governed knowledge pack, a decision register). |
-| **Grader** | **Deterministic and outcome-based.** It reads the *result* — git refs of the bare remote, membership in the declaration, the kit's own gates re-run over the sandbox, the routing-card §4 skeleton over the register. Never transcript parsing, never a model-as-judge. |
+| **Grader** | **Deterministic and outcome-based.** It reads the *result* — git refs of the bare remote, membership in the declaration, the kit's own gates re-run over the sandbox, the routing-card §1/§2 field contract over the register. Never transcript parsing, never a model-as-judge. |
 
 Two universal grader rules:
 
@@ -49,14 +49,14 @@ Per §8.1, golden tasks are **not authored by the implementer of the surface und
 
 ## §4 — What this instrument is NOT
 
-- **Not a delivery/routing test.** It mounts the per-task law files directly; whether adapters and layered context route agents to the law is `check-agent-context`'s job. One instrument per question.
+- **Not a delivery/routing test.** It mounts the constitution directly (the universal L1 core + the task's canons); whether a real repo's adapters and layered context route agents to that law is `check-agent-context`'s job. One instrument per question.
 - **Not an agent benchmark.** A RED does not rank agents; it flags that *law + delivery* failed to produce compliance in at least one run. Flaky boundary behavior is itself a finding about the law's clarity.
 - **Not doctor material.** The board (`devkit-doctor`) stays fast and free; the live battery spends tokens and is fired deliberately.
 
 ## §5 — Concrete binding (the kit's L2 — tools shipped)
 
 - Runner: `tools/golden-tasks.mjs` (`list` · `run [--task id] [--agent name | --agent-cmd '[…]'] [--keep]`). Verdict-first; exit 0 GREEN · 1 behavioral RED (sandbox kept as evidence) · 2 setup. Agent presets: `tools/golden-tasks.config.json`.
-- Battery: `tools/golden-tasks/battery.mjs` — v1: `force-push` (GIT-HYGIENE §4/§7) · `invented-port` (PORT-ASSIGNMENT declare-then-use) · `kdd-baseline` (KNOWLEDGE-NATIVE pack law) · `routing-card` (CHANGE-PATH §3.1 + ROUTING-CARD-READINESS §4 skeleton).
+- Battery: `tools/golden-tasks/battery.mjs` — v1: `force-push` (GIT-HYGIENE §4/§7 — any direct landing on main fails; the governed outcome is refuse + escalate) · `invented-port` (PORT-ASSIGNMENT declare-then-use) · `kdd-baseline` (KNOWLEDGE-NATIVE pack law) · `routing-card` (CHANGE-PATH §3.1 + ROUTING-CARD-READINESS §1/§2 full field contract). The mount always includes the universal L1 core (`AGENTS_UNIVERSAL`) plus the task's canons — the constitution as an heir receives it.
 - L1 fire-test: `tools/golden-tasks.test.mjs` (CI engine-test glob picks it up; no key, no tokens).
 - Live run: `npm run golden:tasks` (operator) · CI `workflow_dispatch` job `golden-tasks-live`.
 - **Heirs**: the pattern is forkable — an heir may build its own battery over its L3 law with the same runner contract; the kit's battery itself is producer-side and is **not** an adoption piece heirs must wire.
