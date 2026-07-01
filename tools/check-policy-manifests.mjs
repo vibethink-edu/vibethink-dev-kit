@@ -76,16 +76,27 @@ const problems = [];
 const sourcesWithManifest = new Set();
 
 // Battery task ids, for golden-task watch refs (lazy — only if some rule uses one).
-let batteryIds = null;
-async function loadBatteryIds() {
-  if (batteryIds) return batteryIds;
+let batteryTasks = null;
+async function loadBattery() {
+  if (batteryTasks) return batteryTasks;
   try {
     const { TASKS } = await import(new URL("./golden-tasks/battery.mjs", import.meta.url));
-    batteryIds = new Set(TASKS.map((t) => t.id));
+    batteryTasks = TASKS;
   } catch {
-    batteryIds = new Set();
+    batteryTasks = [];
   }
-  return batteryIds;
+  return batteryTasks;
+}
+
+// A cited §N(.M) must anchor to real prose: a heading carrying that section number
+// (with or without the § glyph — sealed titles predate one convention) or an inline
+// §N reference. A cite that anchors nowhere is dangling law (PR #218 review P1).
+function sectionAnchored(prose, num) {
+  const esc = num.replace(/\./g, "\\.");
+  return (
+    new RegExp(`^#{1,6}\\s+(?:§\\s*)?${esc}(?:[.\\s—:-]|$)`, "m").test(prose) ||
+    new RegExp(`§\\s*${esc}(?![\\d.])`).test(prose)
+  );
 }
 
 for (const file of manifestFiles) {
@@ -105,6 +116,39 @@ for (const file of manifestFiles) {
     problems.push(`${rel}: "rules" must be a non-empty array`);
     continue;
   }
+
+  // 2. source + 3. status parity (prose loaded first — the rules loop cites into it)
+  let prose = null;
+  if (m.source) {
+    const srcAbs = join(ROOT, m.source);
+    if (!existsSync(srcAbs)) {
+      problems.push(`${rel}: source "${m.source}" does not exist`);
+    } else {
+      sourcesWithManifest.add(m.source.replace(/\\/g, "/"));
+      prose = readFileSync(srcAbs, "utf8");
+      const h1 = (prose.match(/^#\s+(.+)$/m) || [])[1] || "";
+      // The id may live in the H1 or in the filename — the filename IS canonical
+      // identity for spines whose (sealed) title predates the -00N id convention.
+      const srcBase = m.source.replace(/\\/g, "/").split("/").pop();
+      if (m.id && !h1.includes(m.id) && !srcBase.includes(m.id))
+        problems.push(
+          `${rel}: id "${m.id}" found neither in the canon's title ("${h1.slice(0, 60)}…") nor in its filename (${srcBase})`
+        );
+      const statusLine = (prose.match(/^.*\*\*Status:\*\*.*$/m) || [])[0] || "";
+      // Exact-token parity, not substring: "PROPOSED — not SEALED yet" must NOT
+      // satisfy a manifest claiming SEALED (PR #218 review P1). The prose token is
+      // the first word after **Status:** (markdown emphasis stripped).
+      const afterTag = statusLine.split(/\*\*Status:\*\*/)[1] ?? "";
+      const proseToken = (afterTag.replace(/[*_`>]/g, "").trim().match(/^[A-Za-z-]+/) || [])[0] || "";
+      if (!statusLine)
+        problems.push(`${rel}: source has no **Status:** line — parity unverifiable`);
+      else if (m.status && proseToken !== m.status)
+        problems.push(
+          `${rel}: status drift — manifest claims "${m.status}" but the prose status token is "${proseToken}" (line: ${statusLine.replace(/\*\*/g, "").trim().slice(0, 70)})`
+        );
+    }
+  }
+
   const seen = new Set();
   for (const r of m.rules) {
     const tag = `${rel} rule "${r.id ?? "?"}"`;
@@ -116,9 +160,18 @@ for (const file of manifestFiles) {
     }
     if (r.level && !LEVELS.has(r.level))
       problems.push(`${tag}: level "${r.level}" not in {MUST, NEVER}`);
-    if (r.cite && !/§/.test(String(r.cite)))
+    const citeNums = [...String(r.cite ?? "").matchAll(/§\s*(\d+(?:\.\d+)*)/g)].map((x) => x[1]);
+    if (r.cite && citeNums.length === 0)
       problems.push(`${tag}: cite carries no § section — a rule without a prose anchor is new law, not a projection`);
-    // 4. watch
+    if (prose)
+      for (const num of citeNums)
+        if (!sectionAnchored(prose, num))
+          problems.push(
+            `${tag}: cite §${num} anchors to no heading or § reference in ${m.source} — dangling citation (the section moved, or the rule is new law)`
+          );
+    // 4. watch — existence is not enough: the watcher must DECLARE a relationship
+    // to this law (its source cites the canon id / the battery task lists the law),
+    // or any existing file could pose as a rule's "watcher" (PR #218 review P1).
     const w = r.watch;
     if (w && typeof w === "object") {
       if (!WATCH_KINDS.has(w.kind))
@@ -126,49 +179,44 @@ for (const file of manifestFiles) {
       else if (w.kind === "none") {
         if (!w.note || !String(w.note).trim())
           problems.push(`${tag}: watch none requires a note — unwatched is a conscious declaration`);
-      } else {
-        if (!w.ref || !existsSync(join(ROOT, w.ref)))
-          problems.push(`${tag}: watch.ref "${w.ref}" does not exist`);
-        if (w.kind === "golden-task") {
-          const ids = await loadBatteryIds();
-          if (!w.task || !ids.has(w.task))
-            problems.push(`${tag}: watch golden-task names task "${w.task}" which is not in the battery`);
-        }
+      } else if (!w.ref || !existsSync(join(ROOT, w.ref))) {
+        problems.push(`${tag}: watch.ref "${w.ref}" does not exist`);
+      } else if (w.kind === "gate") {
+        const watcherSrc = readFileSync(join(ROOT, w.ref), "utf8");
+        if (m.id && !watcherSrc.includes(m.id))
+          problems.push(
+            `${tag}: watcher ${w.ref} never cites ${m.id} — no declared relationship to this law (an existing-but-unrelated file is a false watch)`
+          );
+      } else if (w.kind === "golden-task") {
+        const battery = await loadBattery();
+        const task = battery.find((t) => t.id === w.task);
+        if (!task)
+          problems.push(`${tag}: watch golden-task names task "${w.task}" which is not in the battery`);
+        else if (
+          m.id &&
+          ![...(task.laws ?? []), ...(task.lawFiles ?? [])].join(" ").includes(m.id)
+        )
+          problems.push(
+            `${tag}: battery task "${w.task}" does not declare ${m.id} among its laws — a trap for another law is a false watch`
+          );
       }
-    }
-  }
-
-  // 2. source + 3. status parity
-  if (m.source) {
-    const srcAbs = join(ROOT, m.source);
-    if (!existsSync(srcAbs)) {
-      problems.push(`${rel}: source "${m.source}" does not exist`);
-    } else {
-      sourcesWithManifest.add(m.source.replace(/\\/g, "/"));
-      const prose = readFileSync(srcAbs, "utf8");
-      const h1 = (prose.match(/^#\s+(.+)$/m) || [])[1] || "";
-      // The id may live in the H1 or in the filename — the filename IS canonical
-      // identity for spines whose (sealed) title predates the -00N id convention.
-      const srcBase = m.source.replace(/\\/g, "/").split("/").pop();
-      if (m.id && !h1.includes(m.id) && !srcBase.includes(m.id))
-        problems.push(
-          `${rel}: id "${m.id}" found neither in the canon's title ("${h1.slice(0, 60)}…") nor in its filename (${srcBase})`
-        );
-      const statusLine = (prose.match(/^.*\*\*Status:\*\*.*$/m) || [])[0] || "";
-      if (!statusLine)
-        problems.push(`${rel}: source has no **Status:** line — parity unverifiable`);
-      else if (m.status && !statusLine.includes(m.status))
-        problems.push(
-          `${rel}: status drift — manifest claims "${m.status}" but the prose Status line reads: ${statusLine.replace(/\*\*/g, "").trim().slice(0, 80)}`
-        );
     }
   }
 }
 
-// 5. coverage ratchet + frontier report
+// 5. coverage ratchet — BIDIRECTIONAL (PR #218 review P1: a one-way list is not a
+// ratchet). requireFor ⇒ manifest exists; manifest ⇒ its canon is in requireFor.
+// So shrinking coverage cannot happen by deleting one file: it always takes a
+// visible two-file diff (manifest + config), which review governance owns.
 for (const canon of requireFor) {
   if (!sourcesWithManifest.has(canon.replace(/\\/g, "/")))
     problems.push(`coverage: ${canon} is in requireFor but has no manifest in ${policyDir} (the ratchet never slides back)`);
+}
+for (const src of sourcesWithManifest) {
+  if (!requireFor.map((c) => c.replace(/\\/g, "/")).includes(src))
+    problems.push(
+      `coverage: ${src} has a manifest but is not in requireFor — the ratchet grows with every manifest (add it to tools/policy-manifests.config.json)`
+    );
 }
 let frontier = 0;
 for (const root of canonRoots) {

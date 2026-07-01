@@ -11,28 +11,42 @@
       "level": "MUST",
       "cite": "§3, §3.1",
       "rule": "On a genuine path/methodology/executor fork, emit the routing decision card and wait for the authority's GO; trivial+reversible+no-contract work takes the direct path with no card.",
-      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "routing-card" }
+      "watch": {
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "routing-card"
+      }
     },
     {
       "id": "ROUTE-MUST-DURABLE-TRACE",
       "level": "MUST",
-      "cite": "§3.1 (+ REFERENCE-ROUTING-CARD-READINESS-001 §1)",
-      "rule": "On non-trivial work the card leaves one durable 'routing' record in the decision register (kind, path, methodology, executor, recommendation, authority_go, ref).",
-      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "routing-card" }
+      "cite": "§3.1",
+      "rule": "On non-trivial work the card leaves one durable 'routing' record in the decision register — field shape per REFERENCE-ROUTING-CARD-READINESS-001 §1 (kind, path, methodology, executor, recommendation, authority_go, ref).",
+      "watch": {
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "routing-card"
+      }
     },
     {
       "id": "ROUTE-MUST-CODER-VIA-SPINE",
       "level": "MUST",
       "cite": "§3.1",
       "rule": "When the executor is an autonomous coder, dispatch through the coder spine (orchestration + safe-identity + launch runbook) — never improvised; no ready launch-surface → stand it up first.",
-      "watch": { "kind": "gate", "ref": "tools/check-coder-launch-readiness.mjs" }
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-coder-launch-readiness.mjs"
+      }
     },
     {
       "id": "ROUTE-NEVER-SILENT-RESOLUTION",
       "level": "NEVER",
       "cite": "§3.1",
       "rule": "Silently resolve a genuine path/methodology/executor choice that belongs to the authority — the card is presented verdict-first and the agent waits for GO.",
-      "watch": { "kind": "none", "note": "behavioral, live-agent only; partially exercised by the routing-card golden task" }
+      "watch": {
+        "kind": "none",
+        "note": "behavioral, live-agent only; partially exercised by the routing-card golden task"
+      }
     }
   ]
 }

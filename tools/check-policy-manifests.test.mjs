@@ -71,7 +71,8 @@ function manifest(over = {}, ruleOver = {}) {
 }
 function seed(dir, m) {
   write(dir, "canon/CANON-EXAMPLE-001.md", CANON);
-  write(dir, "gate.mjs", "// a watching gate");
+  // A legitimate watcher DECLARES its law (house convention: the header cites the canon).
+  write(dir, "gate.mjs", "// gate — makes CANON-EXAMPLE-001 bite");
   write(dir, "policy/canon-example-001.policy.json", m);
 }
 
@@ -92,6 +93,44 @@ test("status drift (manifest out-claims prose) → RED, exit 1", () => {
   const { code, out } = run(dir, CFG);
   assert.equal(code, 1, out);
   assert.match(out, /status drift/i);
+});
+
+test("substring status ('PROPOSED — not SEALED yet' vs manifest SEALED) → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest());
+  write(
+    dir,
+    "canon/CANON-EXAMPLE-001.md",
+    CANON.replace("SEALED 2026-07-01 by the named authority", "PROPOSED — not SEALED yet")
+  );
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /status drift/i);
+});
+
+test("dangling § citation (section absent from the canon) → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { cite: "§9" }));
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /dangling citation/i);
+});
+
+test("watcher exists but never cites the canon (false watch) → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { watch: { kind: "gate", ref: "unrelated.mjs" } }));
+  write(dir, "unrelated.mjs", "// an existing but unrelated script");
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /false watch|never cites/i);
+});
+
+test("manifest missing from requireFor (one-way ratchet) → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest());
+  const { code, out } = run(dir, { ...CFG, requireFor: [] });
+  assert.equal(code, 1, out);
+  assert.match(out, /ratchet grows/i);
 });
 
 test("rule without § anchor (new law, not projection) → RED, exit 1", () => {

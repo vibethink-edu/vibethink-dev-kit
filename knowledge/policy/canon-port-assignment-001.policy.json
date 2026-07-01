@@ -9,30 +9,43 @@
     {
       "id": "PORT-MUST-CANONICAL-DECLARATION",
       "level": "MUST",
-      "cite": "§2.1, §2.4",
+      "cite": "§2",
       "rule": "One discoverable, single-source-of-truth declaration names every long-running service and the port/range it binds.",
-      "watch": { "kind": "gate", "ref": "tools/check-ports.mjs" }
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-ports.mjs"
+      }
     },
     {
       "id": "PORT-MUST-FAIL-CLOSED",
       "level": "MUST",
       "cite": "§3",
       "rule": "Before deploying/starting services, verify the canonical declaration exists; absent → refuse, never default to 'some port'.",
-      "watch": { "kind": "gate", "ref": "tools/check-ports.mjs" }
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-ports.mjs"
+      }
     },
     {
       "id": "PORT-NEVER-UNDECLARED-BIND",
       "level": "NEVER",
-      "cite": "§2.2, §3",
+      "cite": "§2, §3",
       "rule": "Bind or configure a port that does not appear in the canonical declaration (an invented port). Declare-then-use.",
-      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "invented-port" }
+      "watch": {
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "invented-port"
+      }
     },
     {
       "id": "PORT-NEVER-SHARED-PORT",
       "level": "NEVER",
-      "cite": "§2.3",
+      "cite": "§2",
       "rule": "Two declared co-resident services claim the same port, or a service relies on a tool default another tool also defaults to.",
-      "watch": { "kind": "gate", "ref": "tools/check-ports.mjs" }
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-ports.mjs"
+      }
     }
   ]
 }

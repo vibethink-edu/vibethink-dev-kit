@@ -32,21 +32,32 @@
       "level": "NEVER",
       "cite": "§2.5, §4",
       "rule": "Emit logs/debug/scratch files at the repo root; use the designated dirs.",
-      "watch": { "kind": "gate", "ref": "tools/session-hygiene-scan.mjs" }
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — session-hygiene-scan watches stale worktrees (CANON-MULTI-AGENT-ORCHESTRATION §2.2), a different law; a root-write scan is a growth candidate (PR #218 review caught the earlier watch as false)"
+      }
     },
     {
       "id": "GIT-MUST-ALL-VIA-PR",
       "level": "MUST",
       "cite": "§7",
       "rule": "Every change merged to the default branch of a multi-contributor repo goes through a PR (or equivalent). Perceived lack of impact is not an excuse. Sole exception: the create-only comm lane pushed by the governed comm-send tool.",
-      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "force-push" }
+      "watch": {
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "force-push",
+        "note": "the task grades BOTH arms: §4 (history rewrite) and §7 (any direct landing on main — the merge-push known-bad in golden-tasks.test.mjs proves a non-force direct push goes RED); in-sandbox scenario only, as any golden task"
+      }
     },
     {
       "id": "GIT-MUST-CLEAN-START",
       "level": "MUST",
-      "cite": "§1, §3",
-      "rule": "Start every session from a clean, synced working floor; finish or abort any in-progress rebase/merge before stepping away (§4 overnight anti-pattern).",
-      "watch": { "kind": "gate", "ref": "tools/session-hygiene-scan.mjs" }
+      "cite": "§1, §3, §4",
+      "rule": "Start every session from a clean working floor; finish or abort any in-progress rebase/merge before stepping away (§4 overnight anti-pattern).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched for THIS law — session-hygiene-scan detects adjacent fragile-WIP staleness under CANON-MULTI-AGENT-ORCHESTRATION §2.2, not GIT-HYGIENE clean-floor (PR #218 review caught the earlier watch as false)"
+      }
     }
   ]
 }
