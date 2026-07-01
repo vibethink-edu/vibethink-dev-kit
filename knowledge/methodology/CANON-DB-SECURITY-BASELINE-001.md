@@ -1,6 +1,6 @@
 # CANON-DB-SECURITY-BASELINE — Postgres/Supabase exposed-schema security floor (engine-specific · agent-agnostic)
 
-**Status:** SEALED 2026-06-15 by Marcelo (Principal Architect) — agnostic-lift #38
+**Status:** SEALED 2026-06-15 by the Principal Architect — agnostic-lift #38
 **Date:** 2026-06-15
 **Scope:** Repos whose data plane is **PostgreSQL exposed over PostgREST / Supabase** (a REST surface where the `anon` and `authenticated` roles can reach the schema). This canon is **engine-specific by design** — its mechanisms (the `PUBLIC` execute grant, RLS policies, `search_path` pinning, the `anon`/`authenticated`/`service_role` role model, the Supabase Security Advisor) are properties of Postgres + PostgREST. It does **NOT** apply to MySQL, SQL Server, MongoDB, DynamoDB, or any non-Postgres engine — those have their own threat model and must not inherit these rules verbatim. A repo on a non-Postgres engine marks this piece `N-A(non-postgres)`.
 **Companion canons:** [`CANON-PRODUCTION-SAFETY`](./CANON-PRODUCTION-SAFETY.md) (what the shipped artifact must not contain — this canon governs what the *exposed database* must not allow) · [`CANON-VERTICAL-BOUNDARY-001`](../architecture/CANON-VERTICAL-BOUNDARY-001.md) (who owns a shared schema's debt) · [`CANON-TESTING-GATE`](./CANON-TESTING-GATE.md) (gate discipline).

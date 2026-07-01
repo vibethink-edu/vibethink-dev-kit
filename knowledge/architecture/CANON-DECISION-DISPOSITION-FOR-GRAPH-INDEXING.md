@@ -2,12 +2,12 @@
 
 > **Scope:** every repo that inherits this kit.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-04 by Marcelo (Principal Architect) — Tier C consolidation; approved for supra-repo integration (fire-test
+> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation; approved for supra-repo integration (fire-test
 > passed: no product, vendor, tool, or person name appears here).
 > **Amended 2026-05-22:** §3.2 / golden rules — inline code markers are
 > **advisory-only** (a real indexer does not harvest them); **Markdown/ADR is the
 > strong indexable binding**. Corrected on empirical verification, not assumption.
-> **§3.8 amendment SEALED 2026-06-05 by Marcelo (agnostic-lift A#17):** added *documentation depth for complex / constitutional decisions* (3-part: formal spec + architectural context + concrete cross-context examples), lifted from a product-side `CANON-COMPLEX-DECISION-DOCUMENTATION-001`.
+> **§3.8 amendment SEALED 2026-06-05 by the Principal Architect (agnostic-lift A#17):** added *documentation depth for complex / constitutional decisions* (3-part: formal spec + architectural context + concrete cross-context examples), lifted from a product-side `CANON-COMPLEX-DECISION-DOCUMENTATION-001`.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** supra-repo discipline, together with **Cross-Repo Artifact
 > Isolation** (`CANON-CROSS-AGENT-CONTEXT-LAYERING.md` §4). Same discipline set.

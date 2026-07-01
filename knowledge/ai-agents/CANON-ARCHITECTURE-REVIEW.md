@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where a second architect / external advisor / audit agent reviews the system's architecture (not a single change).
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-05 (authorized): added the over-engineering lens + hard-drop discipline (§5.1), the independence axis in-field/fresh-context (§3.1), and the inbound wiring from the verification-selection gate (§3.2).**
+> **Status:** SEALED 2026-06-05 by the Principal Architect — Tier A consolidation (autonomous-close authorization). **Amendment 2026-06-05 (authorized): added the over-engineering lens + hard-drop discipline (§5.1), the independence axis in-field/fresh-context (§3.1), and the inbound wiring from the verification-selection gate (§3.2).**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings (do not duplicate):** `REVIEW-CALL-CHECKLIST` (the controls for reviewing a single *implementation* — recall/precision, correct-by-design) · `REVIEW-READINESS-PROTOCOL` (is the work *ready* to review + handoff states) · `CANON-TESTING-GATE` (the verification-selection gate that escalates here — §3.2) · `CANON-DEV-MODE-DISCIPLINE` (the over-engineering signals the §5.1 lens reads). **This canon covers the third thing: verdicts on the *architecture itself*** — gaps, drift, contradictions, over-engineering, and the lens the reviewer brings.
 

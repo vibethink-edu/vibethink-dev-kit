@@ -2,7 +2,7 @@
 
 > **Scope:** every repo whose end-to-end / integration tests authenticate against a real auth provider.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization).
+> **Status:** SEALED 2026-06-05 by the Principal Architect — Tier A consolidation (autonomous-close authorization).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-TESTING-MINIMUM-BAR` (unit-level minimum bar — explicitly defers E2E to this canon) · `CANON-AGENT-SCOPE-DISCIPLINE` (the Finding Protocol used in §8).
 

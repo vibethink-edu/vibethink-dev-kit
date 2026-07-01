@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that coordinates modern coding agents (and humans) on shared work.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by Marcelo (Principal Architect) — Tier A consolidation (autonomous-close authorization). **Re-sealed 2026-06-05 by Marcelo** — amendment §13 (the skill eval loop) confirmed.
+> **Status:** SEALED 2026-06-05 by the Principal Architect — Tier A consolidation (autonomous-close authorization). **Re-sealed 2026-06-05 by the Principal Architect** — amendment §13 (the skill eval loop) confirmed.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-MULTI-AGENT-ORCHESTRATION` (how agents hand work between each other) · `CANON-AGENT-SCOPE-DISCIPLINE` (how an agent scopes a session) · `CANON-AGENT-COLLABORATION` (how an agent works with the human authority).
 
