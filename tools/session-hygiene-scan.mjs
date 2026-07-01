@@ -4,7 +4,9 @@
  *
  * Flags any registered git worktree that ends a session with FRAGILE WIP — i.e.
  * uncommitted or unpushed work whose last commit is OLDER than today (local date).
- * The operator decides what to rescue, push, or discard. This script NEVER mutates.
+ * The operator decides what to rescue, push, or discard. This script never mutates
+ * the worktree, refs, or branches — it may create a temporary dangling Git object
+ * (via `commit-tree`) for the squash-merge probe (harmless, reclaimed by GC).
  *
  * Decision states for closeout (canon §2.2): every touched branch/worktree must
  * end in PUSHED, READY-PR, or DISCARDED. The scan only DETECTS the failure mode;
@@ -94,6 +96,20 @@ function inspect(wt, today) {
     upstreamState = wt.detached ? "detached" : "no-upstream";
   }
 
+  // Local-only work: a no-upstream (non-integration) branch whose commits are not
+  // yet on the integration ref has real work that has NOT travelled — a clean
+  // worktree status would otherwise hide it (unpushed is only computed when there
+  // IS an upstream). Count commits ahead of the integration ref.
+  let localOnlyAhead = 0;
+  if (upstreamState === "no-upstream" && wt.branch) {
+    const mainRef = resolveMainRef(wt.path);
+    const mainLocal = mainRef.replace(/^origin\//, "");
+    if (mainRef && wt.branch !== mainLocal && wt.branch !== mainRef) {
+      const ahead = git(wt.path, "rev-list", "--count", `${mainRef}..HEAD`);
+      localOnlyAhead = ahead ? parseInt(ahead, 10) || 0 : 0;
+    }
+  }
+
   // Last commit date (YYYY-MM-DD local) — proxy for "is this worktree from today?"
   const lastCommitIso = git(wt.path, "log", "-1", "--format=%cs"); // %cs = short ISO date
   const hasDirty = uncommittedCount > 0 || unpushedCount > 0;
@@ -101,7 +117,13 @@ function inspect(wt, today) {
   let reason = "";
 
   if (!hasDirty) {
-    kind = "clean";
+    // Clean tree, but committed-and-never-pushed local work is a warn, not silent-clean.
+    if (localOnlyAhead > 0) {
+      kind = "local-only";
+      reason = `${localOnlyAhead} local commit(s) not pushed (no upstream)`;
+    } else {
+      kind = "clean";
+    }
   } else if (!lastCommitIso) {
     // No commits yet — likely a brand-new working session; not stale per definition.
     kind = "current";
@@ -121,6 +143,7 @@ function inspect(wt, today) {
     uncommittedCount,
     unpushedCount,
     upstreamState,
+    localOnlyAhead,
     lastCommitIso,
   };
 }
@@ -188,6 +211,7 @@ function main() {
       stale: results.filter((r) => r.kind === "stale").length,
       current: results.filter((r) => r.kind === "current").length,
       clean: results.filter((r) => r.kind === "clean").length,
+      localOnly: results.filter((r) => r.kind === "local-only").length,
       squashMergedBranches: squashMerged,
       results,
     };
@@ -196,11 +220,13 @@ function main() {
     console.log(`\nsession-hygiene-scan (CANON-MULTI-AGENT-ORCHESTRATION §2.2)`);
     console.log(`today: ${today}  ·  worktrees: ${results.length}\n`);
     for (const r of results) {
-      const mark = r.kind === "stale" ? "✗" : r.kind === "current" ? "·" : r.kind === "skip" ? "–" : "✓";
+      const mark = r.kind === "stale" ? "✗" : r.kind === "local-only" ? "⚠" : r.kind === "current" ? "·" : r.kind === "skip" ? "–" : "✓";
       const label = r.wt.branch || (r.wt.detached ? "(detached)" : "(no branch)");
       const detail =
         r.kind === "stale"
           ? `STALE — uncommitted=${r.uncommittedCount}, unpushed=${r.unpushedCount}, ${r.reason}`
+          : r.kind === "local-only"
+            ? `local-only — ${r.reason}`
           : r.kind === "current"
             ? `current — uncommitted=${r.uncommittedCount}, unpushed=${r.unpushedCount} (${r.reason})`
             : r.kind === "skip"
@@ -217,12 +243,19 @@ function main() {
       for (const b of squashMerged) console.log(`    git branch -D ${b}`);
       console.log("");
     }
+    const localOnly = results.filter((r) => r.kind === "local-only");
+    if (localOnly.length > 0) {
+      console.log(
+        `⚠ ${localOnly.length} local-only branch(es) — committed work with no upstream, not yet pushed. ` +
+          `Not RED, but it has not travelled; set an upstream and push before relying on it.\n`,
+      );
+    }
     const stale = results.filter((r) => r.kind === "stale");
     if (stale.length === 0) {
       console.log("GREEN — no stale WIP. (Same-day WIP is allowed; close it in PUSHED / READY-PR / DISCARDED before ending the session — canon §2.2.)\n");
       process.exit(0);
     } else {
-      console.log(`RED — ${stale.length} worktree(s) with stale WIP. Rescue, push, or discard them before continuing. The scan does not mutate.\n`);
+      console.log(`RED — ${stale.length} worktree(s) with stale WIP. Rescue, push, or discard them before continuing. The scan does not mutate the worktree, refs, or branches.\n`);
       process.exit(1);
     }
   }

@@ -81,6 +81,20 @@ test("clean worktree (no uncommitted, no upstream) → '✓ clean' + exit 0", ()
   assert.equal(code, 0, "clean → exit 0");
 });
 
+// ── local-only: committed work, no upstream, ahead of main → warn, exit 0 ───
+test("local-only branch (committed, no upstream, ahead of main) → '⚠ local-only' + exit 0", () => {
+  const { code, out } = runScan((dir) => {
+    fs.writeFileSync(path.join(dir, "README.md"), "# repo\n");
+    gitCommit(dir, "init", isoDaysAgo(0));
+    execFileSync("git", ["checkout", "-q", "-b", "feature/local-only"], { cwd: dir });
+    fs.writeFileSync(path.join(dir, "feat.txt"), "committed but never pushed\n");
+    gitCommit(dir, "local work", isoDaysAgo(0));
+    // clean tree, no upstream, 1 commit ahead of main → must be surfaced, not "clean"
+  });
+  assert.match(out, /local-only/, "committed work with no upstream must surface as local-only, not silent clean");
+  assert.equal(code, 0, "local-only is a WARN (not RED) → exit 0");
+});
+
 // ── current: uncommitted but activity is TODAY → exit 0, not flagged ────────
 test("uncommitted with same-day commit → 'current' + exit 0 (not stale)", () => {
   const { code, out } = runScan((dir) => {
