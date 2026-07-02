@@ -1,6 +1,6 @@
 # REFERENCE-POLICY-ENGINE-001 — The reference runtime policy engine (machine-enforced law)
 
-**Status:** PROPOSED 2026-07-01 — drafted by the Principal Architect (roadmap item 3, slice S1; design GO'd by the chief architect in the 2026-07-01 handoff). Seal + register row belong to the chief architect on the S1 PR, per the same path as its two companions.
+**Status:** **SEALED 2026-07-02 by the named authority** — drafted by the Principal Architect (roadmap item 3, slice S1; design GO'd by the chief architect in the 2026-07-01 handoff), approved and sealed by the chief architect ("adelante", register row D-052). Shipped in PR #221 after independent adversarial review: APPROVE WITH FIXES (2 P2) → fixed `3046e7b`.
 **Date:** 2026-07-01
 **Scope:** the dev-kit (producer-side instrument) + any heir that wants action-time enforcement over machine-readable law (copy the reference engine or build its own against the same sealed contract).
 **Spine:** this is the L2 instrument of `CANON-RUNTIME-POLICY-ENGINE-001` (SEALED — the contract; **not reopened here**), consuming `REFERENCE-POLICY-MANIFESTS-001` (the law's machine form, D-051) and proven by `REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001` (the behavior battery, D-050). The instrument-loop closes: **law → manifest → engine → trap**.
