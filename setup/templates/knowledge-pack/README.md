@@ -26,6 +26,12 @@ Accepted Knowledge Baseline only after human/principal validation.
 `status: accepted` for an accepted pack and let the repo's KDD status surface compute
 whether the pack is lapsed or blocked by a declared business pivot.
 
+Pack artifacts may carry descriptive frontmatter for agent navigation, such as
+`type`, `title`, `description`, `tags`, or `timestamp`. Those fields are only
+descriptive. They never confer authority, acceptance, validation, or freshness.
+Lifecycle status, validator identity, acceptance evidence, and revalidation inputs
+belong in `PACK-METADATA.md`.
+
 ## Required Files
 
 - `PACK-METADATA.md`
