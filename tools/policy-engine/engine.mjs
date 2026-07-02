@@ -133,6 +133,18 @@ export const STATIC_FLOOR = Object.freeze([
     "pipe-to-shell",
     /\b(curl|wget|iwr|invoke-webrequest)\b[^|\n]*\|\s*(sh|bash|zsh|node|python3?|pwsh|powershell|iex)\b/i
   ),
+  // Self-protection (S2 review P1): the engine's approval surface and session
+  // store are NOT reachable from the governed tool plane. An agent behind the
+  // engine can `eval` (harmless — it only reads a verdict) but can never
+  // self-settle an ASK (approve/deny), invoke the hook adapter (forging a
+  // PostToolUse approval), or touch the session store files. An agent NOT behind
+  // the engine is outside its jurisdiction — that boundary belongs to the
+  // harness static deny (§8 backstop), declared, not pretended away.
+  floorPolicy(
+    "self-protection",
+    "policy-engine approval surface / session store",
+    /policy-engine\.mjs["'\s]+(approve|deny)\b|hook-adapter\.mjs|policy-sessions/i
+  ),
 ]);
 
 /**
@@ -219,7 +231,7 @@ export function evaluate(event, state, policies = []) {
  * review and MUST NOT be forced into matchers.
  *
  * enforce = { point: <§2 point or array>, verdict: <§3 verdict>,
- *             match: { pattern, tool?, captureNotInStateLabel? } }
+ *             match: { pattern, tool?, captureNotInStateLabel?, unlessGrant? } }
  *
  * The matcher is declarative over the action's SHAPE — never NLP at runtime.
  * `captureNotInStateLabel` makes membership mechanical: the pattern's first
@@ -227,6 +239,13 @@ export function evaluate(event, state, policies = []) {
  * the ports a repo declares); a member → ALLOW, anything else — including a
  * MISSING label — takes the rule's verdict. That absence path is deliberate
  * fail-closed (e.g. CANON-PORT-ASSIGNMENT-001 §3: no declaration → refuse).
+ * `unlessGrant` (S2) is the GOVERNED-EXEMPTION shape for rules whose prose
+ * declares one lawful exception (e.g. GIT-HYGIENE §7's create-only comm lane).
+ * A grant is CALL-TIME PROVENANCE: it is honored ONLY from `event.labels`
+ * (`ev.labels[<grant>]`), which the governed invoker passes at evaluation time
+ * (CLI/adapter `--grant`). It is NEVER read from persisted session state — a
+ * session file is data an agent with shell access could forge (S2 review P1);
+ * an exemption must ride the invocation of the governed flow itself.
  */
 export function compileManifest(manifest) {
   const policies = [];
@@ -248,12 +267,15 @@ export function compileManifest(manifest) {
       );
     const re = new RegExp(enf.match.pattern);
     const notInLabel = enf.match.captureNotInStateLabel;
+    const unlessGrant = enf.match.unlessGrant;
     policies.push({
       name: `${manifest.id}/${rule.id}`,
       on: points,
       verdicts: [enf.verdict, "ALLOW"],
       evaluate(ev, state) {
         if (enf.match.tool && ev.tool !== enf.match.tool) return { verdict: "ALLOW" };
+        // Call-time grant ONLY — persisted state is never an exemption (review P1).
+        if (unlessGrant && ev.labels?.[unlessGrant]) return { verdict: "ALLOW" };
         const m = re.exec(String(ev.content ?? ""));
         if (!m) return { verdict: "ALLOW" };
         if (notInLabel) {

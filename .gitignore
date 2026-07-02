@@ -29,3 +29,6 @@ build/
 
 # Graphify cache (regenerable, never committed — privacy baseline, EXTERNAL-TOOLS.md)
 graphify-out/
+
+# Policy-engine session files (per-session runtime state, never committed)
+.policy-sessions/

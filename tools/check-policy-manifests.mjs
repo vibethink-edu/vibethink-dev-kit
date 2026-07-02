@@ -29,9 +29,10 @@
  *                     food — CANON-RUNTIME-POLICY-ENGINE-001) must be well-formed:
  *                     point(s) in the canon's §2 range, verdict in the §3 range,
  *                     a match.pattern that compiles as a RegExp (with a capturing
- *                     group when captureNotInStateLabel is declared). Only
- *                     MECHANICALLY-DECIDABLE rules carry enforce; judgment rules
- *                     stay watched by gates / golden tasks / review.
+ *                     group when captureNotInStateLabel is declared; a non-empty
+ *                     grant name when unlessGrant declares a governed exemption).
+ *                     Only MECHANICALLY-DECIDABLE rules carry enforce; judgment
+ *                     rules stay watched by gates / golden tasks / review.
  *
  * Config (tools/policy-manifests.config.json):
  *   { "policyDir": "knowledge/policy",
@@ -269,6 +270,13 @@ for (const file of manifestFiles) {
                 `${tag}: captureNotInStateLabel declared but the pattern has no capturing group — nothing to look up in session state`
               );
           }
+          if (
+            e.match.unlessGrant !== undefined &&
+            (typeof e.match.unlessGrant !== "string" || !e.match.unlessGrant.trim())
+          )
+            problems.push(
+              `${tag}: enforce.match.unlessGrant must be a non-empty string — a governed exemption names its call-time grant explicitly`
+            );
         }
       }
     }
