@@ -41,3 +41,21 @@
 | P3 | ACCEPTED → FIXED (one-writer/protected-store deployment contract lifted into reference §7) | `44685f7` |
 
 **Prior cycle, same front (for the record):** S1 review (PR #221) = APPROVE WITH FIXES, 2 P2 (fail-closed compiler · declared partial port coverage) → fixed `3046e7b`, addendum in the S1 delivery.
+
+---
+
+## Re-review (2026-07-02, same day, verbatim) — **Verdict final: APPROVE**
+
+> Verifiqué el fix `44685f7`.
+>
+> El exploit exacto quedó cerrado: `state.labels.commLane=true` forjado en el JSON de sesión ya no exime. Ahora la exención usa `unlessGrant`, leído solo desde `event.labels` por `--grant commLane` en la invocación gobernada. Probé: estado forjado → `DENY`; grant por llamada → `ALLOW`.
+>
+> El floor self-protection cubre las formas directas: `policy-engine approve/deny`, `hook-adapter.mjs`, `.policy-sessions` y `vibethink-policy-sessions`. También hay tests known-bad para self-settlement, tamper y forged Post. Un `node -e` genérico puede construir strings dinámicos, pero eso está declarado honestamente como límite del pattern-floor y queda en el backstop sellado del harness static deny (§8 / no arbitrary-exec wildcard). Me parece suficiente como frontera de S2.
+>
+> El patrón ref-token ahora da lo esperado: `git push origin main` → match/DENY · `git push origin feature/main-fix` → no match · `git push origin HEAD` → no match · `git push origin HEAD:main` → match/DENY · `git push origin refs/heads/main` → match/DENY · `git push origin release/main` → match, residual declarado en coverage.
+>
+> Validación: `policy-engine.test.mjs` 22/22 · `policy-engine-session.test.mjs` 22/22 · `check-policy-manifests.test.mjs` 20/20 · manifests GREEN 32/32.
+>
+> No findings restantes.
+
+**Disposition final:** P1/P2/P3 → FIXED (`44685f7`) → re-verified by the independent reviewer → **APPROVE, no findings restantes**. PR #222 queda a sello+merge del chief architect.
