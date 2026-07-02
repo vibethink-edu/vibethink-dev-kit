@@ -269,6 +269,26 @@ test("captureNotInStateLabel without a capturing group in the pattern → RED, e
   assert.match(out, /no capturing group/i);
 });
 
+test("unlessGrant empty/non-string → RED, exit 1 (a governed exemption names its call-time grant)", () => {
+  const dir = makeRepo();
+  seed(
+    dir,
+    manifest(
+      {},
+      {
+        enforce: {
+          point: "tool-call",
+          verdict: "DENY",
+          match: { pattern: "git push", unlessGrant: "  " },
+        },
+      }
+    )
+  );
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /unlessGrant must be a non-empty string/i);
+});
+
 // The real repo's manifests must themselves pass the gate (dogfood).
 test("the kit's own manifests → GREEN against the real config", () => {
   const kitRoot = path.dirname(path.dirname(TOOL));

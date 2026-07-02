@@ -14,13 +14,25 @@
  *   node tools/policy-engine.mjs policies [--manifest <file> ... | --policy-dir <dir>]
  *   node tools/policy-engine.mjs eval --point <request|pre-model|tool-call|tool-result>
  *        [--tool <name>] --content <text|-> [--manifest <file> ...]
- *        [--policy-dir <dir>] [--state <file.json>]
+ *        [--policy-dir <dir>] [--state <file.json>] [--session <file.json>]
+ *   node tools/policy-engine.mjs approve --session <file.json> --key <pending-key>
+ *   node tools/policy-engine.mjs deny    --session <file.json> --key <pending-key>
  *
  * Policy source: every --manifest file, or every *.policy.json under --policy-dir
  * (default: knowledge/policy under the cwd when present). Rules without `enforce`
  * are judgment law — they are reported by `policies` as not mechanically enforced,
  * never guessed at runtime. --state seeds the per-session state (§5), e.g.
  * {"labels":{"declaredPorts":[4000,4100]}}; --content - reads stdin.
+ *
+ * Sessions (S2, §3/§5): --session persists state across calls (one JSON per
+ * session). An ASK parks its withheld writes as a PENDING under the action's key
+ * (printed with the verdict); `approve` is the ONLY path that applies them,
+ * `deny` drops them unapplied — a denied ASK leaves no side effects.
+ *
+ * Grants (S2 review P1): --grant <name> (repeatable) attaches a CALL-TIME grant
+ * to the event (event.labels) for `unlessGrant` exemptions. A grant is the
+ * governed invoker's provenance — it is never read from (or written to) the
+ * session file, which an agent with shell access could forge.
  *
  * Verdict-first. Exit: 0 = ALLOW · 1 = DENY · 3 = ASK (a human approval is
  * required — the caller withholds all writes until it happens) · 2 = setup error.
@@ -35,6 +47,13 @@ import {
   createSessionState,
   evaluate,
 } from "./policy-engine/engine.mjs";
+import {
+  loadSession,
+  pendingKey,
+  recordPending,
+  saveSession,
+  settlePending,
+} from "./policy-engine/session-store.mjs";
 
 const argv = process.argv.slice(2);
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
@@ -55,11 +74,35 @@ function flags(name) {
 const flag = (name) => flags(name)[0] ?? null;
 
 const mode = argv[0];
-if (!mode || !["eval", "policies"].includes(mode))
+if (!mode || !["eval", "policies", "approve", "deny"].includes(mode))
   die(
     2,
-    "SETUP — usage: policy-engine <eval|policies> [--point p --tool t --content c] [--manifest f ...] [--policy-dir d] [--state f]"
+    "SETUP — usage: policy-engine <eval|policies|approve|deny> [--point p --tool t --content c] [--manifest f ...] [--policy-dir d] [--state f] [--session f] [--key k]"
   );
+
+/* ─────────────── settle a pending ASK (§3 — the approval surface) ─────────────── */
+
+if (mode === "approve" || mode === "deny") {
+  const sessionFile = flag("--session");
+  const key = flag("--key");
+  if (!sessionFile || !key)
+    die(2, `SETUP — ${mode} needs --session <file> and --key <pending-key>`);
+  if (!existsSync(sessionFile)) die(2, `SETUP — session file not found: ${sessionFile}`);
+  const session = loadSession(sessionFile);
+  const settled = settlePending(session, key, { approve: mode === "approve" });
+  if (!settled) die(2, `SETUP — no pending ASK under key "${key}" in ${sessionFile}`);
+  saveSession(sessionFile, session);
+  console.log(
+    settled.approved
+      ? green(bold(`APPROVED — ${settled.updates} withheld update(s) applied to the session (§3)`))
+      : yellow(
+          bold(
+            `DENIED — ${settled.updates} withheld update(s) dropped unapplied (§3: no side effects)`
+          )
+        )
+  );
+  process.exit(0);
+}
 
 /* ───────────────────────────── load the law ───────────────────────────── */
 
@@ -119,7 +162,9 @@ let content = flag("--content");
 if (content == null) die(2, "SETUP — eval needs --content <text|->");
 if (content === "-") content = readFileSync(0, "utf8");
 
-const state = createSessionState();
+const sessionFile = flag("--session");
+const session = sessionFile ? loadSession(sessionFile) : null;
+const state = session ? session.state : createSessionState();
 const stateFile = flag("--state");
 if (stateFile) {
   try {
@@ -129,22 +174,41 @@ if (stateFile) {
   }
 }
 
-const result = evaluate({ point, tool: flag("--tool") ?? undefined, content }, state, policies);
+const grants = Object.fromEntries(flags("--grant").map((g) => [g, true]));
+const event = {
+  point,
+  tool: flag("--tool") ?? undefined,
+  content,
+  ...(Object.keys(grants).length ? { labels: grants } : {}),
+};
+const result = evaluate(event, state, policies);
 
 if (result.verdict === "DENY") {
+  if (session) saveSession(sessionFile, session); // §4: a DENY applied the accumulated writes
   console.log(red(bold(`DENY — ${result.decidingPolicy}`)));
   console.log(`  ${result.reason ?? "(no reason returned)"}`);
   process.exit(1);
 }
 if (result.verdict === "ASK") {
+  let key = null;
+  if (session) {
+    key = pendingKey(event);
+    recordPending(session, key, { asks: result.asks, withheldUpdates: result.withheldUpdates });
+    saveSession(sessionFile, session); // pendings parked; state untouched (§3)
+  }
   console.log(
     yellow(
       bold(`ASK — ${result.asks.length} approval(s) required; ALL writes withheld until approved`)
     )
   );
   for (const a of result.asks) console.log(`  ${a.policy}: ${a.reason ?? "(no reason)"}`);
+  if (key)
+    console.log(
+      `  pending key: ${key}  (policy-engine approve --session ${sessionFile} --key ${key})`
+    );
   process.exit(3);
 }
+if (session) saveSession(sessionFile, session); // ALLOW applied its writes (§4)
 console.log(
   green(
     bold(
