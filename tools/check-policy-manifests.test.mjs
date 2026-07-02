@@ -269,7 +269,7 @@ test("captureNotInStateLabel without a capturing group in the pattern → RED, e
   assert.match(out, /no capturing group/i);
 });
 
-test("unlessStateLabel empty/non-string → RED, exit 1 (a governed exemption names its label)", () => {
+test("unlessGrant empty/non-string → RED, exit 1 (a governed exemption names its call-time grant)", () => {
   const dir = makeRepo();
   seed(
     dir,
@@ -279,14 +279,14 @@ test("unlessStateLabel empty/non-string → RED, exit 1 (a governed exemption na
         enforce: {
           point: "tool-call",
           verdict: "DENY",
-          match: { pattern: "git push", unlessStateLabel: "  " },
+          match: { pattern: "git push", unlessGrant: "  " },
         },
       }
     )
   );
   const { code, out } = run(dir, CFG);
   assert.equal(code, 1, out);
-  assert.match(out, /unlessStateLabel must be a non-empty string/i);
+  assert.match(out, /unlessGrant must be a non-empty string/i);
 });
 
 // The real repo's manifests must themselves pass the gate (dogfood).

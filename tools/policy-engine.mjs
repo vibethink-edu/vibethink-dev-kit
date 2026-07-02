@@ -29,6 +29,11 @@
  * (printed with the verdict); `approve` is the ONLY path that applies them,
  * `deny` drops them unapplied — a denied ASK leaves no side effects.
  *
+ * Grants (S2 review P1): --grant <name> (repeatable) attaches a CALL-TIME grant
+ * to the event (event.labels) for `unlessGrant` exemptions. A grant is the
+ * governed invoker's provenance — it is never read from (or written to) the
+ * session file, which an agent with shell access could forge.
+ *
  * Verdict-first. Exit: 0 = ALLOW · 1 = DENY · 3 = ASK (a human approval is
  * required — the caller withholds all writes until it happens) · 2 = setup error.
  * Pure Node, zero deps.
@@ -169,7 +174,13 @@ if (stateFile) {
   }
 }
 
-const event = { point, tool: flag("--tool") ?? undefined, content };
+const grants = Object.fromEntries(flags("--grant").map((g) => [g, true]));
+const event = {
+  point,
+  tool: flag("--tool") ?? undefined,
+  content,
+  ...(Object.keys(grants).length ? { labels: grants } : {}),
+};
 const result = evaluate(event, state, policies);
 
 if (result.verdict === "DENY") {

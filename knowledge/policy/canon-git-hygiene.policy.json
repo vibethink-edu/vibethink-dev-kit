@@ -21,8 +21,9 @@
         "verdict": "DENY",
         "match": {
           "tool": "bash",
-          "pattern": "\\bgit\\b[^\\n]*\\bpush\\b(?=[^\\n]*(?:--force(?:-with-lease|-if-includes)?\\b|\\s-f\\b|\\s\\+\\S+))(?=[^\\n]*\\b(?:main|master)\\b)"
-        }
+          "pattern": "\\bgit\\b[^\\n]*\\bpush\\b(?=[^\\n]*(?:--force(?:-with-lease|-if-includes)?\\b|\\s-f\\b|\\s\\+\\S+))(?=[^\\n]*[\\s:/+](?:main|master)(?:\\s|$))"
+        },
+        "coverage": "PARTIAL — main/master must appear as a ref token (end of a refspec segment), so feature/main-fix does NOT match (S2 review P2); a branch literally named .../main is shape-indistinguishable and still matches (declared). The floor's any-branch force-push rule backstops what this scoped rule abstains on."
       }
     },
     {
@@ -71,10 +72,10 @@
         "verdict": "DENY",
         "match": {
           "tool": "bash",
-          "pattern": "\\bgit\\b[^\\n]*\\bpush\\b(?=[^\\n]*\\b(?:main|master)\\b)",
-          "unlessStateLabel": "commLane"
+          "pattern": "\\bgit\\b[^\\n]*\\bpush\\b(?=[^\\n]*[\\s:/+](?:main|master)(?:\\s|$))",
+          "unlessGrant": "commLane"
         },
-        "coverage": "PARTIAL — catches a direct push naming the default branch (main/master); a bare `git push` from a default-branch checkout carries no branch literal and stays with the golden trap. The §7 sole exception (governed comm lane) is the unlessStateLabel: the governed comm-send flow sets labels.commLane; the tempted agent's prose cannot (S1-P5)."
+        "coverage": "PARTIAL — catches a direct push naming the default branch as a ref token (feature/main-fix does NOT match — S2 review P2; a branch literally named .../main still does, declared); a bare `git push` from a default-branch checkout carries no branch literal and stays with the golden trap. The §7 sole exception (governed comm lane) is the unlessGrant: a CALL-TIME grant the governed comm-send flow passes at invocation (--grant commLane) — never persisted state an agent could forge (S2 review P1)."
       }
     },
     {

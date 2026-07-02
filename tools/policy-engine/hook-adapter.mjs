@@ -23,12 +23,18 @@
  *
  * Usage (wired as a harness hook):
  *   node tools/policy-engine/hook-adapter.mjs [--policy-dir knowledge/policy]
- *        [--manifest <file> ...] [--session-dir <dir>]
+ *        [--manifest <file> ...] [--session-dir <dir>] [--grant <name> ...]
  * The mode comes from stdin's hook_event_name (Pre... vs Post...); sessions
- * persist per session_id under --session-dir (default: .policy-sessions,
- * gitignore it).
+ * persist per session_id under --session-dir. The DEFAULT session dir lives
+ * OUTSIDE the workspace (os tmpdir / vibethink-policy-sessions) so the governed
+ * tool plane cannot casually rewrite it (S2 review P1) — and the static floor's
+ * self-protection class denies tool-plane commands that reference the store or
+ * this adapter at all. --grant attaches call-time grants (event.labels) for
+ * `unlessGrant` exemptions: the grant rides the INVOCATION the governed flow
+ * owns (the hook command line in harness settings), never the session file.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
+import os from "node:os";
 import { join } from "node:path";
 import { compileManifest, evaluate } from "./engine.mjs";
 import {
@@ -72,9 +78,15 @@ try {
       ? toolInput
       : (toolInput?.command ?? JSON.stringify(toolInput ?? {}));
   const tool = /bash|shell|powershell|terminal/i.test(toolName) ? "bash" : toolName.toLowerCase();
-  const event = { point: "tool-call", tool, content };
+  const grants = Object.fromEntries(flags("--grant").map((g) => [g, true]));
+  const event = {
+    point: "tool-call",
+    tool,
+    content,
+    ...(Object.keys(grants).length ? { labels: grants } : {}),
+  };
 
-  const sessionDir = flag("--session-dir") ?? ".policy-sessions";
+  const sessionDir = flag("--session-dir") ?? join(os.tmpdir(), "vibethink-policy-sessions");
   const sessionFile = join(sessionDir, `${String(input.session_id ?? "default")}.json`);
   const session = loadSession(sessionFile);
 

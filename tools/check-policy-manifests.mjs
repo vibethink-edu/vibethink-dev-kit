@@ -30,7 +30,7 @@
  *                     point(s) in the canon's §2 range, verdict in the §3 range,
  *                     a match.pattern that compiles as a RegExp (with a capturing
  *                     group when captureNotInStateLabel is declared; a non-empty
- *                     label when unlessStateLabel declares a governed exemption).
+ *                     grant name when unlessGrant declares a governed exemption).
  *                     Only MECHANICALLY-DECIDABLE rules carry enforce; judgment
  *                     rules stay watched by gates / golden tasks / review.
  *
@@ -271,11 +271,11 @@ for (const file of manifestFiles) {
               );
           }
           if (
-            e.match.unlessStateLabel !== undefined &&
-            (typeof e.match.unlessStateLabel !== "string" || !e.match.unlessStateLabel.trim())
+            e.match.unlessGrant !== undefined &&
+            (typeof e.match.unlessGrant !== "string" || !e.match.unlessGrant.trim())
           )
             problems.push(
-              `${tag}: enforce.match.unlessStateLabel must be a non-empty string — a governed exemption names its label explicitly`
+              `${tag}: enforce.match.unlessGrant must be a non-empty string — a governed exemption names its call-time grant explicitly`
             );
         }
       }

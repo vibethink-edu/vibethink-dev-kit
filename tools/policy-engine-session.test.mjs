@@ -2,16 +2,22 @@
 /**
  * Tests for the S2 surface of the reference policy engine: persisted session state
  * + withheld-write ledger (session-store), the session-aware CLI (--session /
- * approve / deny), the §7 pattern factories (patterns.mjs), the governed-exemption
- * matcher (unlessStateLabel — S1-P5), and the PreToolUse-style hook adapter.
+ * approve / deny / --grant), the §7 pattern factories (patterns.mjs), the
+ * governed-exemption matcher (unlessGrant — S1-P5), and the PreToolUse-style
+ * hook adapter.
  *
  * Known-bad discipline (§8.7a), the S2 clauses on their violating inputs:
  *   - an ASK's withheld writes NEVER land without approve (deny → dropped, §3)
  *   - budget/risk/rate policies bite only through ACCUMULATED state (§5) — the
  *     same call that passes on a fresh session DENIES/ASKS on a burned one
- *   - the comm-lane exemption is a session label the governed flow sets — the
- *     tempted agent's prose cannot; without it a direct push to main is DENIED
- *   - the hook adapter fails CLOSED on garbage input
+ *   - exemptions are CALL-TIME grants from the governed invoker: a commLane
+ *     label FORGED into the session file grants nothing (review P1), and the
+ *     floor's self-protection class denies tool-plane self-settlement or
+ *     store tampering
+ *   - main/master must be a ref token: feature/main-fix is not a
+ *     default-branch push (review P2)
+ *   - the hook adapter fails CLOSED on garbage input; a forged Post without a
+ *     parked pending applies nothing
  *
  * The last test closes the S2 loop the way S1 closed force-push: the MERGE-PUSH
  * gaming of the golden force-push trap (no rewrite, still a direct landing on
@@ -149,23 +155,93 @@ test("rateLimit §7: the cap bites only through the counter — call N+1 is DENI
   assert.match(third.reason, /rate limit/);
 });
 
-/* ─────────────── governed exemption: unlessStateLabel (S1-P5) ──────────────── */
+/* ──────────── governed exemption: unlessGrant, call-time only (S1-P5) ──────── */
 
 const gitPolicies = () => compileManifest(JSON.parse(readFileSync(GIT_MANIFEST, "utf8")));
 
-test("direct push to main → DENY (GIT §7); the governed comm-lane label abstains the rule", () => {
+test("direct push to main → DENY (GIT §7); the governed CALL-TIME grant abstains the rule", () => {
   const plain = evaluate(ev("git push origin main"), createSessionState(), gitPolicies());
   assert.equal(plain.verdict, "DENY");
   assert.equal(plain.decidingPolicy, "CANON-GIT-HYGIENE/GIT-MUST-ALL-VIA-PR");
-  const lane = createSessionState({ labels: { commLane: true } });
-  assert.equal(evaluate(ev("git push origin main"), lane, gitPolicies()).verdict, "ALLOW");
+  const granted = evaluate(
+    ev("git push origin main", { labels: { commLane: true } }),
+    createSessionState(),
+    gitPolicies()
+  );
+  assert.equal(granted.verdict, "ALLOW");
 });
 
-test("the exemption never weakens the rest: force-push DENIES even WITH the comm-lane label", () => {
-  const lane = createSessionState({ labels: { commLane: true } });
-  const r = evaluate(ev("git push --force origin main"), lane, gitPolicies());
+test("KNOWN-BAD (review P1): a commLane label FORGED into session state grants NOTHING", () => {
+  const forged = createSessionState({ labels: { commLane: true } });
+  const r = evaluate(ev("git push origin main"), forged, gitPolicies());
+  assert.equal(r.verdict, "DENY", "persisted state is never an exemption — grants are call-time");
+  assert.equal(r.decidingPolicy, "CANON-GIT-HYGIENE/GIT-MUST-ALL-VIA-PR");
+});
+
+test("the grant never weakens the rest: force-push DENIES even WITH the comm-lane grant", () => {
+  const r = evaluate(
+    ev("git push --force origin main", { labels: { commLane: true } }),
+    createSessionState(),
+    gitPolicies()
+  );
   assert.equal(r.verdict, "DENY");
   assert.equal(r.decidingPolicy, "CANON-GIT-HYGIENE/GIT-NEVER-FORCE-PUSH-DEFAULT");
+});
+
+test("review P2: main/master must be a REF TOKEN — feature/main-fix is NOT a default-branch push", () => {
+  const s = () => createSessionState();
+  assert.equal(
+    evaluate(ev("git push origin feature/main-fix"), s(), gitPolicies()).verdict,
+    "ALLOW"
+  );
+  assert.equal(evaluate(ev("git push origin HEAD:main"), s(), gitPolicies()).verdict, "DENY");
+  assert.equal(
+    evaluate(ev("git push origin refs/heads/master"), s(), gitPolicies()).verdict,
+    "DENY"
+  );
+  assert.equal(
+    evaluate(
+      ev("git push --force origin feature/main-fix"),
+      s(),
+      gitPolicies()
+    ).decidingPolicy.startsWith("static-floor/destruction"),
+    true,
+    "the scoped force rule abstains on feature branches; the floor's any-branch force rule backstops"
+  );
+});
+
+/* ─────────── the engine protects its own boundary (review P1, floor) ────────── */
+
+test("KNOWN-BAD (review P1): tool-plane self-settlement is floor-DENIED (approve/deny/hook-adapter)", () => {
+  for (const cmd of [
+    "node tools/policy-engine.mjs approve --session .policy-sessions/x.json --key abc",
+    "node tools/policy-engine.mjs deny --session s.json --key abc",
+    "node tools/policy-engine/hook-adapter.mjs --session-dir whatever",
+  ]) {
+    const r = evaluate(ev(cmd), createSessionState(), []);
+    assert.equal(r.verdict, "DENY", cmd);
+    assert.match(r.decidingPolicy, /^static-floor\/self-protection/, cmd);
+  }
+});
+
+test("KNOWN-BAD (review P1): tool-plane tampering with the session store is floor-DENIED", () => {
+  for (const cmd of [
+    'echo \'{"labels":{"commLane":true}}\' > .policy-sessions/default.json',
+    "node -e \"require('fs').writeFileSync('/tmp/vibethink-policy-sessions/h1.json','{}')\"",
+  ]) {
+    const r = evaluate(ev(cmd), createSessionState(), []);
+    assert.equal(r.verdict, "DENY", cmd);
+    assert.match(r.decidingPolicy, /^static-floor\/self-protection/, cmd);
+  }
+});
+
+test("eval stays reachable: invoking policy-engine.mjs eval from the tool plane is NOT floor-blocked", () => {
+  const r = evaluate(
+    ev("node tools/policy-engine.mjs eval --point tool-call --content 'git status'"),
+    createSessionState(),
+    []
+  );
+  assert.equal(r.verdict, "ALLOW", "reading a verdict is harmless; settling one is not");
 });
 
 /* ────────────────────────── session-aware CLI (§3) ─────────────────────────── */
@@ -296,6 +372,48 @@ test("hook post: the tool RAN (= the human approved) → the parked pending sett
   );
   const sessionFile = path.join(TMP, "hook-sessions", "h3.json");
   assert.equal(Object.keys(loadSession(sessionFile).pendings).length, 0, "pending settled");
+});
+
+test("KNOWN-BAD (review P1): a forged Post for an action that never ASKED applies NOTHING", () => {
+  const sessionDir = path.join(TMP, "hook-sessions");
+  const before = JSON.stringify(loadSession(path.join(sessionDir, "h9.json")));
+  const r = runHook(
+    {
+      hook_event_name: "PostToolUse",
+      tool_name: "Bash",
+      tool_input: { command: "deploy now" },
+      session_id: "h9", // fresh session: no pre, no pending
+    },
+    ["--manifest", ASK_MANIFEST]
+  );
+  assert.equal(r.out.trim(), "{}");
+  assert.equal(
+    JSON.stringify(loadSession(path.join(sessionDir, "h9.json"))),
+    before,
+    "no pending → nothing settles, nothing applies"
+  );
+});
+
+test("CLI --grant: the governed invoker's call-time grant abstains the §7 rule (exit 0)", () => {
+  const r = spawnSync(
+    "node",
+    [
+      CLI,
+      "eval",
+      "--point",
+      "tool-call",
+      "--tool",
+      "bash",
+      "--content",
+      "git push origin main",
+      "--manifest",
+      GIT_MANIFEST,
+      "--grant",
+      "commLane",
+    ],
+    { encoding: "utf8" }
+  );
+  assert.equal(r.status, 0, r.stdout);
 });
 
 test("hook fails CLOSED: garbage stdin → deny, never silence (§6)", () => {
