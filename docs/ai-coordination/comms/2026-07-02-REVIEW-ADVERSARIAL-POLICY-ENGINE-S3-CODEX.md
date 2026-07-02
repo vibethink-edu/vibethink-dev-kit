@@ -54,8 +54,8 @@
 
 | Finding | Disposition | Link |
 |---|---|---|
-| P1 | ACCEPTED → FIXED (`VERDICT_SEGMENTS` single-source prompt+grader, all segments required in the SAME comm; marker-only → RED with distinct reason; reviewer's exploit added as known-bad test — 13/13) | fix commit on this branch (see delivery addendum) |
-| P3 | ACCEPTED → FIXED (telemetry.mjs header: "OTLP-named local JSONL" + explicit not-a-full-OTLP-payload qualifier) | fix commit on this branch (see delivery addendum) |
+| P1 | ACCEPTED → FIXED (`VERDICT_SEGMENTS` single-source prompt+grader, all segments required in the SAME comm; marker-only → RED with distinct reason; reviewer's exploit added as known-bad test — 13/13) | `75ddc50` |
+| P3 | ACCEPTED → FIXED (telemetry.mjs header: "OTLP-named local JSONL" + explicit not-a-full-OTLP-payload qualifier) | `75ddc50` |
 
 ## Audit ladder declared (§10)
 
