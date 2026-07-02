@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-CONTEXT-HYGIENE",
+  "source": "knowledge/ai-agents/CANON-CONTEXT-HYGIENE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An agent's context window is not a free resource — past a fill threshold quality degrades silently, so context discipline (thresholds, persistence to the filesystem, fresh context per phase, cutting instead of steering) is as important as code discipline.",
+  "rules": [
+    {
+      "id": "CTX-MUST-PERSIST-DECISIONS",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Never let the context window be the only place an important decision lives — anything that must survive the session goes to the filesystem (decision store, append-only work log, handoff artifact), and before cutting, verify a fresh agent could continue from the repo alone.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-governance.mjs"
+      }
+    },
+    {
+      "id": "CTX-MUST-REPORT-DEGRADATION",
+      "level": "MUST",
+      "cite": "§2.2, §2.3",
+      "rule": "On detecting a qualitative degradation signal, the agent reports it explicitly to the human, does not proceed until the human confirms continue-or-cut, and records the warning in the active work-log if told to continue.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CTX-NEVER-COMPLEX-WORK-PAST-RED",
+      "level": "NEVER",
+      "cite": "§2.1, §8",
+      "rule": "Past the red context threshold, do not start new complex work and never take major architectural decisions — close the current task, persist state, and cut the session.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CTX-NEVER-STEER-POISONED-CONTEXT",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "When an early decision turns out wrong, do not steer the agent back within the same context — persist the lesson, cut the session, and restart fresh with only the persisted artifacts.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CTX-MUST-RUN-CLOSEOUT-CHECKS",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "When a session ends, run the context-specific closeout checks: persist undocumented decisions, commit or explicitly discard uncommitted work, clean or declare worktrees, capture pending tasks, and update the operational-status doc if it drifts from reality.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CTX-NEVER-EXTERNAL-SKILL-ON-IDENTITY",
+      "level": "NEVER",
+      "cite": "§6.2",
+      "rule": "Never import external 'expert' skills onto work that touches product identity, vocabulary, architecture, data model, or UX; if any skill's output contradicts canon, canon wins and the agent reports the contradiction rather than reconciling the two.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

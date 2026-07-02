@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-AGENT-SCOPE-DISCIPLINE",
+  "source": "knowledge/methodology/CANON-AGENT-SCOPE-DISCIPLINE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Scope is explicit, measurable, and enforced at the file-edit boundary — declared in a Scope Card, grounded in the right system first, and never crossed by direct edits into another layer or module.",
+  "rules": [
+    {
+      "id": "SCOPE-MUST-SCOPE-CARD",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Declare a Scope Card (SYSTEM/ROLE/DOMAIN/SCOPE/LAYER/FILES) before the first file edit; if the human did not specify a scope, ask — never guess — and never edit files outside the declared FILES glob without explicit human authorization.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SCOPE-MUST-GROUND-FIRST",
+      "level": "MUST",
+      "cite": "§2.1",
+      "rule": "In a multi-system workspace, confirm which system you are in and how it actually runs before touching its build/dev/tests/infra, and before any destructive command (rm -rf, reset --hard, mass delete) confirm the repo identity with a cheap ground-check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SCOPE-NEVER-CROSS-LAYER-EDIT",
+      "level": "NEVER",
+      "cite": "§3.1",
+      "rule": "A vertical agent edits horizontal files, or a horizontal agent edits vertical files — layers communicate through tasks, not direct edits.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SCOPE-NEVER-FIX-OUT-OF-SCOPE",
+      "level": "NEVER",
+      "cite": "§4, §5",
+      "rule": "Fix a cross-boundary need or an out-of-scope discovery yourself — write a TASK in the coordination lane for the layer owner, or a FINDING for the discovery, then continue your own work.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SCOPE-MUST-CHECK-ASSIGNMENT-REGISTRY",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Before starting work, check the Assignment Registry: if another agent is assigned to the module do not start and ask the human; otherwise add yourself, and update your status when done.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "SCOPE-NEVER-SILENT-TOPIC-SHIFT",
+      "level": "NEVER",
+      "cite": "§8.1",
+      "rule": "Expand silently into another front, domain, or constitutional concern — say the topic shift explicitly and decide whether the current branch/worktree still fits or a new front must be opened.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

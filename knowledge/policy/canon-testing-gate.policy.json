@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-TESTING-GATE",
+  "source": "knowledge/methodology/CANON-TESTING-GATE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Tests are never optional — the Testing Gate is the 60-second decision that maps a change's nature × stakes to the verification type(s) required.",
+  "rules": [
+    {
+      "id": "TESTGATE-MUST-ANSWER-TWO-QUESTIONS",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Before GO, answer the two Gate questions — what does the change touch, and what are the stakes — and if they cannot be answered, the design is not ready.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "TESTGATE-MUST-SELECT-BY-MATRIX",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Select the required verification type(s) from the nature × stakes matrix as the default routing, scaling depth with stakes — the trivial path does not carry the full set.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "TESTGATE-NEVER-ZERO-VERIFICATION",
+      "level": "NEVER",
+      "cite": "§5",
+      "rule": "No change that alters behaviour merges with zero verification; only non-behavioural changes (typo, comment, log line, rename, formatting, pure move, exempt file classes) require no check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "TESTGATE-NEVER-MUTATION-HARD-GATE",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "Never wire mutation testing as a CI hard-gate or per-file requirement — it is an opt-in strength lens; for the top-stakes row (auth/payments/tenant-isolation) it is recommended and, if skipped, the skip is stated in one line in the work-unit's verification field.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "TESTGATE-MUST-EVAL-AI-AGAINST-RUBRIC",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "Verify AI/model-driven behaviour with an eval scored against a rubric — for governed AI behaviour the rubric is the canon-contract itself; for ungoverned behaviour the ad-hoc rubric is declared in the work-unit.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "TESTGATE-MUST-ESCALATE-HIGH-COMPLEXITY",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "When the change is high-complexity or ambiguous, escalate the verification strategy to an independent advisor who runs the architecture review in a fresh context — the one who builds does not grade.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

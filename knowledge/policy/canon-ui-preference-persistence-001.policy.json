@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-UI-PREFERENCE-PERSISTENCE-001",
+  "source": "knowledge/methodology/CANON-UI-PREFERENCE-PERSISTENCE-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "A per-user, cosmetic, disposable UI preference is client-side browser state — never governed configuration and never code.",
+  "rules": [
+    {
+      "id": "UIPREF-NEVER-GOVERNED-STORE",
+      "level": "NEVER",
+      "cite": "§1",
+      "rule": "Never persist a per-user, cosmetic, disposable UI preference in the governed configuration/settings store or in code — it persists in the browser (cookie or equivalent).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UIPREF-MUST-BOUNDARY-TEST",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Before persisting any value, apply the boundary test — 'if this value were wrong for the next person, would anyone need to audit, administer, or explain it?' — routing yes to governed config and no to client-side preference.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UIPREF-NEVER-SENSITIVE-IN-CLIENT-STORE",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Never place secrets, tokens, tenant identifiers, or any governed config value in the client preference store.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UIPREF-MUST-READ-POST-HYDRATION",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Read the preference post-hydration, never at SSR render — the server renders with the system default (a code constant) and the client synchronizes from the cookie in the first effect after mount; only the override is persisted.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UIPREF-MUST-NEUTRAL-NAMESPACE",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Use a brand- and product-neutral key/prefix namespace for the client preference store — the name reflects the kind of value (a UI preference), not the system or vendor that hosts it.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UIPREF-NEVER-BYPASS-ADMIN-SURFACE",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "Never persist a value that fails the boundary test client-side as a shortcut to avoid building an admin surface.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

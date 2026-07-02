@@ -1,0 +1,80 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-CODER-SAFE-IDENTITY-001",
+  "source": "knowledge/ai-agents/CANON-CODER-SAFE-IDENTITY-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "The executor pushes as a low-privilege propose-only bot, a separate owner identity reviews and merges, and the two never share an active credential in the same session — asymmetry that contains any executor error, hostile or honest.",
+  "rules": [
+    {
+      "id": "CODER-MUST-PROPOSE-ONLY",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "The executor pushes as a propose-only bot — write to the repo and open a PR, with no merge, no admin, no bypass of branch protection, and no self-approval of its own PR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODER-MUST-SESSION-BOUND-IDENTITY",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Bind identity per session by injecting the bot credential into the executor process's environment before launch; do not flip a global credential per task — the owner's session runs without the token and resolves to the stored owner credential.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODER-MUST-AUTH-GATE-BEFORE-PUSH",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Before any push, verify the active identity of your own session; if it is not the expected bot, STOP, do not push, and escalate to the human — never trust an identity status pasted from another window or session.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODER-MUST-AUDIT-PUSH-ACTOR",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Audit the push actor via the forge's events/activity for the branch, not just the cosmetic commit author — the commit author reading as the bot proves nothing about who actually pushed.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODER-MUST-SCOPE-RELAXATION",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "Scope permission relaxation to the executor's session/worktree — never machine/user-global and never committed to the repo — and keep a guard even in bypass: prompt on destructive patterns and deny reads of secret files.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODER-NEVER-CREDENTIAL-IN-LAUNCH-FILES",
+      "level": "NEVER",
+      "cite": "§9",
+      "rule": "The bot credential is never written to a file — the PREP step prepares the launch surface (per-spec prompt, per-session permission settings, launch script running the auth gate) whose scripts expect the credential in the session environment, never contain it.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-coder-launch-readiness.mjs"
+      }
+    },
+    {
+      "id": "CODER-MUST-WORKTREE-IDENTITY-BINDING",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "One executor session = one worktree = one bot identity: two executors never share a working tree, the push comes from the same machine/session that owns the worktree and carries the bot identity, and dependent executors create their worktree from the latest integration branch at launch time.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

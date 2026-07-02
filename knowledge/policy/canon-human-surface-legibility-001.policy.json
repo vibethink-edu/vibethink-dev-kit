@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-HUMAN-SURFACE-LEGIBILITY-001",
+  "source": "knowledge/methodology/CANON-HUMAN-SURFACE-LEGIBILITY-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Every human-facing surface leads with the decision layer — verdict first in plain language, detail on demand — and a verbose surface that does not state the verdict is a defect, not thoroughness.",
+  "rules": [
+    {
+      "id": "LEGIB-MUST-VERDICT-FIRST",
+      "level": "MUST",
+      "cite": "§1, §3",
+      "rule": "Lead every human-facing surface with a one-line verdict in plain language (are we OK, and how many things need action), passing the one-glance test before any detail.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGIB-MUST-FIX-PER-RED",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Give each red item an actionable next step, not just a failure marker — a red that does not say what to do is half a defect report.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGIB-NEVER-VERBOSE-DEFAULT",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Verbosity must never be the default view — detail lives behind a flag, toggle, or drill-in (--verbose, expand, show raw), pulled on demand.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGIB-NEVER-SILENT-GAPS",
+      "level": "NEVER",
+      "cite": "§3",
+      "rule": "Never let skipped, not-run, or not-applicable items be simply absent — they are stated explicitly, because absence reads as fine and lies by omission.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "LEGIB-NEVER-VERBOSE-MUTE",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Never ship a verbose-but-mute surface (a wall the human must read end-to-end to find the one thing that matters); the cure is to invert the order — verdict at the top, depth underneath — not to append a summary at the bottom.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

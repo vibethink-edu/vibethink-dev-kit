@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-VERSIONING-001",
+  "source": "knowledge/methodology/CANON-VERSIONING-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Every artifact has its versioning model declared and traceable — versioning is not inferred, it is enforced at the boundary.",
+  "rules": [
+    {
+      "id": "VER-MUST-DECLARE-TOOL-VERSION",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Every tool/script declares its SemVer-lite (MAJOR.MINOR) version in a VERSION constant or manifest, bumping MAJOR on breaking changes to CLI args, return shape, exit codes, or documented behavior contract.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-tool-versions.mjs"
+      }
+    },
+    {
+      "id": "VER-MUST-LIVE-VERSION-SOURCE",
+      "level": "MUST",
+      "cite": "§5, §11",
+      "rule": "A declared app/package versioning model points at a live version source (a derived version, not a hand-typed literal that can freeze), with the deployed version + commit hash exposed at the deploy boundary and health endpoint.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-versioning.mjs"
+      }
+    },
+    {
+      "id": "VER-MUST-CLASSIFY-IMPACT-PRE-IMPLEMENTATION",
+      "level": "MUST",
+      "cite": "§10.1",
+      "rule": "Every task/PR is classified before implementation with exactly one canonical VERSIONING: verdict read from the repo's local versioning authority — and if that authority is missing or contradictory the verdict is BLOCKED-CONFLICT, which stops work instead of inferring a bump.",
+      "watch": {
+        "kind": "gate",
+        "ref": "tools/check-versioning.mjs"
+      }
+    },
+    {
+      "id": "VER-NEVER-SILENT-BREAKING",
+      "level": "NEVER",
+      "cite": "§3, §9",
+      "rule": "Never ship a breaking change without the explicit declaration — a feat(scope)!: marker or BREAKING CHANGE: footer is required; a breaking change without it is non-compliant.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "VER-NEVER-FLOATING-INTERNAL-DEPS",
+      "level": "NEVER",
+      "cite": "§4, §9",
+      "rule": "Never use floating versions (^, ~, >=) for internal monorepo dependencies — exact pins only.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "VER-NEVER-EDIT-ADR-BODY",
+      "level": "NEVER",
+      "cite": "§8, §9",
+      "rule": "Never edit an ADR body after ACCEPTED — only status transitions are allowed; a revised decision is captured in a new superseding ADR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

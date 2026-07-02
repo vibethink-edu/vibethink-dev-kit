@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-CODER-ORCHESTRATION-001",
+  "source": "knowledge/ai-agents/CANON-CODER-ORCHESTRATION-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An autonomous executor runs long sessions without stalling by writing matchable commands and an allowlist for the routine, while deliberately keeping the gates — identity, destruction, secrets, boundary-class design — that it must not cross.",
+  "rules": [
+    {
+      "id": "CODERORCH-NEVER-ALLOWLIST-GATES",
+      "level": "NEVER",
+      "cite": "§7",
+      "rule": "The allowlist must never cover identity change (forge login/switch), destruction (recursive delete, force-push, hard reset), secret reads, or arbitrary-execution wildcards — these stay prompted or denied on purpose, even under bypass.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODERORCH-MUST-DESIGN-GATE",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "For boundary-class work (identity, access control, security, sensitive-data handling) the executor presents its plan to the coordinator and proceeds only after approval — the plan is approved before the sensitive code is written, never only the draft PR after it.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODERORCH-NEVER-SELF-MERGE",
+      "level": "NEVER",
+      "cite": "§8",
+      "rule": "The executor proposes, it does not dispose: it opens a draft PR, never merges, never self-approves, and does not edit the architect's governance instruments (the present-mirror, the decision register).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODERORCH-MUST-FANOUT-GATE",
+      "level": "MUST",
+      "cite": "§9, §9.1",
+      "rule": "Before launching work as a single sequential thread, evaluate the wave at the dispatch point: if ≥2 units are READY and INDEPENDENT, fan out by default (one executor per piece, each in its own worktree); if not, name the one blocker — sequencing is the declared exception, never the lazy default.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODERORCH-MUST-RECHECK-BASE",
+      "level": "MUST",
+      "cite": "§9",
+      "rule": "Before scaffolding any piece, fetch and re-check the current integration branch and in-flight branches/PRs in that area — branching from a stale head risks duplicating work another executor already landed.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "CODERORCH-NEVER-HARDEN-DEFAULT-TO-GATE",
+      "level": "NEVER",
+      "cite": "§10",
+      "rule": "A use-by-default tooling expectation must not be hardened into a required CI/merge gate unless deliberately decided as one; when the environment cannot provide a provisioned tool, proceed without it and document why — never a silent skip.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

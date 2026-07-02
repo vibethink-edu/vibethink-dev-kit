@@ -1,0 +1,50 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-GAP-REPORT",
+  "source": "knowledge/methodology/CANON-GAP-REPORT.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "When the human authority asks where a feature stands, the agent delivers a gap report verified against the real code — a diagnosis, not a recap of the plan doc and not the start of execution.",
+  "rules": [
+    {
+      "id": "GAP-MUST-VERIFY-AGAINST-CODE",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Follow the protocol in order — read the feature's plan/requirements doc, then its roadmap, then the real code — and ground the report in what the code confirms, not what a doc claims.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GAP-MUST-USE-DELIVERY-FORMAT",
+      "level": "MUST",
+      "cite": "§3, §4",
+      "rule": "Deliver in the canonical format (✅ what works / 🔴 UX gaps / 🟡 functional gaps / 🔴 infrastructure blockers / logical order of work), one concise table per section, omitting empty sections.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GAP-NEVER-INVENT",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Do not invent — report only what the code confirms, and when code and documentation conflict, code wins and the doc is flagged as stale.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "GAP-NEVER-ACT-WITHOUT-GO",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "Never start work off the back of a gap report without the human's go-ahead — the report ends by proposing the next action and asking before acting.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

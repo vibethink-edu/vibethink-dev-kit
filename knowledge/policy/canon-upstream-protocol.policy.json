@@ -1,0 +1,120 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-UPSTREAM-PROTOCOL",
+  "source": "knowledge/architecture/CANON-UPSTREAM-PROTOCOL.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "An unreviewed upstream is invisible technical debt — every adoption, fork, or pin of external code runs a governed protocol, is decided by the human authority, and is captured as an ADR before code lands.",
+  "rules": [
+    {
+      "id": "UPSTREAM-MUST-ADR-BEFORE-CODE",
+      "level": "MUST",
+      "cite": "§2, §3",
+      "rule": "Before adopting, installing, forking, or integrating any substantial third-party dependency, run the 6-step Adoption Protocol, obtain an explicit decision from the consuming repo's human authority, and write the decision as an ADR before any code lands.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-NEVER-COPYLEFT-INTO-REPO",
+      "level": "NEVER",
+      "cite": "§3.1",
+      "rule": "Strong-copyleft (AGPL/GPL) code never enters the repo as a fork or copy — not even one function; it may only be studied for patterns reimplemented from scratch or consumed across a network boundary as an external service.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-DOCUMENT-EVERY-SKIP",
+      "level": "MUST",
+      "cite": "§10, §11",
+      "rule": "Document every skipped upstream version in the baseline-versions doc with package, versions, decision, date, and reason — only 'I looked and decided to skip because X' is a valid skip; an undocumented skip is a finding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-APPLY-SECURITY-PATCHES",
+      "level": "MUST",
+      "cite": "§11",
+      "rule": "Security patches are obligatory without negotiation, per the severity policy: Critical/High CVE same day (overriding every other rule), Medium within one week, Low at the next monthly review.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-NEVER-MIX-UPDATES-IN-ONE-PR",
+      "level": "NEVER",
+      "cite": "§11",
+      "rule": "Never mix updates of multiple upstream repos in a single PR — one update per PR, merged only with a green build and passing test suite, with the baseline doc updated in the same PR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-BAN-GRADE-F-PROVIDERS",
+      "level": "MUST",
+      "cite": "§17",
+      "rule": "Every external (Typology B/C) provider carries a security grade, and grade F blocks all integration work — set on discovery for automatic triggers, recorded and committed immediately as a governance event, with return only via the governed reinstatement path (remediation, confirmation, independent verification, authority approval, probation at grade C).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-EXTRACT-PATTERN-DEFAULT",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "For any new upstream above the small-utility threshold the default is extract the pattern — read the source, take the idea/design/shape, implement it ourselves; adopt as a dependency only when surface size, robust maintenance, and clean license ALL hold and the decision is captured as an ADR (the burden of proof sits on the adopt side).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-INDEX-AND-DRIFT",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Run the §6 mechanism set: a per-fork UPSTREAM.md (URL, license, snapshot, diff summary, the do-not-overwrite list for bounded adaptations, cadence, next review), ONE discoverable baseline-versions index of every tracked upstream, a mandatory drift-detection check, and exactly one declared cadence per upstream — missing a cadence cycle is itself a finding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-SYNC-SHAPE",
+      "level": "MUST",
+      "cite": "§12",
+      "rule": "Execute every sync in the §12 shape: dedicated one-upstream branch, fetch with selective integration (never blind-merge — review the diff first), full build+test green before review, a PR comparison table by category with the why of each ignored item, and the baseline index updated in the SAME PR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-TRIPLE-CLASSIFICATION",
+      "level": "MUST",
+      "cite": "§13, §14, §15",
+      "rule": "Classify every upstream by the full triple — kind, risk tier, and runtime-location typology (the import-vs-curl litmus) — and handle it by its tier's automation policy: Tier 1 exact pins never auto-updated, Tier 2 bot PR with no auto-merge, Tier 3 patch auto-merge only.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-SPONSOR-INTAKE",
+      "level": "MUST",
+      "cite": "§16",
+      "rule": "Every adoption proposal opens with the Sponsor's declared Intent block and closes with the sealed Outcome artifact — without the intake block the proposal does not advance through the adoption protocol (fail-closed by design).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

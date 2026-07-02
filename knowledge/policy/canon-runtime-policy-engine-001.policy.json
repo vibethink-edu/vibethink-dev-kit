@@ -1,0 +1,80 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-RUNTIME-POLICY-ENGINE-001",
+  "source": "knowledge/ai-agents/CANON-RUNTIME-POLICY-ENGINE-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Govern an agent at runtime by intercepting each action and returning a verdict — ALLOW, ASK, or DENY — composed across policies in declared order, carrying per-session state, and failing closed.",
+  "rules": [
+    {
+      "id": "RPE-MUST-FAIL-CLOSED",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "A policy that throws DENIES by default — a broken guard never fails open; the only exceptions are a declared advisory/classifier-only policy failing to ALLOW and a declared approval-gate policy failing to ASK.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-NEVER-ASK-SIDE-EFFECTS",
+      "level": "NEVER",
+      "cite": "§3, §10",
+      "rule": "Never apply writes before the human approves an ASK: approval is stateful, and a denied or timed-out ASK leaves no side effects — all writes are withheld.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-MUST-COMPOSE-IN-ORDER",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Policies evaluate in declared order — a DENY short-circuits the chain, an ASK accumulates and withholds all writes until approval, an ALLOW continues — and the composed result names the deciding policy, stacked session → agent-spec → server/admin.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-NEVER-VENDOR-MODEL-GATE",
+      "level": "NEVER",
+      "cite": "§7, §10",
+      "rule": "Never gate on a vendor model id — gate on tier/capability; a brand-coupled threshold rots and fails the fire-test.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-NEVER-DISSOLVE-SHARED-FLOOR",
+      "level": "NEVER",
+      "cite": "§8, §10",
+      "rule": "Where the static allowlist and the runtime engine both run, the static deny is the backstop and the engine the membrane — neither may dissolve the shared floor: the engine must never let through identity, destruction, secrets, or arbitrary-exec actions the static deny blocks.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-MUST-INTERCEPT-AT-BOUNDARY",
+      "level": "MUST",
+      "cite": "§1, §2",
+      "rule": "Govern by intercepting each proposed action at its declared enforcement point(s) BEFORE side effects, evaluating it against the live session — accumulated context, not only a static command-shape check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-MUST-SESSION-STATE",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Carry per-session state that policies read and update — counters, an accumulated risk score, cumulative cost/token usage, labels — persisted across turns where the L3 stores it; this is what makes a rule contextual instead of a flat per-call check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

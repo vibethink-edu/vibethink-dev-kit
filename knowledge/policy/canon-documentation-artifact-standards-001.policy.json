@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001",
+  "source": "knowledge/methodology/CANON-DOCUMENTATION-ARTIFACT-STANDARDS-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Tie every documentation artifact to the recognized external standard a developer already knows — never invent a house format where a SOTA standard exists.",
+  "rules": [
+    {
+      "id": "DOCSTD-NEVER-HOUSE-FORMAT",
+      "level": "NEVER",
+      "cite": "§1, §4",
+      "rule": "Do not invent a house doc format where a widely-recognized external standard exists — a house artifact is legitimate only when no recognized external standard covers its job (Roadmap now/next/later and UPSTREAM are the only surviving ones).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DOCSTD-MUST-BIND-STANDARD-SET",
+      "level": "MUST",
+      "cite": "§2",
+      "rule": "Bind each documentation artifact to its designated external standard from the canonical set — ADR to MADR, Changelog to Keep a Changelog 1.0.0, specs to SDD/SpecKit, versioning to SemVer/CalVer + Conventional Commits, PRR to Google SRE PRR, postmortems/runbooks to SRE practice, docs taxonomy to Diátaxis — using the kit-shipped templates.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DOCSTD-MUST-APPLY-SUPERSEDES",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Apply the supersede/rename directives: rename PRDI to PRR with sections state → gap → plan → validation → rollback, adopt the MADR template with the one ADR naming convention owned by CANON-NAMING-CONVENTIONS-001 §6, and adopt Diátaxis as the docs taxonomy.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DOCSTD-NEVER-WORK-JOURNAL",
+      "level": "NEVER",
+      "cite": "§5",
+      "rule": "Do not ship or mandate a work-journal artifact (BITACORA/LOG) — its content is folded into Changelog (deltas), ADR (decisions/why), and git history (chronology).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DOCSTD-MUST-CONSUMER-BIND",
+      "level": "MUST",
+      "cite": "§6, §7",
+      "rule": "Each consuming repo binds to the same artifact names and shipped templates (not embedded copies) and declares at L3 its docs root, ADR/decisions location and naming, adopted templates, and work-journal posture.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

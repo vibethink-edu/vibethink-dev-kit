@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-BRANCH-WORKTREE-LIFECYCLE",
+  "source": "knowledge/methodology/CANON-BRANCH-WORKTREE-LIFECYCLE.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "Every branch has a birth and a death — a mandatory entry gate and exit gate — and worktree isolation carries the same lifecycle discipline: one task, one unique fresh branch, cleaned up the moment its work ships.",
+  "rules": [
+    {
+      "id": "BRANCH-MUST-ENTRY-GATE",
+      "level": "MUST",
+      "cite": "§3.1",
+      "rule": "Before creating any branch, pass the entry gate: on the default branch, clean working tree, local branch count under threshold, zero stashes, no stuck rebase/merge — if any check fails, fix it first, do not create the branch.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "BRANCH-NEVER-EDIT-DEFAULT-BRANCH",
+      "level": "NEVER",
+      "cite": "§3.2, §8",
+      "rule": "Edit files on the default branch and then stash/branch — create the branch before editing any file; branch first, edit second.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "BRANCH-MUST-EXIT-GATE",
+      "level": "MUST",
+      "cite": "§3.3",
+      "rule": "Immediately after merge, run the exit gate: remote branch deleted, local branch deleted, back on the default branch, merged changes pulled, working tree clean, stash list empty — emitting an exit state; if any step fails, fix it before anything else.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "BRANCH-NEVER-REUSE-BRANCH-OR-STALE-WORKTREE",
+      "level": "NEVER",
+      "cite": "§5.2",
+      "rule": "Reuse an existing branch without explicit owner confirmation, reuse a stale leftover worktree directory (remove and recreate fresh), or key a worktree on a numeric/truncated prefix — the worktree id is the full work-item slug, and a collision with a different branch/work-item means ABORT.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "BRANCH-MUST-CLEANUP-WORKTREES",
+      "level": "MUST",
+      "cite": "§5.4",
+      "rule": "Remove the worktree immediately after merge, use squash-aware merged-branch detection (never rely on 'git branch --merged' alone), and periodically audit the physical worktree-root directory — not only the registry — for abandoned and orphaned dirs.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "BRANCH-MUST-READONLY-DEFAULT-WORKTREE",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Treat the default (main) worktree as read-only — only git sync and the create-only comms lane are permitted, all other work happens in a feature branch/worktree, and any emergency override documents its reason in the commit.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

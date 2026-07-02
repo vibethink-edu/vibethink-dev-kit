@@ -1,0 +1,90 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DB-SECURITY-BASELINE-001",
+  "source": "knowledge/methodology/CANON-DB-SECURITY-BASELINE-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "On a Postgres schema exposed via PostgREST/Supabase to anon/authenticated, a privilege you did not explicitly close is open — deny is a thing you do, per object, and verify.",
+  "rules": [
+    {
+      "id": "DBSEC-NEVER-ANON-SECDEF",
+      "level": "NEVER",
+      "cite": "§2",
+      "rule": "No SECURITY DEFINER function in an exposed schema may be executable by anon/authenticated unless a documented, audited allowlist entry derived from real client .rpc() call sites says it must be; control-plane functions are never on the allowlist.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-MUST-REVOKE-PUBLIC",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Revoke EXECUTE (and table/sequence privileges) from PUBLIC as well as anon/authenticated — revoking only the roles is a silent no-op — and verify the closure with has_*_privilege after revoking.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-NEVER-ANON-OPEN-WRITE",
+      "level": "NEVER",
+      "cite": "§4",
+      "rule": "No table in the exposed schema may lack RLS, and no FOR ALL/INSERT/UPDATE/DELETE policy with USING(true)/WITH CHECK(true) may be granted to anon — writes go server-side via service_role, authenticated tenant/row-scoped, or token-validated server-side.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-MUST-PIN-SEARCH-PATH",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Pin search_path on every function (SECURITY INVOKER included, for determinism), and rely on the gate — not a one-time sweep — to catch functions added unpinned afterward.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-MUST-ADVISOR-GATE",
+      "level": "MUST",
+      "cite": "§8",
+      "rule": "Run the Supabase Security Advisor as a required check at CI and/or pre-cutover: green means 0 security Errors and 0 security Warnings or a documented exception (rationale + owner) in the repo, and any new security-class warning fails the gate like a failing test.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-MUST-SELFTEST-MIGRATIONS",
+      "level": "MUST",
+      "cite": "§9",
+      "rule": "DB-security migrations are catalog-driven, idempotent, and end with an embedded self-test (DO $$ … RAISE EXCEPTION … $$) that re-checks the invariant and rolls back if the migration's own goal is not met.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-MUST-EXTENSIONS-OUT-OF-PUBLIC",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Install extensions in a dedicated extensions schema, not public; moving an existing extension is its OWN migration with a tested rollback, never bundled with other changes.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-NEVER-EXPOSED-MATVIEWS-OR-PUBLIC-BUCKETS",
+      "level": "NEVER",
+      "cite": "§7",
+      "rule": "Never leave a materialized view selectable by anon/authenticated (matviews ignore RLS — revoke and serve them server-side) nor a storage bucket publicly listable except by explicit intent; enable leaked-password protection.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}

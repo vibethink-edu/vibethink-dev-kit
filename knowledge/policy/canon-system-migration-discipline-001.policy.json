@@ -1,0 +1,70 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-SYSTEM-MIGRATION-DISCIPLINE-001",
+  "source": "knowledge/methodology/CANON-SYSTEM-MIGRATION-DISCIPLINE-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "A legacy-to-new system migration is a governed discipline, not an ad-hoc load: every new element declares its origin, the change set is reconciled as-built, and each apply is verified (positive and negative) and recorded.",
+  "rules": [
+    {
+      "id": "MIGRATE-MUST-DECLARE-ORIGIN",
+      "level": "MUST",
+      "cite": "§3",
+      "rule": "Every new schema element introduced for the new system declares its origin class (DERIVED with its formula/backfill, GREENFIELD, or SEED) — no new schema element is admitted without one.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIGRATE-MUST-PLAYBOOK-AS-BUILT",
+      "level": "MUST",
+      "cite": "§4",
+      "rule": "Add the MIGRATION-PLAYBOOK row (what changed, origin class, formula/backfill, cutover gotchas) in the same change-set/PR that makes the schema change — as-built, never reconstructed from memory.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIGRATE-MUST-VERIFY-POSITIVE-AND-NEGATIVE",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Every migration follows written-not-applied → verify → apply, where verification covers both the positive check (the change does what it should) and the negative check (no unintended drop, orphaned data, or constraint rejecting valid legacy rows).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIGRATE-NEVER-APPLY-OUT-OF-ORDER",
+      "level": "NEVER",
+      "cite": "§5",
+      "rule": "Never apply a migration out of the explicitly declared dependency order — dependencies are declared, not assumed, and the playbook orders the batch.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIGRATE-NEVER-REPO-OR-RUNTIME-CREDENTIAL",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "Never store apply credentials in the repo and never use the application's runtime credential for a migration — hydrate an admin/owner credential at apply time.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "MIGRATE-MUST-APPLY-LEDGER",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Apply each migration surgically in a transaction with a self-test (failed self-test rolls back) and leave an apply-record of what migration, when, who (real attributable identity), and result.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}
