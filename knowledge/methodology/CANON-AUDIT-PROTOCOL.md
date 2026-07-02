@@ -2,7 +2,7 @@
 
 > **Scope:** every repo that audits its own canon, features, or surfaces for truthfulness and follow-through.
 > Vendor-neutral, product-neutral, tool-neutral.
-> **Status:** SEALED 2026-06-05 by the Principal Architect — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. **§8 (Verifier integrity) added + SEALED 2026-06-13 by the Principal Architect.**
+> **Status:** SEALED 2026-06-05 by the Principal Architect — agnostic-lift seal sweep ("SEAL DALE"). Fire-test passed. **§8 (Verifier integrity) added + SEALED 2026-06-13 by the Principal Architect.** **§9 (Verbatim persistence of the audit record) + §10 (Completeness ladder A0–A3) added 2026-07-02 on the chief architect's GO ("GO por supuesto"), sealed on merge of their PR — from a repeated chat-delivered-review incident and the completeness question raised the same day.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling (do not duplicate):** `CANON-ARCHITECTURE-REVIEW` — that canon is the *verdict on a system's architecture* (is the design sound, what are the gaps). **This canon is a different object: the audit of *artifacts* (canon, features, surfaces) for *truthfulness*, and the *disposition* that carries every finding to closure.** Review asks "is it sound?"; audit asks "does it lie, and did we act on what we found?"
 > **SOTA-informed (`CANON-DEVELOPMENT-PROCESS §7`):** prior-art for the two halves — *claims/documentation auditing* (does the artifact assert a present truth it cannot back?) and *finding-lifecycle / triage disposition* (issue states carried to closure, definition-of-done for findings). Patterns extracted, not a tool adopted.
@@ -159,3 +159,48 @@ This is the unifying lens behind several sibling failure modes the kit already n
 **Precedent.** A consumer added a gate to stop a broken-merge pattern; the gate **merged broken** — a `typecheck` vs `type-check` typo so it never ran the real step — **and did not block** a PR because it was not marked required. The pattern it existed to catch slipped through anyway: a gate neither proven-to-fail nor blocking. The L3 incarnation (the wired CI job + its required flag) lives in the consuming repo.
 
 **Instrument (policy without mechanism is illusion).** The kit ships `tools/check-gate-integrity.mjs` (template `setup/templates/gate-integrity/`) — *the gate that audits the gates* — enforcing the portable half **(a)**: every declared gate must ship a paired test with a known-bad case proving it goes RED; a gate with no test, or a happy-path-only test, is refused. It is itself a gate, so it audits itself; the kit dogfoods it. The non-portable half **(b)** — required/blocking — is per-repo, per-forge branch protection and is the consumer's L3 binding, not something a portable gate can read.
+
+## §9 — The audit record is persisted verbatim, before it is acted on
+
+An audit or review verdict that lives only in a chat is **not a record** — chat is
+ephemeral transport, not delivery (`CANON-MULTI-AGENT-ORCHESTRATION` §2: your
+memory/notebook/chat is not delivery). The §4 disposition rules presuppose the audit
+IS a file; this section closes the step before them:
+
+> **The moment an audit/review verdict arrives — authored in-repo, produced by an
+> executor, or DELIVERED VIA CHAT/relay from an external reviewer — it is persisted
+> VERBATIM as a dated file in the repo's single audit/comms location, committed and
+> pushed, BEFORE OR WHILE the findings are acted on. The response/disposition
+> addendum never substitutes for the record of the verdict itself.**
+
+- **Verbatim** means the reviewer's findings as delivered (quoted), plus: source,
+  date, subject (what was audited, at which revision), verdict, and the §4
+  disposition table as it progresses.
+- **Fixing first and filing later is the anti-pattern**: the fix's legitimacy derives
+  from the finding; an unfiled finding makes the fix an unexplained change.
+- This rule is **trap-eligible** (behavioral golden task: a verdict arrives in the
+  prompt → the grader checks the file exists in the audit location). Precedent: the
+  same agent left a chat-delivered audit unfiled twice (2026-06-23, 2026-07-02)
+  before this section existed — a memory-level rule failed twice; law + trap is the
+  correction.
+
+## §10 — Completeness ladder: an audit declares WHAT it covered (A0–A3)
+
+§8.6 forbids a *gate* from claiming more than the surface it scans. The same
+discipline applies to the audit itself: **an audit without a declared coverage
+ladder is green-by-omission**. Every audit delivery declares which layers it ran:
+
+| Layer | What it covers | How it is verified |
+|---|---|---|
+| **A0 — Mechanical floor** | The repo's own gates/doctor/test suites, run and cited at the audited revision | Machine, free — an audit that did not run the floor has not started |
+| **A1 — Sealed law** | The applicable policy manifests' MUSTs/NEVERs, enumerated one by one: complies / not-applicable / finding | Semi-mechanical — machine-readable law (policy manifests) makes "completeness against the law" an enumerable list, not prose |
+| **A2 — Principles / judgment** | Architecture-review lenses (gaps, drift, contradiction, over-engineering) plus the product's own category principles | Human / strong-model judgment — the kit names the SLOT; each product binds its own principles (L3) |
+| **A3 — Closure** | §4 disposition per finding + §5 links + §9 verbatim persistence | Already law; the ladder makes skipping it visible |
+
+- **A skipped layer is a DECLARED layer** ("this audit covered A0–A1; A2 was not
+  run"), never a silent omission — unaudited is not green (§8.6, one level up).
+- The ladder is a **minimum standard, not a ceiling**: an L3 may add layers (e.g.
+  runtime probing, live-data checks) but may not remove or blur these.
+- The declaration is a small block in the audit delivery; its shape is
+  gate-validatable if a repo later wants teeth (the same manifests→engine path the
+  kit already walked).

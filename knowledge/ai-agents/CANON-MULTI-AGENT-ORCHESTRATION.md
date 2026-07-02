@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.** **Amendment proposed 2026-06-28 — §3.2 Multi-Model Agent Routing; sealed by the Principal Architect on merge.**
+> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.** **Amendment proposed 2026-06-28 — §3.2 Multi-Model Agent Routing; sealed by the Principal Architect on merge.** **Amendment 2026-07-02 (chief-architect GO, sealed on merge of its PR): §3.3 Tier economy — a high-tier session spends its tier on judgment, delegates mechanical work downward by default, dispatches closed-contract slices, and declares (never assumes) the interleaved-design exception.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -337,6 +337,41 @@ REVIEW: <review policy>; HUMAN_APPROVAL=<required|not-required + reason>
 This section defines the universal contract. A consuming repo may implement it as a
 launcher, task-readiness gate, config file, or subagent scheduler, but the L3 adapter
 must cite this section and must not collapse the fields into one "model choice" string.
+
+## 3.3 Tier economy — the high tier is spent on judgment, not keystrokes
+
+§3.2 governs *how* a route is declared; this section governs *when* a high-capability
+session must route work **downward**. The most expensive resource in a multi-model
+stack is high-tier reasoning; burning it on mechanical execution is waste the human
+should never have to police by reminder.
+
+Default duties of a session running on a high capability tier:
+
+1. **The high tier is spent on decisions**: design, law/canon work, security
+   semantics, adversarial review, seals, and authoring the briefings that carry
+   those decisions. These are the tasks where a wrong call costs days.
+2. **Mechanical mid-size work inside the session is delegated to a lower tier**
+   (subagent/task runner): bulk renames, running-and-summarizing suites, subsystem
+   exploration, well-specified repetitive edits. Delegation is the default, not the
+   favor.
+3. **A slice with a CLOSED CONTRACT is dispatched, not executed in-session**: the
+   design is decided, the tests judge it, the deliverable is a reviewable unit
+   (branch/PR) — that work goes to the repo's governed dispatch pipeline (an
+   executor session on an appropriate tier), keeping the high-tier session in the
+   architect/reviewer role. **Cut test:** if the briefing would require the executor
+   to make design decisions, the dispatch is cut wrong — the decision travels IN the
+   briefing, or the slice is not ready to dispatch.
+4. **Declared exception, never silent:** when design and implementation are
+   genuinely interleaved (each finding changes the design), executing directly on
+   the high tier is legitimate — the session DECLARES it is doing so and why,
+   instead of assuming it.
+5. **Review is never downgraded to save cost** (§3.2 rule 6 restated at the tier
+   level): independence and reviewer strength follow the work's impact, not the
+   executor's tier.
+
+This is a judgment rule (§3 safety boundary: escalate judgment, automate the
+machine-verifiable): its watchers are review discipline and, where available,
+execution telemetry — not a runtime matcher.
 
 ## 4. Visibility & interrupt (non-negotiable)
 

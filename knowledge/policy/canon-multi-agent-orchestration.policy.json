@@ -47,6 +47,16 @@
       }
     },
     {
+      "id": "ORCH-MUST-TIER-ECONOMY",
+      "level": "MUST",
+      "cite": "§3.3",
+      "rule": "A high-tier session spends its tier on judgment (design, law, security semantics, adversarial review, seals, briefings): mechanical mid-size work is delegated to a lower tier by default, a closed-contract slice is dispatched to the governed pipeline rather than executed in-session, and the interleaved-design exception is DECLARED, never assumed. Review strength is never downgraded to save cost.",
+      "watch": {
+        "kind": "none",
+        "note": "judgment rule (§3 boundary) — watched by review discipline; execution telemetry (roadmap item 6 / policy-engine S3) is the growth candidate for measuring tier spend"
+      }
+    },
+    {
       "id": "ORCH-MUST-READ-RED-GATE",
       "level": "MUST",
       "cite": "§6",
