@@ -72,8 +72,9 @@
       "cite": "§9",
       "rule": "The moment an audit/review verdict arrives — including delivered via chat/relay — it is persisted VERBATIM as a dated file in the single audit/comms location, committed and pushed, before or while acting on the findings; the response addendum never substitutes for the record of the verdict itself.",
       "watch": {
-        "kind": "none",
-        "note": "declared unwatched — TRAP-ELIGIBLE (§9): behavioral golden-task growth candidate (verdict arrives in prompt → grader checks the filed record exists); two field incidents (2026-06-23, 2026-07-02) motivate it"
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "audit-persistence"
       }
     },
     {

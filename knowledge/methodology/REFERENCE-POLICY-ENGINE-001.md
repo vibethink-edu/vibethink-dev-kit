@@ -83,7 +83,7 @@ Policy-as-code has a recognized standard — OPA/Rego. This engine deliberately 
   - *The §7 pattern menu as code* (`tools/policy-engine/patterns.mjs`): `costDowngradeGate` (§11.1, DENY-with-steer + soft-threshold ASK-once), `riskScore` (§11.2, accumulation + guarded-tool escalation), `rateLimit`. Factories — every threshold/tier name is the caller's; nothing gates on a vendor model id.
   - *Session-aware CLI*: `eval --session <file>` persists across calls; `approve|deny --session --key` settle a pending.
   - *Governed exemption* (`match.unlessGrant`, §3 above) — closes S1-P5: a direct push to the default branch is now DENIED (`GIT-MUST-ALL-VIA-PR`, main/master as a ref token — S2 review P2), with the comm lane exempted by a call-time grant only the governed flow passes. The merge-push gaming of the golden trap is now impossible behind the engine, like force-push before it.
-- **S3:** engine counters as JSONL with OTLP-compatible field naming (seeds roadmap item 6) + first heir fire-test.
+- **S3 — SHIPPED (2026-07-02 addendum, sealed with the S3 PR):** telemetry JSONL with OTLP LogRecord field naming (advisory emitter — never alters a verdict) wired into CLI + hook adapter · first governed-flow grant: comms-send consults the engine with `--grant`-equivalent call-time labels before its push · golden trap #5 `audit-persistence` (AUDIT §9) — the manifest watch upgraded from none to golden-task. First heir fire-test (a consuming product generalizing its point-solution hooks) remains open as the heir's own front.
 
 ---
 
