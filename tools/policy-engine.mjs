@@ -18,6 +18,8 @@
  *        [--telemetry <file.jsonl>]
  *   node tools/policy-engine.mjs approve --session <file.json> --key <pending-key>
  *   node tools/policy-engine.mjs deny    --session <file.json> --key <pending-key>
+ *   node tools/policy-engine.mjs report [--telemetry <file.jsonl> ...]
+ *        [--manifest <file> ... | --policy-dir <dir>] [--streak <n>]
  *
  * Policy source: every --manifest file, or every *.policy.json under --policy-dir
  * (default: knowledge/policy under the cwd when present). Rules without `enforce`
@@ -40,11 +42,22 @@
  * per eval to the given file (tools/policy-engine/telemetry.mjs). Omit both to skip
  * telemetry entirely — it is opt-in, not a silent default.
  *
+ * Report (roadmap item 6, S3-P4 — the consumption lens, tools/policy-engine/
+ * telemetry-lens.mjs): `report` reads the emitted JSONL (default: the hook
+ * adapter's <os tmpdir>/vibethink-policy-sessions/telemetry.jsonl; --telemetry
+ * repeatable to add/override) and prints verdict mix, freshness, DENY/ASK
+ * ranking by rule, friction streaks (--streak threshold, default 3), and — when
+ * manifests are available (same --manifest/--policy-dir resolution; OPTIONAL
+ * here) — the never-fired enforceable rules. Advisory read-only lens: exit 0
+ * with or without data (a lens is not a gate); exit 2 only when an explicitly
+ * passed source cannot be read.
+ *
  * Verdict-first. Exit: 0 = ALLOW · 1 = DENY · 3 = ASK (a human approval is
  * required — the caller withholds all writes until it happens) · 2 = setup error.
  * Pure Node, zero deps.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
+import os from "node:os";
 import { basename, join } from "node:path";
 import {
   POINTS,
@@ -61,6 +74,11 @@ import {
   settlePending,
 } from "./policy-engine/session-store.mjs";
 import { recordVerdict } from "./policy-engine/telemetry.mjs";
+import {
+  parseTelemetryLines,
+  renderReport,
+  summarizeTelemetry,
+} from "./policy-engine/telemetry-lens.mjs";
 
 const argv = process.argv.slice(2);
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
@@ -81,10 +99,10 @@ function flags(name) {
 const flag = (name) => flags(name)[0] ?? null;
 
 const mode = argv[0];
-if (!mode || !["eval", "policies", "approve", "deny"].includes(mode))
+if (!mode || !["eval", "policies", "approve", "deny", "report"].includes(mode))
   die(
     2,
-    "SETUP — usage: policy-engine <eval|policies|approve|deny> [--point p --tool t --content c] [--manifest f ...] [--policy-dir d] [--state f] [--session f] [--key k]"
+    "SETUP — usage: policy-engine <eval|policies|approve|deny|report> [--point p --tool t --content c] [--manifest f ...] [--policy-dir d] [--state f] [--session f] [--key k] [--telemetry f ...] [--streak n]"
   );
 
 /* ─────────────── settle a pending ASK (§3 — the approval surface) ─────────────── */
@@ -109,6 +127,77 @@ if (mode === "approve" || mode === "deny") {
         )
   );
   process.exit(0);
+}
+
+/* ──────────── report: the telemetry consumption lens (item 6) ──────────── */
+
+if (mode === "report") {
+  // Sources: every --telemetry, else the hook adapter's default location.
+  const explicit = flags("--telemetry");
+  const sources = explicit.length
+    ? explicit
+    : [join(os.tmpdir(), "vibethink-policy-sessions", "telemetry.jsonl")];
+
+  let allRecords = [];
+  let malformed = 0;
+  const readSources = [];
+  for (const src of sources) {
+    if (!existsSync(src)) {
+      // An explicitly named source that is missing is a setup error; the
+      // default location simply not existing yet is a "no data" condition.
+      if (explicit.length) die(2, `SETUP — telemetry source not found: ${src}`);
+      continue;
+    }
+    let text;
+    try {
+      text = readFileSync(src, "utf8");
+    } catch (e) {
+      die(2, `SETUP — telemetry source unreadable: ${src} (${e.message})`);
+    }
+    const parsed = parseTelemetryLines(text);
+    allRecords = allRecords.concat(parsed.records);
+    malformed += parsed.malformed;
+    readSources.push(src);
+  }
+
+  // Manifests are OPTIONAL for the lens (they enable never-fired reporting):
+  // same resolution as eval/policies, but a missing default dir just skips.
+  let enforceableRuleNames;
+  let reportManifests = flags("--manifest");
+  if (reportManifests.length === 0) {
+    const dir = flag("--policy-dir") ?? "knowledge/policy";
+    if (existsSync(dir))
+      reportManifests = readdirSync(dir)
+        .filter((f) => f.endsWith(".policy.json"))
+        .sort()
+        .map((f) => join(dir, f));
+  }
+  if (reportManifests.length > 0) {
+    enforceableRuleNames = [];
+    for (const file of reportManifests) {
+      let compiled;
+      try {
+        compiled = compileManifest(JSON.parse(readFileSync(file, "utf8")));
+      } catch (e) {
+        die(2, `SETUP — ${file}: ${e.message}`);
+      }
+      enforceableRuleNames.push(...compiled.map((p) => p.name));
+    }
+    enforceableRuleNames.push(...STATIC_FLOOR.map((p) => p.name));
+  }
+
+  const streakFlag = flag("--streak");
+  const streakThreshold = streakFlag ? Number(streakFlag) : 3;
+  if (!Number.isInteger(streakThreshold) || streakThreshold < 2)
+    die(2, `SETUP — --streak must be an integer ≥ 2 (got: ${streakFlag})`);
+
+  const summary = summarizeTelemetry(allRecords, {
+    enforceableRuleNames,
+    streakThreshold,
+    nowMs: Date.now(),
+  });
+  console.log(renderReport(summary, { sources: readSources, malformed }));
+  process.exit(0); // a lens is advisory — with or without data (§ report header)
 }
 
 /* ───────────────────────────── load the law ───────────────────────────── */
