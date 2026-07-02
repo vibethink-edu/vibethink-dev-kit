@@ -18,6 +18,13 @@
  *   3. AUTOMATIC, not damaged — still ONE command; criteria run silently on the
  *      happy path. Safety may block the automatic; governance adds no friction.
  *
+ * Self-governance (S3, CANON-RUNTIME-POLICY-ENGINE-001): immediately before the
+ * push, this tool consults the SAME engine + git-hygiene manifest a policy-engine
+ * hook would, passing the call-time grant `labels.commLane` that `GIT-MUST-ALL-VIA-PR`
+ * (§7) declares as the comm lane's sole lawful exemption. This is the first governed
+ * flow that grants ITSELF at invocation — a plain agent shelling out the identical
+ * `git push origin <branch>` carries no such grant and is DENIED by the same rule.
+ *
  * Lane is read from tools/inbox.config.json (agnostic, same as the inbox engine),
  * defaulting to docs/ai-coordination/comms.
  *
@@ -30,14 +37,23 @@
  * Exit codes: 0 ok (pushed — OR a declared COMMITTED-LOCAL fallback when no remote
  *   is configured / --no-push, per CANON-MULTI-AGENT-ORCHESTRATION §2.2.1) ·
  *   1 SAFETY block (secret) · 2 governance/validation error · 3 create-only conflict
- *   (file exists) · 4 git failure with the file written (the COMMIT failed, or the
- *   PUSH failed though a remote exists — surfaced, never swallowed).
+ *   (file exists) · 4 git failure with the file written (the COMMIT failed, the
+ *   governed push self-check did not ALLOW, or the PUSH failed though a remote
+ *   exists — surfaced, never swallowed).
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { HIGH_CONFIDENCE_PATTERNS } from "./comms-security-gate.mjs";
+import { compileManifest, evaluate } from "./policy-engine/engine.mjs";
+
+/** knowledge/policy/canon-git-hygiene.policy.json, resolved relative to THIS file
+ *  (the tool's own location), never cwd — comms:send can run from any repo root. */
+const GIT_HYGIENE_MANIFEST = new URL(
+  "../knowledge/policy/canon-git-hygiene.policy.json",
+  import.meta.url
+);
 
 /** Lane path, read from tools/inbox.config.json (matches the inbox engine). */
 function resolveLane() {
@@ -353,6 +369,51 @@ if (isMain()) {
   if (args.noPush || !hasRemote) {
     outcome = "committed-local";
   } else {
+    // GOVERNED self-check (S3): consult the runtime policy engine BEFORE the push,
+    // the same way any other governed tool-call would. This is the call-time GRANT
+    // shape (CANON-RUNTIME-POLICY-ENGINE-001 §3/engine.mjs compileManifest doc): the
+    // comm lane is the SOLE lawful exception to CANON-GIT-HYGIENE §7 (everything via
+    // PR), and it is honored ONLY because THIS governed flow passes `commLane` at
+    // invocation — never because it is comms-send's code path by assumption. A plain
+    // agent shelling out `git push origin main` carries no such grant and is DENIED
+    // by the identical rule (see comms-send.test.mjs).
+    const pushBranch = (() => {
+      try {
+        return (
+          execFileSync("git", ["branch", "--show-current"], {
+            cwd: root,
+            encoding: "utf8",
+          }).trim() || "HEAD"
+        );
+      } catch {
+        return "HEAD";
+      }
+    })();
+    const pushContent = `git push origin ${pushBranch} --no-verify`;
+    let manifest;
+    try {
+      manifest = JSON.parse(readFileSync(GIT_HYGIENE_MANIFEST, "utf8"));
+    } catch (err) {
+      console.error(
+        `⚠ comms:send — could not load the git-hygiene policy manifest (${GIT_HYGIENE_MANIFEST}): ${err?.message ?? err}`
+      );
+      console.error("   Aborting before push — governed self-check is required, not optional.");
+      process.exit(4);
+    }
+    const policies = compileManifest(manifest);
+    const verdict = evaluate(
+      { point: "tool-call", tool: "bash", content: pushContent, labels: { commLane: true } },
+      {},
+      policies
+    );
+    if (verdict.verdict !== "ALLOW") {
+      console.error(
+        `⚠ comms:send — the governed push self-check did NOT allow this push: ${verdict.verdict} — ${verdict.decidingPolicy ?? "?"}`
+      );
+      console.error(`   ${verdict.reason ?? "(no reason returned)"}`);
+      console.error("   The commit is safe locally. Nothing was pushed.");
+      process.exit(4);
+    }
     try {
       execFileSync("git", ["push", "--no-verify"], { cwd: root, stdio: "pipe" });
       outcome = "pushed";

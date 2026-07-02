@@ -15,6 +15,7 @@
  *   node tools/policy-engine.mjs eval --point <request|pre-model|tool-call|tool-result>
  *        [--tool <name>] --content <text|-> [--manifest <file> ...]
  *        [--policy-dir <dir>] [--state <file.json>] [--session <file.json>]
+ *        [--telemetry <file.jsonl>]
  *   node tools/policy-engine.mjs approve --session <file.json> --key <pending-key>
  *   node tools/policy-engine.mjs deny    --session <file.json> --key <pending-key>
  *
@@ -34,12 +35,17 @@
  * governed invoker's provenance — it is never read from (or written to) the
  * session file, which an agent with shell access could forge.
  *
+ * Telemetry (S3, advisory — never alters a verdict): --telemetry <file.jsonl>
+ * (or env POLICY_ENGINE_TELEMETRY as a fallback) appends one OTLP-shaped LogRecord
+ * per eval to the given file (tools/policy-engine/telemetry.mjs). Omit both to skip
+ * telemetry entirely — it is opt-in, not a silent default.
+ *
  * Verdict-first. Exit: 0 = ALLOW · 1 = DENY · 3 = ASK (a human approval is
  * required — the caller withholds all writes until it happens) · 2 = setup error.
  * Pure Node, zero deps.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import {
   POINTS,
   STATIC_FLOOR,
@@ -54,6 +60,7 @@ import {
   saveSession,
   settlePending,
 } from "./policy-engine/session-store.mjs";
+import { recordVerdict } from "./policy-engine/telemetry.mjs";
 
 const argv = process.argv.slice(2);
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
@@ -182,6 +189,19 @@ const event = {
   ...(Object.keys(grants).length ? { labels: grants } : {}),
 };
 const result = evaluate(event, state, policies);
+
+// Telemetry (S3, advisory — recorded AFTER the verdict, never influences it).
+// sessionId = the --session file's basename without extension, when present.
+const telemetryFile = flag("--telemetry") ?? process.env.POLICY_ENGINE_TELEMETRY ?? null;
+if (telemetryFile) {
+  recordVerdict(telemetryFile, {
+    point,
+    tool: event.tool,
+    verdict: result.verdict,
+    decidingPolicy: result.decidingPolicy ?? undefined,
+    sessionId: sessionFile ? basename(sessionFile).replace(/\.[^.]+$/, "") : undefined,
+  });
+}
 
 if (result.verdict === "DENY") {
   if (session) saveSession(sessionFile, session); // §4: a DENY applied the accumulated writes

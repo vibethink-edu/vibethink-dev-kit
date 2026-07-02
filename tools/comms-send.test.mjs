@@ -9,12 +9,16 @@
  */
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { compileManifest, evaluate } from "./policy-engine/engine.mjs";
 
 const SEND = fileURLToPath(new URL("./comms-send.mjs", import.meta.url));
+const GIT_HYGIENE_MANIFEST = fileURLToPath(
+  new URL("../knowledge/policy/canon-git-hygiene.policy.json", import.meta.url)
+);
 
 let pass = 0;
 let fail = 0;
@@ -43,6 +47,25 @@ function makeRepo() {
   git(dir, ["config", "user.name", "Test"]);
   git(dir, ["config", "commit.gpgsign", "false"]);
   git(dir, ["commit", "-q", "--allow-empty", "-m", "init"]);
+  return dir;
+}
+
+/** A throwaway git repo WITH a bare remote wired up and tracking configured, so a
+ *  real `git push` (the S3 governed self-check's actual push path) can travel. */
+function makeRepoWithRemote() {
+  const bareDir = mkdtempSync(path.join(os.tmpdir(), "comms-send-test-bare-"));
+  tmpdirs.push(bareDir);
+  git(bareDir, ["init", "-q", "--bare"]);
+
+  const dir = mkdtempSync(path.join(os.tmpdir(), "comms-send-test-"));
+  tmpdirs.push(dir);
+  git(dir, ["init", "-q"]);
+  git(dir, ["config", "user.email", "t@t.t"]);
+  git(dir, ["config", "user.name", "Test"]);
+  git(dir, ["config", "commit.gpgsign", "false"]);
+  git(dir, ["remote", "add", "origin", bareDir]);
+  git(dir, ["commit", "-q", "--allow-empty", "-m", "init"]);
+  git(dir, ["push", "-q", "-u", "origin", "HEAD"]);
   return dir;
 }
 
@@ -172,6 +195,46 @@ test("governance comm with a complete Self-Check → exit 0", () => {
   const { code, out } = send(repo, govArgs(body));
   assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
   assert.match(out, /COMMITTED-LOCAL/);
+});
+
+// 9. S3 self-governance — the governed push flow still travels end-to-end when a
+//    real remote exists: comms-send's own call-time `commLane` grant must ALLOW its
+//    push through the git-hygiene policy engine (existing tests above only exercise
+//    the no-remote COMMITTED-LOCAL path, which never reaches the self-check).
+test("governed push flow (real remote) → grant still allows, exit 0 pushed", () => {
+  const repo = makeRepoWithRemote();
+  const { code, out } = send(repo, baseArgs());
+  assert.equal(code, 0, `expected exit 0, got ${code}\n${out}`);
+  assert.match(out, /committed \+ pushed/);
+  const remoteBranch = execFileSync("git", ["branch", "--show-current"], {
+    cwd: repo,
+    encoding: "utf8",
+  }).trim();
+  const remoteLog = execFileSync("git", ["log", "--oneline", "-1", `origin/${remoteBranch}`], {
+    cwd: repo,
+    encoding: "utf8",
+  });
+  assert.match(remoteLog, /docs\(comms\): test subject/, "the push must have actually travelled");
+});
+
+// 10. Unit-style: the SAME push content the self-check builds, evaluated directly
+//     against the engine — WITHOUT the commLane grant it is DENY, WITH it ALLOW.
+//     No real push needed; this pins the exemption shape the self-check depends on.
+test("push-to-main content: DENY without commLane grant, ALLOW with it", () => {
+  const manifest = JSON.parse(readFileSync(GIT_HYGIENE_MANIFEST, "utf8"));
+  const policies = compileManifest(manifest);
+  const content = "git push origin main --no-verify";
+
+  const ungranted = evaluate({ point: "tool-call", tool: "bash", content }, {}, policies);
+  assert.equal(ungranted.verdict, "DENY", JSON.stringify(ungranted));
+  assert.match(ungranted.decidingPolicy, /GIT-MUST-ALL-VIA-PR/);
+
+  const granted = evaluate(
+    { point: "tool-call", tool: "bash", content, labels: { commLane: true } },
+    {},
+    policies
+  );
+  assert.equal(granted.verdict, "ALLOW", JSON.stringify(granted));
 });
 
 for (const d of tmpdirs) {

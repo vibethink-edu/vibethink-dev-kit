@@ -24,6 +24,7 @@
  * Usage (wired as a harness hook):
  *   node tools/policy-engine/hook-adapter.mjs [--policy-dir knowledge/policy]
  *        [--manifest <file> ...] [--session-dir <dir>] [--grant <name> ...]
+ *        [--no-telemetry]
  * The mode comes from stdin's hook_event_name (Pre... vs Post...); sessions
  * persist per session_id under --session-dir. The DEFAULT session dir lives
  * OUTSIDE the workspace (os tmpdir / vibethink-policy-sessions) so the governed
@@ -32,6 +33,10 @@
  * this adapter at all. --grant attaches call-time grants (event.labels) for
  * `unlessGrant` exemptions: the grant rides the INVOCATION the governed flow
  * owns (the hook command line in harness settings), never the session file.
+ *
+ * Telemetry (S3, advisory — never alters a verdict): every PRE verdict is recorded
+ * as an OTLP-shaped LogRecord line (tools/policy-engine/telemetry.mjs) to
+ * `<sessionDir>/telemetry.jsonl` by default; pass --no-telemetry to disable.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import os from "node:os";
@@ -44,6 +49,7 @@ import {
   saveSession,
   settlePending,
 } from "./session-store.mjs";
+import { recordVerdict } from "./telemetry.mjs";
 
 const argv = process.argv.slice(2);
 function flags(name) {
@@ -115,6 +121,19 @@ try {
   );
 
   const result = evaluate(event, session.state, policies);
+
+  // Telemetry (S3, advisory — recorded AFTER the verdict, never influences it).
+  // Every PRE verdict is logged; --no-telemetry opts out entirely.
+  if (!argv.includes("--no-telemetry")) {
+    recordVerdict(join(sessionDir, "telemetry.jsonl"), {
+      point: event.point,
+      tool: event.tool,
+      verdict: result.verdict,
+      decidingPolicy: result.decidingPolicy ?? undefined,
+      sessionId: String(input.session_id ?? "default"),
+    });
+  }
+
   if (result.verdict === "ASK") {
     const key = pendingKey(event);
     recordPending(session, key, { asks: result.asks, withheldUpdates: result.withheldUpdates });
