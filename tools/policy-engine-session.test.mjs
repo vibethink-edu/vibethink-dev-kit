@@ -336,15 +336,15 @@ test("hook pre: force-push tool call → permissionDecision deny, naming the man
   assert.match(json.hookSpecificOutput.permissionDecisionReason, /GIT-NEVER-FORCE-PUSH-DEFAULT/);
 });
 
-test("hook pre: lawful command → allow; ASK law → ask + pending parked in the session file", () => {
-  assert.equal(
+test("hook pre: lawful command → silent {} passthrough (an explicit allow would BYPASS the harness permission prompts); ASK law → ask + pending parked in the session file", () => {
+  assert.deepEqual(
     runHook({
       hook_event_name: "PreToolUse",
       tool_name: "Bash",
       tool_input: { command: "git status" },
       session_id: "h2",
-    }).json.hookSpecificOutput.permissionDecision,
-    "allow"
+    }).json,
+    {}
   );
   const asked = runHook(
     {
