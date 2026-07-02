@@ -96,11 +96,18 @@ export function summarizeTelemetry(records, { enforceableRuleNames, streakThresh
 
     // Friction streaks: consecutive DENYs of the same rule WITHIN a session's
     // own record sequence (the file interleaves sessions; per-session order is
-    // still append order). Any other verdict for that session breaks its run.
+    // still append order). Any other verdict for that session breaks its run —
+    // and a DENY of a DIFFERENT rule both breaks the old run and starts a new
+    // one, so a threshold-crossing run must be flushed before the overwrite
+    // (R1 review P2: dropping it silently made the real wall disappear).
     if (verdict === "DENY" && rule) {
       const run = live.get(session);
       if (run && run.rule === rule) run.length++;
-      else live.set(session, { rule, length: 1 });
+      else {
+        if (run && run.length >= streakThreshold)
+          streaks.push({ session, rule: run.rule, length: run.length });
+        live.set(session, { rule, length: 1 });
+      }
     } else {
       const run = live.get(session);
       if (run && run.length >= streakThreshold) streaks.push({ session, rule: run.rule, length: run.length });
@@ -179,6 +186,14 @@ export function renderReport(summary, { sources = [], malformed = 0 } = {}) {
     out.push("  friction streaks (consecutive DENYs, same session+rule — over-match suspect or a flow needing a governed grant):");
     for (const s of summary.streaks)
       out.push(`    ${s.length}× ${s.rule}  [session ${s.session}]`);
+    // R1 review P3: a malformed line may have BEEN the run-breaker between two
+    // shorter runs — with corruption in the log, streak lengths are upper bounds.
+    // (Annotation over break-on-malformed: a corrupt line carries no session id,
+    // so breaking would sever ALL live runs and under-report unrelated sessions.)
+    if (malformed > 0)
+      out.push(
+        `    ⚠ log has ${malformed} malformed line(s) — a corrupt record may have been a run-breaker; treat streak lengths as upper bounds`
+      );
   }
 
   if (summary.neverFired) {

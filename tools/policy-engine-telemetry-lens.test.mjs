@@ -147,6 +147,26 @@ test("interleaved sessions: another session's records neither break nor inflate 
   assert.deepEqual(s.streaks[0], { session: "s1", rule: "R/WALL", length: 3 });
 });
 
+test("KNOWN-BAD (R1-P2): a rule-SWITCH DENY flushes the prior threshold-crossing run — the real wall is reported, not dropped", () => {
+  const s = summarizeTelemetry(
+    recsOf(
+      line("DENY", "R/WALL"),
+      line("DENY", "R/WALL"),
+      line("DENY", "R/WALL"),
+      line("DENY", "R/OTHER") // same session, different rule — used to silently drop R/WALL×3
+    )
+  );
+  assert.equal(s.streaks.length, 1, JSON.stringify(s.streaks));
+  assert.deepEqual(s.streaks[0], { session: "s1", rule: "R/WALL", length: 3 });
+});
+
+test("KNOWN-BAD (R1-P2): a rule-switch after a SHORT run reports nothing — the flush does not invent streaks", () => {
+  const s = summarizeTelemetry(
+    recsOf(line("DENY", "R/WALL"), line("DENY", "R/WALL"), line("DENY", "R/OTHER"), line("ALLOW"))
+  );
+  assert.equal(s.streaks.length, 0, JSON.stringify(s.streaks));
+});
+
 test("a streak still open at end-of-log is flushed (the wall the agent is hitting RIGHT NOW)", () => {
   const s = summarizeTelemetry(
     recsOf(line("DENY", "R/WALL"), line("DENY", "R/WALL"), line("DENY", "R/WALL"))
@@ -173,6 +193,17 @@ test("render: with data → verdict mix + rule ranking + malformed count surface
   assert.match(txt, /ALLOW 1 · DENY 1/);
   assert.match(txt, /R\/HOT/);
   assert.match(txt, /1 malformed/);
+});
+
+test("KNOWN-BAD (R1-P3): streaks over a log WITH malformed lines carry the upper-bound caveat", () => {
+  const s = summarizeTelemetry(
+    recsOf(line("DENY", "R/WALL"), line("DENY", "R/WALL"), line("DENY", "R/WALL")),
+    { nowMs: Date.now() }
+  );
+  const annotated = renderReport(s, { sources: ["x.jsonl"], malformed: 1 });
+  assert.match(annotated, /upper bounds/);
+  const clean = renderReport(s, { sources: ["x.jsonl"], malformed: 0 });
+  assert.doesNotMatch(clean, /upper bounds/);
 });
 
 /* ─────────────────────────── CLI end-to-end ─────────────────────────── */
@@ -219,6 +250,18 @@ test("KNOWN-BAD: CLI report with a corrupt line → counted, exit 0, no crash", 
   const r = run("report", "--telemetry", f);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /1 malformed/);
+});
+
+test("KNOWN-BAD (R1-P3, reviewer's CLI repro): corrupt run-breaker joins 2+2 into a 4-streak — reported WITH the upper-bound caveat", () => {
+  const f = path.join(TMP, "ghost.jsonl");
+  writeFileSync(
+    f,
+    `${line("DENY", "R/WALL")}\n${line("DENY", "R/WALL")}\n{corrupt-was-the-run-breaker\n${line("DENY", "R/WALL")}\n${line("DENY", "R/WALL")}\n`
+  );
+  const r = run("report", "--telemetry", f);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /4× R\/WALL/);
+  assert.match(r.stdout, /upper bounds/);
 });
 
 test("KNOWN-BAD: --streak below 2 or non-integer is refused (exit 2)", () => {
