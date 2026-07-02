@@ -235,6 +235,76 @@ test("baseline missing adapter citation → RED", () => {
   assert.match(out, /missing knowledge adapter citation/);
 });
 
+test("OKF-compatible raw-input pack with descriptive frontmatter + relative index links → GREEN", () => {
+  const dir = makeDir();
+  validPack(dir);
+  write(
+    dir,
+    "docs/knowledge/customer-ops-v1/PACK-METADATA.md",
+    [
+      "---",
+      "type: kdd-pack-metadata",
+      "title: Pack Metadata",
+      "tags: [kdd, knowledge-pack, metadata]",
+      "timestamp: 2026-07-02",
+      "---",
+      "",
+      "# Customer Ops Knowledge Pack",
+      "id: customer-ops",
+      "version: 1.0",
+      "status: raw-input",
+      "validator: pending",
+      "",
+    ].join("\n")
+  );
+  write(
+    dir,
+    "docs/knowledge/customer-ops-v1/BUSINESS-CONTEXT.md",
+    [
+      "---",
+      "type: kdd-business-context",
+      "title: Business Context",
+      "tags: [kdd, business-context]",
+      "timestamp: 2026-07-02",
+      "---",
+      "",
+      "# Business Context",
+      "",
+      "Imported external evidence, not accepted knowledge.",
+      "",
+    ].join("\n")
+  );
+  write(
+    dir,
+    "docs/knowledge/customer-ops-v1/index.md",
+    [
+      "---",
+      'okf_version: "0.1"',
+      "title: Customer Ops Knowledge Pack",
+      "---",
+      "",
+      "# Index",
+      "",
+      "- [Metadata](./PACK-METADATA.md)",
+      "- [Business Context](./BUSINESS-CONTEXT.md)",
+      "",
+    ].join("\n")
+  );
+  const { code, out } = run(dir, config({ featureRoots: [] }));
+  assert.equal(code, 0, out);
+  assert.match(out, /GREEN/);
+});
+
+test("OKF slash-absolute bundle link is rejected by current KDD reference gate → RED", () => {
+  const dir = makeDir();
+  validPack(dir);
+  write(dir, "docs/knowledge/customer-ops-v1/index.md", "# Index\n\n- [Metadata](/PACK-METADATA.md)\n");
+  const { code, out } = run(dir, config({ featureRoots: [] }));
+  assert.equal(code, 1, out);
+  assert.match(out, /reference/);
+  assert.match(out, /\/PACK-METADATA\.md/);
+});
+
 test("missing knowledgeMemoryAdapter → RED", () => {
   const dir = makeDir();
   validPack(dir);

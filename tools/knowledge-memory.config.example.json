@@ -5,6 +5,7 @@
   "sourceRoots": ["docs/knowledge", "doc/decisions", "docs/features"],
   "sourceExtensions": [".md", ".json", ".yaml", ".yml"],
   "sourcePackStatuses": ["accepted"],
+  "sourceExclusions": ["index.md", "log.md"],
   "maxManifestAgeDays": 14,
   "knowledgeMemoryAdapter": {
     "name": "vibethink-default",

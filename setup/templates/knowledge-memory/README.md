@@ -9,8 +9,10 @@ Graphify, Engram, vector, search, or markdown-only memory adapters.
 
 1. Copy `knowledge-memory.config.json` to `tools/knowledge-memory.config.json`.
 2. Edit `sourceRoots`, `knowledgeMemoryAdapter`, and `indexes` for the consuming repo.
-3. Refresh declared engines.
-4. Run:
+3. If the repo generates OKF-compatible surfaces such as `index.md` or `log.md`, keep
+   them in `sourceExclusions` unless they are intended to be accepted source files.
+4. Refresh declared engines.
+5. Run:
 
 ```bash
 node <kit>/tools/kdd-refresh.mjs tools/knowledge-memory.config.json

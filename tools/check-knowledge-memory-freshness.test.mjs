@@ -142,6 +142,41 @@ test("candidate pack changes do not stale accepted-source manifest", () => {
   assert.match(r.out, /GREEN/);
 });
 
+test("excluded OKF generated surfaces can churn without staling accepted memory → GREEN", () => {
+  const dir = makeDir();
+  fixture(
+    dir,
+    baseConfig({
+      sourceExclusions: ["index.md", "log.md"],
+    })
+  );
+  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n\n- [Business](./BUSINESS-CONTEXT.md)\n");
+  write(dir, "docs/knowledge/vito-core/log.md", "# OKF Log\n\n- generated before refresh\n");
+  assert.equal(refresh(dir).code, 0);
+  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n\n- [Business](./BUSINESS-CONTEXT.md)\n- regenerated\n");
+  write(dir, "docs/knowledge/vito-core/log.md", "# OKF Log\n\n- generated after refresh\n");
+  const r = check(dir);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /source exclusions/);
+  assert.match(r.out, /GREEN/);
+});
+
+test("source exclusions changed after refresh → RED", () => {
+  const dir = makeDir();
+  fixture(
+    dir,
+    baseConfig({
+      sourceExclusions: ["index.md", "log.md"],
+    })
+  );
+  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n");
+  assert.equal(refresh(dir).code, 0);
+  write(dir, "tools/knowledge-memory.config.json", baseConfig({ sourceExclusions: ["index.md"] }));
+  const r = check(dir);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /source exclusions.*changed/);
+});
+
 test("required index artifact missing → RED", () => {
   const dir = makeDir();
   fixture(dir);

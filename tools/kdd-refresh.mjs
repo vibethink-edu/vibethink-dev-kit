@@ -56,6 +56,11 @@ const sourceExtensions = new Set(
 const sourceStatuses = Array.isArray(cfg.sourcePackStatuses) && cfg.sourcePackStatuses.length
   ? cfg.sourcePackStatuses.map((s) => String(s).toLowerCase())
   : ["accepted"];
+const sourceExclusions = new Set(
+  (Array.isArray(cfg.sourceExclusions) ? cfg.sourceExclusions : [])
+    .map((p) => String(p).replace(/\\/g, "/").replace(/^\/+/, "").toLowerCase())
+    .filter(Boolean)
+);
 
 function walk(root) {
   const absRoot = toAbs(root);
@@ -91,6 +96,9 @@ function packRootFor(file) {
 
 function includeSource(file) {
   if (resolve(file) === resolve(absManifest)) return false;
+  const fileRel = rel(file).toLowerCase();
+  const basename = fileRel.split("/").pop();
+  if (sourceExclusions.has(fileRel) || sourceExclusions.has(basename)) return false;
   const packRoot = packRootFor(file);
   if (!packRoot) return true;
   const status = metadataStatus(packRoot);
@@ -161,6 +169,7 @@ const manifest = {
   sourceRoots,
   sourceExtensions: [...sourceExtensions].sort(),
   sourcePackStatuses: sourceStatuses,
+  sourceExclusions: [...sourceExclusions].sort(),
   sourceFingerprint: fingerprint(sourceFiles),
   sourceFiles,
   indexes: indexRecords,

@@ -267,7 +267,7 @@ if (cfg.knowledgeRoot === null || cfg.knowledgeRoot === undefined) {
         }
       }
       const meta = metadataStatus(pack);
-      if (meta && !["candidate", "accepted", "superseded", "rejected"].includes(meta.status || "")) {
+      if (meta && !["raw-input", "candidate", "accepted", "superseded", "rejected"].includes(meta.status || "")) {
         packProblems++;
         console.log(`  ${red("✗")} pack                    ${rel(pack)} has invalid status`);
       }

@@ -115,6 +115,25 @@ test("--run-indexes with failing refreshCommand → exit 1", () => {
   assert.equal(r.code, 1, `a failing index refresh must exit 1\n${r.out}`);
 });
 
+// 6. source exclusions are part of the manifest contract, not hidden config.
+test("refresh records sourceExclusions in the manifest", () => {
+  const root = scaffold();
+  writeFileSync(
+    path.join(root, "tools", "knowledge-memory.config.json"),
+    JSON.stringify({
+      knowledgeRoot: "kb",
+      manifestPath: "kb/.kdd-memory-manifest.json",
+      sourceExtensions: [".md"],
+      sourceExclusions: ["index.md", "log.md"],
+      indexes: [],
+    })
+  );
+  const r = run(REFRESH, root, ["tools/knowledge-memory.config.json"]);
+  assert.equal(r.code, 0, `expected exit 0\n${r.out}`);
+  const manifest = JSON.parse(readFileSync(path.join(root, "kb", ".kdd-memory-manifest.json"), "utf8"));
+  assert.deepEqual(manifest.sourceExclusions, ["index.md", "log.md"]);
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });
