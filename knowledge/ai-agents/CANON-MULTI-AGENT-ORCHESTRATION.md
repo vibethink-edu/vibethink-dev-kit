@@ -2,7 +2,7 @@
 
 > **Scope:** every repo where more than one AI agent (and a human) collaborate.
 > Vendor-neutral, product-neutral.
-> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.** **Amendment proposed 2026-06-28 — §3.2 Multi-Model Agent Routing; sealed by the Principal Architect on merge.** **Amendment 2026-07-02 (chief-architect GO, sealed on merge of its PR): §3.3 Tier economy — a high-tier session spends its tier on judgment, delegates mechanical work downward by default, dispatches closed-contract slices, and declares (never assumes) the interleaved-design exception.**
+> **Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation (fire-test passed: no product, vendor, or agent brand names appear here). **Amendment 2026-06-05 (authorized): §2.3 Handoff completeness (rubric + 4 mechanisms) — first canon authored under the SOTA-informed gate (`CANON-DEVELOPMENT-PROCESS §7`); prior-art recorded in `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md`. Seal-confirmed by the Principal Architect 2026-06-05 ("SEAL DALE").** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2.2.1 No-remote local-commit fallback — persistence vs travel + the `COMMITTED-LOCAL` declared exit state with a mandatory developer warning.** **Amendment 2026-06-15 (SEALED by the Principal Architect): §2 producer-side routing test ("who has to ACT on this, and will they find it where I put it?"; your memory/notebook/chat is not delivery) — salvaged from superseded PR #30; the producer mirror of §2.1.** **Amendment proposed 2026-06-28 — §3.2 Multi-Model Agent Routing; sealed by the Principal Architect on merge.** **Amendment 2026-07-02 (chief-architect GO, sealed on merge of its PR): §3.3 Tier economy — a high-tier session spends its tier on judgment, delegates mechanical work downward by default, dispatches closed-contract slices, and declares (never assumes) the interleaved-design exception.** **Amendment 2026-07-02 (chief-architect GO — "uno hace trabajo de este costoso que es barato guardarlo y caro perderlo"; seals on merge of its PR): §2.4 Costly work products persist at delivery — cheap to save, expensive to lose.**
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Sibling:** `CANON-CROSS-AGENT-CONTEXT-LAYERING.md` (how agents read rules);
 > this canon is how agents *hand work between each other and the human*.
@@ -242,6 +242,52 @@ A handoff missing any line is **incomplete** — the gap becomes the next sessio
 > high-stakes. The cheap default is **1 + 2 + 3**; reserve 4 for handoffs whose
 > failure is expensive (do not ceremonialize every handoff — the over-engineering
 > boundary of the architecture-review canon applies).
+
+## 2.4 Costly work products persist at delivery — cheap to save, expensive to lose
+
+*(Amendment — added 2026-07-02 on the chief-architect GO: "uno hace trabajo de este
+costoso que es barato guardarlo y caro perderlo"; seals on merge of its PR.)*
+
+The §2 routing test already says chat is not delivery, and the audit-protocol canon
+(`CANON-AUDIT-PROTOCOL` §9) already forces verbatim persistence of **audit/review
+verdicts**. This section names the general economic law behind both:
+
+> **A work product that was expensive to produce — a research report, a benchmark,
+> a long analysis, a multi-agent run's synthesis — is persisted as a committed
+> artifact AT delivery, by the producer, unprompted. Saving costs a commit; losing
+> costs the entire production run. An expensive artifact that exists only in a chat
+> window has not been delivered; it is awaiting deletion.**
+
+- **The trigger is production cost, not artifact type.** Whenever the cost of
+  producing the result (compute, tokens, wall-clock, human attention, judgment)
+  materially exceeds the cost of saving it, the persistence obligation attaches.
+  Audits (already law), research reports, benchmarks, architecture analyses,
+  orchestrated-run syntheses — the category is open-ended by design.
+- **The producer persists, unprompted.** The human never has to say "guardalo".
+  The chat message is the *summary*; the committed file is the *deliverable* —
+  the summary points to the file, never substitutes for it. (Producer-side mirror
+  of the §2 routing test, applied to the human as consumer.)
+- **Persist before or while acting on it, never "after".** An orchestration
+  harness returning a result in-session returns an **ephemeral payload**: context
+  windows compress, sessions end, task outputs rotate. The first act upon receiving
+  an expensive result is to file it; synthesis and discussion follow. (The same
+  order the audit canon imposes on verdicts — filing first is what makes everything
+  after it legible.)
+- **Dispatched work names its persistence target in the dispatch.** When costly
+  work is sent to another session/agent (a research prompt, an audit request, an
+  orchestrated run), the dispatch itself states where the result must land
+  (repo + path + branch discipline). Persistence is part of the task contract,
+  not an afterthought the receiving agent may or may not have.
+- **Cross-reference, don't duplicate:** the audit canon's verbatim rule is the
+  audit-specific instance of this law; §2.2's exit states cover the
+  *branch/worktree* the artifact rides in; this section covers the artifact itself.
+
+**Precedent (2026-07-02).** A strategic benchmark produced by a ~100-agent
+deep-research run (millions of tokens, adversarially verified findings) arrived as
+an in-chat result; the human had to *ask* whether persistence was automatic — it
+was not, and the harness default was chat-only. The sibling failure had already
+occurred twice with chat-delivered audits before the audit canon's §9 existed.
+Memory-level rules failed in both families; law is the correction.
 
 ## 3. The safety boundary
 
