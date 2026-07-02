@@ -336,6 +336,42 @@ test("hook pre: force-push tool call → permissionDecision deny, naming the man
   assert.match(json.hookSpecificOutput.permissionDecisionReason, /GIT-NEVER-FORCE-PUSH-DEFAULT/);
 });
 
+// Heir S2 review P1 (Opus): the ref-token boundary must survive shell terminators
+// and quoting — direct Bash spellings of a default-branch push, not residual wrappers.
+for (const [i, command] of [
+  "git push origin main; echo done",
+  "git push origin main|cat",
+  "(git push origin main)",
+  'git push origin "main"',
+  "git push origin 'main'",
+  "git push origin HEAD:main",
+].entries()) {
+  test(`hook pre: shell-syntax bypass attempt DENYs: ${command}`, () => {
+    const { json } = runHook({
+      hook_event_name: "PreToolUse",
+      tool_name: "Bash",
+      tool_input: { command },
+      session_id: `bypass-${i}`,
+    });
+    assert.equal(json.hookSpecificOutput.permissionDecision, "deny", command);
+    assert.match(json.hookSpecificOutput.permissionDecisionReason, /GIT-MUST-ALL-VIA-PR|GIT-NEVER-FORCE-PUSH/);
+  });
+}
+
+for (const [i, command] of ["git push origin main-backup", "git push origin mainly"].entries()) {
+  test(`hook pre: false-positive guard passes through: ${command}`, () => {
+    assert.deepEqual(
+      runHook({
+        hook_event_name: "PreToolUse",
+        tool_name: "Bash",
+        tool_input: { command },
+        session_id: `fp-${i}`,
+      }).json,
+      {}
+    );
+  });
+}
+
 test("hook pre: lawful command → silent {} passthrough (an explicit allow would BYPASS the harness permission prompts); ASK law → ask + pending parked in the session file", () => {
   assert.deepEqual(
     runHook({
