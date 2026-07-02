@@ -147,18 +147,34 @@ test("excluded OKF generated surfaces can churn without staling accepted memory 
   fixture(
     dir,
     baseConfig({
-      sourceExclusions: ["index.md", "log.md"],
+      sourceExclusions: ["docs/knowledge/vito-core/generated/index.md", "docs/knowledge/vito-core/generated/log.md"],
     })
   );
-  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n\n- [Business](./BUSINESS-CONTEXT.md)\n");
-  write(dir, "docs/knowledge/vito-core/log.md", "# OKF Log\n\n- generated before refresh\n");
+  write(dir, "docs/knowledge/vito-core/generated/index.md", "# OKF Index\n\n- [Business](../BUSINESS-CONTEXT.md)\n");
+  write(dir, "docs/knowledge/vito-core/generated/log.md", "# OKF Log\n\n- generated before refresh\n");
   assert.equal(refresh(dir).code, 0);
-  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n\n- [Business](./BUSINESS-CONTEXT.md)\n- regenerated\n");
-  write(dir, "docs/knowledge/vito-core/log.md", "# OKF Log\n\n- generated after refresh\n");
+  write(dir, "docs/knowledge/vito-core/generated/index.md", "# OKF Index\n\n- [Business](../BUSINESS-CONTEXT.md)\n- regenerated\n");
+  write(dir, "docs/knowledge/vito-core/generated/log.md", "# OKF Log\n\n- generated after refresh\n");
   const r = check(dir);
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /source exclusions/);
   assert.match(r.out, /GREEN/);
+});
+
+test("basename source exclusion does not hide accepted index changes → RED", () => {
+  const dir = makeDir();
+  fixture(
+    dir,
+    baseConfig({
+      sourceExclusions: ["index.md"],
+    })
+  );
+  write(dir, "docs/knowledge/vito-core/index.md", "# Accepted Index\n\nLoad-bearing accepted context v1.\n");
+  assert.equal(refresh(dir).code, 0);
+  write(dir, "docs/knowledge/vito-core/index.md", "# Accepted Index\n\nLoad-bearing accepted context v2.\n");
+  const r = check(dir);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /source fingerprint/);
 });
 
 test("source exclusions changed after refresh → RED", () => {
@@ -166,12 +182,12 @@ test("source exclusions changed after refresh → RED", () => {
   fixture(
     dir,
     baseConfig({
-      sourceExclusions: ["index.md", "log.md"],
+      sourceExclusions: ["docs/knowledge/vito-core/generated/index.md", "docs/knowledge/vito-core/generated/log.md"],
     })
   );
-  write(dir, "docs/knowledge/vito-core/index.md", "# OKF Index\n");
+  write(dir, "docs/knowledge/vito-core/generated/index.md", "# OKF Index\n");
   assert.equal(refresh(dir).code, 0);
-  write(dir, "tools/knowledge-memory.config.json", baseConfig({ sourceExclusions: ["index.md"] }));
+  write(dir, "tools/knowledge-memory.config.json", baseConfig({ sourceExclusions: ["docs/knowledge/vito-core/generated/index.md"] }));
   const r = check(dir);
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /source exclusions.*changed/);

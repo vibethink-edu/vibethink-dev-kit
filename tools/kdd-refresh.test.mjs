@@ -124,14 +124,14 @@ test("refresh records sourceExclusions in the manifest", () => {
       knowledgeRoot: "kb",
       manifestPath: "kb/.kdd-memory-manifest.json",
       sourceExtensions: [".md"],
-      sourceExclusions: ["index.md", "log.md"],
+      sourceExclusions: ["kb/generated/index.md", "kb/generated/log.md"],
       indexes: [],
     })
   );
   const r = run(REFRESH, root, ["tools/knowledge-memory.config.json"]);
   assert.equal(r.code, 0, `expected exit 0\n${r.out}`);
   const manifest = JSON.parse(readFileSync(path.join(root, "kb", ".kdd-memory-manifest.json"), "utf8"));
-  assert.deepEqual(manifest.sourceExclusions, ["index.md", "log.md"]);
+  assert.deepEqual(manifest.sourceExclusions, ["kb/generated/index.md", "kb/generated/log.md"]);
 });
 
 for (const d of tmpdirs) {

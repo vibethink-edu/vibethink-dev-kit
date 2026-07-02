@@ -97,8 +97,7 @@ function packRootFor(file) {
 function includeSource(file) {
   if (resolve(file) === resolve(absManifest)) return false;
   const fileRel = rel(file).toLowerCase();
-  const basename = fileRel.split("/").pop();
-  if (sourceExclusions.has(fileRel) || sourceExclusions.has(basename)) return false;
+  if (sourceExclusions.has(fileRel)) return false;
   const packRoot = packRootFor(file);
   if (!packRoot) return true;
   const status = metadataStatus(packRoot);

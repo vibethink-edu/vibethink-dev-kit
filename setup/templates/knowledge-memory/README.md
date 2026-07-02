@@ -9,8 +9,9 @@ Graphify, Engram, vector, search, or markdown-only memory adapters.
 
 1. Copy `knowledge-memory.config.json` to `tools/knowledge-memory.config.json`.
 2. Edit `sourceRoots`, `knowledgeMemoryAdapter`, and `indexes` for the consuming repo.
-3. If the repo generates OKF-compatible surfaces such as `index.md` or `log.md`, keep
-   them in `sourceExclusions` unless they are intended to be accepted source files.
+3. If the repo generates OKF-compatible surfaces such as `index.md` or `log.md`, exclude
+   only exact repo-relative generated file paths in `sourceExclusions`. Never exclude by
+   basename (`index.md`, `log.md`) because that can hide accepted knowledge at any depth.
 4. Refresh declared engines.
 5. Run:
 

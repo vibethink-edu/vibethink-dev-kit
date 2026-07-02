@@ -305,6 +305,20 @@ test("OKF slash-absolute bundle link is rejected by current KDD reference gate �
   assert.match(out, /\/PACK-METADATA\.md/);
 });
 
+test("OKF slash-absolute concept link is rejected by current KDD reference gate → RED", () => {
+  const dir = makeDir();
+  validPack(dir);
+  write(
+    dir,
+    "docs/knowledge/customer-ops-v1/BUSINESS-CONTEXT.md",
+    "# Business Context\n\nSee [metadata](/PACK-METADATA.md).\n"
+  );
+  const { code, out } = run(dir, config({ featureRoots: [] }));
+  assert.equal(code, 1, out);
+  assert.match(out, /reference/);
+  assert.match(out, /\/PACK-METADATA\.md/);
+});
+
 test("missing knowledgeMemoryAdapter → RED", () => {
   const dir = makeDir();
   validPack(dir);
