@@ -345,6 +345,15 @@ for (const [i, command] of [
   'git push origin "main"',
   "git push origin 'main'",
   "git push origin HEAD:main",
+  // quote-splitting (S2 re-review, round 2): shell collapses quotes → main
+  "git push origin ma''in",
+  'git push origin ma""in',
+  "git push origin m'a'i'n",
+  // once mis-declared residual (re-review finding 2): these DO deny
+  "git -C /repo push origin main",
+  "cd subdir && git push origin main",
+  'sh -c "git push origin main"',
+  "env GIT_DIR=/x git push origin main",
 ].entries()) {
   test(`hook pre: shell-syntax bypass attempt DENYs: ${command}`, () => {
     const { json } = runHook({
