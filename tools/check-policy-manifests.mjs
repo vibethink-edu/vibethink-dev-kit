@@ -25,6 +25,13 @@
  *                     (the ratchet: coverage grows canon-by-canon, never slides
  *                     back); remaining sealed canons without one are REPORTED as
  *                     the open frontier, not failed.
+ *   6. enforce      — an OPTIONAL per-rule `enforce` block (the policy engine's
+ *                     food — CANON-RUNTIME-POLICY-ENGINE-001) must be well-formed:
+ *                     point(s) in the canon's §2 range, verdict in the §3 range,
+ *                     a match.pattern that compiles as a RegExp (with a capturing
+ *                     group when captureNotInStateLabel is declared). Only
+ *                     MECHANICALLY-DECIDABLE rules carry enforce; judgment rules
+ *                     stay watched by gates / golden tasks / review.
  *
  * Config (tools/policy-manifests.config.json):
  *   { "policyDir": "knowledge/policy",
@@ -68,10 +75,17 @@ const manifestFiles = readdirSync(policyAbs)
   .filter((f) => f.endsWith(".policy.json"))
   .sort();
 if (manifestFiles.length === 0)
-  die(2, `RED — setup error: no *.policy.json in ${policyDir} — a projection gate with nothing to audit is false-green (§8.6)`);
+  die(
+    2,
+    `RED — setup error: no *.policy.json in ${policyDir} — a projection gate with nothing to audit is false-green (§8.6)`
+  );
 
 const LEVELS = new Set(["MUST", "NEVER"]);
 const WATCH_KINDS = new Set(["gate", "golden-task", "none"]);
+// The enforcement-point and verdict ranges mirror CANON-RUNTIME-POLICY-ENGINE-001
+// §2/§3 — the SEALED canon is the source of these sets, not the engine code.
+const ENFORCE_POINTS = new Set(["request", "pre-model", "tool-call", "tool-result"]);
+const ENFORCE_VERDICTS = new Set(["ALLOW", "ASK", "DENY"]);
 const problems = [];
 const sourcesWithManifest = new Set();
 
@@ -139,7 +153,11 @@ for (const file of manifestFiles) {
       // satisfy a manifest claiming SEALED (PR #218 review P1). The prose token is
       // the first word after **Status:** (markdown emphasis stripped).
       const afterTag = statusLine.split(/\*\*Status:\*\*/)[1] ?? "";
-      const proseToken = (afterTag.replace(/[*_`>]/g, "").trim().match(/^[A-Za-z-]+/) || [])[0] || "";
+      const proseToken =
+        (afterTag
+          .replace(/[*_`>]/g, "")
+          .trim()
+          .match(/^[A-Za-z-]+/) || [])[0] || "";
       if (!statusLine)
         problems.push(`${rel}: source has no **Status:** line — parity unverifiable`);
       else if (m.status && proseToken !== m.status)
@@ -162,7 +180,9 @@ for (const file of manifestFiles) {
       problems.push(`${tag}: level "${r.level}" not in {MUST, NEVER}`);
     const citeNums = [...String(r.cite ?? "").matchAll(/§\s*(\d+(?:\.\d+)*)/g)].map((x) => x[1]);
     if (r.cite && citeNums.length === 0)
-      problems.push(`${tag}: cite carries no § section — a rule without a prose anchor is new law, not a projection`);
+      problems.push(
+        `${tag}: cite carries no § section — a rule without a prose anchor is new law, not a projection`
+      );
     if (prose)
       for (const num of citeNums)
         if (!sectionAnchored(prose, num))
@@ -178,7 +198,9 @@ for (const file of manifestFiles) {
         problems.push(`${tag}: watch.kind "${w.kind}" not in {gate, golden-task, none}`);
       else if (w.kind === "none") {
         if (!w.note || !String(w.note).trim())
-          problems.push(`${tag}: watch none requires a note — unwatched is a conscious declaration`);
+          problems.push(
+            `${tag}: watch none requires a note — unwatched is a conscious declaration`
+          );
       } else if (!w.ref || !existsSync(join(ROOT, w.ref))) {
         problems.push(`${tag}: watch.ref "${w.ref}" does not exist`);
       } else if (w.kind === "gate") {
@@ -191,14 +213,63 @@ for (const file of manifestFiles) {
         const battery = await loadBattery();
         const task = battery.find((t) => t.id === w.task);
         if (!task)
-          problems.push(`${tag}: watch golden-task names task "${w.task}" which is not in the battery`);
-        else if (
-          m.id &&
-          ![...(task.laws ?? []), ...(task.lawFiles ?? [])].join(" ").includes(m.id)
-        )
+          problems.push(
+            `${tag}: watch golden-task names task "${w.task}" which is not in the battery`
+          );
+        else if (m.id && ![...(task.laws ?? []), ...(task.lawFiles ?? [])].join(" ").includes(m.id))
           problems.push(
             `${tag}: battery task "${w.task}" does not declare ${m.id} among its laws — a trap for another law is a false watch`
           );
+      }
+    }
+    // 6. enforce — optional; when present it feeds the runtime policy engine, so a
+    // malformed block is a policy that silently never fires (fail-open by typo).
+    if (r.enforce !== undefined) {
+      const e = r.enforce;
+      if (!e || typeof e !== "object" || Array.isArray(e)) {
+        problems.push(`${tag}: enforce must be an object`);
+      } else {
+        const pts = Array.isArray(e.point) ? e.point : [e.point];
+        if (pts.length === 0 || !pts.every((p) => ENFORCE_POINTS.has(p)))
+          problems.push(
+            `${tag}: enforce.point "${pts.join(", ")}" not in the §2 range {${[...ENFORCE_POINTS].join(", ")}}`
+          );
+        if (!ENFORCE_VERDICTS.has(e.verdict))
+          problems.push(
+            `${tag}: enforce.verdict "${e.verdict}" not in the §3 range {${[...ENFORCE_VERDICTS].join(", ")}}`
+          );
+        if (!e.match || typeof e.match !== "object" || typeof e.match.pattern !== "string") {
+          problems.push(
+            `${tag}: enforce.match.pattern (string) is required — a mechanical rule matches the action's shape, never NLP`
+          );
+        } else {
+          let compiled = null;
+          try {
+            compiled = new RegExp(e.match.pattern);
+          } catch (err) {
+            problems.push(
+              `${tag}: enforce.match.pattern does not compile as a RegExp (${err.message})`
+            );
+          }
+          if (
+            e.match.tool !== undefined &&
+            (typeof e.match.tool !== "string" || !e.match.tool.trim())
+          )
+            problems.push(`${tag}: enforce.match.tool must be a non-empty string when present`);
+          if (e.match.captureNotInStateLabel !== undefined) {
+            if (
+              typeof e.match.captureNotInStateLabel !== "string" ||
+              !e.match.captureNotInStateLabel.trim()
+            )
+              problems.push(
+                `${tag}: enforce.match.captureNotInStateLabel must be a non-empty string`
+              );
+            if (compiled && !/\((?!\?[:!=<])/.test(e.match.pattern))
+              problems.push(
+                `${tag}: captureNotInStateLabel declared but the pattern has no capturing group — nothing to look up in session state`
+              );
+          }
+        }
       }
     }
   }
@@ -210,7 +281,9 @@ for (const file of manifestFiles) {
 // visible two-file diff (manifest + config), which review governance owns.
 for (const canon of requireFor) {
   if (!sourcesWithManifest.has(canon.replace(/\\/g, "/")))
-    problems.push(`coverage: ${canon} is in requireFor but has no manifest in ${policyDir} (the ratchet never slides back)`);
+    problems.push(
+      `coverage: ${canon} is in requireFor but has no manifest in ${policyDir} (the ratchet never slides back)`
+    );
 }
 for (const src of sourcesWithManifest) {
   if (!requireFor.map((c) => c.replace(/\\/g, "/")).includes(src))

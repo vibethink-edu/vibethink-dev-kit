@@ -4,7 +4,8 @@
  * Integration style: run the gate for real over throwaway repos in tmp dirs.
  * Known-bad discipline (§8.7a): every drift class is demonstrated to go RED —
  * status out-claiming the prose, a rule with no § anchor, a dangling watch ref,
- * an undeclared unwatched rule, a coverage-ratchet hole.
+ * an undeclared unwatched rule, a coverage-ratchet hole, and a malformed `enforce`
+ * block (bad point/verdict, non-compiling pattern, missing capture group).
  * Pure Node, no deps. Run: node tools/check-policy-manifests.test.mjs
  */
 import assert from "node:assert/strict";
@@ -48,8 +49,13 @@ function run(dir, cfg) {
   return { code: r.status ?? 1, out: `${r.stdout ?? ""}${r.stderr ?? ""}` };
 }
 
-const CANON = "# CANON-EXAMPLE-001 — Example law\n\n**Status:** SEALED 2026-07-01 by the named authority\n\n## §1 — Rule\n\nDeclared things only.\n";
-const CFG = { policyDir: "policy", canonRoots: ["canon"], requireFor: ["canon/CANON-EXAMPLE-001.md"] };
+const CANON =
+  "# CANON-EXAMPLE-001 — Example law\n\n**Status:** SEALED 2026-07-01 by the named authority\n\n## §1 — Rule\n\nDeclared things only.\n";
+const CFG = {
+  policyDir: "policy",
+  canonRoots: ["canon"],
+  requireFor: ["canon/CANON-EXAMPLE-001.md"],
+};
 const GOOD_RULE = {
   id: "EX-MUST-DECLARE",
   level: "MUST",
@@ -89,7 +95,11 @@ test("faithful projection → GREEN, exit 0", () => {
 test("status drift (manifest out-claims prose) → RED, exit 1", () => {
   const dir = makeRepo();
   seed(dir, manifest());
-  write(dir, "canon/CANON-EXAMPLE-001.md", CANON.replace("SEALED 2026-07-01 by the named authority", "DRAFT"));
+  write(
+    dir,
+    "canon/CANON-EXAMPLE-001.md",
+    CANON.replace("SEALED 2026-07-01 by the named authority", "DRAFT")
+  );
   const { code, out } = run(dir, CFG);
   assert.equal(code, 1, out);
   assert.match(out, /status drift/i);
@@ -171,7 +181,11 @@ test("coverage-ratchet hole (requireFor without manifest) → RED, exit 1", () =
 test("sealed-but-unmanifested canon → reported as frontier, still GREEN", () => {
   const dir = makeRepo();
   seed(dir, manifest());
-  write(dir, "canon/CANON-FRONTIER-001.md", CANON.replace("CANON-EXAMPLE-001", "CANON-FRONTIER-001"));
+  write(
+    dir,
+    "canon/CANON-FRONTIER-001.md",
+    CANON.replace("CANON-EXAMPLE-001", "CANON-FRONTIER-001")
+  );
   const { code, out } = run(dir, CFG);
   assert.equal(code, 0, out);
   assert.match(out, /frontier: 1 sealed canon/);
@@ -183,6 +197,76 @@ test("empty policyDir → setup error, exit 2 (meta-gate auditing nothing)", () 
   write(dir, "canon/CANON-EXAMPLE-001.md", CANON);
   const { code, out } = run(dir, CFG);
   assert.equal(code, 2, out);
+});
+
+// ── enforce blocks (the policy engine's food) — every malformation goes RED ──
+
+const GOOD_ENFORCE = {
+  point: "tool-call",
+  verdict: "DENY",
+  match: { tool: "bash", pattern: "git push .*(--force|-f)\\b" },
+};
+
+test("well-formed enforce block → still GREEN", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { enforce: GOOD_ENFORCE }));
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 0, out);
+});
+
+test("enforce.point outside the §2 range → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { enforce: { ...GOOD_ENFORCE, point: "whenever" } }));
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /enforce\.point .*not in the §2 range/i);
+});
+
+test("enforce.verdict outside the §3 range → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { enforce: { ...GOOD_ENFORCE, verdict: "BLOCK" } }));
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /enforce\.verdict .*not in the §3 range/i);
+});
+
+test("enforce pattern that does not compile → RED, exit 1 (a typo is a policy that never fires)", () => {
+  const dir = makeRepo();
+  seed(dir, manifest({}, { enforce: { ...GOOD_ENFORCE, match: { pattern: "([unclosed" } } }));
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /does not compile/i);
+});
+
+test("enforce without match.pattern → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(
+    dir,
+    manifest({}, { enforce: { point: "tool-call", verdict: "DENY", match: { tool: "bash" } } })
+  );
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /match\.pattern .*required/i);
+});
+
+test("captureNotInStateLabel without a capturing group in the pattern → RED, exit 1", () => {
+  const dir = makeRepo();
+  seed(
+    dir,
+    manifest(
+      {},
+      {
+        enforce: {
+          point: "tool-call",
+          verdict: "DENY",
+          match: { pattern: "--port[= ]\\d+", captureNotInStateLabel: "declaredPorts" },
+        },
+      }
+    )
+  );
+  const { code, out } = run(dir, CFG);
+  assert.equal(code, 1, out);
+  assert.match(out, /no capturing group/i);
 });
 
 // The real repo's manifests must themselves pass the gate (dogfood).

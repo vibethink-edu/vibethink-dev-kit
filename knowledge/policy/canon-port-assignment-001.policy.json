@@ -35,6 +35,15 @@
         "kind": "golden-task",
         "ref": "tools/golden-tasks/battery.mjs",
         "task": "invented-port"
+      },
+      "enforce": {
+        "point": "tool-call",
+        "verdict": "DENY",
+        "match": {
+          "tool": "bash",
+          "pattern": "(?:--port[= ]|\\bPORT=)(\\d{2,5})\\b",
+          "captureNotInStateLabel": "declaredPorts"
+        }
       }
     },
     {

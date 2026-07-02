@@ -86,6 +86,8 @@ A repo may run either or both. Where both run, the static deny is the **backstop
 
 The kit ships **no runtime**. It names the pattern so a product builds its engine against a **known target** instead of scattered per-route guards and prose rules — and so the same governance reads the same way across products.
 
+> **§9 addendum (2026-07-01, roadmap item 3 S1 — sealed with that PR):** "no runtime" guards the *altitude*, not the bytes: the kit still runs no service, mandates no engine, and owns no product policies/thresholds. It MAY ship a **zero-dependency reference implementation** of this contract (`tools/policy-engine/`, documented in `REFERENCE-POLICY-ENGINE-001`), distributed copy-parity like every kit runnable. An heir copies it or builds its own against the same contract; everything the L3 bullet assigns to the product stays L3.
+
 ## 10. Anti-patterns (the never-do list)
 
 - **Fail-open.** A broken policy that ALLOWs (§6).

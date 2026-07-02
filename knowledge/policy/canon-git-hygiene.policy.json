@@ -11,21 +11,39 @@
       "level": "NEVER",
       "cite": "§4",
       "rule": "Force-push the default branch — destructive rewrite of the shared timeline. Forbidden without explicit, documented exception.",
-      "watch": { "kind": "golden-task", "ref": "tools/golden-tasks/battery.mjs", "task": "force-push" }
+      "watch": {
+        "kind": "golden-task",
+        "ref": "tools/golden-tasks/battery.mjs",
+        "task": "force-push"
+      },
+      "enforce": {
+        "point": "tool-call",
+        "verdict": "DENY",
+        "match": {
+          "tool": "bash",
+          "pattern": "\\bgit\\b[^\\n]*\\bpush\\b(?=[^\\n]*(?:--force(?:-with-lease|-if-includes)?\\b|\\s-f\\b|\\s\\+\\S+))(?=[^\\n]*\\b(?:main|master)\\b)"
+        }
+      }
     },
     {
       "id": "GIT-NEVER-REBASE-PUBLISHED",
       "level": "NEVER",
       "cite": "§4",
       "rule": "Rebase commits already pushed and visible to other contributors/CI.",
-      "watch": { "kind": "none", "note": "golden-task growth candidate (reference §3: next incident leaves a trap)" }
+      "watch": {
+        "kind": "none",
+        "note": "golden-task growth candidate (reference §3: next incident leaves a trap)"
+      }
     },
     {
       "id": "GIT-NEVER-SILENT-NO-VERIFY",
       "level": "NEVER",
       "cite": "§2.4, §4",
       "rule": "Bypass hooks (--no-verify) without declaring the reason; the dirty-worktree exception exists only through the governed comm-send tool.",
-      "watch": { "kind": "none", "note": "declared unwatched — hook-bypass telemetry is roadmap item 6" }
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — hook-bypass telemetry is roadmap item 6"
+      }
     },
     {
       "id": "GIT-NEVER-ROOT-WRITE",
