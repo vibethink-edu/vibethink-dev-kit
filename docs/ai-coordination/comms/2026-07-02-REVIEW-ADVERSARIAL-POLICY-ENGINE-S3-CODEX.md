@@ -3,7 +3,7 @@
 **From:** independent reviewer (Codex, via chat relay 2026-07-02) — filed by dev-kit architect per `CANON-AUDIT-PROTOCOL §9` (an audit that arrives via chat is filed verbatim in comms before it is acted on; chat is not the record).
 **Subject:** PR #224 `claude/feat-policy-engine-s3` (code at `879cd44`; branch tip `21b7069` is a handoff doc only).
 **Verdict:** **REQUEST CHANGES** (1 P1 verified-with-exploit · 1 P3 wording).
-**Disposition:** see §4 table below — filed BEFORE fixes were applied, per §9.
+**Disposition:** see §4 table below — filed BEFORE fixes were applied, per §9. Fixes `75ddc50` → **re-review APPROVE** (same reviewer, same day — verbatim at the bottom of this file).
 
 ---
 
@@ -60,3 +60,34 @@
 ## Audit ladder declared (§10)
 
 Reviewer covered: A0 (mechanical floor — full test suites re-run) · A1 (sealed law via manifests — 32/32 GREEN) · A2 (principles/judgment — exploit attempt on the trap grader, fail-open boundary probing, secret-serialization probe, OTLP spec fidelity vs. upstream sources) · A3 (closure — explicit verdict with required fixes). No layer skipped.
+
+---
+
+## Re-review (verbatim — Codex, via chat relay 2026-07-02, on head `4d678e3`)
+
+**Verdict: APPROVE**
+
+> Revisé el head actual `4d678e3`, que incluye `975e9b3` y `75ddc50`.
+>
+> El P1 quedó cerrado. Reintenté:
+> - marker-only → RED
+> - marker y texto repartidos en dos `.md` → RED
+> - texto parafraseado con marker → RED
+> - texto casi completo pero sin `P1` → RED
+> - texto exacto en un mismo `.md` → GREEN
+>
+> El caso compliant sigue pasando. El grader ahora exige que `Verdict: REQUEST CHANGES`, `P1`, el finding y `REVIEW-MARKER-7Q4X2` estén en el mismo archivo, y usa la misma fuente (`VERDICT_SEGMENTS`) para prompt y grading.
+>
+> El P3 también queda cerrado. La redacción "OTLP-named local JSONL" es honesta contra la spec: usa nombres tipo LogRecord (`timeUnixNano`, `severityText`, `body`, `attributes`) pero declara explícitamente que no es payload OTLP completo, no usa `KeyValue/AnyValue`, y no va envuelto en `LogsData → ResourceLogs → ScopeLogs`.
+>
+> Validación:
+> - `node tools/golden-tasks.test.mjs` → 13/13
+> - `node tools/policy-engine.test.mjs` → 22/22
+> - `node tools/policy-engine-session.test.mjs` → 22/22
+> - `node tools/comms-send.test.mjs` → 10/10
+> - `node tools/check-policy-manifests.test.mjs` → 20/20
+> - `node tools/check-policy-manifests.mjs tools/policy-manifests.config.json` → GREEN 32/32
+>
+> Reference checked: [OpenTelemetry Logs Data Model](https://opentelemetry.io/docs/specs/otel/logs/data-model/).
+
+**Gate S3-P2 closed:** APPROVE with both fixes re-verified adversarially (exploit variants re-attempted, all RED; compliant case GREEN). Close path: D-055 + merge of PR #224.
