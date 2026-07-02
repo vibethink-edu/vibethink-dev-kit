@@ -118,6 +118,33 @@ test("invented-port fails CLOSED: no declaredPorts label at all → DENY (PORT �
   assert.match(r.reason, /CANON-PORT-ASSIGNMENT-001/);
 });
 
+test("port matcher covers the declared shapes only (--port/--listen/PORT=); other bind shapes stay with the trap+gate", () => {
+  const state = createSessionState();
+  assert.equal(evaluate(ev("node server.mjs --listen 4999"), state, portPolicies).verdict, "DENY");
+  // Declared PARTIAL coverage (S1 review P2): shapes like `-p 1234` or config-file
+  // ports are NOT mechanized — the golden trap + check-ports remain their watchers.
+  assert.equal(evaluate(ev("docker run -p 4999:80 img"), state, portPolicies).verdict, "ALLOW");
+});
+
+test("compileManifest fails CLOSED on a mixed valid+invalid point list (never silently narrows)", () => {
+  const bad = {
+    id: "CANON-X",
+    rules: [
+      {
+        id: "X-NEVER-Y",
+        cite: "§1",
+        rule: "x",
+        enforce: {
+          point: ["tool-call", "bad-point"],
+          verdict: "DENY",
+          match: { pattern: "x" },
+        },
+      },
+    ],
+  };
+  assert.throws(() => compileManifest(bad), /malformed enforce block/);
+});
+
 /* ───────────────────────── composition & precedence (§4) ───────────────────── */
 
 test("DENY short-circuits: policies after the denier never run", () => {

@@ -47,6 +47,7 @@ The golden battery proved the constitution can *hold under temptation* — but h
 - `match.pattern` is a RegExp over the event content; optional `match.tool` scopes the tool; optional `match.captureNotInStateLabel` makes **membership** mechanical: the pattern's capture is looked up in `state.labels[<label>]` — a member → ALLOW; anything else, **including a missing label, takes the rule's verdict** (deliberate fail-closed: `CANON-PORT-ASSIGNMENT-001` §3, no declaration → refuse).
 - The gate (`check-policy-manifests.mjs` check 6) validates the shape: point in the §2 range, verdict in the §3 range, pattern compiles, capture group present when membership is declared. A typo'd block is a policy that never fires — that is why malformation is RED, not a warning.
 - `enforce` **rides the rule's existing § citation**; it adds no law. Adding a matcher to a rule is projection maintenance; adding a *rule* still requires its § in the sealed prose first.
+- **A matcher is PARTIAL by design and must never be read as the rule's full enforcement.** It mechanizes the *unambiguous* action shapes; everything the shape can't see (other flag spellings, config-file values, indirect effects) stays owned by the rule's `watch` instruments (gate / golden task / review). When the gap is material, declare it in an `enforce.coverage` free-text field (e.g. the port matcher covers `--port/--listen/PORT=` but not `-p` or config-driven binds — S1 review P2). An engine DENY is a floor, not the ceiling.
 
 ## §4 — Semantic mapping to OPA (bind-to-standards)
 

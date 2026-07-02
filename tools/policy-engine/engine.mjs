@@ -233,11 +233,13 @@ export function compileManifest(manifest) {
   for (const rule of manifest?.rules ?? []) {
     const enf = rule?.enforce;
     if (!enf) continue;
-    const points = (Array.isArray(enf.point) ? enf.point : [enf.point]).filter((p) =>
-      POINTS.includes(p)
-    );
+    // Fail-closed compiler: EVERY declared point must be in range. Filtering the
+    // bad ones out would silently narrow where a policy fires (a mixed
+    // ["tool-call","bad-point"] must refuse to compile, not degrade — S1 review P2).
+    const points = Array.isArray(enf.point) ? enf.point : [enf.point];
     if (
       points.length === 0 ||
+      !points.every((p) => POINTS.includes(p)) ||
       !VERDICTS.includes(enf.verdict) ||
       typeof enf.match?.pattern !== "string"
     )

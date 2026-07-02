@@ -64,3 +64,14 @@ Over the full law: `policies` reports **2 mechanically-enforced policies from 32
 | S1-P4 | **S3**: JSONL counters OTLP-naming (roadmap item 6 seed) + first heir fire-test (ViTo generalizes its point-solution hooks) | Behind S2 |
 | S1-P5 | GIT §7 (todo via PR) sin matcher mecánico aún — un DENY plano de push-directo-a-main rompería el comm lane governado; necesita session-labels (S2) | S2 |
 | S1-P6 | P-1 del delivery de manifiestos (5 canons con token `approved`/`CANON` fuera de la frontera) sigue abierto — sin cambio | Chief architect |
+
+---
+
+## Addendum — independent adversarial review response (2026-07-02, APPROVE WITH FIXES → fixed)
+
+Independent review: **no P1**; 2 P2, both ACCEPTED and fixed in the same PR:
+
+- **P2-1 (compiler not fail-closed on mixed points):** `compileManifest` filtered invalid points instead of refusing — `["tool-call","bad-point"]` silently narrowed to `["tool-call"]`. Fixed: EVERY declared point must be in range or the block refuses to compile; known-bad test added (mixed valid+invalid → throws). The gate already rejected this shape in CI; now the runtime compiler matches it.
+- **P2-2 (port matcher false negatives undeclared):** the matcher only saw `--port/--listen/PORT=` shapes and could be read as full enforcement of `PORT-NEVER-UNDECLARED-BIND`. Fixed: matcher widened to `--listen`, an explicit `enforce.coverage: PARTIAL` declaration added to the manifest, the doctrine added to the reference §3 (a matcher is a floor, not the ceiling — unmechanized shapes stay with the trap + gate), and a test pinning what is and is NOT covered (`-p 4999:80` → ALLOW by declared design).
+
+Reviewer's validation run (independent): engine 20/20 · gate 19/19 · manifests GREEN 32/32 · the comparative claim confirmed ("the side effect became impossible, not the agent better-behaved").
