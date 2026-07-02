@@ -5,14 +5,23 @@
  * shipped by S2). The core stays harness-free; THIS file speaks one harness wire
  * shape — the de-facto pre/post tool-hook JSON: stdin
  * `{hook_event_name, tool_name, tool_input, session_id}` → stdout
- * `{hookSpecificOutput: {permissionDecision: allow|ask|deny, ...}}`. An L3 on a
- * different harness copies this file and rewrites ONLY the wire mapping.
+ * `{hookSpecificOutput: {permissionDecision: ask|deny, ...}}` — or `{}` for
+ * ALLOW: the engine's authority on this wire is DENY and ASK only. An explicit
+ * "allow" is an APPROVAL to the harness — it bypasses the harness's own
+ * permission prompts for the call — so emitting it for every non-objected
+ * command would auto-approve the whole tool plane and disable the human
+ * permission layer. "No policy objected" therefore stays SILENT and the call
+ * continues through the normal permission flow. (Heir fire-test finding, first
+ * live wiring — ViTo PR #4119; the header always said "pass through", the
+ * explicit emission was implementation-vs-intent drift.) An L3 on a different
+ * harness copies this file and rewrites ONLY the wire mapping.
  *
  * This closes the §3 approval loop with the harness's OWN permission prompt as
  * the real approval surface:
- *   - pre  (PreToolUse):  evaluate → ALLOW/DENY pass through; ASK → the verdict
- *          maps to the harness "ask" AND the withheld writes are parked in the
- *          session store under the action's key. Nothing has been applied.
+ *   - pre  (PreToolUse):  evaluate → DENY emits deny; ALLOW passes through
+ *          silently (`{}`); ASK → the verdict maps to the harness "ask" AND the
+ *          withheld writes are parked in the session store under the action's
+ *          key. Nothing has been applied.
  *   - post (PostToolUse): the tool RAN — that IS the human's approval — so the
  *          parked writes for this exact action are settled+applied (§11.4
  *          ask-once: an approval label in those writes prevents re-asking).
@@ -139,14 +148,15 @@ try {
     recordPending(session, key, { asks: result.asks, withheldUpdates: result.withheldUpdates });
     saveSession(sessionFile, session);
     emit("ask", `${result.reason ?? "policy approval required"} [pending:${key}]`);
+  } else if (result.verdict === "DENY") {
+    saveSession(sessionFile, session); // DENY applied its writes (§4)
+    emit("deny", `${result.decidingPolicy}: ${result.reason}`);
   } else {
-    saveSession(sessionFile, session); // ALLOW/DENY applied their writes (§4)
-    emit(
-      result.verdict === "DENY" ? "deny" : "allow",
-      result.verdict === "DENY"
-        ? `${result.decidingPolicy}: ${result.reason}`
-        : "no policy objected"
-    );
+    saveSession(sessionFile, session); // ALLOW applied its writes (§4)
+    // ALLOW = SILENT PASSTHROUGH (`{}`), never an explicit permissionDecision —
+    // see the header: an explicit "allow" bypasses the harness permission
+    // prompts and would auto-approve every non-objected command.
+    process.stdout.write("{}\n");
   }
   process.exit(0);
 } catch (e) {
