@@ -65,6 +65,16 @@
         "kind": "gate",
         "ref": "tools/check-coder-launch-readiness.mjs"
       }
+    },
+    {
+      "id": "CODER-MUST-WORKTREE-IDENTITY-BINDING",
+      "level": "MUST",
+      "cite": "§7",
+      "rule": "One executor session = one worktree = one bot identity: two executors never share a working tree, the push comes from the same machine/session that owns the worktree and carries the bot identity, and dependent executors create their worktree from the latest integration branch at launch time.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
     }
   ]
 }

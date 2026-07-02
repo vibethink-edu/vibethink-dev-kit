@@ -65,6 +65,16 @@
         "kind": "none",
         "note": "declared unwatched — no gate cites this canon yet; growth candidate"
       }
+    },
+    {
+      "id": "E2E-MUST-GOVERNED-SHARED-FIXTURES",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "When tests must share a seed user (rare, avoidable), the fixture lives in a dedicated, owned and documented test-fixtures path, uses the e2e.fixture.<name>@<test-domain> email prefix, has a CI-secret password distinct from any production secret, and is registered in the fixtures index so its lifecycle is visible.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
     }
   ]
 }

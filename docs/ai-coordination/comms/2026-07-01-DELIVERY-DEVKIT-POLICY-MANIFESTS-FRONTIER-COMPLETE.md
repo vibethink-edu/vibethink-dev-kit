@@ -29,3 +29,17 @@
 ## Límite declarado (sin cambio)
 
 El gate NO juzga calidad semántica de la redacción (límite estructural declarado en el reference §2/§5) — por eso P-4 existe y por eso cada regla exige cita § auditable a mano.
+
+---
+
+## Addendum — fidelity review response (same day, APPROVE WITH FIXES → fixed)
+
+Independent fidelity review (8-manifest directed sample): **zero unfaithful/invented rules**; 5 P2 for **incomplete load-bearing selection** — all 5 ACCEPTED and fixed (+11 rules, 177 → 188):
+
+- UPSTREAM-PROTOCOL +5 (§5 extract-pattern default · §6 index/UPSTREAM.md/drift/cadence · §12 sync shape · §13-§15 triple classification + automation policy · §16 sponsor intake fail-closed)
+- DB-SECURITY-BASELINE +2 (§6 extensions out of public · §7 exposed matviews/public buckets + leaked-password protection)
+- CODER-SAFE-IDENTITY +1 (§7 worktree ↔ session ↔ identity binding)
+- RUNTIME-POLICY-ENGINE +2 (§1/§2 interception boundary before side effects · §5 session state)
+- E2E-TEST-USER-DISCIPLINE +1 (§6 governed shared fixtures)
+
+Each new rule was derived by reading the cited section (not from memory); gate GREEN 32/32 after. Selection-completeness is now a known review lens: the gate cannot see omission — that check stays human/reviewer (limit already declared in reference §2/§5).

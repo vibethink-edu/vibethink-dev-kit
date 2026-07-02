@@ -65,6 +65,56 @@
         "kind": "none",
         "note": "declared unwatched — no gate cites this canon yet; growth candidate"
       }
+    },
+    {
+      "id": "UPSTREAM-MUST-EXTRACT-PATTERN-DEFAULT",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "For any new upstream above the small-utility threshold the default is extract the pattern — read the source, take the idea/design/shape, implement it ourselves; adopt as a dependency only when surface size, robust maintenance, and clean license ALL hold and the decision is captured as an ADR (the burden of proof sits on the adopt side).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-INDEX-AND-DRIFT",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Run the §6 mechanism set: a per-fork UPSTREAM.md (URL, license, snapshot, diff summary, the do-not-overwrite list for bounded adaptations, cadence, next review), ONE discoverable baseline-versions index of every tracked upstream, a mandatory drift-detection check, and exactly one declared cadence per upstream — missing a cadence cycle is itself a finding.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-SYNC-SHAPE",
+      "level": "MUST",
+      "cite": "§12",
+      "rule": "Execute every sync in the §12 shape: dedicated one-upstream branch, fetch with selective integration (never blind-merge — review the diff first), full build+test green before review, a PR comparison table by category with the why of each ignored item, and the baseline index updated in the SAME PR.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-TRIPLE-CLASSIFICATION",
+      "level": "MUST",
+      "cite": "§13, §14, §15",
+      "rule": "Classify every upstream by the full triple — kind, risk tier, and runtime-location typology (the import-vs-curl litmus) — and handle it by its tier's automation policy: Tier 1 exact pins never auto-updated, Tier 2 bot PR with no auto-merge, Tier 3 patch auto-merge only.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "UPSTREAM-MUST-SPONSOR-INTAKE",
+      "level": "MUST",
+      "cite": "§16",
+      "rule": "Every adoption proposal opens with the Sponsor's declared Intent block and closes with the sealed Outcome artifact — without the intake block the proposal does not advance through the adoption protocol (fail-closed by design).",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
     }
   ]
 }

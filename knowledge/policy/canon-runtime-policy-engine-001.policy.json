@@ -55,6 +55,26 @@
         "kind": "none",
         "note": "declared unwatched — no gate cites this canon yet; growth candidate"
       }
+    },
+    {
+      "id": "RPE-MUST-INTERCEPT-AT-BOUNDARY",
+      "level": "MUST",
+      "cite": "§1, §2",
+      "rule": "Govern by intercepting each proposed action at its declared enforcement point(s) BEFORE side effects, evaluating it against the live session — accumulated context, not only a static command-shape check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "RPE-MUST-SESSION-STATE",
+      "level": "MUST",
+      "cite": "§5",
+      "rule": "Carry per-session state that policies read and update — counters, an accumulated risk score, cumulative cost/token usage, labels — persisted across turns where the L3 stores it; this is what makes a rule contextual instead of a flat per-call check.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
     }
   ]
 }

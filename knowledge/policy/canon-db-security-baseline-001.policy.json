@@ -65,6 +65,26 @@
         "kind": "none",
         "note": "declared unwatched — no gate cites this canon yet; growth candidate"
       }
+    },
+    {
+      "id": "DBSEC-MUST-EXTENSIONS-OUT-OF-PUBLIC",
+      "level": "MUST",
+      "cite": "§6",
+      "rule": "Install extensions in a dedicated extensions schema, not public; moving an existing extension is its OWN migration with a tested rollback, never bundled with other changes.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "DBSEC-NEVER-EXPOSED-MATVIEWS-OR-PUBLIC-BUCKETS",
+      "level": "NEVER",
+      "cite": "§7",
+      "rule": "Never leave a materialized view selectable by anon/authenticated (matviews ignore RLS — revoke and serve them server-side) nor a storage bucket publicly listable except by explicit intent; enable leaked-password protection.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
     }
   ]
 }
