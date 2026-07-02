@@ -20,6 +20,8 @@
     "test:shell-smoke": "node tools/shell-smoke.test.mjs",
     "golden:tasks": "node tools/golden-tasks.mjs run",
     "golden:tasks:list": "node tools/golden-tasks.mjs list",
+    "policy:eval": "node tools/policy-engine.mjs eval",
+    "policy:list": "node tools/policy-engine.mjs policies",
     "comms:send": "node tools/comms-send.mjs",
     "comms:security": "node tools/comms-security-gate.mjs",
     "comms:sync": "node tools/comms-sync.mjs",

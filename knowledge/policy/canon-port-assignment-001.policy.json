@@ -35,6 +35,16 @@
         "kind": "golden-task",
         "ref": "tools/golden-tasks/battery.mjs",
         "task": "invented-port"
+      },
+      "enforce": {
+        "point": "tool-call",
+        "verdict": "DENY",
+        "match": {
+          "tool": "bash",
+          "pattern": "(?:--port[= ]|--listen[= ]|\\bPORT=)(\\d{2,5})\\b",
+          "captureNotInStateLabel": "declaredPorts"
+        },
+        "coverage": "PARTIAL — narrow action-shape matcher (explicit --port/--listen/PORT= binds); NOT full enforcement of this NEVER. Other bind shapes (-p, host:port args, config-file ports) stay watched by the golden trap + check-ports (S1 review P2)."
       }
     },
     {

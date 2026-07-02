@@ -1,0 +1,88 @@
+# REFERENCE-POLICY-ENGINE-001 — The reference runtime policy engine (machine-enforced law)
+
+**Status:** **SEALED 2026-07-02 by the named authority** — drafted by the Principal Architect (roadmap item 3, slice S1; design GO'd by the chief architect in the 2026-07-01 handoff), approved and sealed by the chief architect ("adelante", register row D-052). Shipped in PR #221 after independent adversarial review: APPROVE WITH FIXES (2 P2) → fixed `3046e7b`.
+**Date:** 2026-07-01
+**Scope:** the dev-kit (producer-side instrument) + any heir that wants action-time enforcement over machine-readable law (copy the reference engine or build its own against the same sealed contract).
+**Spine:** this is the L2 instrument of `CANON-RUNTIME-POLICY-ENGINE-001` (SEALED — the contract; **not reopened here**), consuming `REFERENCE-POLICY-MANIFESTS-001` (the law's machine form, D-051) and proven by `REFERENCE-BEHAVIORAL-GOLDEN-TASKS-001` (the behavior battery, D-050). The instrument-loop closes: **law → manifest → engine → trap**.
+
+---
+
+## §0 — Why this exists
+
+The golden battery proved the constitution can *hold under temptation* — but holding depended on the agent reading and honoring prose. The maturity roadmap (item 3) names the next step: *"force-push forbidden" stops being text an agent may not have read and becomes a physical no.* This reference implementation is that step's S1: the same trap that previously graded "the agent resisted" now grades "the system made it impossible" — a DENY **before the side effect**.
+
+## §1 — What ships (S1)
+
+| Piece | Contract |
+|---|---|
+| `tools/policy-engine/engine.mjs` | the PURE CORE, zero dependencies, no filesystem/harness: `evaluate(event, state, policies)` implementing the sealed contract verbatim (§2 conformance map below), `compileManifest()` (manifests → policies), `createSessionState()`/`applyUpdates()` (§5 state + post-approval application), and the built-in `STATIC_FLOOR` |
+| `tools/policy-engine.mjs` | the CLI: `eval` (one action → verdict; exit **0 ALLOW · 1 DENY · 3 ASK · 2 setup**) and `policies` (what law compiled). A harness adapter calls this before the side effect and honors the exit code |
+| `enforce` manifest field | optional per-rule block in `VIBETHINK_POLICY_MANIFEST_V1` (§3 below); validated by `check-policy-manifests.mjs` like everything else |
+| 2 DENY policies | fed by EXISTING manifests: force-push (`CANON-GIT-HYGIENE` §4/§7) · invented-port (`CANON-PORT-ASSIGNMENT-001` §2/§3) |
+| L1 fire-test | `tools/policy-engine.test.mjs` — every contract clause on its known-bad, plus the golden force-push trap run behind the engine (GREEN = impossible, not resisted) |
+
+**Distribution:** copy-parity, like every kit runnable. If the engine ever grows dependencies, it moves to the org-registry path (`ADR-20260619-shared-runtime-package-distribution`) — never vendored deps in the kit.
+
+## §2 — Contract conformance (canon § → behavior)
+
+- **§2 points** — a policy declares `on: [request | pre-model | tool-call | tool-result]`; the engine skips the rest.
+- **§3 verdicts** — `ALLOW` (may carry a replacement `data` payload, threaded to later policies and returned — the redaction case) · `ASK` (accumulates; **ALL writes withheld**, returned as `withheldUpdates` for the adapter to apply **only on human approval**) · `DENY` (short-circuits with a reason).
+- **§4 composition** — declared array order (the caller owns the session → agent-spec → server layering); a DENY applies the writes accumulated so far and names the deciding policy.
+- **§5 state** — `{counters, risk, cost_usd, labels}` per session; updates are `SET / INCREMENT / APPEND`; storage is the adapter's (S2).
+- **§6 fail-closed** — a policy that throws, returns a verdict outside its declared set, or is malformed → DENY; declared `advisory` → ALLOW; declared `approval-gate` → ASK. A broken guard never fails open.
+- **§8 the shared floor** — `STATIC_FLOOR` (identity / destruction / secrets / arbitrary-exec, the `CANON-CODER-ORCHESTRATION-001` §7 classes) is appended to **every** chain by the engine itself; `evaluate` offers no way to remove it. An allow-everything policy list still cannot force-push (§10 anti-pattern "dissolving the shared floor", made structurally impossible).
+- **§7 discipline** — nothing here gates on a vendor model id; the engine names no vendor, model, or harness.
+
+## §3 — The `enforce` field (the engine's food)
+
+```json
+"enforce": {
+  "point": "tool-call",
+  "verdict": "DENY",
+  "match": { "tool": "bash", "pattern": "git push .*(--force|-f)\\b" }
+}
+```
+
+- **Only MECHANICALLY-DECIDABLE rules carry it** — declarative matchers over the action's *shape*, never NLP at runtime. Most manifest rules are judgment law and MUST NOT be forced into matchers; they stay watched by gates / golden tasks / review (their `watch` field, unchanged).
+- `match.pattern` is a RegExp over the event content; optional `match.tool` scopes the tool; optional `match.captureNotInStateLabel` makes **membership** mechanical: the pattern's capture is looked up in `state.labels[<label>]` — a member → ALLOW; anything else, **including a missing label, takes the rule's verdict** (deliberate fail-closed: `CANON-PORT-ASSIGNMENT-001` §3, no declaration → refuse).
+- The gate (`check-policy-manifests.mjs` check 6) validates the shape: point in the §2 range, verdict in the §3 range, pattern compiles, capture group present when membership is declared. A typo'd block is a policy that never fires — that is why malformation is RED, not a warning.
+- `enforce` **rides the rule's existing § citation**; it adds no law. Adding a matcher to a rule is projection maintenance; adding a *rule* still requires its § in the sealed prose first.
+- **A matcher is PARTIAL by design and must never be read as the rule's full enforcement.** It mechanizes the *unambiguous* action shapes; everything the shape can't see (other flag spellings, config-file values, indirect effects) stays owned by the rule's `watch` instruments (gate / golden task / review). When the gap is material, declare it in an `enforce.coverage` free-text field (e.g. the port matcher covers `--port/--listen/PORT=` but not `-p` or config-driven binds — S1 review P2). An engine DENY is a floor, not the ceiling.
+
+## §4 — Semantic mapping to OPA (bind-to-standards)
+
+Policy-as-code has a recognized standard — OPA/Rego. This engine deliberately stays mappable to it, so a future swap is a compile target, not a redesign (`CANON-UPSTREAM-PROTOCOL` §5: extract the pattern, declare the mapping):
+
+| Ours | OPA equivalent | Note |
+|---|---|---|
+| `ALLOW` / `DENY` composed in order, DENY short-circuits | `allow` / `deny` rules; deny-overrides composition | direct — an `enforce` block compiles mechanically to a Rego rule over the input document |
+| `event` (point, tool, content) | the `input` document | direct |
+| manifest `enforce` blocks | Rego policies loaded from a bundle | our manifests stay the source; Rego would be a build artifact |
+| **`ASK` + withheld writes** | — | **our extension**: OPA has no human-approval verdict; in an OPA deployment this stays in the adapter (PEP), not the policy engine (PDP) |
+| **mutable per-session state** (`counters/risk/cost`) | `data` documents are read-only at eval time | **our extension**: OPA externalizes state updates; ours are first-class (`state_updates`) |
+| fail-closed on a broken policy | default-deny idiom | ours is engine-level, not per-policy convention |
+
+**Not adopted now, by decision (2026-07-01 handoff):** a Go binary + a second language for a ~300-line zero-dep Node need, with no native ASK or session state, fails the adoption burden of proof. The mapping above is what keeps that decision reversible.
+
+## §5 — Layering (the §9 reconciliation)
+
+`CANON-RUNTIME-POLICY-ENGINE-001` §9 assigns the **contract** to L1 and the **engine** to L3, "the kit ships no runtime". This reference refines — through the canon's own seal path, on the S1 PR — what that sentence guards: the kit still runs **no service**, mandates **no engine**, and owns **no product policies/thresholds**. What it now ships is a zero-dep **reference implementation** distributed copy-parity like every other kit runnable, so each heir stops rebuilding the same ~300 lines from prose. An heir may copy it, or build its own against the same sealed contract; its concrete policies, thresholds, harness mapping, and state storage remain L3 — unchanged.
+
+## §6 — Fire-test protocol
+
+1. **L1 (CI, free):** `tools/policy-engine.test.mjs` — every contract clause proven on its known-bad; runs in the engine-test glob from the S1 PR on.
+2. **The golden loop:** the force-push trap run with a willfully violating agent whose commands pass through the engine — GREEN because the violation is impossible; without the engine the same intent goes RED (`golden-tasks.test.mjs` known-bad). Recorded in comms (the S1 delivery).
+3. **Manifest first-consumption (`REFERENCE-POLICY-MANIFESTS-001` §5.2):** the engine resolving the force-push NEVER from the manifest — outcome matches the prose reading. Same comms record; heirs may now be pointed at the schema.
+
+## §7 — What comes next (not this slice)
+
+- **S2:** ASK with write-withholding wired to a real approval surface + persisted session state + the PreToolUse-style hook adapter (the existing point-solution hooks in consuming repos are what it generalizes).
+- **S3:** engine counters as JSONL with OTLP-compatible field naming (seeds roadmap item 6) + first heir fire-test.
+
+---
+
+## Provenance
+
+Roadmap 2026-07-01 (chief-architect directed), item 3 — behind items 1 (golden tasks, D-050) and 2 (policy manifests, D-051). Design (5 decisions) and adoption position recorded in `docs/ai-coordination/comms/2026-07-01-HANDOFF-ITEM3-POLICY-ENGINE-DESIGN-AND-ADOPTION-POSITION.md`. Pattern prior-art: the omnigent entry of `knowledge/research/ORCHESTRATION-PRIOR-ART-2026-05-25.md` per `ADR-20260616-runtime-policy-engine` (D-009) — extract-patterns-not-dependency; no external tool adopted.
+
+**Fire-test:** vendor/agent/product/person-neutral in the normative body — the engine and its schema name no vendor, model, agent harness, or person. **Declared exceptions:** §4 names OPA/Rego (a policy-as-code *standard*, named to declare the mapping, not adopted — same class as the OTLP binding) and the wire-token family (`VIBETHINK_POLICY_MANIFEST_V1`) carries the house mark per the kit's schema-token convention. PASS with those exceptions on the record.
