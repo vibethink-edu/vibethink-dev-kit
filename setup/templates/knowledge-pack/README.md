@@ -22,6 +22,10 @@ Accepted Knowledge Baseline only after human/principal validation.
 7. Refresh the declared KDD memory indexes and write the freshness manifest with
    `tools/kdd-refresh.mjs`.
 
+`lapsed` and `stale-by-pivot` are health conditions, not `status:` values. Keep
+`status: accepted` for an accepted pack and let the repo's KDD status surface compute
+whether the pack is lapsed or blocked by a declared business pivot.
+
 ## Required Files
 
 - `PACK-METADATA.md`

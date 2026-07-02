@@ -183,6 +183,22 @@ test("accepted pack without validator → RED", () => {
   assert.match(out, /accepted without validator/);
 });
 
+test("computed health conditions are not persisted lifecycle statuses → RED", () => {
+  for (const status of ["lapsed", "stale-by-pivot"]) {
+    const dir = makeDir();
+    validPack(dir);
+    validFeature(dir);
+    write(
+      dir,
+      "docs/knowledge/customer-ops-v1/PACK-METADATA.md",
+      `# Customer Ops Knowledge Pack\nstatus: ${status}\nvalidator: Principal Architect\n`
+    );
+    const { code, out } = run(dir);
+    assert.equal(code, 1, out);
+    assert.match(out, /invalid status/);
+  }
+});
+
 test("open question missing owner/status → RED", () => {
   const dir = makeDir();
   validPack(dir);

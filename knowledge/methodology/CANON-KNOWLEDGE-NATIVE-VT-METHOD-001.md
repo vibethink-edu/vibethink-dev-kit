@@ -10,6 +10,9 @@
 > (baseline validity, business-pivot reconstruction & status), §9.1 (KDD refresh — bringing a
 > consumer current with the spine: spine-first, owner-first, inherit-don't-rebuild, gated, declared,
 > triggered cadence).
+> **Amendment SEALED 2026-07-02 by Marcelo:** §4 / §8.2 clarification:
+> `lapsed` and `stale-by-pivot` are computed baseline-health conditions over an
+> `accepted` pack, not persisted `status:` lifecycle values.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream -> fork.
 > **Companions:** `CANON-DEVELOPMENT-PROCESS.md` (governance precedes code),
 > `VT-METHOD.md` (house L2 flow), `CANON-CONTEXT-HYGIENE.md` (context is selected
@@ -160,6 +163,16 @@ into a baseline a fresh agent can consume.
 
 An accepted pack is not canon. It binds product understanding for a scope. If it creates
 law, architecture, or policy, the relevant decision/canon/spec artifact is still required.
+
+The persisted `status:` vocabulary is exactly the five lifecycle states above. `lapsed`
+and `stale-by-pivot` are **not** persisted `status:` values. They are computed health
+conditions over an `accepted` pack:
+
+- `status: accepted` + revalidation date/window elapsed -> `lapsed` health condition;
+- `status: accepted` + declared unreconciled business pivot -> `stale-by-pivot` health condition.
+
+In other words: `accepted` names what the pack is; `lapsed` and `stale-by-pivot`
+name whether that accepted pack is currently safe to use.
 
 ## 5. Knowledge Pack Roles
 
@@ -395,10 +408,19 @@ uses three independent nets:
   reconstruction is open. The operator's at-a-glance health of the baseline; the form (`kdd status` / a
   doctor line / an endpoint) is L3 binding, the **status contract** is universal.
 
-The lifecycle states (§4) gain two transitions: `accepted → lapsed` (TTL) and `accepted →
-stale-by-pivot` (declared business change); both route back through the Reconstruction Sprint (§3) to
-`accepted`. Neither hash-freshness (§8.1) nor these checks can prove a baseline is *true* — only that
-it has not lapsed and no pivot is pending; truth remains a human acceptance.
+The lifecycle state (§4) remains `accepted` while these health checks are evaluated. The
+health conditions are:
+
+```text
+accepted + elapsed revalidation window -> lapsed
+accepted + unreconciled declared business pivot -> stale-by-pivot
+```
+
+Both conditions route back through the Reconstruction Sprint (§3) and human/principal
+review. Resolution may re-confirm the pack as `accepted`, amend it in place, supersede it,
+or mark it `candidate` again for further reconstruction. Neither hash-freshness (§8.1) nor
+these checks can prove a baseline is *true* — only that it has not lapsed and no pivot is
+pending; truth remains a human acceptance.
 
 ## 9. L3 Binding
 
@@ -471,6 +493,8 @@ ad-hoc *"pull and hope."*
 - declared pack directories exist;
 - required artifacts exist and are non-empty;
 - a Knowledge Memory Adapter is declared for VT-METHOD use;
+- `PACK-METADATA.md` uses a valid persisted lifecycle `status:` (`raw-input`, `candidate`,
+  `accepted`, `superseded`, or `rejected`), not a computed health condition;
 - Markdown references resolve locally when they are file references;
 - open questions include owner and status;
 - feature docs marked as complex/product-shaping/AI-assisted/cross-boundary declare a
