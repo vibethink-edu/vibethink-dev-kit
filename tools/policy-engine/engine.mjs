@@ -219,7 +219,7 @@ export function evaluate(event, state, policies = []) {
  * review and MUST NOT be forced into matchers.
  *
  * enforce = { point: <§2 point or array>, verdict: <§3 verdict>,
- *             match: { pattern, tool?, captureNotInStateLabel? } }
+ *             match: { pattern, tool?, captureNotInStateLabel?, unlessStateLabel? } }
  *
  * The matcher is declarative over the action's SHAPE — never NLP at runtime.
  * `captureNotInStateLabel` makes membership mechanical: the pattern's first
@@ -227,6 +227,11 @@ export function evaluate(event, state, policies = []) {
  * the ports a repo declares); a member → ALLOW, anything else — including a
  * MISSING label — takes the rule's verdict. That absence path is deliberate
  * fail-closed (e.g. CANON-PORT-ASSIGNMENT-001 §3: no declaration → refuse).
+ * `unlessStateLabel` (S2) is the GOVERNED-EXEMPTION shape for rules whose prose
+ * declares one lawful exception (e.g. GIT-HYGIENE §7's create-only comm lane):
+ * a truthy state.labels[<label>] — set by the governed flow itself, never by the
+ * tempted agent's prose — abstains the rule; absent, the verdict applies. The
+ * label mechanizes the exception WITHOUT weakening the default (fail-closed).
  */
 export function compileManifest(manifest) {
   const policies = [];
@@ -248,12 +253,14 @@ export function compileManifest(manifest) {
       );
     const re = new RegExp(enf.match.pattern);
     const notInLabel = enf.match.captureNotInStateLabel;
+    const unlessLabel = enf.match.unlessStateLabel;
     policies.push({
       name: `${manifest.id}/${rule.id}`,
       on: points,
       verdicts: [enf.verdict, "ALLOW"],
       evaluate(ev, state) {
         if (enf.match.tool && ev.tool !== enf.match.tool) return { verdict: "ALLOW" };
+        if (unlessLabel && state?.labels?.[unlessLabel]) return { verdict: "ALLOW" };
         const m = re.exec(String(ev.content ?? ""));
         if (!m) return { verdict: "ALLOW" };
         if (notInLabel) {
