@@ -29,3 +29,40 @@
   uncertainty: when malformed > 0, the streak section carries an explicit
   upper-bound caveat. + known-bad tests both ways (annotated when malformed>0 with
   streaks; silent when clean).
+
+---
+
+## R2 — re-review @ 5b20148 (verbatim): APPROVE
+
+> VERDICT: APPROVE
+>
+> P2 — streak drop on same-session rule change → FIXED (correcto). El fix hace flush de
+> la corrida previa si ≥ streakThreshold antes de sobreescribir en el else del rule-switch.
+> Re-corrí mi repro exacto de R1 y edge cases nuevos: R/WALL×3 + DENY R/OTHER → R/WALL:3
+> reportado (antes se dropeaba) · cadena A×3,B×3,C×3 (C abierto en EOL) → los 3 flushed,
+> sin dup, sin miss · A×5 luego switch a B → 1 sola streak A length 5 (no doble conteo) ·
+> short run A×2 luego switch → nada inventado · dos paredes A separadas por ALLOW → 2
+> streaks correctas. Los 2 known-bads pedidos están.
+>
+> P3 — corrupt-join phantom streak → ANOTADO (correcto). Cotas superiores cuando
+> malformed>0, con mi repro exacto 2+corrupt+2 → 4-streak como known-bad. El rationale
+> anotar-vs-romper es sólido y está documentado en código. La anotación es la elección
+> honesta.
+>
+> Residual observado (direction-safe, NO blocker): una línea corrupta que era un DENY
+> extensor real puede enmascarar una streak (under-report), y el caveat "upper bounds"
+> solo se renderiza dentro de la sección de streaks — si la corrupción suprime todas,
+> no hay caveat. Aceptable; a lo sumo doc-only futuro.
+>
+> Focos que seguían CLEAN (sin regresión): neutralidad (funciones puras, sin
+> evaluate/state/IO) · exit codes (0 para datos, 2 solo setup). Validación re-run en
+> 5b20148: telemetry-lens 24/24 · policy-engine 22/22 · session 37/37 · manifests 32/32
+> GREEN. El hueco §8.7a de R1 (transición rule-change sin known-bad) quedó cerrado.
+>
+> Disposition R2: P2 ACCEPTED → FIXED · P3 ACCEPTED → FIXED (anotado) · residual
+> under-report enmascarado NOTED — direction-safe, no blocker. Precedente honrado:
+> como S2 (3 rondas → APPROVE), acá 2 rondas → APPROVE. GO merge en #227.
+
+**Owner disposition:** R2 APPROVE registrado; residual under-report NOTED queda declarado
+aquí como límite honesto conocido (doc-only candidate, no arranca frente). Merge ejecutado
+con el GO de Marcelo.
