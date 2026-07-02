@@ -1,10 +1,14 @@
 /**
- * policy-engine/telemetry.mjs — advisory OTLP-compatible JSONL emitter for engine
+ * policy-engine/telemetry.mjs — advisory OTLP-named local JSONL emitter for engine
  * verdicts (S3; seeds roadmap item 6, REFERENCE-POLICY-ENGINE-001 §7).
  *
- * Appends one JSON line per `evaluate()` outcome, shaped like an OTLP LogRecord
- * (field names only — no OTLP SDK, no dependency, no network export): `timeUnixNano`,
- * `severityText`, `body`, `attributes`. This is INSTRUMENTATION, not governance: it
+ * Appends one JSON line per `evaluate()` outcome, using OTLP LogRecord FIELD NAMING
+ * only (`timeUnixNano`, `severityText`, `body`, `attributes`) — it is NOT a full OTLP
+ * payload: attributes are a plain JSON object (not OTLP KeyValue/AnyValue encoding)
+ * and records are not wrapped in LogsData→ResourceLogs→ScopeLogs. No OTLP SDK, no
+ * dependency, no network export; an exporter would need a mapping step. (S3 review
+ * P3: say "OTLP-named", never "OTLP-compatible".)
+ * This is INSTRUMENTATION, not governance: it
  * exists so a later "doctor"/dashboard lens can read a plain, standard-shaped log of
  * what the engine decided — never a second source of verdicts.
  *

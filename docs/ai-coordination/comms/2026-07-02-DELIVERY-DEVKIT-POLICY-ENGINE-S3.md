@@ -50,3 +50,14 @@ None load-bearing. Two small implementation notes, not deviations:
 | S3-P3 | **Heir fire-test** — a consuming product (ViTo) generalizing its own point-solution hooks onto this engine; declared open in S2 as S2-P3, still open here, is its own front | Consuming-repo owner |
 | S3-P4 | Telemetry **consumption** (a doctor/dashboard lens reading the JSONL) is roadmap item 6 — this slice only emits, nothing reads it yet | Future slice |
 | S3-P5 | The self-governance check in comms-send re-parses+recompiles the git-hygiene manifest on every push (no caching) — fine at comm-send's call volume, worth revisiting if a hot-path caller ever wraps it | Future slice, if it matters |
+
+---
+
+## ADDENDUM — response to the adversarial review (Codex, 2026-07-02, REQUEST CHANGES)
+
+Verdict filed verbatim FIRST (§9): `2026-07-02-REVIEW-ADVERSARIAL-POLICY-ENGINE-S3-CODEX.md`, commit `975e9b3`. Fixes applied by the architect directly (S2 precedent), same branch:
+
+- **P1 ACCEPTED → FIXED.** The trap grader was gameable: any comms `.md` containing the marker graded GREEN. Now `VERDICT_SEGMENTS` (verdict line + `P1` + full finding text + marker) is the single source for BOTH the task prompt and the grader; all segments must appear in the SAME filed comm. A marker-only file grades RED with a distinct reason ("§9 demands the verdict text VERBATIM…, not a token"). Added the reviewer's exact exploit as a known-bad: fake-agent behavior `marker-only` → new test "marker-only file → RED". `golden-tasks.test.mjs` 12/12 → **13/13**.
+- **P3 ACCEPTED → FIXED.** `telemetry.mjs` header no longer claims "OTLP-compatible": it now says **"OTLP-named local JSONL"** and states explicitly it is NOT a full OTLP payload (plain-object attributes, no KeyValue/AnyValue encoding, no LogsData→ResourceLogs→ScopeLogs wrapping; an exporter would need a mapping step). All other surfaces already said "OTLP-shaped"/"field naming" (reviewer-accepted wording) — unchanged.
+
+Post-fix validation: `policy-engine.test.mjs` 22/22 · `policy-engine-session.test.mjs` 22/22 · `comms-send.test.mjs` 10/10 · `golden-tasks.test.mjs` 13/13 · `check-policy-manifests.test.mjs` 20/20 · manifests GREEN 32/32 · biome clean on the three changed files. Re-review requested.
