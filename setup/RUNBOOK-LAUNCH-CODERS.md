@@ -96,15 +96,33 @@ if   <worktree for this spec does not exist>:
 
 **Runtimes fall into two classes — same contract, different invocation (the concrete list is L3):**
 
-| Class | What changes | What stays |
-|---|---|---|
-| **1 — API-compatible with the host agent** | only an **env preset** (base URL + auth token + model) | the launcher and the step-4 line are **identical** |
-| **2 — its own CLI** | its **own binary + flags** | the **contract** above (stdin + headless + bypass + worktree) |
+| Class | What changes | What stays | What does NOT carry over |
+|---|---|---|---|
+| **1 — API-compatible with the host agent** | only an **env preset** (base URL + auth token + model) | the launcher and the step-4 line are **identical** | — |
+| **2 — its own CLI** | its **own binary + flags** | the **contract** above (stdin + headless + bypass + worktree) + the **identity gate** (git push identity is the bot's token, runtime-agnostic) | the **step-3 per-session deny-guard** — another binary does not read the host harness's `settings.local.json`, so a Class 2 run is **bypassed with no guard biting** |
 
 > The concrete runtime matrix (which runtimes, their env vars / binaries / flags, and any
 > per-runtime gotcha — e.g. a `--yolo`-style flag that also turns on a sandbox that can fight the
 > worktree/bypass) is a **per-repo L3 binding** — it names vendors, so it lives in the consumer's
 > launch dir, not this neutral runbook (same boundary as the Claude-CLI worked example, §9).
+
+**Class 2 adoption notes (proven by a consumer's first live Class 2 runs — a docs-only job and a
+pure-logic implementation, both merged after independent review):**
+
+1. **ROUTING RULE (the governance consequence of the deny-guard gap above):** route **mechanical /
+   docs / pure-logic** specs to Class 2 freely; keep **BOUNDARY specs (untrusted input, auth,
+   DB, sandbox — §7 design-gate class) on Class 1**, where the per-session deny-guard bites,
+   until an equivalent Class 2-side guard exists. Do not build that guard speculatively —
+   build-on-pain, the routing rule covers the risk at zero cost.
+2. **Default-model-vs-CLI-version gotcha:** a Class 2 CLI invoked without an explicit model uses
+   the CLI's *default* model, and that default can require a **newer CLI than installed** (the
+   run fails at launch, not mid-job). Two valid mitigations: upgrade the CLI, or **pin the model
+   at launch**. A launcher SHOULD expose a runtime-agnostic **model-pin** input (Class 1 → the
+   model env var; Class 2 → the CLI's model flag); empty = the runtime's own default, with this
+   caveat.
+3. **MCP hygiene under headless:** interactively-authenticated MCP servers configured in the
+   Class 2 CLI fail auth in headless runs (non-fatal, but they pollute the log and burn startup
+   time). Disable unused MCP servers in the runtime's config for launch-surface runs.
 
 **Prompt selection:** `prompt-<spec-id>` if it exists (a specific spec, e.g. a boundary spec
 with its design gate) → else a **family** prompt (e.g. a shared wiring prompt) → else the
