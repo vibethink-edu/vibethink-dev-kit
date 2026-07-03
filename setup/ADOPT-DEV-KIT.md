@@ -1337,6 +1337,39 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 50 — Agent-native surface contract (dual doors + delegation + fixtures) (universal reference)
+
+**Layer:** L1 reference (neutral).  
+**Home:** `knowledge/methodology/REFERENCE-AGENT-NATIVE-SURFACE-CONTRACT-001.md`.  
+**Authority:** `knowledge/methodology/CANON-DEVELOPMENT-PROCESS.md` §8.1 and §8.2.
+
+- **Qué:** the practical implementation shape for dual-surface capabilities:
+  one capability registry, one human projection, one programmatic projection,
+  a delegated actor handle, a versioned runtime envelope, shared conformance
+  fixtures, a tool-provider surface, and an independent human verification
+  surface. It does **not** add a new rule; it makes §8.1 buildable.
+- **Cómo:**
+  - Doc **by reference** — your L3 rules point to the reference when a capability
+    is agent-operated or agent-facing.
+  - Declare where your capability registry lives and how it projects to GUI and
+    API/tool/workflow.
+  - Use an opaque, short-lived, server-minted delegated actor handle instead of
+    giving an agent raw user or service credentials.
+  - Use a schema-validated runtime envelope and import the same fixtures in
+    producer and consumer tests.
+  - Keep mutation-class work governed: idempotency, provenance, dry-run/propose
+    where needed, and typed errors.
+- **Verificar:**
+  - A recent agent-operated capability has both a GUI smoke and a programmatic
+    happy path.
+  - Negative tests prove auth-first and scope-first behavior.
+  - The producer and consumer parse the same runtime envelope fixture.
+  - A mutation-class operation records provenance and can be independently
+    verified by the governing human.
+  - The reference names no product, vendor, model, framework, or domain.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
@@ -1388,6 +1421,7 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 46 | Launch your first coder (dispatch on-ramp) | ADOPTED / PENDING / N-A(no coders) | launch script + readiness config + prompt template + §3.1 routing |
 | 48 | UI preference persistence | ADOPTED / PENDING / N-A(no UI prefs) | client preference helper + namespace + hydration pattern |
 | 49 | KDD / Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate + freshness manifest |
+| 50 | Agent-native surface contract | ADOPTED / ADOPTED-NATIVE / PENDING / N-A(no agent-operated capabilities) | capability registry + delegated actor handle + envelope fixtures + conformance tests |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.
