@@ -88,10 +88,20 @@ try {
   const toolInput = input.tool_input;
   // The action's content: a shell-ish tool contributes its command line; anything
   // else is matched against its serialized input (declarative shape, never NLP).
+  // For structured input we normalize backslashes to forward slashes AS WE SERIALIZE
+  // (a replacer on each string value, before JSON escaping). Without this, a Windows
+  // `file_path` (e.g. a Write/Edit to `repo\.github\workflows\ci.yml`) reaches the
+  // matchers with its separators kept as backslashes — and path-shaped rules written
+  // `[/\\]` (one separator) miss them, letting Write/Edit slip past NEVER-TOUCH-LAW /
+  // tamper-CI / destroy-evidence on Windows while the SAME path via a Bash command
+  // (which uses `/`) is denied. Forward slashes make both planes match identically on
+  // every OS. (F-B8, surfaced by the WorkBench L3 Battle 3 live fire-test.)
+  const normalizePathSeparators = (_key, value) =>
+    typeof value === "string" ? value.replace(/\\/g, "/") : value;
   const content =
     typeof toolInput === "string"
       ? toolInput
-      : (toolInput?.command ?? JSON.stringify(toolInput ?? {}));
+      : (toolInput?.command ?? JSON.stringify(toolInput ?? {}, normalizePathSeparators));
   const tool = /bash|shell|powershell|terminal/i.test(toolName) ? "bash" : toolName.toLowerCase();
   const grants = Object.fromEntries(flags("--grant").map((g) => [g, true]));
   const event = {

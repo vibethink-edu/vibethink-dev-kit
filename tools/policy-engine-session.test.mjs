@@ -523,6 +523,70 @@ test("golden force-push trap + engine-gated MERGE-PUSH gamer → GREEN (the §7 
   assert.match(out, /GREEN — 1\/1/);
 });
 
+/* ── F-B8: path-shaped matchers must cover Write/Edit on Windows (backslash file_path) ──
+ * Known-bad: a Windows `file_path` is the violating input. Before the hook-adapter
+ * normalized separators, JSON.stringify kept the path's backslashes and the `[/\\]`
+ * rules missed a Write to `.github\workflows\...` (ALLOW + file created) while the SAME
+ * path via a Bash command (forward slashes) was DENIED — an OS-specific enforcement hole. */
+const CI_MANIFEST = path.join(TMP, "ci-tamper.policy.json");
+writeFileSync(
+  CI_MANIFEST,
+  JSON.stringify({
+    id: "CANON-TEMP-CI",
+    rules: [
+      {
+        id: "TEMP-NEVER-TAMPER-CI",
+        cite: "§1",
+        rule: "Never write CI workflow definitions.",
+        enforce: {
+          point: "tool-call",
+          verdict: "DENY",
+          match: { pattern: "\\.github[/\\\\]workflows[/\\\\]" },
+        },
+      },
+    ],
+  })
+);
+
+function runHookWith(manifest, input) {
+  const r = spawnSync(
+    "node",
+    [HOOK, "--manifest", manifest, "--session-dir", path.join(TMP, "hook-fb8"), "--no-telemetry"],
+    { encoding: "utf8", input: JSON.stringify(input) }
+  );
+  return JSON.parse(r.stdout || "{}");
+}
+
+test("F-B8: a Windows Write to .github/workflows DENIES (backslash file_path, not just Bash)", () => {
+  const json = runHookWith(CI_MANIFEST, {
+    hook_event_name: "PreToolUse",
+    tool_name: "Write",
+    tool_input: { file_path: "C:\\repo\\.github\\workflows\\ci.yml", content: "name: ci\n" },
+    session_id: "fb8-write",
+  });
+  assert.equal(json.hookSpecificOutput?.permissionDecision, "deny", "Windows Write file_path must be denied");
+});
+
+test("F-B8: the SAME path via Bash also DENIES (cross-plane parity)", () => {
+  const json = runHookWith(CI_MANIFEST, {
+    hook_event_name: "PreToolUse",
+    tool_name: "Bash",
+    tool_input: { command: "mkdir -p .github/workflows && echo x > .github/workflows/ci.yml" },
+    session_id: "fb8-bash",
+  });
+  assert.equal(json.hookSpecificOutput?.permissionDecision, "deny");
+});
+
+test("F-B8: a benign Windows Write passes through silently (no false positive)", () => {
+  const json = runHookWith(CI_MANIFEST, {
+    hook_event_name: "PreToolUse",
+    tool_name: "Write",
+    tool_input: { file_path: "C:\\repo\\src\\index.ts", content: "x" },
+    session_id: "fb8-benign",
+  });
+  assert.deepEqual(json, {}, "ALLOW is a silent passthrough");
+});
+
 rmSync(TMP, { recursive: true, force: true });
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

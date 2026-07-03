@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-07-03
+
+### Fixed
+- **Policy engine hook-adapter — path-shaped matchers now cover `Write`/`Edit` on Windows (F-B8).**
+  The adapter serialized structured `tool_input` with `JSON.stringify`, which keeps a Windows
+  `file_path`'s separators as backslashes; path rules written `[/\\]` (one separator) missed them,
+  so a `Write` to `.github\workflows\...` (or `scripts\policy-engine\...`, evidence paths, …) slipped
+  past NEVER-TOUCH-LAW / tamper-CI / destroy-evidence on Windows, while the SAME path via a Bash
+  command (forward slashes) was denied. The adapter now normalizes backslashes to `/` as it serializes
+  (a replacer on each string value, preserving other JSON escapes), so both planes match identically on
+  every OS. New fire-tests in `tools/policy-engine-session.test.mjs` (Windows Write → DENY · Bash parity ·
+  benign Write passthrough). Surfaced by the WorkBench L3 Battle 3 live fire-test (`FINDING-DEVKIT-POLICY-MATCHER-WINDOWS-WRITE-EDIT-GAP-2026-07-03`).
+
 ## 2026-06-29
 
 ### Added
