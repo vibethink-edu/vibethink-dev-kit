@@ -80,7 +80,7 @@ Ids only; each is one-shot, evidence-contracted, actionable-close. The **prompt 
 | **git** | `git-scope` (separate scopes) · `git-precommit` (audit, no commit) · `git-commit` (one clean scope) · `git-pushready` (ready to travel?) · `owner` (whose branch/worktree before touching) |
 | **ci** | `ci-status` · `ci-triage` (first real error) · `ci-cost` (are we burning time/tokens?) · `ci-rerun` (justified rerun only) |
 | **task** | `task-size` (path/class/gates) · `task-status` · `coder-needed` (executor routing) |
-| **handoff** | `handoff-full` (route + prepare) · `handoff-local` (shared lane) · `handoff-ext` (external/GitHub) · `finding` (governed out-of-scope finding) |
+| **handoff** | `handoff-full` (route + prepare) · `handoff-local` (shared lane; consumes declared closeout state, recommends `session-close` first when state is unclear) · `handoff-ext` (external/GitHub) · `finding` (governed out-of-scope finding) |
 | **review** | `review-ready` (is a surface ready for human review?) |
 | **context** | `bootstrap` (cold entry: read the bootstrap family) · `chat-weight` (is this session too heavy? — triage) · `chat-handoff` (roll to a fresh session: emit a self-contained re-entry block to paste into a new chat) |
 | **meta** | `commands-help` (list) · `ops-sync` (§5) |
@@ -96,6 +96,7 @@ Product-specific commands (a kit-refresh trigger, knowledge-index freshness, pro
 Flows are written with **command ids only** — that keeps them agnostic (the ids are L1; the concrete bodies are L3). They show how commands compose, not what they invoke.
 
 - **Session start → work → close:** `repo-morning` → (`git-scope` if dirty & yours) → … → `session-close`.
+- **Close then hand off:** `session-close` → `handoff-local`. `handoff-local` should not perform cleanup itself; it consumes the declared closeout state or recommends running `session-close` first.
 - **Ship one change:** `git-scope` → `git-precommit` → `git-commit` → `git-pushready`.
 - **CI is red:** `ci-status` → `ci-triage` → (`ci-cost` if stuck looping) → `ci-rerun` *only if justified*.
 - **Route a task:** `task-size` → `coder-needed` → (if delegating) `handoff-full`.
