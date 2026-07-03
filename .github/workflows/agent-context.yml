@@ -17,8 +17,16 @@ name: agent-context
 #     here (forks consume identical code — re-testing it N times is waste).
 
 on:
+  # Restricted to the default branch (CI-cost hygiene): a bare `push:`/`pull_request:`
+  # ran this on every push to EVERY feature branch AND again on the PR — a double run
+  # per commit. `pull_request` (targets master) covers the branch before merge; `push`
+  # to master covers direct pushes post-merge. Same fix ViTo applied to copy-parity /
+  # skills-catalog (2026-06-30). The `workflow_call` interface BELOW is untouched — forks
+  # consume this reusably via `uses: .../agent-context.yml@master`, independent of these.
   push:
+    branches: [master]
   pull_request:
+    branches: [master]
   workflow_dispatch:
     inputs:
       golden-agent:
@@ -58,6 +66,11 @@ on:
 
 env:
   KIT_REPO: vibethink-edu/vibethink-dev-kit
+
+# Superseded runs on the same ref cancel each other (rapid pushes don't pile up).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   smoke:
