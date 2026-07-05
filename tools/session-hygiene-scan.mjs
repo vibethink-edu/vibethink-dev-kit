@@ -60,10 +60,11 @@ function parseWorktreeList(porcelain) {
   //   HEAD <sha>
   //   branch refs/heads/<name>   (or 'detached')
   //   bare                       (for bare repos)
+  //   locked [<reason>]           (present when the worktree is locked; reason optional)
   const blocks = porcelain.split(/\r?\n\r?\n/).filter(Boolean);
   const worktrees = [];
   for (const block of blocks) {
-    const wt = { path: "", head: "", branch: "", detached: false, bare: false };
+    const wt = { path: "", head: "", branch: "", detached: false, bare: false, locked: false, lockReason: "" };
     for (const line of block.split(/\r?\n/)) {
       if (line.startsWith("worktree ")) wt.path = line.slice("worktree ".length);
       else if (line.startsWith("HEAD ")) wt.head = line.slice("HEAD ".length);
@@ -72,14 +73,31 @@ function parseWorktreeList(porcelain) {
         wt.branch = ref.replace(/^refs\/heads\//, "");
       } else if (line === "detached") wt.detached = true;
       else if (line === "bare") wt.bare = true;
+      else if (line === "locked" || line.startsWith("locked ")) {
+        wt.locked = true;
+        wt.lockReason = line === "locked" ? "" : line.slice("locked ".length);
+      }
     }
     if (wt.path) worktrees.push(wt);
   }
   return worktrees;
 }
 
+// A create-time lock reason: `git worktree add` sets `initializing` while it populates
+// the worktree; if the add is interrupted the lock is never cleared, leaving a
+// registered-but-half-created worktree (CANON-BRANCH-WORKTREE-LIFECYCLE §5.4 —
+// interrupted-create heal). Matched loosely so a launcher's own create-time reason
+// (e.g. "initializing", "creating", "add-in-progress") is caught too.
+const CREATE_LOCK_RE = /^(initializ|creat|add-in-progress)/i;
+
 function inspect(wt, today) {
   if (wt.bare) return { wt, kind: "skip", reason: "bare" };
+
+  // Interrupted-create heal candidate: checked BEFORE `git status`, which a locked
+  // mid-create worktree may not answer cleanly. Heal = unlock → remove → recreate fresh.
+  if (wt.locked && CREATE_LOCK_RE.test(wt.lockReason)) {
+    return { wt, kind: "locked-initializing", reason: `locked mid-create (${wt.lockReason || "no reason"}) — heal: unlock, remove, recreate fresh` };
+  }
 
   const status = git(wt.path, "status", "--porcelain");
   const uncommittedCount = status ? status.split(/\r?\n/).filter(Boolean).length : 0;
@@ -212,6 +230,7 @@ function main() {
       current: results.filter((r) => r.kind === "current").length,
       clean: results.filter((r) => r.kind === "clean").length,
       localOnly: results.filter((r) => r.kind === "local-only").length,
+      lockedInitializing: results.filter((r) => r.kind === "locked-initializing").length,
       squashMergedBranches: squashMerged,
       results,
     };
@@ -220,11 +239,13 @@ function main() {
     console.log(`\nsession-hygiene-scan (CANON-MULTI-AGENT-ORCHESTRATION §2.2)`);
     console.log(`today: ${today}  ·  worktrees: ${results.length}\n`);
     for (const r of results) {
-      const mark = r.kind === "stale" ? "✗" : r.kind === "local-only" ? "⚠" : r.kind === "current" ? "·" : r.kind === "skip" ? "–" : "✓";
+      const mark = r.kind === "stale" || r.kind === "locked-initializing" ? "✗" : r.kind === "local-only" ? "⚠" : r.kind === "current" ? "·" : r.kind === "skip" ? "–" : "✓";
       const label = r.wt.branch || (r.wt.detached ? "(detached)" : "(no branch)");
       const detail =
         r.kind === "stale"
           ? `STALE — uncommitted=${r.uncommittedCount}, unpushed=${r.unpushedCount}, ${r.reason}`
+          : r.kind === "locked-initializing"
+            ? `LOCKED-INITIALIZING — ${r.reason}`
           : r.kind === "local-only"
             ? `local-only — ${r.reason}`
           : r.kind === "current"
@@ -250,12 +271,26 @@ function main() {
           `Not RED, but it has not travelled; set an upstream and push before relying on it.\n`,
       );
     }
+    const lockedInit = results.filter((r) => r.kind === "locked-initializing");
+    if (lockedInit.length > 0) {
+      console.log(
+        `✗ ${lockedInit.length} worktree(s) LOCKED mid-create (§5.4 interrupted-create heal) — an interrupted \`worktree add\` ` +
+          `left them registered-but-locked; they can block a new task on the same slot. Heal (never preserve):`,
+      );
+      for (const r of lockedInit)
+        console.log(`    git worktree unlock "${r.wt.path}" && git worktree remove --force "${r.wt.path}"   # then recreate fresh`);
+      console.log("");
+    }
     const stale = results.filter((r) => r.kind === "stale");
-    if (stale.length === 0) {
+    const needsAction = stale.length + lockedInit.length;
+    if (needsAction === 0) {
       console.log("GREEN — no stale WIP. (Same-day WIP is allowed; close it in PUSHED / READY-PR / DISCARDED before ending the session — canon §2.2.)\n");
       process.exit(0);
     } else {
-      console.log(`RED — ${stale.length} worktree(s) with stale WIP. Rescue, push, or discard them before continuing. The scan does not mutate the worktree, refs, or branches.\n`);
+      const parts = [];
+      if (stale.length) parts.push(`${stale.length} with stale WIP`);
+      if (lockedInit.length) parts.push(`${lockedInit.length} locked mid-create`);
+      console.log(`RED — ${parts.join(" + ")}. Rescue/push/discard the stale ones; heal the locked ones. The scan does not mutate the worktree, refs, or branches.\n`);
       process.exit(1);
     }
   }

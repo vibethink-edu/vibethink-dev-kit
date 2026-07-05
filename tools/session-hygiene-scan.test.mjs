@@ -199,5 +199,38 @@ test("unmerged branch → NOT listed (no false positive)", () => {
   );
 });
 
+// ── interrupted-create heal (§5.4 Amendment 2026-07-05) ─────────────────────
+// happy path: a worktree left locked mid-create is a heal candidate, RED + exit 1.
+test("worktree locked mid-create ('initializing') → '✗ LOCKED-INITIALIZING' + exit 1 (heal candidate)", () => {
+  const { code, out } = runScan((dir) => {
+    fs.writeFileSync(path.join(dir, "README.md"), "# repo\n");
+    gitCommit(dir, "init", isoDaysAgo(0));
+    const wtPath = path.join(dir, "wt-stuck");
+    execFileSync("git", ["worktree", "add", "-q", "--detach", wtPath], { cwd: dir });
+    execFileSync("git", ["worktree", "lock", "--reason", "initializing", wtPath], { cwd: dir });
+  });
+  assert.match(out, /LOCKED-INITIALIZING/, "must flag a worktree locked mid-create");
+  assert.match(out, /RED/, "locked mid-create is RED (blocks a new task on the slot)");
+  assert.equal(code, 1, "locked mid-create → exit 1");
+});
+
+// failure mode: a worktree DELIBERATELY locked with a non-create reason must NOT be
+// treated as a heal candidate (the matcher must not over-match and propose removing
+// a worktree a human locked on purpose).
+test("KNOWN-BAD: worktree locked with a non-create reason → NOT a heal candidate (lockedInitializing=0)", () => {
+  const parsed = scanJson((dir) => {
+    fs.writeFileSync(path.join(dir, "README.md"), "# repo\n");
+    gitCommit(dir, "init", isoDaysAgo(0));
+    const wtPath = path.join(dir, "wt-held");
+    execFileSync("git", ["worktree", "add", "-q", "--detach", wtPath], { cwd: dir });
+    execFileSync("git", ["worktree", "lock", "--reason", "external drive — do not touch", wtPath], { cwd: dir });
+  });
+  assert.equal(
+    parsed.lockedInitializing,
+    0,
+    "a deliberately-locked worktree (non-create reason) must NOT be flagged as locked-initializing",
+  );
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);
