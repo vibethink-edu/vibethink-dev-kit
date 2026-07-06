@@ -37,7 +37,7 @@ flowchart LR
     CANON_GAP_REPORT["#28 gap report"]
     CANON_GIT_HYGIENE["#22 git hygiene"]
     CANON_HUMAN_SURFACE_LEGIBILITY_001["#39 human surface legibility"]
-    CANON_IDENTITY_PROVISIONING_INTEGRITY_001["identity provisioning integrity"]
+    CANON_IDENTITY_PROVISIONING_INTEGRITY_001["#51 identity provisioning integrity"]
     CANON_KNOWLEDGE_NATIVE_VT_METHOD_001["#49 knowledge native vt method"]
     CANON_NAMING_CONVENTIONS_001["#13 naming conventions"]
     CANON_PORT_ASSIGNMENT_001["#41 port assignment"]

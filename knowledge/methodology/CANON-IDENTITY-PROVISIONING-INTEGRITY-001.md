@@ -1,7 +1,7 @@
 # CANON-IDENTITY-PROVISIONING-INTEGRITY-001 — Multi-source identity must be provisioned atomically and drift-checked (universal · agent-agnostic)
 
 > **Scope:** every system whose authorization for a principal (a human operator, a service account, an admin) is derived from **two or more identity/role sources that are provisioned separately** — e.g. one store answers "who is this" and another answers "what may they do", or two role stores are consulted by two different guards. Vendor-neutral, product-neutral, engine-neutral, storage-neutral.
-> **Status:** DRAFT — pending Principal Architect seal.
+> **Status:** SEALED 2026-07-06 by the Principal Architect (Rule #4 — approval given, after three independent adversarial validation rounds). Binding.
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Siblings:** `CANON-CODER-SAFE-IDENTITY-001` (the *executor/bot* identity that pushes code — a different layer: execution provenance, not principal authorization) · `CANON-DB-SECURITY-BASELINE-001` (the Postgres/PostgREST *data-plane* floor — engine-specific; this canon is the **application-layer** principal-authorization complement, engine-agnostic) · `CANON-DATA-CHANGE-AUDIT-001` (governs the audited mutation this canon's provisioning is an instance of).
 
@@ -75,4 +75,4 @@ Of the two failure directions, **lockout is the one a hardening change actively 
 
 **Fire-test:** the normative body (§1–§7) names no vendor, product, engine, agent, or person.
 
-**Status:** DRAFT pending the Principal Architect's seal (Rule #4). On seal: catalog-sync exemption removed and the piece registered as adoptable.
+**Status:** SEALED 2026-07-06 by the Principal Architect (Rule #4). Validated across three independent adversarial rounds (REQUEST-CHANGES → narrow REQUEST-CHANGES → APPROVE; records in `doc/REVIEW-ADVERSARIAL-*-CANON-IDENTITY-PROVISIONING-INTEGRITY-2026-07-06.md`). Registered as adoptable piece #51; catalog-sync exemption removed on seal.

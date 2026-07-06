@@ -21,10 +21,6 @@
     {
       "file": "knowledge/ai-agents/CANON-COMM-INTERNAL-VS-EXTERNAL-001.md",
       "reason": "DRAFT pending Principal Architect seal. The internal/external communication axis is proposed agnostic doctrine, but is not yet an adoptable piece; catalog registration waits for the seal. Until then it must not block the catalog of adoptable pieces — but it is not silently absent either."
-    },
-    {
-      "file": "knowledge/methodology/CANON-IDENTITY-PROVISIONING-INTEGRITY-001.md",
-      "reason": "DRAFT pending Principal Architect seal (D-060, supra-lift from a ViTo consumer finding: multi-source identity → atomic provisioning + mandatory drift-check; drift is a lockout risk). Spine-coverage checked before lift — not covered by CODER-SAFE-IDENTITY (executor/bot identity) or DB-SECURITY-BASELINE (Postgres data plane); this is the engine-agnostic application-layer complement. Not yet an adoptable piece; catalog registration + inheritance-status row wait for the seal (governance numbering is the architect's call). Until then it must not block the catalog of adoptable pieces — but it is not silently absent either."
     }
   ],
   "statusTokens": [
