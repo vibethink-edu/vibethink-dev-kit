@@ -1370,6 +1370,42 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 51 — Identity provisioning integrity (multi-source → atomic + drift-check) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-IDENTITY-PROVISIONING-INTEGRITY-001.md`.
+
+- **Qué:** when a principal's authorization is assembled from **two or more identity/role
+  sources provisioned separately**, those sources are one logical fact split across stores.
+  If they diverge — a principal present/active in one and absent/inactive in another, or
+  carrying a different authority level in each — that is **drift**, a security fault whose
+  most dangerous direction is **lockout of a legitimate principal** when a guard is hardened
+  to read the stricter source. Requires **(a) atomic provisioning** of all sources and
+  **(b) a mandatory read-only drift-check** that gates any change to which source a guard
+  consults and runs periodically.
+- **Cómo:**
+  - Doc **by reference** — your `AGENTS.md` points to the canon.
+  - **Mechanism is L3** — declare the concrete sources and which guard reads which; the
+    drift-check wired to real store names (per-pair, observational on an intended-complete
+    pair, intent-record-bounded only on a declared-sparse direction); the role-equivalence
+    mapping between the two vocabularies (or an explicit attribute-incomparable declaration);
+    where provisioning happens and how atomicity is realized; the remediation authority.
+  - Where the change cadence warrants, wire the drift-check as a **regression gate** so a
+    guard-narrowing PR cannot merge with open drift (the `CANON-AUDIT-PROTOCOL §8.7`
+    known-bad discipline applies to that gate).
+  - A system with a **single** identity/role source marks this `N-A(single-identity-source)`.
+- **Verificar:**
+  - A change that alters which identity source a guard consults is preceded by a clean
+    drift-check over the co-provisioned population; the check is observational on an
+    intended-complete pair (it sees a rogue-/legacy-provisioned principal, not only the
+    atomically-provisioned ones).
+  - Provisioning writes all sources as one governed unit, or a governed sequence that
+    verifies all sides landed and treats a partial write as a failure.
+  - The canon names no store, engine, IdP, product, or vocabulary (fire-test); concrete
+    tables and role enums are L3.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
