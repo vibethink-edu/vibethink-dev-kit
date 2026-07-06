@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 42 spines · 96 declared relationships.
+> 43 spines · 99 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -37,6 +37,7 @@ flowchart LR
     CANON_GAP_REPORT["#28 gap report"]
     CANON_GIT_HYGIENE["#22 git hygiene"]
     CANON_HUMAN_SURFACE_LEGIBILITY_001["#39 human surface legibility"]
+    CANON_IDENTITY_PROVISIONING_INTEGRITY_001["identity provisioning integrity"]
     CANON_KNOWLEDGE_NATIVE_VT_METHOD_001["#49 knowledge native vt method"]
     CANON_NAMING_CONVENTIONS_001["#13 naming conventions"]
     CANON_PORT_ASSIGNMENT_001["#41 port assignment"]
@@ -122,6 +123,9 @@ flowchart LR
   CANON_HUMAN_SURFACE_LEGIBILITY_001 --- CANON_MULTI_AGENT_ORCHESTRATION
   CANON_HUMAN_SURFACE_LEGIBILITY_001 --- CANON_CONTEXT_HYGIENE
   CANON_HUMAN_SURFACE_LEGIBILITY_001 --- CANON_AUDIT_PROTOCOL
+  CANON_IDENTITY_PROVISIONING_INTEGRITY_001 --- CANON_CODER_SAFE_IDENTITY_001
+  CANON_IDENTITY_PROVISIONING_INTEGRITY_001 --- CANON_DB_SECURITY_BASELINE_001
+  CANON_IDENTITY_PROVISIONING_INTEGRITY_001 --- CANON_DATA_CHANGE_AUDIT_001
   CANON_KNOWLEDGE_NATIVE_VT_METHOD_001 --- VT_METHOD
   CANON_KNOWLEDGE_NATIVE_VT_METHOD_001 --- CANON_DEVELOPMENT_PROCESS
   CANON_KNOWLEDGE_NATIVE_VT_METHOD_001 --- CANON_CONTEXT_HYGIENE
