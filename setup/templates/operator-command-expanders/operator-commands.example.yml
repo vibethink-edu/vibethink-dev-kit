@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/espanso/espanso/dev/schemas/match.schema.json
 #
-# EXAMPLE Espanso adapter — an 11-command DEMO, NOT the baseline.
+# EXAMPLE Espanso adapter — a 12-command DEMO, NOT the baseline.
 # ⚠ Do NOT sync against this file: the full command set + rules live in
 #   REFERENCE-OPERATOR-COMMAND-CATALOG §4 (the source of truth). ops-sync reconciles
 #   against the CATALOG — comparing your local adapter to this demo is meaningless.
@@ -44,6 +44,9 @@ matches:
     replace: "{{preamble}} Prepare/create a LOCAL handoff on the repo's shared channel. Verify repo, branch, worktree, ownership, git state, real recipient. Before generating the handoff, decide whether the state is already declared; if not, recommend running :session-close first. Do not clean up inside the handoff; consume declared closeout evidence when it exists. Use the governed send tool if present; else write the comm with first-line front matter + flat fields. Commit/push if there is a remote and verify the recipient's routing; if no remote, allow only COMMITTED-LOCAL with a warning. Body: objective, verified state + evidence, artifacts, gates run, pending decisions, read-first, not-included, closing state, next action. Close with RECOMMENDATION."
   - trigger: ":finding"
     replace: "{{preamble}} You found an anomaly/risk/opportunity OUTSIDE your scope: file a governed FINDING instead of fixing it. Classify the category (SECURITY, DATABASE, ARCHITECTURE, PERFORMANCE, CONFIG-SURFACE, ALTERNATIVE, or a repo category). State WHAT, WHERE (file+line), WHY it matters, and SUGGESTED ACTION (INVESTIGATE | FIX | CONSULT-EXPERT | TRY-PLAN-B | ESCALATE-TO-ARCHITECT). Use the governed channel if present; SECURITY + ESCALATE go to the authority immediately. Close with RECOMMENDATION."
+  # ── dk (dev-kit currency) ────────────────────────────────────────────────
+  - trigger: ":dk-refresh"
+    replace: "{{preamble}} Refresh the dev-kit in THIS session WITHOUT restarting it. Run the dev-kit upgrade tool (`node <your-dev-kit-path>/tools/devkit-upgrade.mjs`) — it fast-forward-pulls the kit and prints the CANON-DELTA (the D-rows / canons changed since this session's last pull). Then RE-READ the flagged canons before continuing: the kit is inherited BY REFERENCE, so 'refresh' means re-read, not re-install. Report EXECUTED pull result, the canon-delta list, which canons you re-read, and confirm you are now operating on the current rules. Close with RECOMMENDATION."
   # ── meta ─────────────────────────────────────────────────────────────────
   - trigger: ":ops-sync"
     replace: "{{preamble}} Read the dev-kit operator command catalog (REFERENCE-OPERATOR-COMMAND-CATALOG) and create/update my command expander ADDITIVELY. Detect my expander (Espanso / VS Code / other) or ask. Do NOT delete or replace my existing snippets; on a trigger clash, report it and propose an alias; validate prefix-safety (no trigger an exact prefix of another) before writing; generate valid files for my tool and validate it can load them (restart + read the log if available). Report evidence — files created/edited, triggers added, conflicts — and how to test :commands-help. Close with RECOMMENDATION."
