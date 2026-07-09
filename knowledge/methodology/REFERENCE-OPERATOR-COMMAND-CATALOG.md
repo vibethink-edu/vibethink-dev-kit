@@ -83,9 +83,10 @@ Ids only; each is one-shot, evidence-contracted, actionable-close. The **prompt 
 | **handoff** | `handoff-full` (route + prepare) · `handoff-local` (shared lane; consumes declared closeout state, recommends `session-close` first when state is unclear) · `handoff-ext` (external/GitHub) · `finding` (governed out-of-scope finding) |
 | **review** | `review-ready` (is a surface ready for human review?) |
 | **context** | `bootstrap` (cold entry: read the bootstrap family) · `chat-weight` (is this session too heavy? — triage) · `chat-handoff` (roll to a fresh session: emit a self-contained re-entry block to paste into a new chat) |
+| **dk** | `dk-refresh` (fast-forward-pull the kit + print the canon-delta, then re-read the flagged canons — refresh a running session WITHOUT restarting it; the content sibling of `ops-sync`) |
 | **meta** | `commands-help` (list) · `ops-sync` (§5) |
 
-Product-specific commands (a kit-refresh trigger, knowledge-index freshness, product schema checks) are **L3 extensions**, not part of this core.
+Product-specific commands (knowledge-index freshness, product schema checks) are **L3 extensions**, not part of this core. *(`dk-refresh` is core, not L3: refreshing the kit is a universal kit operation — the content sibling of `ops-sync`, which refreshes the command adapter — and its only machine-specific part is the mount path, an L3 placeholder like every other command's concrete bits.)*
 
 > **`chat-weight` vs `chat-handoff`.** `chat-weight` is the lightweight triage — *seguir / resumir aquí / rollover*. `chat-handoff` is the action when the verdict is rollover: it picks the most appropriate handoff and **produces a self-contained re-entry block to paste into a new chat**, so the same work continues (with you or other people) without losing context. Distinct from `handoff-*` (which hand work to a *recipient*): `chat-handoff` optimizes for *rebuild-my-context-to-continue*, not *tell-someone-else-what-to-do*.
 
@@ -105,6 +106,7 @@ Flows are written with **command ids only** — that keeps them agnostic (the id
 - **Fresh agent enters a repo:** `bootstrap` → `repo-morning`.
 - **Saw something off-scope:** `finding` (don't fix it inline).
 - **Set up / refresh your commands:** `ops-sync`.
+- **A kit canon changed and your session is still running:** `dk-refresh` (pull + canon-delta + re-read the flagged canons — no restart).
 
 ---
 
