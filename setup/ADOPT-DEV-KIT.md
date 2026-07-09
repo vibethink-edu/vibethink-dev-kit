@@ -1406,6 +1406,37 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 52 — Executable CLI catalog contract (portable command discovery + gate) (universal reference)
+
+**Layer:** L1 reference (neutral).
+**Home:** `knowledge/methodology/REFERENCE-EXECUTABLE-CLI-CATALOG-CONTRACT.md`.
+**Template:** `setup/templates/cli-catalog/`.
+**Gate:** `tools/check-cli-catalog-contract.mjs`.
+
+- **Qué:** a portable JSON contract for repos that expose executable commands to
+  humans, agents, local automation, or orchestration surfaces. The contract makes
+  command discovery explicit: stable id, group, script, package-script alias,
+  doc path, description, safety label, tags, and default args. It is a discovery
+  contract, not an authority to execute.
+- **Cómo:**
+  - Doc **by reference** — your L3 rules point to the reference when a repo has a
+    wrapper, command menu, agent-facing command surface, or generated command export.
+  - Copy or reference `setup/templates/cli-catalog/cli-catalog.schema.json`.
+  - Declare `tools/cli-catalog-contract.config.json` from the template. Point it at
+    either a catalog JSON file or a local export command whose stdout is catalog JSON.
+  - Keep every command entry tied to local docs. The safety vocabulary and actual
+    command ids are L3.
+- **Verificar:**
+  - `node <kit>/tools/check-cli-catalog-contract.mjs tools/cli-catalog-contract.config.json`
+    is GREEN.
+  - If `requireDocPaths` is true, every `docPath` exists in the repo.
+  - Duplicate ids, missing required fields, invalid id shape, and non-JSON export
+    output go RED.
+  - The reference names no product, tenant, provider, package manager, runner, or
+    concrete consuming repo.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
@@ -1458,6 +1489,8 @@ paste into your repo's `AGENTS.md` under a `## Dev-Kit inheritance` section:
 | 48 | UI preference persistence | ADOPTED / PENDING / N-A(no UI prefs) | client preference helper + namespace + hydration pattern |
 | 49 | KDD / Knowledge-native VT-METHOD | ADOPTED / PENDING / N-A(no product-shaping work) | knowledge root + Knowledge Memory Adapter + baseline gate + freshness manifest |
 | 50 | Agent-native surface contract | ADOPTED / ADOPTED-NATIVE / PENDING / N-A(no agent-operated capabilities) | capability registry + delegated actor handle + envelope fixtures + conformance tests |
+| 51 | Identity provisioning integrity | ADOPTED / PENDING / N-A(single-identity-source) | identity sources + drift-check + guard-narrowing gate |
+| 52 | Executable CLI catalog contract | ADOPTED / PENDING / N-A(no executable command surface) | catalog export + schema + contract gate + command docs |
 
 Statuses:
 - **ADOPTED** — in active use; verification has run at least once.

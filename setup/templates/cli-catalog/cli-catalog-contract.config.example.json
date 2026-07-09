@@ -1,0 +1,6 @@
+{
+  "_schema": "EXECUTABLE_CLI_CATALOG_CONTRACT_GATE_V1",
+  "_doc": "Drives check-cli-catalog-contract.mjs. Declare either catalog (JSON file path) or catalogCommand (argv array that prints JSON to stdout). requireDocPaths=true verifies command docPath files exist.",
+  "catalog": "tools/cli-catalog.json",
+  "requireDocPaths": true
+}
