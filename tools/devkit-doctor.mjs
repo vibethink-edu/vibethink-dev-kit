@@ -143,6 +143,12 @@ const GATES = [
     fix: "the coder launch-surface is incomplete (missing launch script / per-session settings / declared bot-token env-var) — an agent cannot self-verify readiness, so it falls to the human (CANON-CHANGE-PATH-AND-DECISION-CLASSES-001 §3.1, F2); stand the surface up (RUNBOOK-LAUNCH-CODERS §1–§3); or remove the config for a conscious N-A (a repo that does not launch coders)",
   },
   {
+    label: "executable CLI catalog",
+    engine: "check-cli-catalog-contract.mjs",
+    targets: ["tools/cli-catalog-contract.config.json"],
+    fix: "the exported executable CLI catalog is missing required portable fields, has duplicate ids, or points at missing docs — align it to REFERENCE-EXECUTABLE-CLI-CATALOG-CONTRACT and the cli-catalog template",
+  },
+  {
     label: "policy manifests (machine law)",
     engine: "check-policy-manifests.mjs",
     targets: ["tools/policy-manifests.config.json"],
