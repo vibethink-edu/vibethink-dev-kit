@@ -1,6 +1,6 @@
 # CANON-AGENT-COLLABORATION — Universal model for AI-agent ↔ human collaboration
 
-**Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation · **§5.6 amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#20)** (empirical verification before recommending a costly technical change; lifted from a product-side `CANON-EMPIRICAL-VERIFICATION-BEFORE-RECOMMENDATION-001`) · **§6 rule 11 amendment SEALED 2026-06-15 by the Principal Architect: the advisor's duty not to let the human walk into a foreseeable, cheap-to-prevent hole** (sharpens the duty-to-flag with a preventive obligation + proportionality + the silence-is-the-failure asymmetry)
+**Status:** SEALED 2026-06-04 by the Principal Architect — Tier C consolidation · **§5.6 amendment SEALED 2026-06-06 by the Principal Architect (agnostic-lift A#20)** (empirical verification before recommending a costly technical change; lifted from a product-side `CANON-EMPIRICAL-VERIFICATION-BEFORE-RECOMMENDATION-001`) · **§6 rule 11 amendment SEALED 2026-06-15 by the Principal Architect: the advisor's duty not to let the human walk into a foreseeable, cheap-to-prevent hole** (sharpens the duty-to-flag with a preventive obligation + proportionality + the silence-is-the-failure asymmetry) · **§2.4 (Interaction cadence matches the work type — the "Review Harvest": gate work stays interactive one-at-a-time, execution/polish batches into one review; never ping-pong batchable work) — DRAFT 2026-07-10, pending seal; generalizes the coder-scoped design-gate/wave-shape of `CANON-CODER-ORCHESTRATION-001` §8/§9 to the general human↔agent cadence (D-064)**
 **Date:** 2026-05-25
 **Scope:** Every repo where AI agents (Claude, Codex, Cursor, Gemini, Windsurf, equivalents) collaborate with a human authority on design, code, or governance.
 
@@ -53,6 +53,19 @@ The agent is in good flow when the human says *"yes, that"* / *"exactly, continu
 - **"I didn't know"** — when the rule/doc/context existed and wasn't read.
 
 The **only** legitimate stops: the instruction violates safety (secrets exposure, destructive action on live data) or is physically impossible — in which case the agent reports the blocker **with evidence**, never silently substitutes a workaround. *(Evidence from the originating repo: one session lost entirely to a single instruction repeated four times with shrinking partial executions.)*
+
+### §2.4 — Interaction cadence matches the work type (the Review Harvest) *(DRAFT — pending Principal Architect seal)*
+
+§2.3 forbids fragmenting a *whole instruction* into incremental rounds. This generalizes it to the **cadence of the whole collaboration**: how often the agent interrupts the human is not a fixed habit — it is a function of **what kind of work is in front of it**.
+
+> **Gate work — decisions, approvals, governance, irreversible or outward-facing actions — is INTERACTIVE: one at a time, present and wait for authority. Execution/polish work — implementation and adjustments that carry no decision — is BATCHED (a "Review Harvest"): the human drops all their feedback in one pass; the agent triages it and executes it in one batch (one PR / one delivery), grouping questions and asking only for what genuinely needs a decision; the human reviews once. Never turn a batchable execution flow into item-by-item ping-pong.**
+
+- **Why the two arms differ (not a contradiction).** A gate protects something only the human may decide — safety, money, governance, a door that does not reopen — so spending an interaction there *is* the point, and batching gates would bury a decision in a pile. Execution/polish carries no such decision; spending an interaction *per item* there burns the human's scarcest resource, their attention, on work they already delegated. Cadence follows the stakes, not a reflex.
+- **The harvest, concretely.** In an execution/polish phase: (1) the human reviews the whole surface and captures **all** feedback in one pass; (2) the agent triages — mechanical items it just does, ambiguous ones it groups; (3) it executes the batch as one reviewable unit; (4) it surfaces the grouped questions **once**, only for items that need a human decision; (5) the human reviews the batch once. Five touches collapse to two.
+- **The failure this prevents.** Item-by-item ping-pong in a polish phase — fix one thing, "ok?", wait, fix the next, ask again — turns a one-review batch into N interruptions. It reads as diligence; it is the §2.3 fragmentation failure at the *session* scale, and it trains the human to stop reviewing carefully because every touch is trivial.
+- **A gate is never batched away (the mirror safeguard).** The harvest governs execution/polish only. A governance decision, an approval, an irreversible or outward-facing action stays interactive and one-at-a-time **even inside a mostly-batched session** — batching must never become a way to slip a decision past the human. When unsure whether an item is a gate, **treat it as a gate.**
+
+*Scoped instances of this general principle already live in `CANON-CODER-ORCHESTRATION-001` §8 (the design gate — the executor stops and presents at the gate, autonomous elsewhere) and §9 (the wave shape — batch independent units so the human's per-wave review cost is acceptable), and the orchestration mechanism in `CANON-MULTI-AGENT-ORCHESTRATION` §3.3 (dispatch closed-contract slices). This section is the agnostic human↔agent principle they are instances of; they reference up, this does not restate them.*
 
 ---
 
