@@ -37,6 +37,13 @@
  * Non-goal: it does not cross-check triggers against §4's curated markdown (that
  * set is prose, not a machine manifest). It proves the adapter is internally
  * clean, which is what stops `commands-help` from listing dead/dup/colliding cmds.
+ *
+ * Known limitation (declared, not silent): the completeness self-check counts
+ * trigger DECLARATIONS (a `trigger:` or a `triggers:` header). A `triggers:` list
+ * yields N commands from one header, so a list that drops SOME (not all) of its
+ * items cannot be detected by the parsed<declared net. Singular `trigger:` (the
+ * shipped form) has no such gap. Malformed-YAML values that Espanso itself would
+ * not load are out of scope.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
