@@ -10,6 +10,7 @@ import path from "node:path";
 import {
   detectExternalTools,
   findExecutableOnPath,
+  graphifyAreasFromPaths,
 } from "./external-tools-health.mjs";
 
 let pass = 0;
@@ -180,7 +181,8 @@ test("graphify CLI present but graph missing => WARN and says not to rely on it"
   assert.equal(graphify.state, "artifact-missing");
   assert.equal(graphify.activity.state, "artifact-missing");
   assert.match(graphify.message, /do not rely/i);
-  assert.match(graphify.remediation.join("\n"), /graphify update <subdir>/);
+  // Deterministic hint: no placeholder — either a concrete area or "not needed".
+  assert.doesNotMatch(graphify.remediation.join("\n"), /<subdir>/);
 });
 
 test("graphify stale graph => WARN and requires scoped update before use", () => {
@@ -197,6 +199,9 @@ test("graphify stale graph => WARN and requires scoped update before use", () =>
     cwd: repo,
     env: { PATH: "/usr/bin", GRAPHIFY_STALE_DAYS: "3" },
     now,
+    // Deterministic area injected (in production this is read from git): a change
+    // under apps/dashboard must yield a CONCRETE command, not "<subdir>".
+    changedAreas: ["apps/dashboard"],
     run: runMap({
       "graphify --version": { status: 0, stdout: "graphify 0.8.39\n", stderr: "" },
     }),
@@ -207,7 +212,53 @@ test("graphify stale graph => WARN and requires scoped update before use", () =>
   assert.equal(graphify.state, "artifact-stale");
   assert.ok(graphify.activity.ageDays >= 4);
   assert.match(graphify.message, /do not read it as current/);
-  assert.match(graphify.remediation.join("\n"), /prefer scoped update/i);
+  assert.match(graphify.remediation.join("\n"), /graphify update apps\/dashboard/);
+  assert.doesNotMatch(graphify.remediation.join("\n"), /<subdir>/);
+  assert.deepEqual(graphify.activity.areas, ["apps/dashboard"]);
+});
+
+// KNOWN-BAD: the pure area computation — docs/build/root-file paths must NOT
+// become areas; apps/packages collapse to their 2-segment workspace root.
+test("graphifyAreasFromPaths: apps/packages → workspace root; docs/build/root excluded", () => {
+  assert.deepEqual(
+    graphifyAreasFromPaths([
+      "apps/dashboard/src/components/x.tsx",
+      "apps/dashboard/tsconfig.tsbuildinfo",
+      "packages/vito-core/src/y.ts",
+      "docs/ai-coordination/comms/z.md", // docs → excluded
+      "node_modules/dep/index.js",       // build root → excluded
+      "console.log(0))",                  // root-level file → no area
+      "scripts/foo.mjs",                  // top-level non-workspace → its own dir
+    ]),
+    ["apps/dashboard", "packages/vito-core", "scripts"],
+  );
+});
+
+// A tree with only docs (or nothing) changed → the hint says a refresh is not needed.
+test("graphify stale + only docs changed => hint says refresh not needed (no concrete area)", () => {
+  const repo = tmp();
+  const graphDir = path.join(repo, "graphify-out");
+  mkdirSync(graphDir, { recursive: true });
+  writeFileSync(path.join(graphDir, "graph.json"), "{}");
+  const now = Date.now() + 5 * 86_400_000;
+
+  const health = detectExternalTools({
+    lock: { tools: [fakeLock().tools[0]] },
+    platform: "linux",
+    home: "/home/dev",
+    cwd: repo,
+    env: { PATH: "/usr/bin", GRAPHIFY_STALE_DAYS: "3" },
+    now,
+    changedAreas: [], // only docs / nothing → no code area
+    run: runMap({
+      "graphify --version": { status: 0, stdout: "graphify 0.8.39\n", stderr: "" },
+    }),
+  });
+
+  const graphify = health.tools[0];
+  assert.equal(graphify.state, "artifact-stale");
+  assert.match(graphify.remediation.join("\n"), /not needed now/i);
+  assert.doesNotMatch(graphify.remediation.join("\n"), /<subdir>/);
 });
 
 test("engram CLI present but memory stale => WARN and requires recall/doctor/export", () => {
