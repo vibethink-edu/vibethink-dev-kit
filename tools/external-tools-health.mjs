@@ -21,6 +21,74 @@ function uniq(xs) {
   return [...new Set(xs.filter(Boolean))];
 }
 
+// Roots that are not code graphify would index — never suggest refreshing them.
+const NON_CODE_AREA_ROOTS = new Set([
+  "docs", "node_modules", ".git", ".github", "dist", "build", "coverage",
+  "graphify-out", ".next", ".turbo", ".vscode",
+]);
+
+// Pure: map a set of changed file paths to the graphify "areas" to refresh.
+// An area is the workspace root of a changed file: `apps/<x>` / `packages/<x>`
+// (the monorepo convention) or else the file's top-level directory. Root-level
+// files (no directory) and non-code roots (docs, build output, …) are excluded.
+// Deterministic — this is what turns "graphify update <subdir>" (which the human
+// must guess) into a concrete "graphify update apps/dashboard".
+export function graphifyAreasFromPaths(paths) {
+  const areas = new Set();
+  for (const raw of paths || []) {
+    const p = String(raw).replace(/\\/g, "/").replace(/^\.\//, "").trim();
+    if (!p || !p.includes("/")) continue; // a root-level file has no area
+    const segs = p.split("/");
+    if (NON_CODE_AREA_ROOTS.has(segs[0])) continue;
+    const area = (segs[0] === "apps" || segs[0] === "packages") && segs[1]
+      ? `${segs[0]}/${segs[1]}`
+      : segs[0];
+    areas.add(area);
+  }
+  return [...areas].sort();
+}
+
+// Best-effort: the changed code areas in this working tree (uncommitted + this
+// branch vs its upstream). Never throws; a repo with no git / no upstream just
+// yields fewer paths. Used to fill the concrete area into the graphify hint.
+function readChangedAreas(cwd, runner) {
+  const run = runner || ((args) => spawnSync("git", ["-C", cwd, ...args], { encoding: "utf8", timeout: 5000 }));
+  const paths = [];
+  try {
+    const st = run(["status", "--porcelain"]);
+    if (st && st.status === 0 && st.stdout) {
+      for (const line of st.stdout.split(/\r?\n/)) {
+        if (line.length < 4) continue;
+        const rest = line.slice(3); // strip "XY " status prefix
+        paths.push(rest.includes(" -> ") ? rest.split(" -> ").pop() : rest);
+      }
+    }
+  } catch { /* best-effort */ }
+  try {
+    const df = run(["diff", "--name-only", "@{u}...HEAD"]);
+    if (df && df.status === 0 && df.stdout) {
+      for (const line of df.stdout.split(/\r?\n/)) if (line.trim()) paths.push(line.trim());
+    }
+  } catch { /* no upstream — fine */ }
+  return graphifyAreasFromPaths(uniq(paths));
+}
+
+// The concrete graphify remediation: name the exact areas to refresh, or say a
+// refresh is not needed (only docs/nothing changed). Replaces the cryptic
+// `graphify update <subdir>` placeholder the human could not resolve.
+function graphifyRefreshHint(areas) {
+  if (areas.length) {
+    return [
+      `refresh only what you changed: ${areas.map((a) => `graphify update ${a}`).join("  ·  ")}`,
+      "do NOT run `graphify update .` — a full monorepo rebuild is slow (and rarely what you need)",
+    ];
+  }
+  return [
+    "no code area changed since your last commit/pull — a graphify refresh is not needed now; run `graphify update <the-area-you-are-navigating>` only when you are about to trace code in a specific area",
+    "do NOT run `graphify update .` — a full rebuild is slow",
+  ];
+}
+
 function stripAnsi(s) {
   return String(s || "").replace(/\x1b\[[0-9;]*m/g, "");
 }
@@ -320,6 +388,8 @@ function graphifyActivity(tool, result, opts) {
   if (tool.name !== "graphify") return null;
   const staleDays = Number(opts.env.GRAPHIFY_STALE_DAYS || 3);
   const graph = join(opts.cwd, "graphify-out", "graph.json");
+  // Deterministic area(s): opts.changedAreas (tests) else read from git in cwd.
+  const areas = opts.changedAreas ?? readChangedAreas(opts.cwd, opts.gitRun);
   const st = safeStat(graph);
   if (!st) {
     return {
@@ -327,11 +397,9 @@ function graphifyActivity(tool, result, opts) {
       state: "artifact-missing",
       path: graph,
       ageDays: null,
+      areas,
       message: "graphify graph is missing; do not rely on graphify orientation until a scoped graph is built",
-      remediation: [
-        "run graphify update <subdir> before using graphify for code navigation",
-        "do not rebuild the whole monorepo unless that is deliberately scoped and affordable",
-      ],
+      remediation: graphifyRefreshHint(areas),
     };
   }
   const ageDays = daysSince(st.mtimeMs, opts.now);
@@ -341,11 +409,9 @@ function graphifyActivity(tool, result, opts) {
       state: "artifact-stale",
       path: graph,
       ageDays,
+      areas,
       message: `graphify graph is ${ageDays}d old; do not read it as current`,
-      remediation: [
-        `run graphify update <subdir> before relying on graphify (stale threshold: ${staleDays}d)`,
-        "prefer scoped update over graphify update .",
-      ],
+      remediation: graphifyRefreshHint(areas),
     };
   }
   return {
@@ -553,6 +619,8 @@ export function detectExternalTools(options = {}) {
     run: options.run || defaultRun,
     exists: options.exists || existsSync,
     now: options.now || Date.now(),
+    changedAreas: options.changedAreas, // optional (tests); undefined → read from git
+    gitRun: options.gitRun, // optional (tests): inject the git runner
   };
   const tools = (lock.tools || []).map((tool) => detectTool(tool, opts));
   const status = tools.some((t) => t.severity === "error")
