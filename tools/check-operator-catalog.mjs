@@ -8,24 +8,30 @@
  * long one). This gate is the machine enforcement of catalog rule 6 (prefix-safe)
  * and rule 8 (one canonical trigger per intention — no dead/duplicate entries).
  *
- * It lints an Espanso-style adapter's TRIGGER SET + body presence only. It is
- * tool-neutral in intent (the shape it parses is the shipped template's shape)
- * and it NEVER executes a command body.
+ * It lints an Espanso-style adapter's TRIGGER SET + body presence only. It never
+ * executes a command body.
  *
  * Three RED conditions:
- *   - dead-command     — a trigger whose body (`replace`) is empty/missing.
+ *   - dead-command      — a trigger whose body is empty/missing.
  *   - duplicate-trigger — the same trigger defined twice.
  *   - prefix-collision  — a trigger that is an exact prefix of another (rule 6).
+ *
+ * SAFE FAILURE MODE (design principle): a hand-rolled scanner cannot parse every
+ * Espanso shape. When it is unsure it FAILS LOUD (exit 2 setup error), NEVER
+ * silently GREEN. A parse-completeness self-check (parsed fewer triggers than the
+ * file declares → exit 2) turns any unanticipated shape into a loud stop instead
+ * of a false "clean". A false RED is annoying; a false GREEN over a broken adapter
+ * is the failure this gate exists to prevent.
  *
  * Config (tools/operator-catalog.config.json), optional:
  *   { "adapter": "setup/templates/operator-command-expanders/operator-commands.example.yml" }
  * With no config, it defaults to the shipped example (the kit dogfoods its own
  * template). A consumer points `adapter` at their real local adapter to lint it.
- * If neither a config nor the default example exists → skip-with-note (GREEN),
- * the kit convention (a repo that ships no adapter has nothing to lint).
+ *   - no config AND default example absent  → skip-with-note (GREEN) — opted out.
+ *   - config names an adapter that is MISSING → exit 2 (loud — a demanded file is gone).
  *
  * Usage: node tools/check-operator-catalog.mjs [config-path]
- * Exit: 0 = GREEN (clean or skipped) · 1 = RED (adapter defect) · 2 = setup error.
+ * Exit: 0 = GREEN (clean or opted-out skip) · 1 = RED (adapter defect) · 2 = setup error.
  * Pure Node, zero deps.
  *
  * Non-goal: it does not cross-check triggers against §4's curated markdown (that
@@ -33,14 +39,15 @@
  * clean, which is what stops `commands-help` from listing dead/dup/colliding cmds.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isAbsolute, join, resolve } from "node:path";
 
 const ROOT = process.cwd();
 const DEFAULT_CONFIG = "tools/operator-catalog.config.json";
 const DEFAULT_ADAPTER =
   "setup/templates/operator-command-expanders/operator-commands.example.yml";
 
-// ── pure core (unit-tested directly) ──────────────────────────────────────
+// ── pure core: the lint (unit-tested directly) ─────────────────────────────
 
 /**
  * Lint a normalized command set.
@@ -49,24 +56,19 @@ const DEFAULT_ADAPTER =
  */
 export function lintOperatorAdapter(commands) {
   const problems = [];
-  const seen = new Map(); // trigger -> first index
+  const seen = new Set();
 
   for (const cmd of commands) {
     const t = cmd.trigger;
-    if (!cmd.hasBody) {
-      problems.push({ kind: "dead-command", trigger: t });
-    }
-    if (seen.has(t)) {
-      problems.push({ kind: "duplicate-trigger", trigger: t });
-    } else {
-      seen.set(t, true);
-    }
+    if (!cmd.hasBody) problems.push({ kind: "dead-command", trigger: t });
+    if (seen.has(t)) problems.push({ kind: "duplicate-trigger", trigger: t });
+    else seen.add(t);
   }
 
-  // prefix collision: an exact prefix of another distinct trigger.
-  const triggers = commands.map((c) => c.trigger);
-  for (const a of new Set(triggers)) {
-    for (const b of new Set(triggers)) {
+  // prefix collision: an exact prefix of another distinct trigger (rule 6).
+  const uniq = [...new Set(commands.map((c) => c.trigger))];
+  for (const a of uniq) {
+    for (const b of uniq) {
       if (a !== b && b.startsWith(a)) {
         problems.push({ kind: "prefix-collision", trigger: a, other: b });
       }
@@ -76,93 +78,138 @@ export function lintOperatorAdapter(commands) {
   return { ok: problems.length === 0, problems };
 }
 
-// ── IO: minimal Espanso adapter scan (trigger set + body presence) ─────────
+// ── IO: minimal, comment/quote/indent-aware Espanso scan ───────────────────
 
 const BLOCK_INDICATORS = new Set([">", "|", ">-", "|-", ">+", "|+"]);
+const BODY_KEYS = "replace|form|markdown|html|image_path|vars";
+
+/** Strip an UNQUOTED trailing `# comment` from a scalar (a `#` inside quotes stays). */
+export function stripInlineComment(raw) {
+  let inS = false;
+  let inD = false;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    if (c === "'" && !inD) inS = !inS;
+    else if (c === '"' && !inS) inD = !inD;
+    else if (c === "#" && !inS && !inD && (i === 0 || /\s/.test(raw[i - 1]))) {
+      return raw.slice(0, i);
+    }
+  }
+  return raw;
+}
 
 function unquote(raw) {
   const s = raw.trim();
   if (
-    (s.startsWith('"') && s.endsWith('"')) ||
-    (s.startsWith("'") && s.endsWith("'"))
+    (s.startsWith('"') && s.endsWith('"') && s.length >= 2) ||
+    (s.startsWith("'") && s.endsWith("'") && s.length >= 2)
   ) {
     return s.slice(1, -1);
   }
   return s;
 }
 
+function indentOf(line) {
+  return line.length - line.replace(/^\s+/, "").length;
+}
+
 /**
- * Extract [{trigger, hasBody}] from an Espanso adapter's `matches:` section.
- * Supports the shipped template shape: list items delimited by `- trigger:`
- * (singular) or `- triggers:` (list), with an inline or block `replace:` body.
- * Deliberately narrow: it reads the trigger set + body presence, not full YAML.
+ * Extract commands from an Espanso adapter's `matches:` section.
+ * Returns { commands, headerCount, hasMatches } — headerCount is the number of
+ * trigger declarations found (a `trigger:` or a `triggers:` list header), used by
+ * the CLI for the parse-completeness self-check.
+ *
+ * Supported shapes: singular `trigger:` and `triggers:` lists; inline and block
+ * (`>`,`|`,…) bodies under `replace`/`form`/`markdown`/`html`/`image_path`/`vars`;
+ * trailing `# comments`; keys in any order within a match; CRLF.
  */
 export function parseEspansoAdapter(text) {
   const lines = text.split(/\r?\n/);
-  const matchesIdx = lines.findIndex((l) => /^matches:\s*$/.test(l));
-  if (matchesIdx === -1) return [];
+  const matchesIdx = lines.findIndex((l) => /^matches:\s*(#.*)?$/.test(l));
+  if (matchesIdx === -1) return { commands: [], headerCount: 0, hasMatches: false };
 
   const commands = [];
+  let headerCount = 0;
   let cur = null;
+  let inBlock = false;
+  let blockIndent = -1;
+
   const flush = () => {
     if (!cur) return;
-    for (const trig of cur.triggers) {
-      commands.push({ trigger: trig, hasBody: cur.hasBody });
-    }
+    for (const t of cur.triggers) commands.push({ trigger: t, hasBody: cur.hasBody });
     cur = null;
   };
+  const newMatch = () => ({ triggers: [], hasBody: false, openByTriggersList: false });
 
   for (let i = matchesIdx + 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trim() === "") continue;
-    // a new column-0 key ends the matches section
-    if (/^\S/.test(line)) {
+    const rawLine = lines[i];
+    if (rawLine.trim() === "") continue;
+
+    // consume block-scalar body content by indentation (deeper than its key).
+    if (inBlock) {
+      if (indentOf(rawLine) > blockIndent) {
+        if (cur && stripInlineComment(rawLine).trim() !== "") cur.hasBody = true;
+        continue;
+      }
+      inBlock = false; // dedent → block ended; fall through to handle this line
+    }
+
+    // a column-0 non-comment key ends the matches section.
+    if (/^\S/.test(rawLine) && !/^\s*#/.test(rawLine)) {
       flush();
       break;
     }
 
+    const line = stripInlineComment(rawLine);
+    if (line.trim() === "") continue; // comment-only line
+
     const isListItem = /^\s*-\s/.test(line);
-    const triggerM = line.match(/^\s*-?\s*trigger:\s*(.+?)\s*$/);
-    const triggersM = /^\s*-?\s*triggers:\s*$/.test(line);
-    const inlineTriggerListM = line.match(/^\s*-\s*(["']?:[^"'\s]+["']?)\s*$/);
+    const hasKey = /^\s*-?\s*[\w-]+:/.test(line);
+    const triggerM = line.match(/^\s*-?\s*trigger:\s*(.*)$/);
+    const triggersHeader = /^\s*-?\s*triggers:\s*$/.test(line);
+    const bodyM = line.match(new RegExp(`^\\s*-?\\s*(?:${BODY_KEYS}):\\s*(.*)$`));
+
+    // a new list item that carries a key starts a new match.
+    if (isListItem && hasKey) {
+      flush();
+      cur = newMatch();
+    }
 
     if (triggerM) {
-      if (isListItem) flush();
-      cur = cur || { triggers: [], hasBody: false };
-      cur.triggers.push(unquote(triggerM[1]));
+      headerCount++;
+      cur = cur || newMatch();
+      const val = unquote(triggerM[1]);
+      if (val) cur.triggers.push(val);
       continue;
     }
-    if (triggersM) {
-      if (isListItem) flush();
-      cur = cur || { triggers: [], hasBody: false };
+    if (triggersHeader) {
+      headerCount++;
+      cur = cur || newMatch();
+      cur.openByTriggersList = true;
       continue;
     }
-    // a bare `- ":x"` list item directly under a `triggers:` list
-    if (cur && cur.triggers.length >= 0 && inlineTriggerListM && !/(trigger|replace):/.test(line)) {
-      cur.triggers.push(unquote(inlineTriggerListM[1]));
-      continue;
-    }
-
-    const replaceM = line.match(/^\s*replace:\s*(.*)$/);
-    if (replaceM && cur) {
-      const val = replaceM[1].trim();
+    if (bodyM) {
+      cur = cur || newMatch();
+      const val = bodyM[1].trim();
       if (BLOCK_INDICATORS.has(val)) {
-        // block scalar: body present if any following more-indented line is non-empty
-        let hasContent = false;
-        for (let j = i + 1; j < lines.length; j++) {
-          if (lines[j].trim() === "") continue;
-          if (/^\s*-\s/.test(lines[j]) || /^\S/.test(lines[j])) break;
-          hasContent = true;
-          break;
-        }
-        cur.hasBody = hasContent;
-      } else {
-        cur.hasBody = unquote(val).length > 0;
+        inBlock = true;
+        blockIndent = indentOf(line);
+      } else if (unquote(val).length > 0) {
+        cur.hasBody = true;
+      }
+      continue;
+    }
+    // a bare list item value (`- ":foo"`) continues an open `triggers:` list.
+    if (isListItem && !hasKey && cur && cur.openByTriggersList) {
+      const m = line.match(/^\s*-\s*(.+?)\s*$/);
+      if (m) {
+        const val = unquote(m[1]);
+        if (val) cur.triggers.push(val);
       }
     }
   }
   flush();
-  return commands;
+  return { commands, headerCount, hasMatches: true };
 }
 
 // ── CLI ────────────────────────────────────────────────────────────────────
@@ -196,6 +243,7 @@ function main() {
   const configAbs = isAbsolute(configRel) ? configRel : join(ROOT, configRel);
 
   let adapterRel = DEFAULT_ADAPTER;
+  let fromConfig = false;
   if (existsSync(configAbs)) {
     let cfg;
     try {
@@ -205,22 +253,33 @@ function main() {
     }
     if (cfg && typeof cfg.adapter === "string" && cfg.adapter.trim()) {
       adapterRel = cfg.adapter.trim();
+      fromConfig = true;
     }
   } else if (configArg) {
-    // an explicit config path was given but does not exist → setup error
     setupError(`config not found: ${configRel}`);
   }
 
   const adapterAbs = isAbsolute(adapterRel) ? adapterRel : join(ROOT, adapterRel);
   if (!existsSync(adapterAbs)) {
-    // no adapter to lint (and no explicit config demanded one) → skip-with-note
+    // a config that names a missing adapter is a loud setup error, not a skip.
+    if (fromConfig) setupError(`configured adapter not found: ${adapterRel}`);
+    // no config + no default example → the repo opted out of shipping an adapter.
     green(`no adapter at ${adapterRel} — nothing to lint (skip)`);
   }
 
   const text = readFileSync(adapterAbs, "utf8");
-  const commands = parseEspansoAdapter(text);
+  const { commands, headerCount, hasMatches } = parseEspansoAdapter(text);
+
+  if (!hasMatches) {
+    setupError(`${adapterRel} has no 'matches:' section — not a recognizable adapter (failing loud, not skipping)`);
+  }
+  if (commands.length < headerCount) {
+    setupError(
+      `${adapterRel}: parsed ${commands.length} trigger(s) but found ${headerCount} trigger declaration(s) — adapter format not fully recognized. Failing loud rather than reporting a false 'clean'.`
+    );
+  }
   if (commands.length === 0) {
-    green(`${adapterRel} defines no matches — nothing to lint (skip)`);
+    setupError(`${adapterRel} has a 'matches:' section but 0 commands parsed — check the adapter format`);
   }
 
   const { ok, problems } = lintOperatorAdapter(commands);
@@ -230,7 +289,11 @@ function main() {
   red(problems, adapterRel);
 }
 
-// run only as CLI, not when imported by the test
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("check-operator-catalog.mjs")) {
-  main();
+// run only as a real CLI, never when imported by the test.
+let isCli = false;
+try {
+  isCli = process.argv[1] && resolve(fileURLToPath(import.meta.url)) === resolve(process.argv[1]);
+} catch {
+  isCli = false;
 }
+if (isCli) main();

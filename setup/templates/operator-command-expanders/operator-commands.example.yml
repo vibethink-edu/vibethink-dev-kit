@@ -6,6 +6,10 @@
 #   against the CATALOG — comparing your local adapter to this demo is meaningless.
 # NEUTRAL SEED: bodies use <placeholders>. Your real adapter (L3) fills concrete commands
 #   (your package-manager scripts, tool paths, canon names). Do NOT commit a product-named file to the kit.
+# LOCALIZATION (rule 5): the `COMANDO EJECUTADO` opener is the Spanish form of catalog rule 9's
+#   neutral `COMMAND EXECUTED: :xxx — <intent>`; the `:cristiano` / `:teen` triggers are intentional
+#   Spanish localized canonical triggers for the `explain-plain` / `explain-teach` ids — illustrating
+#   rule 5, still one canonical trigger per id (rule 8). A consumer localizes to their own language.
 # ADDITIVE: never delete or overwrite existing user snippets. On a trigger clash, alias — don't replace.
 # DRY: the one-shot + evidence block lives once in `preamble` and is referenced as {{preamble}}.
 

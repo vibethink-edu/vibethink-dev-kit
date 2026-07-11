@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
  * Tests for check-operator-catalog.mjs.
- * Honest gate cases: clean set, the three RED conditions (dead-command,
- * duplicate-trigger, prefix-collision), the Espanso scanner against the REAL
- * shipped example, and the CLI exit codes (green / red / setup / skip).
+ * Honest gate cases: clean set, the three RED conditions, the comment/quote/
+ * block-scalar/triggers-list scanner shapes (regressions for the adversarial
+ * review findings M2/M3/D1/D2), the scan of the REAL shipped example, and the
+ * CLI exit-code contract (green / red / setup / opted-out-skip), incl. the
+ * SAFE-FAILURE cases that must fail LOUD (exit 2) not skip (M1, parse-gap).
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -12,7 +14,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { lintOperatorAdapter, parseEspansoAdapter } from "./check-operator-catalog.mjs";
+import {
+  lintOperatorAdapter,
+  parseEspansoAdapter,
+  stripInlineComment,
+} from "./check-operator-catalog.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const TOOL = path.join(HERE, "check-operator-catalog.mjs");
@@ -44,6 +50,12 @@ function tmpAdapter(content) {
   const file = path.join(dir, "adapter.yml");
   writeFileSync(file, content, "utf8");
   return { dir, file };
+}
+function cli(args, cwd = KIT_ROOT) {
+  return spawnSync("node", [TOOL, ...args], { cwd, encoding: "utf8" });
+}
+function triggers(text) {
+  return parseEspansoAdapter(text).commands;
 }
 
 // ── pure core: lintOperatorAdapter ─────────────────────────────────────────
@@ -97,32 +109,82 @@ test("no false prefix-collision on non-prefix pair (:repo-health / :repo-creds)"
   assert.equal(ok, true);
 });
 
+// ── comment stripping ──────────────────────────────────────────────────────
+
+test("stripInlineComment: unquoted trailing comment removed, quoted # kept", () => {
+  assert.equal(stripInlineComment('":x" # note').trim(), '":x"');
+  assert.equal(stripInlineComment('"a # b"'), '"a # b"');
+  assert.equal(stripInlineComment("# whole line"), "");
+});
+
 // ── IO scanner: parseEspansoAdapter ────────────────────────────────────────
 
 test("scanner extracts trigger + inline body", () => {
-  const cmds = parseEspansoAdapter(
-    ["matches:", '  - trigger: ":x"', '    replace: "do x"'].join("\n")
-  );
-  assert.deepEqual(cmds, [{ trigger: ":x", hasBody: true }]);
+  assert.deepEqual(triggers(['matches:', '  - trigger: ":x"', '    replace: "do x"'].join("\n")), [
+    { trigger: ":x", hasBody: true },
+  ]);
 });
 
 test("scanner flags empty inline body as no-body", () => {
-  const cmds = parseEspansoAdapter(
-    ["matches:", '  - trigger: ":empty"', '    replace: ""'].join("\n")
-  );
-  assert.deepEqual(cmds, [{ trigger: ":empty", hasBody: false }]);
+  assert.deepEqual(triggers(['matches:', '  - trigger: ":empty"', '    replace: ""'].join("\n")), [
+    { trigger: ":empty", hasBody: false },
+  ]);
 });
 
-test("scanner: block-scalar body with content → hasBody true", () => {
-  const cmds = parseEspansoAdapter(
-    ["matches:", '  - trigger: ":blk"', "    replace: >-", "      real body"].join("\n")
+test("REGRESSION M3: replace that is only a comment → dead (no body)", () => {
+  const cmds = triggers(['matches:', '  - trigger: ":x"', "    replace: # TODO write body"].join("\n"));
+  assert.deepEqual(cmds, [{ trigger: ":x", hasBody: false }]);
+});
+
+test("REGRESSION M3: trailing comment on trigger line is not part of the trigger", () => {
+  const cmds = triggers(
+    ['matches:', '  - trigger: ":x"   # same again', '    replace: "a"', '  - trigger: ":x"', '    replace: "b"'].join("\n")
   );
+  // both must normalize to :x so the lint sees the duplicate
+  assert.deepEqual(cmds.map((c) => c.trigger), [":x", ":x"]);
+  assert.equal(lintOperatorAdapter(cmds).ok, false);
+});
+
+test("REGRESSION D1: block-scalar body whose content is a markdown bullet → hasBody true", () => {
+  const cmds = triggers(['matches:', '  - trigger: ":blk"', "    replace: |", "      - first step", "      - second"].join("\n"));
   assert.deepEqual(cmds, [{ trigger: ":blk", hasBody: true }]);
 });
 
+test("REGRESSION D1: empty block-scalar body → dead", () => {
+  const cmds = triggers(['matches:', '  - trigger: ":blk"', "    replace: >-", '  - trigger: ":y"', '    replace: "b"'].join("\n"));
+  assert.equal(cmds.find((c) => c.trigger === ":blk").hasBody, false);
+  assert.equal(cmds.find((c) => c.trigger === ":y").hasBody, true);
+});
+
+test("REGRESSION D1: alternative body key (form:) counts as body", () => {
+  const cmds = triggers(['matches:', '  - trigger: ":f"', '    form: "[[name]]"'].join("\n"));
+  assert.deepEqual(cmds, [{ trigger: ":f", hasBody: true }]);
+});
+
+test("REGRESSION D1: replace declared BEFORE trigger in the same match", () => {
+  const cmds = triggers(['matches:', '  - replace: "body first"', '    trigger: ":r"'].join("\n"));
+  assert.deepEqual(cmds, [{ trigger: ":r", hasBody: true }]);
+});
+
+test("scanner: triggers: LIST form → each item a trigger sharing the body", () => {
+  const cmds = triggers(['matches:', "  - triggers:", '      - ":a"', '      - ":b"', '    replace: "shared"'].join("\n"));
+  assert.deepEqual(cmds, [
+    { trigger: ":a", hasBody: true },
+    { trigger: ":b", hasBody: true },
+  ]);
+});
+
+test("REGRESSION D2: a `- \":foo\"` line inside a block body is NOT harvested as a trigger", () => {
+  const cmds = triggers(
+    ['matches:', '  - trigger: ":x"', "    replace: >-", '      mention - ":foo" in prose', '  - trigger: ":foo"', '    replace: "b"'].join("\n")
+  );
+  // only :x and :foo — the prose ":foo" must not create a duplicate
+  assert.deepEqual(cmds.map((c) => c.trigger).sort(), [":foo", ":x"]);
+  assert.equal(lintOperatorAdapter(cmds).ok, true);
+});
+
 test("scanner parses the REAL shipped example: 16 triggers, all with bodies", () => {
-  const text = readFileSync(SHIPPED_EXAMPLE, "utf8");
-  const cmds = parseEspansoAdapter(text);
+  const cmds = triggers(readFileSync(SHIPPED_EXAMPLE, "utf8"));
   assert.equal(cmds.length, 16, `expected 16 commands, got ${cmds.length}`);
   const noBody = cmds.filter((c) => !c.hasBody).map((c) => c.trigger);
   assert.deepEqual(noBody, [], `these have no body: ${noBody.join(", ")}`);
@@ -131,44 +193,70 @@ test("scanner parses the REAL shipped example: 16 triggers, all with bodies", ()
 });
 
 test("shipped example passes the lint (clean)", () => {
-  const text = readFileSync(SHIPPED_EXAMPLE, "utf8");
-  const { ok, problems } = lintOperatorAdapter(parseEspansoAdapter(text));
+  const { commands } = parseEspansoAdapter(readFileSync(SHIPPED_EXAMPLE, "utf8"));
+  const { ok, problems } = lintOperatorAdapter(commands);
   assert.equal(ok, true, `shipped example not clean: ${JSON.stringify(problems)}`);
 });
 
-// ── CLI exit codes ─────────────────────────────────────────────────────────
+// ── CLI exit-code contract ──────────────────────────────────────────────────
 
 test("CLI: default (shipped example) → exit 0 GREEN", () => {
-  const r = spawnSync("node", [TOOL], { cwd: KIT_ROOT, encoding: "utf8" });
+  const r = cli([]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
 });
 
-test("CLI: KNOWN-BAD adapter via config → exit 1 RED", () => {
+test("CLI: KNOWN-BAD adapter (prefix collision) via config → exit 1 RED", () => {
   const bad = tmpAdapter(
-    ["matches:", '  - trigger: ":handoff"', '    replace: "a"', '  - trigger: ":handoff-local"', '    replace: "b"'].join("\n")
+    ['matches:', '  - trigger: ":handoff"', '    replace: "a"', '  - trigger: ":handoff-local"', '    replace: "b"'].join("\n")
   );
   const cfg = path.join(bad.dir, "cfg.json");
   writeFileSync(cfg, JSON.stringify({ adapter: bad.file }), "utf8");
-  const r = spawnSync("node", [TOOL, cfg], { cwd: KIT_ROOT, encoding: "utf8" });
+  const r = cli([cfg]);
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.match(r.stdout, /prefix-collision/);
 });
 
+test("REGRESSION M2: `matches: # comment` + a real duplicate → NOT skipped, exit 1", () => {
+  const bad = tmpAdapter(
+    ['matches: # my commands', '  - trigger: ":x"', '    replace: "a"', '  - trigger: ":x"', '    replace: "b"'].join("\n")
+  );
+  const cfg = path.join(bad.dir, "cfg.json");
+  writeFileSync(cfg, JSON.stringify({ adapter: bad.file }), "utf8");
+  const r = cli([cfg]);
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stdout, /duplicate-trigger/);
+});
+
 test("CLI: explicit missing config → exit 2 setup error", () => {
-  const r = spawnSync("node", [TOOL, "tools/does-not-exist.json"], {
-    cwd: KIT_ROOT,
-    encoding: "utf8",
-  });
+  const r = cli(["tools/does-not-exist.json"]);
   assert.equal(r.status, 2, r.stdout + r.stderr);
 });
 
-test("CLI: config points at missing adapter → exit 0 skip", () => {
+test("REGRESSION M1: config names a MISSING adapter → exit 2 (loud), NOT skip", () => {
   const { dir } = tmpAdapter("matches:\n");
   const cfg = path.join(dir, "cfg.json");
   writeFileSync(cfg, JSON.stringify({ adapter: path.join(dir, "nope.yml") }), "utf8");
-  const r = spawnSync("node", [TOOL, cfg], { cwd: KIT_ROOT, encoding: "utf8" });
-  assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /skip/);
+  const r = cli([cfg]);
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.match(r.stderr, /configured adapter not found/);
+});
+
+test("SAFE-FAILURE: adapter present but 0 commands parsed → exit 2, not GREEN", () => {
+  const empty = tmpAdapter("matches:\n");
+  const cfg = path.join(empty.dir, "cfg.json");
+  writeFileSync(cfg, JSON.stringify({ adapter: empty.file }), "utf8");
+  const r = cli([cfg]);
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+});
+
+test("SAFE-FAILURE: a trigger declaration that yields no value (parse gap) → exit 2", () => {
+  // `- trigger:` with no value → headerCount 1 but 0 commands → completeness check fires
+  const gap = tmpAdapter(['matches:', "  - trigger:", '    replace: "x"'].join("\n"));
+  const cfg = path.join(gap.dir, "cfg.json");
+  writeFileSync(cfg, JSON.stringify({ adapter: gap.file }), "utf8");
+  const r = cli([cfg]);
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.match(r.stderr, /not fully recognized|0 commands|trigger declaration/);
 });
 
 // ── teardown ────────────────────────────────────────────────────────────────
