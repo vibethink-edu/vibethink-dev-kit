@@ -21,7 +21,7 @@ From `doc/decisions/ADR-20260524-supra-repo-inheritance-mechanism.md`:
 |---|---|---|
 | **Docs** (canons, methodology, ADRs) | **by reference** — your repo points at the kit path | never copy a doc (two normative copies drift) |
 | **Runnables** (engines, scripts) | **verbatim copy + parity check** (catalog Piece #31) | never an unguarded copy (it rots silently) |
-| **Mount** (local checkout/symlink of the kit) | dev/read convenience **only** | never let correctness depend on it |
+| **Mount** (the inherited kit checkout the repo resolves) | an **isolated, link-free clone** (own `.git`) — never a junction/symlink to a shared kit (D-066: the follow-delete wipe-risk pattern) | correctness must not silently depend on it — a stale/absent clone is surfaced by `devkit-doctor` (WARN, §8.8 absent-class), never a false-green |
 
 **Enforced by:** the copy-parity gate (Piece #31) for runnables; review discipline
 for doc-copies (a copied canon in an heir's tree is a finding).

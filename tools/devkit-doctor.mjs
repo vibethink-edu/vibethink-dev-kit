@@ -22,8 +22,8 @@
  * Pure Node, zero deps.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { detectExternalTools, formatExternalToolsHuman } from "./external-tools-health.mjs";
 
@@ -231,6 +231,66 @@ function detectInheritedBrain() {
     remediation.push(
       "restore knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md in the dev-kit mount"
     );
+  }
+
+  // mount-integrity (D-066 · §5.4): classify the inherited kit AS THE CONSUMER REACHES IT.
+  // `import.meta.url` is realpath-resolved by Node, so a junction is invisible via KIT_ROOT;
+  // `process.argv[1]` preserves the INVOKED path — a link anywhere in that chain (realpath ≠
+  // the literal path) is the junction-follow-delete wipe-risk pattern. Also flag a consumer
+  // convenience link (e.g. `.vibethink-core`) in the cwd repo. Non-blocking classification: a
+  // genuinely-absent mount is the §8.8 absent-class (WARN + the universal-rulebook error above),
+  // never a hard block here.
+  {
+    let mStatus = "ok";
+    let mMsg = "inherited kit is reached without a link and has its own .git — safe from junction-follow-delete (D-066)";
+    try {
+      const invokedRoot = process.argv[1] ? dirname(dirname(process.argv[1])) : KIT_ROOT;
+      let reachedViaLink = false;
+      let reachUndetermined = false;
+      try {
+        reachedViaLink = existsSync(invokedRoot) && resolve(realpathSync(invokedRoot)) !== resolve(invokedRoot);
+      } catch {
+        reachUndetermined = true; // could not resolve the reach path — indeterminate, NOT assumed safe (MN1, round 2)
+      }
+      let consumerLink = false;
+      try {
+        const cl = join(CWD, ".vibethink-core");
+        consumerLink = existsSync(cl) && lstatSync(cl).isSymbolicLink();
+      } catch {
+        consumerLink = false;
+      }
+      const gitPath = join(KIT_ROOT, ".git");
+      const hasGit = existsSync(gitPath);
+      const gitIsDir = hasGit && (() => { try { return lstatSync(gitPath).isDirectory(); } catch { return false; } })();
+
+      if (reachedViaLink || consumerLink) {
+        mStatus = "warn";
+        mMsg =
+          "inherited kit is reached via a junction/symlink/reparse-point — the wipe-risk pattern (D-066); use an isolated clone the repo references directly, which cannot be junction-follow-deleted";
+      } else if (reachUndetermined) {
+        mStatus = "warn";
+        mMsg =
+          "inherited kit reach path could not be resolved — a junction/symlink cannot be ruled out (indeterminate, treated as WARN, not assumed safe)";
+      } else if (!hasGit) {
+        mStatus = universal ? "warn" : "ok";
+        mMsg = universal
+          ? "inherited kit has no .git — not an isolated clone; use a clone (D-066)"
+          : "inherited kit mount type indeterminate (its absence is reported by universal-rulebook above — §8.8 absent-class)";
+      } else {
+        mMsg = gitIsDir
+          ? "inherited kit is an isolated clone (own .git), reached without a link — immune to junction-follow-delete (D-066)"
+          : "inherited kit has its own .git (worktree/gitlink), reached without a link — follow-delete-safe (D-066)";
+      }
+    } catch {
+      mStatus = "warn"; // indeterminate is NOT assumed-safe (never fail-open on the classification)
+      mMsg = "inherited kit mount type indeterminate — could not classify (treated as WARN, not assumed safe)";
+    }
+    checks.push({ id: "mount-integrity", status: mStatus, path: KIT_ROOT, message: mMsg });
+    if (mStatus === "warn") {
+      remediation.push(
+        "use an isolated clone of the kit (own .git) the repo references directly — never a junction/symlink/reparse-point (D-066 · CANON-BRANCH-WORKTREE-LIFECYCLE §5.4)"
+      );
+    }
   }
 
   if (CWD === KIT_ROOT && !rootAgents) {
