@@ -27,6 +27,7 @@
       "kind": "github-release",
       "cli": "rtk",
       "pin": "0.39.0",
+      "acceptInstalled": ">=0.38",
       "repo": "rtk-ai/rtk",
       "tag": "v0.39.0",
       "assets": {
