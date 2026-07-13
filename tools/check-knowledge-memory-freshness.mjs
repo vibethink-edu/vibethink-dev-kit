@@ -14,6 +14,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
+import { resolveArtifactCacheRoot, restoreVerifiedArtifact } from "./lib/kdd-artifact-cache.mjs";
 
 const ROOT = process.cwd();
 const configPath = process.argv[2] || "tools/knowledge-memory.config.json";
@@ -32,6 +33,7 @@ const rel = (p) => relative(ROOT, p).replace(/\\/g, "/");
 const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 const isFile = (p) => existsSync(p) && statSync(p).isFile();
 const sha = (buf) => createHash("sha256").update(buf).digest("hex");
+const derivedIndexDirectories = new Set(["graphify-out", "engram-out", ".engram"]);
 
 function readJson(path, label) {
   try {
@@ -52,21 +54,27 @@ if (!isFile(absManifest)) {
   console.log(`repo: ${ROOT}\n`);
   console.log(`  ${red("✗")} manifest               missing ${manifestPath}`);
   console.log(`\n${red(bold("RED — KDD memory freshness is unknown."))}`);
-  console.log(`fix: run node <kit>/tools/kdd-refresh.mjs ${configPath} after refreshing declared indexes\n`);
+  console.log(
+    `fix: run node <kit>/tools/kdd-refresh.mjs ${configPath} after refreshing declared indexes\n`
+  );
   process.exit(1);
 }
 const manifest = readJson(absManifest, "manifest");
 
-const sourceRoots = Array.isArray(cfg.sourceRoots) && cfg.sourceRoots.length ? cfg.sourceRoots : [cfg.knowledgeRoot || "docs/knowledge"];
+const sourceRoots =
+  Array.isArray(cfg.sourceRoots) && cfg.sourceRoots.length
+    ? cfg.sourceRoots
+    : [cfg.knowledgeRoot || "docs/knowledge"];
 const sourceExtensions = new Set(
   (Array.isArray(cfg.sourceExtensions) && cfg.sourceExtensions.length
     ? cfg.sourceExtensions
     : [".md", ".json", ".yaml", ".yml"]
   ).map((e) => e.toLowerCase())
 );
-const sourceStatuses = Array.isArray(cfg.sourcePackStatuses) && cfg.sourcePackStatuses.length
-  ? cfg.sourcePackStatuses.map((s) => String(s).toLowerCase())
-  : ["accepted"];
+const sourceStatuses =
+  Array.isArray(cfg.sourcePackStatuses) && cfg.sourcePackStatuses.length
+    ? cfg.sourcePackStatuses.map((s) => String(s).toLowerCase())
+    : ["accepted"];
 const sourceExclusions = new Set(
   (Array.isArray(cfg.sourceExclusions) ? cfg.sourceExclusions : [])
     .map((p) => String(p).replace(/\\/g, "/").replace(/^\/+/, "").toLowerCase())
@@ -80,7 +88,12 @@ function walk(root) {
   const stack = [absRoot];
   for (let i = 0; i < stack.length; i++) {
     for (const entry of readdirSync(stack[i], { withFileTypes: true })) {
-      if (entry.name === "node_modules" || entry.name === ".git") continue;
+      if (
+        entry.name === "node_modules" ||
+        entry.name === ".git" ||
+        derivedIndexDirectories.has(entry.name)
+      )
+        continue;
       const p = join(stack[i], entry.name);
       if (entry.isDirectory()) stack.push(p);
       else if (sourceExtensions.has(extname(entry.name).toLowerCase())) out.push(p);
@@ -137,7 +150,14 @@ function fingerprint(records) {
   return h.digest("hex");
 }
 
-const sourceFiles = [...new Set(sourceRoots.flatMap(walk).filter(includeSource).map((p) => resolve(p)))]
+const sourceFiles = [
+  ...new Set(
+    sourceRoots
+      .flatMap(walk)
+      .filter(includeSource)
+      .map((p) => resolve(p))
+  ),
+]
   .sort((a, b) => rel(a).localeCompare(rel(b)))
   .map(fileRecord);
 const currentFingerprint = fingerprint(sourceFiles);
@@ -152,7 +172,9 @@ console.log(`repo: ${ROOT}\n`);
 
 if (manifest.sourceFingerprint !== currentFingerprint) {
   problems++;
-  console.log(`  ${red("✗")} source fingerprint     stale manifest does not match accepted sources`);
+  console.log(
+    `  ${red("✗")} source fingerprint     stale manifest does not match accepted sources`
+  );
   console.log(`      manifest: ${manifest.sourceFingerprint || "(missing)"}`);
   console.log(`      current:  ${currentFingerprint}`);
 } else {
@@ -166,10 +188,14 @@ if (JSON.stringify(cfgAdapter || null) !== JSON.stringify(manifest.adapter || nu
   console.log(`  ${red("✗")} adapter                config adapter changed since manifest`);
 } else if (cfgAdapter) {
   ok++;
-  console.log(`  ${green("✓")} adapter                ${cfgAdapter.name || cfgAdapter.profile || "declared"}`);
+  console.log(
+    `  ${green("✓")} adapter                ${cfgAdapter.name || cfgAdapter.profile || "declared"}`
+  );
 }
 
-if (JSON.stringify([...sourceExclusions].sort()) !== JSON.stringify(manifest.sourceExclusions || [])) {
+if (
+  JSON.stringify([...sourceExclusions].sort()) !== JSON.stringify(manifest.sourceExclusions || [])
+) {
   problems++;
   console.log(`  ${red("✗")} source exclusions      config exclusions changed since manifest`);
 } else if (sourceExclusions.size) {
@@ -186,7 +212,9 @@ if (typeof cfg.maxManifestAgeDays === "number" && cfg.maxManifestAgeDays >= 0) {
     const ageDays = (Date.now() - generatedAt) / 86400000;
     if (ageDays > cfg.maxManifestAgeDays) {
       problems++;
-      console.log(`  ${red("✗")} manifest age           ${ageDays.toFixed(1)}d > ${cfg.maxManifestAgeDays}d`);
+      console.log(
+        `  ${red("✗")} manifest age           ${ageDays.toFixed(1)}d > ${cfg.maxManifestAgeDays}d`
+      );
     } else {
       ok++;
       console.log(`  ${green("✓")} manifest age           ${ageDays.toFixed(1)}d`);
@@ -194,14 +222,19 @@ if (typeof cfg.maxManifestAgeDays === "number" && cfg.maxManifestAgeDays >= 0) {
   }
 }
 
-const manifestIndexes = new Map((Array.isArray(manifest.indexes) ? manifest.indexes : []).map((i) => [i.name, i]));
+const manifestIndexes = new Map(
+  (Array.isArray(manifest.indexes) ? manifest.indexes : []).map((i) => [i.name, i])
+);
+const artifactCacheRoot = resolveArtifactCacheRoot(ROOT, cfg);
 for (const index of Array.isArray(cfg.indexes) ? cfg.indexes : []) {
   const name = index.name || "unnamed";
   const required = index.required === true;
   const manifestIndex = manifestIndexes.get(name);
   if (!manifestIndex) {
-    (required ? problems++ : warnings++);
-    console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} missing from manifest`);
+    required ? problems++ : warnings++;
+    console.log(
+      `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} missing from manifest`
+    );
     continue;
   }
   // §2.8 (CANON-GIT-HYGIENE): a derived-index refresh MUST be scoped, never a whole-repo rebuild.
@@ -210,39 +243,62 @@ for (const index of Array.isArray(cfg.indexes) ? cfg.indexes : []) {
   if (typeof index.refreshCommand === "string" && index.allowGlobalRefresh !== true) {
     const gm = index.refreshCommand.match(/\bgraphify\s+update\b(.*)$/);
     if (gm) {
-      const scope = gm[1].trim().split(/\s+/).find((t) => t && !t.startsWith("-"));
+      const scope = gm[1]
+        .trim()
+        .split(/\s+/)
+        .find((t) => t && !t.startsWith("-"));
       if (!scope || scope === "." || scope === "./") {
-        (required ? problems++ : warnings++);
+        required ? problems++ : warnings++;
         console.log(
-          `  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} refreshCommand is a WHOLE-REPO graphify rebuild ("${index.refreshCommand.trim()}") — CANON-GIT-HYGIENE §2.8 requires a SCOPED refresh (graphify update <concrete-path>), never a full rebuild; set a concrete scope, or declare "allowGlobalRefresh": true with a documented aggregation reason`
+          `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} refreshCommand is a WHOLE-REPO graphify rebuild ("${index.refreshCommand.trim()}") — CANON-GIT-HYGIENE §2.8 requires a SCOPED refresh (graphify update <concrete-path>), never a full rebuild; set a concrete scope, or declare "allowGlobalRefresh": true with a documented aggregation reason`
         );
       }
     }
   }
   const artifacts = Array.isArray(index.artifacts) ? index.artifacts : [];
   if (artifacts.length === 0) {
-    (required ? problems++ : warnings++);
-    console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} declares no artifacts`);
+    required ? problems++ : warnings++;
+    console.log(
+      `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} declares no artifacts`
+    );
     continue;
   }
   let indexProblems = 0;
   for (const artifact of artifacts) {
     const p = toAbs(artifact);
     const manifestArtifact = (manifestIndex.artifacts || []).find((a) => a.path === rel(p));
+    if (!isFile(p) && manifestArtifact?.exists && manifestArtifact.sha256) {
+      const restored = restoreVerifiedArtifact({
+        cacheRoot: artifactCacheRoot,
+        artifactPath: p,
+        expectedHash: manifestArtifact.sha256,
+        minimumMtimeMs: maxSourceMtime,
+      });
+      if (restored)
+        console.log(
+          `  ${green("↻")} index:${name.padEnd(15)} restored ${artifact} from shared verified cache`
+        );
+    }
     if (!isFile(p)) {
       indexProblems++;
-      console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} artifact missing ${artifact}`);
+      console.log(
+        `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} artifact missing ${artifact}`
+      );
       continue;
     }
     const current = fileRecord(p);
     if (!manifestArtifact?.exists || manifestArtifact.sha256 !== current.sha256) {
       indexProblems++;
-      console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} artifact changed since manifest: ${artifact}`);
+      console.log(
+        `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} artifact changed since manifest: ${artifact}`
+      );
     }
     const requireNewer = index.requireArtifactNewerThanSources !== false;
     if (requireNewer && current.mtimeMs < maxSourceMtime) {
       indexProblems++;
-      console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} artifact older than accepted sources: ${artifact}`);
+      console.log(
+        `  ${required ? red("✗") : yellow("⚠")} index:${name.padEnd(15)} artifact older than accepted sources: ${artifact}`
+      );
     }
   }
   if (indexProblems) {
@@ -255,18 +311,30 @@ for (const index of Array.isArray(cfg.indexes) ? cfg.indexes : []) {
 }
 
 console.log(`\n${bold("─".repeat(60))}`);
-console.log(`${bold("OK:")} ${green(String(ok))}   ${bold("WARN:")} ${warnings ? yellow(String(warnings)) : "0"}   ${bold("RED:")} ${problems ? red(String(problems)) : "0"}`);
+console.log(
+  `${bold("OK:")} ${green(String(ok))}   ${bold("WARN:")} ${warnings ? yellow(String(warnings)) : "0"}   ${bold("RED:")} ${problems ? red(String(problems)) : "0"}`
+);
 console.log(`${bold("─".repeat(60))}`);
 
 if (problems) {
   console.log(`${red(bold(`\nRED — ${problems} KDD memory freshness problem(s).`))}`);
-  console.log(`fix: refresh declared indexes, then run node <kit>/tools/kdd-refresh.mjs ${configPath}\n`);
+  console.log(
+    `fix: refresh declared indexes, then run node <kit>/tools/kdd-refresh.mjs ${configPath}\n`
+  );
   process.exit(1);
 }
 
 if (warnings) {
-  console.log(yellow(bold("\nWARN — optional KDD memory artifact(s) are missing/stale; product correctness is not blocked.\n")));
+  console.log(
+    yellow(
+      bold(
+        "\nWARN — optional KDD memory artifact(s) are missing/stale; product correctness is not blocked.\n"
+      )
+    )
+  );
   process.exit(0);
 }
 
-console.log(green(bold("\nGREEN — KDD memory manifest matches accepted sources and declared indexes.\n")));
+console.log(
+  green(bold("\nGREEN — KDD memory manifest matches accepted sources and declared indexes.\n"))
+);

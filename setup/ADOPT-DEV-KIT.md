@@ -1311,6 +1311,10 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - Copy `setup/templates/knowledge-memory/knowledge-memory.config.json` to
     `tools/knowledge-memory.config.json` and declare the manifest path, accepted source roots,
     adapter, required/optional index artifacts, and refresh commands.
+  - Repos that use Git worktrees SHOULD keep `artifactCache.mode: git-common-dir` so a
+    verified derived index can be restored across clean worktrees by manifest SHA-256.
+    This is a local cache only; versioned Markdown remains the source of truth and a
+    missing/corrupt cache never bypasses the freshness gate.
   - Declare `tools/knowledge-pack.config.json` from `tools/knowledge-pack.config.example.json`:
     knowledge root, feature roots, required artifacts, Knowledge Memory Adapter, trigger
     classes, and engine freshness/health checks.
@@ -1332,6 +1336,8 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     validator, and open questions have owner/status.
   - The KDD memory manifest fingerprint matches accepted sources; required Graphify/Engram
     artifacts exist, match the manifest, and are not older than accepted sources when configured.
+  - Derived `graphify-out`, `engram-out`, and `.engram` directories are not fingerprinted
+    as accepted sources, including when an engine emits one below a Knowledge Pack.
   - If Engram/Graphify are declared by the L3 adapter and stale/unavailable, local/session
     health surfaces RED/WARN; agents do not silently pretend retrieval succeeded.
 

@@ -9,11 +9,16 @@ Graphify, Engram, vector, search, or markdown-only memory adapters.
 
 1. Copy `knowledge-memory.config.json` to `tools/knowledge-memory.config.json`.
 2. Edit `sourceRoots`, `knowledgeMemoryAdapter`, and `indexes` for the consuming repo.
-3. If the repo generates OKF-compatible surfaces such as `index.md` or `log.md`, exclude
+3. Keep `artifactCache.mode` as `git-common-dir` when contributors use Git worktrees.
+   `kdd-refresh` stores only hash-verified derived artifacts in Git's shared local
+   directory, and the freshness gate can restore a missing worktree-local artifact only
+   when its SHA-256 matches the committed manifest. The cache is local and never replaces
+   the versioned Markdown source of truth.
+4. If the repo generates OKF-compatible surfaces such as `index.md` or `log.md`, exclude
    only exact repo-relative generated file paths in `sourceExclusions`. Never exclude by
    basename (`index.md`, `log.md`) because that can hide accepted knowledge at any depth.
-4. Refresh declared engines.
-5. Run:
+5. Refresh declared engines.
+6. Run:
 
 ```bash
 node <kit>/tools/kdd-refresh.mjs tools/knowledge-memory.config.json
@@ -26,3 +31,6 @@ The accepted Markdown Knowledge Pack is the auditable source of truth. Graphify,
 Engram, vector stores, and search indexes are derived memory. If accepted knowledge
 changes and the manifest is stale, local/session health must report RED/WARN before
 agents use the old memory.
+
+Derived directories named `graphify-out`, `engram-out`, or `.engram` are never counted
+as accepted source files, even if an engine writes one below a Knowledge Pack.
