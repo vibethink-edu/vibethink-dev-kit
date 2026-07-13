@@ -15,6 +15,7 @@
     "check-inheritance-claims.mjs": "1.0",
     "check-knowledge-memory-freshness.mjs": "1.0",
     "check-knowledge-pack.mjs": "1.0",
+    "check-operator-catalog.mjs": "1.0",
     "check-policy-manifests.mjs": "1.2",
     "check-ports.mjs": "1.0",
     "check-tenant-contamination.mjs": "1.0",
