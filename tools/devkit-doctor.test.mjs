@@ -7,7 +7,7 @@
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmdirSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -59,18 +59,46 @@ test("--json → valid shape", () => {
   assert.ok(Array.isArray(j.gates), "gates must be an array");
 });
 
-// 2b. mount-integrity (D-066): the check is wired and classifies the running kit. The kit is a
-//     clone (own .git) → status ok. The junction/reparse WARN path is best-effort — it cannot be
-//     forced in a subprocess (can't make the running kit's own root a junction), so the isLink→warn
-//     branch is covered by review, not a fixture here.
-test("mount-integrity check present + classifies the clone kit as ok (D-066)", () => {
+// 2b. mount-integrity (D-066): the check classifies the running kit reached via the REAL path
+//     (no link in the chain) → ok.
+test("mount-integrity: kit reached without a link → ok (D-066)", () => {
   const { code, out } = doctor(tmp(), ["--json"]);
   assert.equal(code, 0, out);
   const j = JSON.parse(out);
   const m = (j.inheritedBrain?.checks || []).find((c) => c.id === "mount-integrity");
   assert.ok(m, "mount-integrity check must be present in inheritedBrain.checks");
-  assert.equal(m.status, "ok", `expected ok for a clone kit, got ${m.status}: ${m.message}`);
-  assert.match(m.message, /clone/i, "message should name the isolated-clone classification");
+  assert.equal(m.status, "ok", `expected ok for a link-free kit, got ${m.status}: ${m.message}`);
+});
+
+// 2c. KNOWN-BAD (§8.7): the kit reached THROUGH a link (junction/symlink) is the wipe-risk pattern
+//     and MUST WARN. This is the fixture the first draft wrongly declared impossible — deleting the
+//     link-detection makes this go warn→ok and fail. Cross-platform: junction on Windows, symlink on POSIX.
+test("mount-integrity: kit reached via a junction/symlink → WARN (D-066 known-bad)", () => {
+  const kitRoot = path.dirname(path.dirname(DOCTOR));
+  const link = path.join(tmp(), "kit-via-link");
+  try {
+    symlinkSync(kitRoot, link, process.platform === "win32" ? "junction" : "dir");
+  } catch (e) {
+    console.log(`       (skipped: cannot create a link on this host: ${e.message})`);
+    return; // no privilege to create a link → skip, never a false fail
+  }
+  try {
+    const r = spawnSync("node", [path.join(link, "tools", "devkit-doctor.mjs"), "--json"], {
+      cwd: tmp(),
+      encoding: "utf8",
+    });
+    const j = JSON.parse(`${r.stdout ?? ""}`);
+    const m = (j.inheritedBrain?.checks || []).find((c) => c.id === "mount-integrity");
+    assert.ok(m, "mount-integrity check must be present");
+    assert.equal(m.status, "warn", `reached via a link MUST warn, got ${m.status}: ${m?.message}`);
+    assert.match(m.message, /junction|symlink|reparse|link/i);
+  } finally {
+    try {
+      process.platform === "win32" ? rmdirSync(link) : unlinkSync(link);
+    } catch {
+      /* leave the link; it points at the shared kit and must never be recursively deleted */
+    }
+  }
 });
 
 // 3. A gate that FAILS → RED + exit 1 + the fix hint. Force it: a copy-parity config

@@ -14,6 +14,11 @@ echo "🔗 VibeThink Context Mounter"
 echo "   Source: $DEVKIT_PATH"
 echo "   Target: $CURRENT_DIR"
 
+# DEPRECATED per D-066 (CANON-BRANCH-WORKTREE-LIFECYCLE §5.4): a symlink to the kit is the
+# junction-follow-delete WIPE-RISK pattern — a recursive delete of this repo can follow the link
+# and destroy the shared kit. PREFER an isolated, link-free clone the repo references directly.
+echo "⚠️  DEPRECATED (D-066): a .vibethink-core symlink to the kit is the follow-delete wipe-risk pattern. Prefer an isolated clone. See CANON-BRANCH-WORKTREE-LIFECYCLE 5.4." >&2
+
 # 2. Create Symlink
 if [ -L "$TARGET_LINK" ]; then
     echo "⚠️  Link '.vibethink-core' already exists."

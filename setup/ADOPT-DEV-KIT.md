@@ -32,7 +32,7 @@ artifact type:
 |---|---|---|
 | **Docs** (canons, methodology, ADRs) | **by reference** — your repo points to the kit path, no copy | docs need no runtime resolution; a pointer keeps a single source of truth |
 | **Runnable** (engines / scripts) | **verbatim copy + CI parity check** | the script must run even where the mount is absent; the parity check is its drift guard |
-| **Mount** (`.vibethink-core` / workspace folder) | dev/read convenience **only** | a symlink can be missing on a checkout — correctness cannot depend on it |
+| **Mount** (the inherited kit checkout) | an **isolated, link-free clone** (own `.git`), referenced by path — never a `.vibethink-core` junction/symlink (D-066: the junction-follow-delete wipe-risk) | a stale/absent clone is surfaced by `devkit-doctor` (WARN, §8.8), so correctness never silently depends on it |
 
 **Golden rule:** the engine is tested **once, here**. Your repo declares its
 **config** and runs the **smoke** against it; it never forks the engine. A copied
