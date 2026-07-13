@@ -3,6 +3,10 @@
 ## 2026-07-13
 
 ### Fixed
+- **SpecKit prerequisite validation now supports governed branch names when the
+  consumer explicitly declares its feature directory.** `SPECIFY_FEATURE_DIRECTORY`
+  or `.specify/feature.json` with `feature_directory` is required; without either,
+  the existing numeric/timestamp branch validation remains in force.
 - **KDD derived artifacts now survive clean Git worktrees without weakening freshness.**
   Repositories may opt into `artifactCache.mode: git-common-dir`; `kdd-refresh` stores
   hash-verified index artifacts in Git's shared local directory, and the freshness gate
