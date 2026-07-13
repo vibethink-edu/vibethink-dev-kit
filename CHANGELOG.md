@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-13
+
+### Fixed
+- **KDD derived artifacts now survive clean Git worktrees without weakening freshness.**
+  Repositories may opt into `artifactCache.mode: git-common-dir`; `kdd-refresh` stores
+  hash-verified index artifacts in Git's shared local directory, and the freshness gate
+  restores a missing worktree-local artifact only when its SHA-256 matches the versioned
+  manifest. Derived `graphify-out`/`engram-out` directories are excluded from accepted
+  source fingerprints so indexes cannot recursively become their own source knowledge.
+
 ## 2026-07-03
 
 ### Fixed

@@ -11,6 +11,9 @@
     "engines": ["engram", "graphify"],
     "sourceOfTruth": "versioned-markdown"
   },
+  "artifactCache": {
+    "mode": "git-common-dir"
+  },
   "indexes": [
     {
       "name": "graphify",
