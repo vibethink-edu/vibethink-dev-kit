@@ -246,10 +246,11 @@ function detectInheritedBrain() {
     try {
       const invokedRoot = process.argv[1] ? dirname(dirname(process.argv[1])) : KIT_ROOT;
       let reachedViaLink = false;
+      let reachUndetermined = false;
       try {
         reachedViaLink = existsSync(invokedRoot) && resolve(realpathSync(invokedRoot)) !== resolve(invokedRoot);
       } catch {
-        reachedViaLink = false;
+        reachUndetermined = true; // could not resolve the reach path — indeterminate, NOT assumed safe (MN1, round 2)
       }
       let consumerLink = false;
       try {
@@ -266,6 +267,10 @@ function detectInheritedBrain() {
         mStatus = "warn";
         mMsg =
           "inherited kit is reached via a junction/symlink/reparse-point — the wipe-risk pattern (D-066); use an isolated clone the repo references directly, which cannot be junction-follow-deleted";
+      } else if (reachUndetermined) {
+        mStatus = "warn";
+        mMsg =
+          "inherited kit reach path could not be resolved — a junction/symlink cannot be ruled out (indeterminate, treated as WARN, not assumed safe)";
       } else if (!hasGit) {
         mStatus = universal ? "warn" : "ok";
         mMsg = universal

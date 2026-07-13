@@ -27,4 +27,18 @@ Fable **executed** the refutations (real `mklink /J` junctions + the branch's re
 ### Clean surfaces (Fable, round 1)
 No collision with D-062's delete-side rules (genuine prevention+mitigation complement); deprecation breaks no flow; version bumps correct; register format consistent; spine-worthy (not gold-plating). *Live bonus: the policy floor blocked Fable's own `rm -rf` of its fixtures — D-062 working during its own review.*
 
-**Disposition:** all round-1 findings applied + re-proven by execution. Re-check (Fable) pending before seal.
+**Disposition:** all round-1 findings applied + re-proven by execution.
+
+## Round 2 (re-check) — `VERDICT: APPROVE`
+
+Fable re-verified against `001b371`, **executing** the reproductions again:
+- **M1 re-proven across 4 invocation forms** the coordinator asked to attack — absolute-through-junction → warn, relative-through-junction → warn, `node --` wrapper-through-junction → warn, real-absolute → ok. The `argv[1]` derivation holds; the round-1 false-green is dead.
+- **M2** `check-agent-context` GREEN (product name neutralized, not relocated; `knowledge` + `setup` both scanned); board 9/9 GREEN.
+- **M3** rule + code are WARN/non-blocking; canon describes actual behavior; §8.8 no longer inverted.
+- **M4 re-proven a genuine known-bad** — Fable stripped the link-detection and ran through a junction: unstripped → warn, stripped → ok (false-green); so 2c fails when the detection is removed. Cleanup unlinks (never recurses); fixture skips-not-fails when unprivileged.
+- **MD1–MD4** all addressed (not hand-waved); MN1/MN2 round-1 closed.
+- **No blocking regressions** (exit-code, neutrality, imports, cleanup all clean).
+
+**One new MINOR (round 2), non-blocking → fixed anyway:** the inner `realpathSync` catch degraded to `reachedViaLink = false` (assumed-safe), inconsistent with the outer catch's warn. **FIX applied:** inner catch → `reachUndetermined = true` → a WARN branch ("junction/symlink cannot be ruled out — indeterminate, not assumed safe"), aligning with the outer catch's principle. Test still 8/8; real kit still `ok`.
+
+**Fable's verdict: "Listo para sello por la autoridad humana."** Records both rounds; presented for the named authority's seal.
