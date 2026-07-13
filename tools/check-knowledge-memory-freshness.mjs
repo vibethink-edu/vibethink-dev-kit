@@ -204,6 +204,21 @@ for (const index of Array.isArray(cfg.indexes) ? cfg.indexes : []) {
     console.log(`  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} missing from manifest`);
     continue;
   }
+  // §2.8 (CANON-GIT-HYGIENE): a derived-index refresh MUST be scoped, never a whole-repo rebuild.
+  // Reject a global `graphify update .` (or no concrete scope) unless the index declares an explicit
+  // aggregation contract via allowGlobalRefresh.
+  if (typeof index.refreshCommand === "string" && index.allowGlobalRefresh !== true) {
+    const gm = index.refreshCommand.match(/\bgraphify\s+update\b(.*)$/);
+    if (gm) {
+      const scope = gm[1].trim().split(/\s+/).find((t) => t && !t.startsWith("-"));
+      if (!scope || scope === "." || scope === "./") {
+        (required ? problems++ : warnings++);
+        console.log(
+          `  ${(required ? red("✗") : yellow("⚠"))} index:${name.padEnd(15)} refreshCommand is a WHOLE-REPO graphify rebuild ("${index.refreshCommand.trim()}") — CANON-GIT-HYGIENE §2.8 requires a SCOPED refresh (graphify update <concrete-path>), never a full rebuild; set a concrete scope, or declare "allowGlobalRefresh": true with a documented aggregation reason`
+        );
+      }
+    }
+  }
   const artifacts = Array.isArray(index.artifacts) ? index.artifacts : [];
   if (artifacts.length === 0) {
     (required ? problems++ : warnings++);
