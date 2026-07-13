@@ -217,6 +217,36 @@ test("graphify stale graph => WARN and requires scoped update before use", () =>
   assert.deepEqual(graphify.activity.areas, ["apps/dashboard"]);
 });
 
+// The doctor↔upgrade parity fix: staleness threshold comes from the LOCK's artifact.staleDays
+// (the same source devkit-upgrade reads), not a hardcoded default. A 5-day-old graph under a
+// lock staleDays=7 is FRESH (before the fix, external-tools-health hardcoded 3 → wrongly STALE,
+// disagreeing with devkit-upgrade). An env var still overrides.
+test("graphify: staleDays is read from the lock artifact (doctor↔upgrade parity), env overrides", () => {
+  const repo = tmp();
+  const graphDir = path.join(repo, "graphify-out");
+  mkdirSync(graphDir, { recursive: true });
+  writeFileSync(path.join(graphDir, "graph.json"), "{}");
+  const now = Date.now() + 5 * 86_400_000; // 5-day-old graph
+  const toolWithArtifact = {
+    ...fakeLock().tools[0],
+    artifact: { path: "graphify-out/graph.json", staleDays: 7 },
+  };
+  const base = {
+    platform: "linux",
+    home: "/home/dev",
+    cwd: repo,
+    now,
+    changedAreas: ["apps/dashboard"],
+    run: runMap({ "graphify --version": { status: 0, stdout: "graphify 0.8.39\n", stderr: "" } }),
+  };
+  // No env override → must read the lock's 7 → 5 < 7 → NOT stale (matches devkit-upgrade).
+  const fresh = detectExternalTools({ ...base, lock: { tools: [toolWithArtifact] }, env: { PATH: "/usr/bin" } });
+  assert.notEqual(fresh.tools[0].state, "artifact-stale", `5d graph must be fresh under lock staleDays=7, got ${fresh.tools[0].state}`);
+  // env override still wins → threshold 3 → 5 > 3 → stale.
+  const overridden = detectExternalTools({ ...base, lock: { tools: [toolWithArtifact] }, env: { PATH: "/usr/bin", GRAPHIFY_STALE_DAYS: "3" } });
+  assert.equal(overridden.tools[0].state, "artifact-stale", "env GRAPHIFY_STALE_DAYS must still override the lock");
+});
+
 // KNOWN-BAD: the pure area computation — docs/build/root-file paths must NOT
 // become areas; apps/packages collapse to their 2-segment workspace root.
 test("graphifyAreasFromPaths: apps/packages → workspace root; docs/build/root excluded", () => {

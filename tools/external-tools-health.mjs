@@ -386,7 +386,9 @@ function newestMtimeUnder(dir, limit = 200) {
 
 function graphifyActivity(tool, result, opts) {
   if (tool.name !== "graphify") return null;
-  const staleDays = Number(opts.env.GRAPHIFY_STALE_DAYS || 3);
+  // single source of truth: the lock's artifact.staleDays (same as devkit-upgrade reads) — an env
+  // var still overrides. Fixes the doctor↔upgrade disagreement (doctor hardcoded 3, lock/upgrade 7).
+  const staleDays = Number(opts.env.GRAPHIFY_STALE_DAYS || tool.artifact?.staleDays || 3);
   const graph = join(opts.cwd, "graphify-out", "graph.json");
   // Deterministic area(s): opts.changedAreas (tests) else read from git in cwd.
   const areas = opts.changedAreas ?? readChangedAreas(opts.cwd, opts.gitRun);
@@ -426,7 +428,7 @@ function graphifyActivity(tool, result, opts) {
 
 function engramActivity(tool, result, opts) {
   if (tool.name !== "engram" && !tool.stateful) return null;
-  const staleDays = Number(opts.env.ENGRAM_STALE_DAYS || 7);
+  const staleDays = Number(opts.env.ENGRAM_STALE_DAYS || tool.artifact?.staleDays || 7);
   const dataDirs = candidateDataDirs(tool, opts.env, opts.platform, opts.home);
   const existing = dataDirs.find((d) => safeExists(d));
   if (!existing) {
