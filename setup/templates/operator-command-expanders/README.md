@@ -28,7 +28,8 @@ If you type triggers into an IDE-extension chat input, prefer **Espanso** — ed
 
 ## Files here
 
-- `operator-commands.example.yml` — Espanso example (neutral; uses `<placeholders>` for product commands + a shared `preamble` variable so the one-shot/evidence block is defined once). **⚠ It is an 11-command DEMO, not the baseline — never sync/compare your adapter against it; the authority is the catalog (`REFERENCE-OPERATOR-COMMAND-CATALOG` §4), which `ops-sync` reconciles against.**
-- `vscode-snippets.example.json` — VS Code snippets example (secondary adapter).
+- `operator-commands.example.yml` — Espanso example (neutral; uses `<placeholders>` for product commands + a shared `preamble` variable so the one-shot/evidence block is defined once). Carries the **v2 inherited rules** (declared execution + the referenced-work/creds/comms floor, catalog rules 9–12) in its `preamble`. **⚠ It is a 16-command DEMO, not the baseline — never sync/compare your adapter against it; the authority is the catalog (`REFERENCE-OPERATOR-COMMAND-CATALOG` §4), which `ops-sync` reconciles against.**
+- `vscode-snippets.example.json` — VS Code snippets example (secondary adapter). **Pre-v2 illustrative subset — structure only; it does NOT yet carry the v2 inherited rules (9–12). Regenerate via `ops-sync` for the full rule set.**
+- `operator-catalog.config.example.json` — config for the `check-operator-catalog` gate (§5.1): copy to `tools/operator-catalog.config.json` and point `adapter` at your local file to lint it.
 
-Both are **neutral seeds**. Your real adapter is **L3**: it fills the concrete command bodies (your package-manager scripts, tool paths, canon names). Never commit a product-named adapter into the kit.
+Both adapters are **neutral seeds**. Your real adapter is **L3**: it fills the concrete command bodies (your package-manager scripts, tool paths, canon names). The binding rule set is the catalog's §2 (rules 1–12), not these examples. Never commit a product-named adapter into the kit.

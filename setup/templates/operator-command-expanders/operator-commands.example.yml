@@ -1,11 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/espanso/espanso/dev/schemas/match.schema.json
 #
-# EXAMPLE Espanso adapter — a 12-command DEMO, NOT the baseline.
+# EXAMPLE Espanso adapter — a 16-command DEMO, NOT the baseline.
 # ⚠ Do NOT sync against this file: the full command set + rules live in
 #   REFERENCE-OPERATOR-COMMAND-CATALOG §4 (the source of truth). ops-sync reconciles
 #   against the CATALOG — comparing your local adapter to this demo is meaningless.
 # NEUTRAL SEED: bodies use <placeholders>. Your real adapter (L3) fills concrete commands
 #   (your package-manager scripts, tool paths, canon names). Do NOT commit a product-named file to the kit.
+# LOCALIZATION (rule 5): the `COMANDO EJECUTADO` opener is the Spanish form of catalog rule 9's
+#   neutral `COMMAND EXECUTED: :xxx — <intent>`; the `:cristiano` / `:teen` triggers are intentional
+#   Spanish localized canonical triggers for the `explain-plain` / `explain-teach` ids — illustrating
+#   rule 5, still one canonical trigger per id (rule 8). A consumer localizes to their own language.
 # ADDITIVE: never delete or overwrite existing user snippets. On a trigger clash, alias — don't replace.
 # DRY: the one-shot + evidence block lives once in `preamble` and is referenced as {{preamble}}.
 
@@ -14,17 +18,26 @@ global_vars:
     type: echo
     params:
       echo: >-
+        Open your reply by declaring which command ran: `COMANDO EJECUTADO: :<this command> — <intención>`.
         For this response only, be concrete and plain. This command is ONE-SHOT: it does not change the
         agent's persona, language preference, collaboration mode, or future responses. Evidence rule:
         never claim you RAN a command you only found in package/scripts/docs/index — label each fact
         EXECUTED / VERIFIED / INFERENCE / NOT-VERIFIED, and for any gate report COMMAND, RESULT, EVIDENCE,
-        INFERENCE (if any), RECOMMENDATION. Always close with an actionable RECOMMENDATION; if the next
-        step maps to another command, say it literally, e.g. run :xxx.
+        INFERENCE (if any), RECOMMENDATION. When you reference a PR / issue / branch / check, give its
+        title AND current state, never a bare number (#123 "title" (OPEN · CI red), not #123). If you touch
+        credentials, secrets, or a UAT/staging identity: read the repo's credential/UAT runbook first, never
+        invent or rotate a key, never hardcode or print a secret value, keep the identity ephemeral and
+        non-destructive. If you file a comm / finding / handoff: use the repo's governed channel with
+        structured front matter (recipient, status, human-needed) — the chat is a pointer, not the artifact.
+        Always close with an actionable RECOMMENDATION; if the next step maps to another command, say it
+        literally, e.g. run :xxx.
 
 matches:
   # ── session ──────────────────────────────────────────────────────────────
   - trigger: ":repo-health"
     replace: "{{preamble}} Run a complete READ-ONLY repo health diagnostic: branch, git status, staged/unstaged/untracked, unpushed commits, remote divergence, stashes, worktrees, in-progress merge/rebase, suspicious/large files, root clutter, obvious secrets, available gates/tests (<pkg> <script> if present), and dev-kit health if inherited. Do not modify anything. Report status / reds / warns / risks, then close with RECOMMENDATION."
+  - trigger: ":repo-creds"
+    replace: "{{preamble}} You are about to touch credentials, secrets, or a UAT/staging identity. FIRST read this repo's credential/UAT runbook and env docs (<path-to-creds-runbook>, <env-docs>). Then: never invent or rotate a key; never hardcode or print a secret value; use only the governed secret store (<secret-store> — L3); treat any UAT/test identity as EPHEMERAL and NON-DESTRUCTIVE — never mutate a real, team, or tenant account. State WHAT you need, WHERE the runbook says it lives, and the safe next step. If the runbook is missing or unclear, STOP and ask — do not improvise. Close with RECOMMENDATION."
   - trigger: ":session-close"
     replace: "{{preamble}} Close the session end-to-end: classify staged/unstaged/untracked, keep valid work, delete only obvious junk, separate mixed scopes, finish or abort any merge/rebase, no --no-verify, no force-push. Commit persistable work, push what can travel, and leave every touched branch/worktree in a declared exit state (PUSHED / READY-PR / DISCARDED / COMMITTED-LOCAL with warning). End with final git status + evidence, and RECOMMENDATION for the next session's first safe step."
   # ── git ──────────────────────────────────────────────────────────────────
@@ -42,8 +55,15 @@ matches:
     replace: "{{preamble}} Verify a surface is ready for HUMAN review without the human fixing setup: clean build (real command if present), minimal smoke/test, server up on the right port, exact route responds, dev env/secrets present, DB/parity if applicable, and real evidence (not 'should work'). Only ask the human for judgement a machine cannot give. Close with VERDICT: review-ready | not-ready + RECOMMENDATION (or the review handoff)."
   - trigger: ":handoff-local"
     replace: "{{preamble}} Prepare/create a LOCAL handoff on the repo's shared channel. Verify repo, branch, worktree, ownership, git state, real recipient. Before generating the handoff, decide whether the state is already declared; if not, recommend running :session-close first. Do not clean up inside the handoff; consume declared closeout evidence when it exists. Use the governed send tool if present; else write the comm with first-line front matter + flat fields. Commit/push if there is a remote and verify the recipient's routing; if no remote, allow only COMMITTED-LOCAL with a warning. Body: objective, verified state + evidence, artifacts, gates run, pending decisions, read-first, not-included, closing state, next action. Close with RECOMMENDATION."
+  - trigger: ":handoff-back"
+    replace: "{{preamble}} You received a handoff/instruction that is AMBIGUOUS — before accepting or acting, ask backward-clarifying questions instead of guessing. Identify exactly what is unclear (scope, target branch/worktree, ownership, definition of done, which of several readings is meant, missing prerequisite). Restate your best current understanding, list the specific blocking questions (numbered, answerable), and state what you will do once each is answered. Do NOT start work that a wrong guess would waste. Close with RECOMMENDATION (the questions to resolve first)."
   - trigger: ":finding"
     replace: "{{preamble}} You found an anomaly/risk/opportunity OUTSIDE your scope: file a governed FINDING instead of fixing it. Classify the category (SECURITY, DATABASE, ARCHITECTURE, PERFORMANCE, CONFIG-SURFACE, ALTERNATIVE, or a repo category). State WHAT, WHERE (file+line), WHY it matters, and SUGGESTED ACTION (INVESTIGATE | FIX | CONSULT-EXPERT | TRY-PLAN-B | ESCALATE-TO-ARCHITECT). Use the governed channel if present; SECURITY + ESCALATE go to the authority immediately. Close with RECOMMENDATION."
+  # ── explain (human-language surface) ─────────────────────────────────────
+  - trigger: ":cristiano"
+    replace: "{{preamble}} Explain the CURRENT status of what we're working on in plain, non-jargon language, so I can continue the same front without losing the thread. No acronyms without expanding them once; no internal codenames without a plain gloss. Say where we are, what's done, what's pending, and what the next concrete step is. Short and concrete. Close with RECOMMENDATION (the next step, in plain words)."
+  - trigger: ":teen"
+    replace: "{{preamble}} Explain the concept/decision at hand DIDACTICALLY, as if teaching someone smart but new to it: define the term, give a concrete worked example, name the common pitfall, and check understanding with one plain analogy. No hand-waving, no unexplained jargon. Close with RECOMMENDATION (what to read or do next to go deeper)."
   # ── dk (dev-kit currency) ────────────────────────────────────────────────
   - trigger: ":dk-refresh"
     replace: "{{preamble}} Refresh the dev-kit in THIS session WITHOUT restarting it. Run the dev-kit upgrade tool (`node <your-dev-kit-path>/tools/devkit-upgrade.mjs`) — it fast-forward-pulls the kit and prints the CANON-DELTA (the D-rows / canons changed since this session's last pull). Then RE-READ the flagged canons before continuing: the kit is inherited BY REFERENCE, so 'refresh' means re-read, not re-install. Report EXECUTED pull result, the canon-delta list, which canons you re-read, and confirm you are now operating on the current rules. Close with RECOMMENDATION."
@@ -51,4 +71,4 @@ matches:
   - trigger: ":ops-sync"
     replace: "{{preamble}} Read the dev-kit operator command catalog (REFERENCE-OPERATOR-COMMAND-CATALOG) and create/update my command expander ADDITIVELY. Detect my expander (Espanso / VS Code / other) or ask. Do NOT delete or replace my existing snippets; on a trigger clash, report it and propose an alias; validate prefix-safety (no trigger an exact prefix of another) before writing; generate valid files for my tool and validate it can load them (restart + read the log if available). Report evidence — files created/edited, triggers added, conflicts — and how to test :commands-help. Close with RECOMMENDATION."
   - trigger: ":commands-help"
-    replace: "List the available operator commands by category (session, repo, git, ci, task, handoff, review, context, meta) with a one-line intent each, and note which short/long aliases are synonyms. This is a static list; do not run anything."
+    replace: "COMANDO EJECUTADO: :commands-help — list operator commands. List the available operator commands by category (session, repo, git, ci, task, handoff, review, explain, context, dk, meta) with a one-line intent each. List ONE canonical trigger per command — no synonym aliases (aliases, if any, are the operator's own opt-in local additions, not part of this set). This is a static list; do not run anything."

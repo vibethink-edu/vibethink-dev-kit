@@ -1,0 +1,4 @@
+{
+  "_comment": "Copy to tools/operator-catalog.config.json in your repo to lint YOUR local operator adapter. 'adapter' is the path to your Espanso (or Espanso-shaped) command file. With no config, check-operator-catalog defaults to the shipped example template (the kit dogfoods it). The gate checks trigger set + body presence only; it never runs a command.",
+  "adapter": "path/to/your/operator-commands.yml"
+}

@@ -2,6 +2,7 @@
   "//": "EXAMPLE VS Code snippets adapter — generated from REFERENCE-OPERATOR-COMMAND-CATALOG.",
   "//scope": "Secondary adapter: fires INSIDE the editor only — NOT guaranteed in extension chat webviews. For chat/webview/terminal inputs use the Espanso adapter.",
   "//neutral": "Bodies use <placeholders>; your real adapter (L3) fills concrete commands. Additive: merge into your snippets file, do not overwrite existing prefixes; on a clash, alias.",
+  "//v2": "PRE-V2 illustrative subset: structure only. It does NOT yet carry the v2 inherited rules (declared execution + the referenced-work/creds/comms floor, catalog rules 9-12) — the Espanso example does. Regenerate via ops-sync for the full rule set; the binding authority is the catalog §2.",
   "repo-health": {
     "prefix": ":repo-health",
     "description": "Read-only repo health diagnostic (one-shot, evidence-contracted)",
