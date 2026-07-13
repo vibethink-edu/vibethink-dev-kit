@@ -59,7 +59,33 @@ EXAMPLES:
 # Get feature paths and validate branch
 $paths = Get-FeaturePathsEnv
 
-if (-not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit:$paths.HAS_GIT)) { 
+function Test-ExplicitFeatureDirectory {
+    param([string]$RepoRoot)
+
+    if (-not [string]::IsNullOrWhiteSpace($env:SPECIFY_FEATURE_DIRECTORY)) {
+        return $true
+    }
+
+    $featureJson = Join-Path $RepoRoot '.specify/feature.json'
+    if (-not (Test-Path -LiteralPath $featureJson -PathType Leaf)) {
+        return $false
+    }
+
+    try {
+        $featureConfig = Get-Content -LiteralPath $featureJson -Raw | ConvertFrom-Json
+        return -not [string]::IsNullOrWhiteSpace([string]$featureConfig.feature_directory)
+    } catch {
+        # Get-FeaturePathsEnv reports malformed feature.json with the canonical
+        # diagnostic. It must not become an implicit branch-validation bypass.
+        return $false
+    }
+}
+
+# Consumers with an explicit feature directory may use their governed branch
+# convention. Without that declaration, preserve the normal numeric/timestamp
+# feature-branch validation and its unambiguous branch-to-spec resolution.
+$hasExplicitFeatureDirectory = Test-ExplicitFeatureDirectory -RepoRoot $paths.REPO_ROOT
+if (-not $hasExplicitFeatureDirectory -and -not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit:$paths.HAS_GIT)) {
     exit 1 
 }
 
