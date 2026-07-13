@@ -59,6 +59,20 @@ test("--json → valid shape", () => {
   assert.ok(Array.isArray(j.gates), "gates must be an array");
 });
 
+// 2b. mount-integrity (D-066): the check is wired and classifies the running kit. The kit is a
+//     clone (own .git) → status ok. The junction/reparse WARN path is best-effort — it cannot be
+//     forced in a subprocess (can't make the running kit's own root a junction), so the isLink→warn
+//     branch is covered by review, not a fixture here.
+test("mount-integrity check present + classifies the clone kit as ok (D-066)", () => {
+  const { code, out } = doctor(tmp(), ["--json"]);
+  assert.equal(code, 0, out);
+  const j = JSON.parse(out);
+  const m = (j.inheritedBrain?.checks || []).find((c) => c.id === "mount-integrity");
+  assert.ok(m, "mount-integrity check must be present in inheritedBrain.checks");
+  assert.equal(m.status, "ok", `expected ok for a clone kit, got ${m.status}: ${m.message}`);
+  assert.match(m.message, /clone/i, "message should name the isolated-clone classification");
+});
+
 // 3. A gate that FAILS → RED + exit 1 + the fix hint. Force it: a copy-parity config
 //    whose upstreamRoot does not exist makes check-copy-parity exit non-zero.
 test("a failing gate → RED, exit 1, with a fix hint", () => {

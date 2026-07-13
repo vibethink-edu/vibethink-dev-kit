@@ -11,6 +11,13 @@ Write-Host "VibeThink Context Mounter"
 Write-Host "Source: $DevKitPath"
 Write-Host "Target: $CurrentDir"
 
+# DEPRECATED per D-066 (CANON-BRANCH-WORKTREE-LIFECYCLE §5.4): a junction to the kit is the
+# junction-follow-delete WIPE-RISK pattern — a recursive delete of this repo can follow the link and
+# destroy the shared kit (it happened 3x: D-061, D-062, and a consumer mount 2026-07-13). PREFER an
+# ISOLATED CLONE the repo references directly (git clone the kit remote), which cannot be
+# junction-follow-deleted. This junction mode remains only for legacy convenience.
+Write-Warning "mount-devkit (.vibethink-core junction) is DEPRECATED (D-066): a junction to the kit is the junction-follow-delete wipe-risk pattern. Prefer an isolated clone. See CANON-BRANCH-WORKTREE-LIFECYCLE 5.4."
+
 # Create Junction
 if (Test-Path $TargetLink) {
   Write-Host "Link exists."

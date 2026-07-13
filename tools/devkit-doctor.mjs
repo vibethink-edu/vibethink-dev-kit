@@ -22,7 +22,7 @@
  * Pure Node, zero deps.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { detectExternalTools, formatExternalToolsHuman } from "./external-tools-health.mjs";
@@ -231,6 +231,38 @@ function detectInheritedBrain() {
     remediation.push(
       "restore knowledge/ai-agents/CANON-CROSS-AGENT-CONTEXT-LAYERING.md in the dev-kit mount"
     );
+  }
+
+  // mount-integrity (D-066 · §5.4): an inherited kit reached via a junction/reparse-point is the
+  // wipe-risk pattern; an isolated clone (own .git) is structurally immune to junction-follow-delete.
+  // Best-effort: if invoked through a link the OS/Node already resolved, the link may be invisible
+  // here — the empty/non-git case is already caught by the universal-rulebook error above.
+  {
+    let mStatus = "ok";
+    let mMsg = "inherited kit is an isolated clone (own .git) — immune to junction-follow-delete (D-066)";
+    try {
+      const isLink = lstatSync(KIT_ROOT).isSymbolicLink();
+      const hasGit = existsSync(join(KIT_ROOT, ".git"));
+      if (isLink) {
+        mStatus = "warn";
+        mMsg =
+          "inherited kit mount is a junction/symlink/reparse-point — the wipe-risk pattern (D-066); migrate to an isolated clone (git clone the kit remote), which cannot be junction-follow-deleted";
+      } else if (!hasGit) {
+        mStatus = universal ? "warn" : "ok";
+        mMsg = universal
+          ? "inherited kit is a plain directory without its own .git — not an isolated clone; prefer a clone (D-066)"
+          : "inherited kit mount type indeterminate (its absence is reported by universal-rulebook above)";
+      }
+    } catch {
+      mStatus = "ok";
+      mMsg = "inherited kit mount not statable (state carried by the universal/layering checks above)";
+    }
+    checks.push({ id: "mount-integrity", status: mStatus, path: KIT_ROOT, message: mMsg });
+    if (mStatus === "warn") {
+      remediation.push(
+        "migrate the inherited kit mount to an isolated clone (its own .git, from the kit remote) — never a junction/reparse-point (D-066 · CANON-BRANCH-WORKTREE-LIFECYCLE §5.4)"
+      );
+    }
   }
 
   if (CWD === KIT_ROOT && !rootAgents) {
