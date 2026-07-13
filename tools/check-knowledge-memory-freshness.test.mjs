@@ -8,7 +8,15 @@
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  utimesSync,
+  writeFileSync,
+} from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -322,6 +330,9 @@ test("shared verified cache restores a required artifact missing from the worktr
   assert.equal(r.code, 0, r.out);
   const cached = cachedGraphPath(dir);
   assert.equal(existsSync(cached), true, "refresh must populate the shared Git cache");
+  const source = path.join(dir, "docs/knowledge/vito-core/BUSINESS-CONTEXT.md");
+  const newerCheckoutTime = new Date(Date.now() + 2000);
+  utimesSync(source, newerCheckoutTime, newerCheckoutTime);
   rmSync(path.join(dir, "graphify-out/graph.json"), { force: true });
   r = check(dir);
   assert.equal(r.code, 0, r.out);

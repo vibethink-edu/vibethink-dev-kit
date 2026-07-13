@@ -272,6 +272,7 @@ for (const index of Array.isArray(cfg.indexes) ? cfg.indexes : []) {
         cacheRoot: artifactCacheRoot,
         artifactPath: p,
         expectedHash: manifestArtifact.sha256,
+        minimumMtimeMs: maxSourceMtime,
       });
       if (restored)
         console.log(

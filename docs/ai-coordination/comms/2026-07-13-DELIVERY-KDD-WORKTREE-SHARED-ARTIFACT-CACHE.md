@@ -16,7 +16,9 @@ already exists in the repository's shared Git directory.
 - `kdd-refresh` hashes every declared artifact and stores only the exact verified bytes
   under Git's common directory, keyed by SHA-256.
 - The freshness check restores a missing worktree-local artifact only when the cache bytes
-  match the SHA-256 recorded in the versioned manifest.
+  match the SHA-256 recorded in the versioned manifest. The restored copy receives the
+  a timestamp newer than the accepted source checkout so exact cached bytes cannot look
+  stale only because a new worktree refreshed filesystem mtimes.
 - A missing, corrupt, or unavailable cache never passes the gate.
 - Versioned Markdown remains the source of truth; the cache is local derived evidence.
 - `graphify-out`, `engram-out`, and `.engram` directories are excluded from accepted-source

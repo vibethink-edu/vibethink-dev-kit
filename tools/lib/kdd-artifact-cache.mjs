@@ -8,6 +8,7 @@ import {
   renameSync,
   rmSync,
   statSync,
+  utimesSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 
@@ -60,7 +61,12 @@ export function storeVerifiedArtifact({ cacheRoot, artifactPath, expectedHash })
   }
 }
 
-export function restoreVerifiedArtifact({ cacheRoot, artifactPath, expectedHash }) {
+export function restoreVerifiedArtifact({
+  cacheRoot,
+  artifactPath,
+  expectedHash,
+  minimumMtimeMs = 0,
+}) {
   const cachePath = cachePathForHash(cacheRoot, expectedHash);
   if (!cachePath || !isFile(cachePath) || sha256(cachePath) !== expectedHash) return false;
 
@@ -69,6 +75,8 @@ export function restoreVerifiedArtifact({ cacheRoot, artifactPath, expectedHash 
   try {
     copyFileSync(cachePath, temporary);
     if (sha256(temporary) !== expectedHash) return false;
+    const restoredAt = new Date(Math.max(Date.now(), minimumMtimeMs + 1));
+    utimesSync(temporary, restoredAt, restoredAt);
     rmSync(artifactPath, { force: true });
     renameSync(temporary, artifactPath);
     return true;
