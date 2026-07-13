@@ -41,4 +41,4 @@ Fable re-verified against `001b371`, **executing** the reproductions again:
 
 **One new MINOR (round 2), non-blocking → fixed anyway:** the inner `realpathSync` catch degraded to `reachedViaLink = false` (assumed-safe), inconsistent with the outer catch's warn. **FIX applied:** inner catch → `reachUndetermined = true` → a WARN branch ("junction/symlink cannot be ruled out — indeterminate, not assumed safe"), aligning with the outer catch's principle. Test still 8/8; real kit still `ok`.
 
-**Fable's verdict: "Listo para sello por la autoridad humana."** Records both rounds; presented for the named authority's seal.
+**Fable's verdict: "Listo para sello por la autoridad humana."** Records both rounds; SEALED 2026-07-13 by the named authority.
