@@ -111,6 +111,41 @@ test("refresh writes manifest and check passes → GREEN", () => {
   assert.match(r.out, /GREEN/);
 });
 
+// KNOWN-BAD (§8.7): a whole-repo `graphify update .` refresh violates CANON-GIT-HYGIENE §2.8
+// (scoped, never a full rebuild). The manifest is fresh, so the ONLY problem is the global scope.
+test("refreshCommand `graphify update .` (whole-repo) → RED (CANON-GIT-HYGIENE §2.8)", () => {
+  const dir = makeDir();
+  fixture(dir, baseConfig({
+    indexes: [{ name: "code-graph", required: true, artifacts: ["graphify-out/graph.json"], refreshCommand: "graphify update ." }],
+  }));
+  assert.equal(refresh(dir).code, 0);
+  const r = check(dir);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /WHOLE-REPO graphify rebuild|SCOPED refresh|§2\.8/);
+});
+
+// the aggregation-contract escape hatch: an explicit allowGlobalRefresh suppresses the scope check.
+test("refreshCommand global rebuild + allowGlobalRefresh:true → not flagged", () => {
+  const dir = makeDir();
+  fixture(dir, baseConfig({
+    indexes: [{ name: "code-graph", required: true, artifacts: ["graphify-out/graph.json"], refreshCommand: "graphify update .", allowGlobalRefresh: true }],
+  }));
+  assert.equal(refresh(dir).code, 0);
+  const r = check(dir);
+  assert.doesNotMatch(r.out, /WHOLE-REPO graphify rebuild/);
+  assert.equal(r.code, 0, r.out);
+});
+
+// a SCOPED refresh (concrete path) is NOT flagged — the common case stays clean.
+test("refreshCommand `graphify update <path>` (scoped) → not flagged", () => {
+  const dir = makeDir();
+  fixture(dir); // baseConfig default is scoped: "graphify update docs/knowledge"
+  assert.equal(refresh(dir).code, 0);
+  const r = check(dir);
+  assert.doesNotMatch(r.out, /WHOLE-REPO graphify rebuild/);
+  assert.equal(r.code, 0, r.out);
+});
+
 test("missing manifest → RED with refresh remediation", () => {
   const dir = makeDir();
   fixture(dir);
