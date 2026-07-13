@@ -1,6 +1,6 @@
 # REFERENCE-OPERATOR-COMMAND-CATALOG — agnostic operator commands for agents
 
-**Status:** **SEALED 2026-07-01 by the named authority** — the **rules** (§2) are binding; the catalog set (§4) is a curated reference. Adapter examples ship as optional templates (`setup/templates/operator-command-expanders/`). **v2 amendment DRAFT 2026-07-10 (D-065) — pending seal** (rules 8–12, the §5.1 gate, four new commands; see §7).
+**Status:** **SEALED 2026-07-01 by the named authority** — the **rules** (§2) are binding; the catalog set (§4) is a curated reference. Adapter examples ship as optional templates (`setup/templates/operator-command-expanders/`). **v2 amendment SEALED 2026-07-10 (D-065)** (rules 8–12, the §5.1 gate, four new commands; see §7).
 **Date:** 2026-07-01 (v2 amendment 2026-07-10)
 **Scope:** Any repo where a human operator drives agents through short, repeatable operational asks. Vendor-neutral, product-neutral, tool-neutral, language-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -162,11 +162,11 @@ Forced by a real operator practice: a tested Espanso command set proved that the
 
 **Amendment 2026-07-01 (b) — approved by the chief architect:** added `chat-handoff` (§4 context — the rollover companion to `chat-weight`: emit a self-contained re-entry block for a new chat) and §4.1 Example flows (id-only, agnostic use cases). No rule change.
 
-**Amendment 2026-07-10 (v2 — DRAFT, pending seal · D-065), forced by real operator usage** (the help was listing dead/duplicate commands; synonym pairs bred junk; commands referenced bare PR numbers; creds/comms asks had no shared floor). Six changes, all agnostic:
+**Amendment 2026-07-10 (v2 — SEALED · D-065), forced by real operator usage** (the help was listing dead/duplicate commands; synonym pairs bred junk; commands referenced bare PR numbers; creds/comms asks had no shared floor). Six changes, all agnostic:
 - **Canonical-only (rule 8, supersedes the "short + long synonym" convention).** One canonical trigger per intention; synonym aliases are opt-in **L3**, never canon. The core index collapses its one true synonym pair (`repo-status` → opt-in alias of `repo-health`); the §3 schema now carries a single `trigger` + opt-in `aliases_local`. *The convention that a command should ship a short **and** a long synonym is retired.*
 - **Declared execution (rule 9).** Every command opens with `COMANDO EJECUTADO: :xxx — <intención>` so the transcript records what was triggered (`declares_execution` in §3).
 - **Three inherited safety/quality rules (10–12):** referenced work carries **title + state** not a bare number; **credential/UAT** commands read the runbook and never invent/rotate/print a key (concrete store L3); **comms/handoff** commands use the repo's governed channel with structured front matter (concrete inbox/lane paths L3). The kit states the principle; the vendor/paths bind at L3 (§6).
 - **The catalog gate (§5.1, `check-operator-catalog`).** Mechanizes rule 6 + kills dead/duplicate commands; the machine enforcement of rule 8's "no junk in `commands-help`". Ships with known-bad tests (`CANON-AUDIT-PROTOCOL §8.7`).
 - **Four new agnostic commands:** `repo-creds` (repo), `handoff-back` (handoff), and a new **explain** category (`explain-plain`, `explain-teach`). All are L1 ids with L3 bodies; `explain-*` triggers localize (rule 5).
 - **Fire-test:** all additions name no first-party product, vendor, store, or path (the concrete secret store, inbox tool, and localized triggers are explicitly routed to L3). PASS.
-Drafted by the dev-kit seat; **independent adversarial validation before seal**; sealed only by the named authority.
+Drafted by the dev-kit seat; **two independent adversarial rounds** (Fable devkit-rev: REQUEST-CHANGES — 4 MAJOR + 5 MEDIUM + 3 MINOR, incl. three gate false-GREENs and a rule-8 self-contradiction → all applied → re-check APPROVE, no regressions; records `doc/REVIEW-ADVERSARIAL-{,APPROVE-}OPCAT-V2-2026-07-10.md`). **SEALED 2026-07-10 by the named authority.**
