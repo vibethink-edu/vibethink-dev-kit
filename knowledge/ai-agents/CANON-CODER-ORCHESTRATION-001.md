@@ -27,7 +27,7 @@ Two consequences shape this canon:
 |---|---|---|
 | Permission-scoping **policy** (scope to session not global; guard even in bypass; deny secrets) | **`CANON-CODER-SAFE-IDENTITY-001`** §8 | does **not** restate; §4/§7 reference it for *which* relaxations are legitimate |
 | The executor's **identity**, auth gate, per-session credential, PREP launch surface | **`CANON-CODER-SAFE-IDENTITY-001`** §3–§6/§9 | does **not** restate; the launch surface PREP emits is where the allowlist (§4) lives |
-| Architect↔executor **dance**, handoff completeness, exit-state vocabulary | **`CANON-MULTI-AGENT-ORCHESTRATION`** §2 | does **not** restate; §8 (design gate) and §9 (wave shape) produce into it |
+| Architect↔executor **dance**, handoff completeness, exit-state vocabulary | **`CANON-MULTI-AGENT-ORCHESTRATION`** §2 | does **not** restate; §8 (design gate), §8.1 (terminal condition) and §9 (wave shape) produce into it |
 | **Worktree** isolation, one-branch-per-worker, shared-foundation order | **`CANON-BRANCH-WORKTREE-LIFECYCLE`** §5/§7 | does **not** restate; §6's `git -C` rule and §9's wave shape build on it |
 | Clean working floor, **all-via-PR**, pre-push preflight | **`CANON-GIT-HYGIENE`** §2/§4 | does **not** restate; the executor's exit states (§8) resolve to it |
 | The **present-mirror / log / decision register** the executor reports to | **`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`** | does **not** restate; §8 names what the executor may **not** touch (the architect's instruments) |
@@ -120,6 +120,30 @@ Not every task is equally autonomous. The executor runs free on mechanical work 
 - **Realization depends on the execution mode:** an interactive executor stops live and presents; a **non-interactive (headless) executor has no live pause**, so the gate is realized as a **two-phase plan-then-go launch** (plan-only run → human GO → implementation run) — the mechanics are an L3 launch concern (the launch runbook). Either way the invariant holds: **the plan is approved before the sensitive code is written** — never only the draft PR after it.
 - **The executor proposes, it does not dispose:** it opens a draft PR, never merges, never self-approves. Merge is the coordinator's (delegated) or the authority's (boundary). It does **not** edit the architect's governance instruments — the present-mirror, the decision register (`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`); it reports to the coordination channel and may append to the history log.
 
+### §8.1 — Run-to-completion (a checkpoint is not a terminal condition) *(from a consumer elevation — an executor stopped at each unit close and a human had to type "continue"; §8's "autonomous after the canary" described the run-shape but the **terminal** condition was never named, so a progress marker read as an end. Same described-but-not-forced class as §9.1. Pending Principal Architect seal.)*
+
+§8 says *when* the executor is autonomous; this says *when a run ends*.
+
+**A checkpoint is a progress marker, not a terminal condition.** At a checkpoint — the close of a unit of work, a passing gate batch, a status update — the executor **records the result, verifies it, and immediately continues with the next executable unit in the same run.** It does **not** emit a final response and it does **not** enter an exit state.
+
+**A run enters a terminal state only on one of the below.** The exit-state vocabulary itself is `CANON-MULTI-AGENT-ORCHESTRATION` §2.2 — this canon does not redefine it, only names *which trigger legitimately reaches it*:
+
+- a **real block** — a decision or external access with no executable alternative;
+- a **legitimate authority gate** — identity change (§7) · the frontier design gate (§8) · an authority-sealed decision · a secret / sensitive-data boundary the canon reserves (§7) · a cloud/production apply that requires a go-ahead · a destructive action (§7) · a merge when the executor is propose-only (§8);
+- an **environment/canary failure it must not improvise around** — a broken toolchain or a missing prerequisite it cannot lawfully create;
+- a **hidden design conflict / broken spec-assumption / open decision** — continuing would mean *inventing design*;
+- a **deliberately terminal phase completing** — e.g. the plan-only phase of a two-phase boundary launch (§8), whose terminal is the reviewable plan artifact, not partial code;
+- a **declared work-in-progress handoff (§2.2/§2.3)** — the executor legitimately cannot complete the scope (a real runtime limit, exhausted context) and hands off as PUSHED with the pending scope and a **named reason**. A sanctioned terminal, not a failure — and the governed landing for a genuine runtime limit (below);
+- **scope complete** — the full scope and all applicable gates verified, the branch PUSHED or READY-PR.
+
+**Not terminal — the executor continues:** completing one unit · reaching a checkpoint · installing dependencies **from an existing lockfile** (pre-authorized) · a **correctable** test/type failure (diagnose, fix, re-run) · completing a subset of gates · emitting a status update · elapsed time.
+
+**The anti-pattern is the partial-progress final response** — ending with "continuing…", "still working", or a partial report while executable scope remains and no terminal above holds. The run does not end there.
+
+> **Prompt-defect vs runtime-limit — separate them.** The failure this closes is a **prompt/decision defect**: the executor *chooses* to emit a final response at a checkpoint, usually because a launch or per-spec prompt listed the checkpoint as a stop. It is corrected here and at the launch surface (RUNBOOK-LAUNCH-CODERS §6a). A **distinct** failure is a **real runtime limit** — the orchestrator force-closes for budget/time/tool-cap with no auto-continuation; no prompt text can re-open a turn the runtime already closed. Its governed landing is the **declared WIP handoff** above; supporting genuinely long runs beyond it (a resumable re-launch) is a launch-surface concern, not this invariant.
+
+> **Under a full-bypass launch — one where no deny-guard bites (distinct from the harness's bypass mode, which keeps the deny-guard, §4) — the §7 gates are mechanically inert:** they survive only as prompt text and this invariant. That raises, not lowers, the bar on the prompt naming the terminal condition correctly.
+
 ---
 
 ## §9 — Wave shape (sequential vs fan-out)
@@ -158,7 +182,7 @@ Conflating the two turns a helpful default into a brittle blocker. The decision 
 ## §11 — L3 binding (what the consuming repo owns)
 
 - the **concrete allowlist** content (which tools, which read-only utilities) and the **per-session settings** file the launch surface emits — within the §7 boundary and the policy of `CANON-CODER-SAFE-IDENTITY-001` §8.
-- the **launch prompt** text (including its command-hygiene section, §4a) and the **per-spec** prompts.
+- the **launch prompt** text (including its command-hygiene section, §4a, and its terminal-condition clause, §8.1) and the **per-spec** prompts — **within the §8.1 terminal-condition invariant** (a per-spec prompt may name legitimate gates, but never demotes scope-completion to a checkpoint or lists a progress marker as a stop).
 - which spec **classes** are boundary vs mechanical (§8), and the repo's **design-gate** convention.
 - the **stable absolute path** for shared scripts (§5) and the **read-only CLI client** for API reads.
 - the **canary** definition for mechanical work and the **acceptance-criteria** verification convention.

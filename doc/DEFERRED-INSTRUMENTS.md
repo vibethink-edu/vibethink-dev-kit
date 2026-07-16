@@ -116,3 +116,31 @@ workflow improved without weakening the kit's authority model.
   or another refresh fails on a bad pin). Then build the consistency check (offline: lock `package` ==
   doc; online/CI: `package==pin` resolves).
 - **Status:** DEFERRED — 2026-06-19.
+
+### executor-prompt terminal-condition check
+- **What:** a check that inspects executor **prompt surfaces** and flags a **progress marker used as a
+  stop** — a checkpoint / unit-of-work close listed as a stop condition, a "checkpoint-final" used as a
+  terminal *without requiring full scope*, a partial close framed as a reason to end the run — while NOT
+  flagging legitimate references ("record a checkpoint and continue", "the checkpoint's evidence", a
+  "final deliverable" that IS the full scope) or the legitimate §7 gates. **Robust form:** require a
+  **canonical machine-parseable stop-condition block** per prompt and classify its members; prose-mining
+  across dialects is fragile (a consumer already had ≥4 phrasings of the stop-list); an absent/unparseable
+  block fails **closed** — never a silent green (the `check-operator-catalog` parse-completeness lesson).
+- **Origin:** consumer elevation (three executor chats stopped at each unit close) →
+  `CANON-CODER-ORCHESTRATION-001` §8.1 (run-to-completion, **D-069**). The **manual rule (§8.1) + RUNBOOK
+  §6a clause + the consumer's prompt cleanup** shipped; this is its **level-3 automation**. A consuming
+  repo (Campus, PR #1174) **explicitly requested** the gate — but against a **prose** fix it just landed green.
+- **Why deferred:** the live failure was a **prompt defect** → §8.1 + the RUNBOOK clause + the cleanup fix
+  it, and that fix is green. The automation's robust form forces every prompt to a **canonical structured
+  block** — i.e. it would make the consumer **re-normalize the prose it just finished**. Build-on-pain
+  (§10 + the §9.1 precedent): do not harden a just-shipped manual layer into a required gate before it
+  demonstrates failure.
+- **TRIGGER to build:** the manual layer **demonstrably fails** — a checkpoint-as-stop is reconstructed in
+  a consumer prompt **despite** §8.1 (a human still has to type "continue" after the fix), **OR** a
+  **second** consumer needs the same enforcement. Then build the check + define the canonical stop-block
+  grammar (the consumer's **pre-fix corpus, in git history, is the known-bad fixture**; the
+  anti-false-positive cases above are the known-good fixtures).
+- **KILL / DROP trigger:** drop if the launch surface's **central injection via a system-level prompt
+  channel** (one that outranks per-spec text) makes a stale per-spec stop-list unreachable — a content
+  check on prompt text would then have nothing left to catch.
+- **Status:** DEFERRED — 2026-07-16. (Consumer demand fired; manual layer just shipped green — re-evaluate at the next hygiene pass.)
