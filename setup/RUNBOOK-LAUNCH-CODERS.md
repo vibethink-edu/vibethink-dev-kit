@@ -212,6 +212,35 @@ Paste a section like this into the launch prompt (lever **a** of
   register — `CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`); report to the coordination
   channel and append to the history log only.
 
+### §6a — The run-to-completion clause to embed in every prompt (and inject centrally)
+
+Alongside command-hygiene, every executor prompt carries the **terminal-condition** rule of
+`CANON-CODER-ORCHESTRATION-001` §8.1 — otherwise a per-spec prompt that lists a checkpoint or a
+unit-of-work close as a *stop* turns a progress marker into a premature end (an executor that
+"finishes" correctly per its prompt but wrongly for the intent, and a human has to type "continue").
+Neutral block to embed:
+
+> **RUN-TO-COMPLETION.** A checkpoint or the close of a unit of work is a **progress marker, not a
+> stop**: record the result, verify the evidence, and continue with the next executable unit **in the
+> same run**. A **correctable** failure is not a block — diagnose, fix, re-run. Installing dependencies
+> **from the existing lockfile** is pre-authorized. Do **not** end with "continuing", "still going", or
+> a partial report. End **only** at a legitimate gate (identity · frontier design gate · authority-sealed ·
+> security/secrets · destructive · cloud/production apply · merge when propose-only), a real block (a
+> pending decision or external access) with no executable alternative, an environment/toolchain failure
+> you must not improvise around, a hidden design conflict or broken spec-assumption (continuing would
+> mean inventing design), a **deliberately terminal phase** (e.g. a plan-only launch), a
+> **declared WIP handoff** with a named reason, or **scope complete** with all applicable gates verified
+> and the branch PUSHED / READY-PR.
+
+**Central injection matters (belt *and* suspenders).** Embedding the clause in each prompt is the belt;
+the launch surface should **also inject it centrally** — in step-4's prompt assembly, alongside the
+assigned-spec line — so a **stale per-spec prompt cannot silently omit or contradict it**. A prompt-level
+injection is only as strong as the position it is read at; where the runtime exposes a **system-level
+prompt channel** (a prompt that outranks the per-spec user prompt), prefer it for the injected clause so a
+historical stop-list cannot win. Absent that channel, the belt is load-bearing: **remove checkpoint-as-stop
+from the per-spec prompts** — an injected user-level clause does not reliably outrank per-spec text read
+closer to the action.
+
 ## 7. Gates and wave shape
 
 - **Boundary specs** (identity, access control, security, sensitive data): the coder produces
