@@ -26,6 +26,7 @@
 | Modelo visión | `llava:7b` | lee imágenes/screenshots; **NO soporta tools** |
 | Chat UI | **Open WebUI** (Docker) | historial, subir docs/imágenes, multi-modelo |
 | Acceso remoto | **Tailscale** | usar la máquina desde otras (celular/Mac) |
+| Transcripción (STT) | **faster-whisper** (venv Python 3.12) | audio → texto, usa la GPU; ver §5 |
 
 ## 2. Setup
 
@@ -64,7 +65,27 @@ winget install tailscale.tailscale
 - **⚠️ Python muy nuevo rompe el stack Python.** Con **Python 3.14** (o cualquier versión recién salida), `faster-whisper`, `torch`, `ComfyUI` **no tienen wheels** → hay que armar un **Python 3.12 dedicado** (uv/conda) para esos.
 - **✅ GPU dedicada NVIDIA >> integrada AMD.** En integradas (Radeon/Vulkan/RADV) cargar un modelo puede **tumbar el driver y reiniciar la máquina** (la iGPU maneja compute + display). Con NVIDIA/CUDA dedicada esto no pasa.
 
-## 5. Pendiente (para completar el stack)
-- `faster-whisper` (STT/transcripción) + `Piper`/`XTTS` (TTS) → **requieren Python 3.12 dedicado**.
-- `ComfyUI` (imágenes) → idem Python 3.12.
+## 5. Transcripción — faster-whisper (audio → texto, STT)
+
+**Montado 2026-07-16** en la ASUS TUF (Python 3.12.9 ya presente, RTX 5060). Receta exacta que funcionó:
+
+```powershell
+# 1) venv AISLADO con Python 3.12 (NO tocar el Python del sistema: era 3.14 -> rompe wheels de torch/ctranslate2)
+py -3.12 -m venv "C:\IA Marcelo Labs\_ai-local\whisper\venv"
+$py = "C:\IA Marcelo Labs\_ai-local\whisper\venv\Scripts\python.exe"
+# 2) faster-whisper + libs de CUDA 12 para GPU (las DLLs vienen EN los wheels; NO hace falta el CUDA toolkit)
+& $py -m pip install faster-whisper nvidia-cublas-cu12 nvidia-cudnn-cu12
+```
+
+Wrapper `transcribe.cmd` (carpeta agregada al PATH del usuario) → `transcribe "audio.m4a" [modelo] [idioma]` genera `.txt` + `.srt` al lado. Default modelo `medium`, idioma `es`. El `.py` intenta `cuda/float16` y cae solo a `cpu/int8`.
+
+### Gotchas de whisper (los que mordieron — 2026-07-16)
+- **⚠️ `RuntimeError: Library cublas64_12.dll is not found` aunque ESTÉ instalada** (en `venv/Lib/site-packages/nvidia/cublas/bin/`). CTranslate2 (nativo) carga cublas **por nombre simple** → solo respeta el **PATH del proceso**, NO `os.add_dll_directory`. **Fix en el `.py`:** para `cublas`, `cudnn`, `cuda_nvrtc` hacer `os.environ["PATH"] = str(nvidia/<lib>/bin) + os.pathsep + PATH` **antes** de `import faster_whisper` (hacer AMBOS: PATH prepend + `add_dll_directory`).
+- **⚠️ `UnicodeEncodeError: charmap codec` al imprimir tildes/símbolos** (ej. `✓`). La consola Windows es cp1252. **Fix:** `sys.stdout.reconfigure(encoding="utf-8", errors="replace")` al inicio. Los `.txt`/`.srt` se escriben con `encoding="utf-8"` aparte.
+- **✅ GPU confirmada** en la RTX 5060 (`cuda/float16`). cuDNN 9 + CUDA 12 vía wheels pip funcionan sin toolkit.
+- Calidad: `base` es solo para smoke test; para español real usar `medium` (balance) o `large-v3` (máxima). Una voz robótica de TTS transcribe mal — es el TTS, no whisper.
+
+## 6. Pendiente (para completar el stack)
+- `ComfyUI` (imágenes) → idem venv Python 3.12 dedicado.
+- TTS: `Piper` / `XTTS` (texto → voz).
 - Embeddings locales (`nomic-embed`) para RAG.
