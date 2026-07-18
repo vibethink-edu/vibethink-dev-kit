@@ -85,7 +85,7 @@ Wrapper `transcribe.cmd` (carpeta agregada al PATH del usuario) → `transcribe 
 - **✅ GPU confirmada** en la RTX 5060 (`cuda/float16`). cuDNN 9 + CUDA 12 vía wheels pip funcionan sin toolkit.
 - Calidad: `base` es solo para smoke test; para español real usar `medium` (balance) o `large-v3` (máxima). Una voz robótica de TTS transcribe mal — es el TTS, no whisper.
 
-## 6. Pendiente (para completar el stack)
-- `ComfyUI` (imágenes) → idem venv Python 3.12 dedicado.
-- TTS: `Piper` / `XTTS` (texto → voz).
-- Embeddings locales (`nomic-embed`) para RAG.
+## 6. Opcional / descartado
+- `ComfyUI` (imágenes) → **descartado para esta máquina (2026-07-16):** el usuario genera imágenes en la nube (OpenAI, etc.), que en una GPU de 8 GB VRAM da mejor calidad/comodidad que SDXL/Flux local. Montar **solo** si aparece necesidad de volumen (batch sin costo por imagen), privacidad de datos, o workflows específicos (LoRA/ControlNet).
+- TTS: `Piper` / `XTTS` (texto → voz) → si surge la necesidad; idem venv Python 3.12.
+- Embeddings locales (`nomic-embed`) para RAG → idem.
