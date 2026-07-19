@@ -1448,6 +1448,39 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 53 — UX base (interaction principles, decided once) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ui/CANON-UX-BASE-001.md`.
+
+- **Qué:** the interaction decisions a product makes **once** instead of screen by screen —
+  when a surface interrupts (inline vs modal), what it may hide, how it announces state, and the
+  reuse-before-build rule. It **points at** the mature external body (usability heuristics,
+  practical interface craft, accessibility) rather than paraphrasing it, and owns only the house
+  rules those sources do not decide: reuse-first · inline over modal for simple edits · show over
+  hide · progressive disclosure · loud active state · four declared states (loading/empty/error/
+  unauthorized) · user text from the localization system, storage names never surfacing.
+  **Explicitly NOT owned:** which component library, where components live, visual identity —
+  those are the repo's L3 binding, and a repo with its own component-sourcing doctrine keeps it
+  (this canon sits underneath as the interaction layer; the two must not restate each other).
+- **Cómo:** cite it from your repo's UI rules (the scoped `AGENTS.md` that governs interface work),
+  and declare the L3 side: your component catalog and its order of preference, your replaceable text
+  layer, your domain vocabulary (and the storage names that must never reach the interface), plus any
+  stricter house rule your product needs. **If your repo already has native UI doctrine, that is not
+  a conflict** — declare `ADOPTED-NATIVE` (`INHERITANCE-CONTRACT` §2) and name where the native rules
+  live. **Restatement means copying §3's rule text**; naming your concrete components, paths and
+  thresholds at L3 is expected.
+- **Verificar:**
+  - Your UI rules file cites this canon and binds it (or declares `ADOPTED-NATIVE` pointing at the
+    native doctrine) — §3's rule text is not copied.
+  - **Recent surfaces** show the rules alive — one named example per behaviour is enough, they need
+    not be the same screen: an edit of one-or-two fields done inline; a conflict/blocked state visible
+    without opening anything; a surface declaring its states (incl. unauthorized, or `N-A(reason)`);
+    no user-visible string hardcoded.
+  - A new house rule added at L3 names the scar that earned it (§3's entry condition).
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
