@@ -55,7 +55,11 @@ launching each coder is one command:
 - **a launch script** (§3) that runs the identity gate, enters/creates the worktree, writes
   the per-session settings, and starts the agent with its prompt;
 - **a per-session settings file** with the allowlist + deny-guard (§5);
-- **one prompt per spec** (or a family/base prompt) carrying the command-hygiene section (§6).
+- **one prompt per spec** (or a family/base prompt) carrying the command-hygiene section (§6);
+- **a goal definition per dispatch** (`setup/templates/goal/GOAL-TEMPLATE.md`) — the 8-field
+  contract (objective, scope, done, borders, vocabulary, reuse, guardrails, mode) the launch
+  prompt executes. Rule #0: fully defined, or no dispatch. (The goal's decisions are the
+  operator/authority's — PREP only carries the filled artifact.)
 
 ---
 
