@@ -3,7 +3,12 @@
   "_comment": "Producer-side gate config (kit-only; consumers never run this). Check 1: every spine matching spinePattern in knowledgeDirs must be cited by the catalog or carry an exemption WITH a reason. Check 2: every spine (+ alsoStatusCheck files) declares a **Status:** line starting with a controlled token — the mechanical end of mixed status vocabulary (new spines conform on arrival; sealed headers are not cosmetically rewritten).",
   "catalogFile": "setup/ADOPT-DEV-KIT.md",
   "contractFile": "setup/INHERITANCE-CONTRACT.md",
-  "knowledgeDirs": ["knowledge/ai-agents", "knowledge/methodology", "knowledge/architecture"],
+  "knowledgeDirs": [
+    "knowledge/ai-agents",
+    "knowledge/methodology",
+    "knowledge/architecture",
+    "knowledge/ui"
+  ],
   "spinePattern": "^(CANON-.*|VT-METHOD)\\.md$",
   "exempt": [
     {

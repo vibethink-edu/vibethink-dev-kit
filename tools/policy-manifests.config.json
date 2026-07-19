@@ -4,7 +4,8 @@
   "canonRoots": [
     "knowledge/ai-agents",
     "knowledge/methodology",
-    "knowledge/architecture"
+    "knowledge/architecture",
+    "knowledge/ui"
   ],
   "requireFor": [
     "knowledge/ai-agents/CANON-ARCHITECTURE-REVIEW.md",
