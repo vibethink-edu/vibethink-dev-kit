@@ -104,5 +104,5 @@ The L3 binding points here; if it restates the fields or the mode rules, it drif
 
 *Provenance: elevated from a consumer's live failure class — idle-yield turns and oversized,
 under-defined dispatches that forced the operator into "continue, continue" — after the consumer
-bound and used the concrete instance first. Elevated by authority decision (see the decision
-register); the consumer's bound instance is the reference implementation.*
+bound the concrete instance first. Elevated by authority decision (D-070, SEALED 2026-07-19);
+the consumer's bound instance is the reference implementation.*
