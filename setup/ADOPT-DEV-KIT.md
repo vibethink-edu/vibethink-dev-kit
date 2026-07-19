@@ -1195,7 +1195,7 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 **Layer:** L1 (neutral).
 **Home:** `setup/RUNBOOK-LAUNCH-CODERS.md` + `setup/templates/coder-prompt/` +
-`setup/templates/coder-launch-readiness/` +
+`setup/templates/coder-launch-readiness/` + `setup/templates/goal/` +
 `knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md` §3.1.
 
 - **Qué:** the **on-ramp** that turns the coder-dispatch machinery (Pieces #35/#36) from
@@ -1219,6 +1219,9 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     per-session settings, and bot-token env-var name. `devkit-doctor` then shows the
     **coder launch readiness** line (skip = conscious N-A for a repo that does not launch
     coders).
+  - **Fill the 8-field goal per dispatch** (`setup/templates/goal/GOAL-TEMPLATE.md`) —
+    objective/scope/done/borders/vocabulary/reuse/guardrails/mode. Rule #0: fully defined,
+    or no dispatch; run its two-axis readiness check (definition + size) before launching.
   - **Route from the gate:** your root rules cite `CHANGE-PATH-…` §3.1 — the decision gate
     names the executor and, for a coder, points at this on-ramp. The live forge state
     (bot is low-priv, branch protected) stays your L3 confirmation (`…SAFE-IDENTITY-001` §3).
@@ -1232,6 +1235,8 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - A recent coder dispatch was **routed by the gate** (the decision named the executor),
     used the prompt template, and the agent **self-verified readiness** instead of asking
     the human to check the infra.
+  - A recent dispatch carried a **filled 8-field goal** (or the repo declared where its
+    filled goals live — the goal→executor wiring is an L3 bind of the goal template).
 
 ---
 
