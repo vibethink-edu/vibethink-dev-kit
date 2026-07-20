@@ -6,7 +6,7 @@
 
 ## 0. El problema
 
-Los agentes (Claude Code, Codex) crean un worktree por tarea bajo `C:\tmp\vito-wt-*`. Cada uno con `node_modules` hidratado pesa **0.5–7 GB**. En una máquina con dispatch intensivo esto genera **~30 GB/día** y nadie los borra al mergear el PR.
+Los agentes (Claude Code, Codex) crean un worktree por tarea bajo `C:\tmp\<prefijo>-wt-*`. Cada uno con `node_modules` hidratado pesa **0.5–7 GB**. En una máquina con dispatch intensivo esto genera **~30 GB/día** y nadie los borra al mergear el PR.
 
 **Síntoma:** alarma de disco al 10% libre; el usuario no entiende en qué se fue 1 TB "si no tengo ni Office".
 
@@ -37,14 +37,14 @@ pwsh "C:\IA Marcelo Labs\scripts\wt-hygiene.ps1" -DiasProteccion 5
 
 ### Guardias de seguridad (por qué es seguro correrlo)
 1. Solo opera dentro de `C:\tmp`.
-2. Solo carpetas `vito-wt-*` / `vito-mobile-*` (no toca logs, evidencias, cuarentenas).
+2. Solo las carpetas que coinciden con el prefijo de worktrees declarado por el repo (p. ej. `<prefijo>-wt-*`) — no toca logs, evidencias ni cuarentenas.
 3. Nunca borra ACTIVE / DIRTY / AMBIG.
 4. **Neutraliza junctions de primer nivel ANTES de borrar** (ver §2).
 5. Usa `git worktree remove` cuando el worktree sigue registrado; `git worktree prune` al final.
 
 ## 2. Gotchas (los que ya mordieron)
 
-- **⚠️ Junction de `node_modules` → el borrado sigue el link y destruye el `node_modules` REAL compartido.** Pasó con Campus (se perdió `node_modules/.bin` del checkout principal). **Fix:** quitar el link con `(Get-Item $p -Force).Delete()` (borra el LINK, no el target) **antes** de cualquier borrado recursivo. **NUNCA** `Remove-Item -Recurse` directo sobre un reparse point.
+- **⚠️ Junction de `node_modules` → el borrado sigue el link y destruye el `node_modules` REAL compartido.** Cicatriz real en un repo consumidor: se perdió `node_modules/.bin` del checkout principal. **Fix:** quitar el link con `(Get-Item $p -Force).Delete()` (borra el LINK, no el target) **antes** de cualquier borrado recursivo. **NUNCA** `Remove-Item -Recurse` directo sobre un reparse point.
 - **⚠️ NO confundir junctions peligrosos con symlinks internos de pnpm.** Un worktree hidratado tiene **8.000–9.500 symlinks** adentro: son de pnpm apuntando a su propio store *dentro de la misma carpeta* → inofensivos y se van con ella. Recorrerlos uno por uno para "protegerlos" cuesta ~1.3M de operaciones inútiles. **Solo importan los links de PRIMER nivel** (un `node_modules` junctionado a otro repo).
 - **⚠️ `git worktree remove` con `node_modules` grande excede timeouts** (>2 min) y deja carpeta huérfana sin `.git`. **Correr siempre en background.**
 - **⚠️ `Directory not empty` es benigno.** git borra lo que rastrea; quedan archivos no versionados (logs, `.env`, `.next/`). Esas carpetas pasan a ORPHAN y las levanta la siguiente corrida.
