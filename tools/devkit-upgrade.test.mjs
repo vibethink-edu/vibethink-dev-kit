@@ -285,7 +285,7 @@ test("--with-graphtest <scope> (dry-run) → 'would run' scoped, never a default
 const DEFAULT_BRANCH = "master";
 
 /** A real git mount with an upstream default branch, optionally diverged from it. */
-function scaffoldGitMount({ diverge }) {
+function scaffoldGitMount({ diverge, advanceUpstream, orphanUpstream }) {
   const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-git-"));
   tmpdirs.push(root);
   const remote = path.join(root, "remote.git");
@@ -319,19 +319,66 @@ function scaffoldGitMount({ diverge }) {
     git(mount, "commit", "-m", "mine");
     git(mount, "fetch", "origin", "--quiet");
   }
+
+  if (advanceUpstream) {
+    // Upstream moves; the mount stays put → behind, never diverged.
+    spawnSync("git", ["clone", remote, other], { encoding: "utf8" });
+    seed(other, "Other Person", "o@o.local");
+    writeFileSync(path.join(other, "theirs.md"), "theirs\n");
+    git(other, "add", "-A");
+    git(other, "commit", "-m", "theirs");
+    git(other, "push", "origin", DEFAULT_BRANCH);
+    git(mount, "fetch", "origin", "--quiet");
+  }
+
+  if (orphanUpstream) {
+    // The shape a single-branch clone produces: the fetch SUCCEEDS (it tracks a real
+    // branch) but the default branch it measures against was never fetched. Both
+    // halves matter — a failing fetch takes a different path, and deleting the ref
+    // without narrowing the refspec would just restore it on the next fetch.
+    git(mount, "checkout", "-b", "tracked-elsewhere");
+    git(mount, "push", "-u", "origin", "tracked-elsewhere");
+    git(mount, "config", "remote.origin.fetch",
+        "+refs/heads/tracked-elsewhere:refs/remotes/origin/tracked-elsewhere");
+    git(mount, "update-ref", "-d", `refs/remotes/origin/${DEFAULT_BRANCH}`);
+  }
+
   mkdirSync(path.join(mount, "tools"), { recursive: true });
   writeFileSync(path.join(mount, "tools", "devkit-upgrade.mjs"), readFileSync(TOOL, "utf8"));
   return mount;
 }
 
-const runInMount = (mount, args = []) => {
+const runInMount = (mount, args = [], extraEnv = {}) => {
+  // Scrub the forge CLI's repo-override env: an exported GH_REPO makes it ignore
+  // the local remote and answer about a real repo over the network, which would
+  // make the offline tests both flaky and non-offline.
+  const env = { ...process.env, ...extraEnv };
+  delete env.GH_REPO;
+  delete env.GH_HOST;
+  delete env.GH_TOKEN;
   const r = spawnSync(
     process.execPath,
     [path.join(mount, "tools", "devkit-upgrade.mjs"), "--dry-run", "--no-tools", ...args],
-    { cwd: mount, encoding: "utf8" }
+    { cwd: mount, encoding: "utf8", env }
   );
   return { code: r.status, out: `${r.stdout}${r.stderr}` };
 };
+
+/**
+ * A fake forge CLI on PATH that answers `pr list` with canned JSON.
+ * The three lines this feature exists for (RED / green / no-route) are otherwise
+ * untestable without network — and they are precisely the lines that must not lie.
+ * POSIX-only: the tool spawns the CLI without a shell, so a shell script is not
+ * resolvable on win32. CI (the gate that counts) is ubuntu.
+ */
+function withForgeShim(json) {
+  const bin = mkdtempSync(path.join(os.tmpdir(), "forge-shim-"));
+  tmpdirs.push(bin);
+  const shim = path.join(bin, "gh");
+  writeFileSync(shim, `#!/bin/sh\ncat <<'JSON'\n${json}\nJSON\n`, { mode: 0o755 });
+  return { PATH: `${bin}${path.delimiter}${process.env.PATH}` };
+}
+const posixOnly = process.platform !== "win32";
 
 // 12. The dry-run must not promise a fast-forward the apply cannot perform.
 test("diverged mount (dry-run) → says it would NOT fast-forward, not a bogus commit count", () => {
@@ -355,18 +402,107 @@ test("diverged mount → diagnosis names the branch, the ahead/behind split and 
 test("diverged mount with no forge behind it → says the PR was not checked, claims nothing", () => {
   const mount = scaffoldGitMount({ diverge: true });
   const { out } = runInMount(mount);
-  assert.match(out, /open PR: not checked/);
-  assert.doesNotMatch(out, /open PR #/);
+  assert.match(out, /PR: not checked/);
+  assert.doesNotMatch(out, /PR #/);
 });
 
-// 15. No regression: an ordinary behind-mount still previews its fast-forward.
-test("clean mount, nothing local → still reports the ordinary fast-forward preview", () => {
+// 15. No regression: an in-sync mount previews an empty fast-forward.
+test("in-sync mount → previews a 0-commit fast-forward, never the divergence warning", () => {
   const mount = scaffoldGitMount({ diverge: false });
   const { code, out } = runInMount(mount);
   assert.equal(code, 0);
   assert.match(out, /would fast-forward 0 commit\(s\)/);
   assert.doesNotMatch(out, /would NOT fast-forward/);
 });
+
+// 16. The ordinary case the suite never covered — behind, with nothing local. This
+//     is the branch that hid the `?? 0` lie: with no test on it, a preview that
+//     invents a number looks identical to one that measured it.
+test("behind-only mount → previews the real commit count, not a divergence", () => {
+  const mount = scaffoldGitMount({ diverge: false, advanceUpstream: true });
+  const { code, out } = runInMount(mount);
+  assert.equal(code, 0);
+  assert.match(out, /would fast-forward 1 commit\(s\)/);
+  assert.doesNotMatch(out, /would NOT fast-forward/);
+});
+
+// 17. Unresolvable counts must be stated as unknown. Saying "0" would be the same
+//     lie this feature exists to kill, moved from the calculation into the render.
+test("mount that cannot resolve the upstream ref → says it cannot preview, invents no number", () => {
+  const mount = scaffoldGitMount({ diverge: false, orphanUpstream: true });
+  const { code, out } = runInMount(mount);
+  assert.equal(code, 0);
+  assert.match(out, /cannot preview/);
+  assert.doesNotMatch(out, /would fast-forward \d+ commit/);
+});
+
+// ── The three lines this feature exists for ──────────────────────────────────
+// A diverged mount whose PR is RED (the scar: two PRs sat red for weeks while four
+// readers were told only "diverged"), one whose checks are merely UNFINISHED, and
+// one whose PR already landed. Each was a confident falsehood before these.
+
+if (posixOnly) {
+  // 18. The scar itself.
+  test("diverged mount, PR red → names the failing check and says it cannot merge", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim(
+      '[{"number":268,"state":"OPEN","statusCheckRollup":[{"name":"l2-product-neutrality","status":"COMPLETED","conclusion":"FAILURE"}]}]'
+    );
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /PR #268: RED — l2-product-neutrality/);
+    assert.match(out, /cannot merge as-is/);
+  });
+
+  // 19. Not-failing is not green. A running check must never read as "merge it".
+  test("diverged mount, checks still running → says wait, never 'checks green'", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim(
+      '[{"number":268,"state":"OPEN","statusCheckRollup":[{"name":"build","status":"IN_PROGRESS"}]}]'
+    );
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /checks still running/);
+    assert.doesNotMatch(out, /checks green/);
+  });
+
+  // 20. A runner that dies reports CANCELLED / TIMED_OUT, never FAILURE — this repo
+  //     has seen it. Treating those as green would recommend merging a dead gate.
+  test("diverged mount, check cancelled → counted as failing, not as green", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim(
+      '[{"number":268,"state":"OPEN","statusCheckRollup":[{"name":"affected build","status":"COMPLETED","conclusion":"CANCELLED"}]}]'
+    );
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /RED — affected build/);
+    assert.doesNotMatch(out, /checks green/);
+  });
+
+  // 21. A squash-merge leaves the old commits counted as ahead, so "already landed"
+  //     is the likeliest divergence — and the one previously reported as "no route".
+  test("diverged mount whose PR already merged → says the branch is stale, not 'no route'", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim('[{"number":268,"state":"MERGED"}]');
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /already MERGED/);
+    assert.match(out, /put the mount back on master/);
+    assert.doesNotMatch(out, /no route to master/);
+  });
+
+  // 22. Only a genuinely empty answer earns the dead-end verdict.
+  test("diverged mount with no PR at all → only then says there is no route", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const { out } = runInMount(mount, [], withForgeShim("[]"));
+    assert.match(out, /no route to master/);
+  });
+
+  // 23. Green is asserted, never inferred from an empty rollup.
+  test("diverged mount, zero checks reported → asks to verify, does not claim green", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim('[{"number":268,"state":"OPEN","statusCheckRollup":[]}]');
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /no checks reported/);
+    assert.doesNotMatch(out, /checks green/);
+  });
+}
 
 for (const d of tmpdirs) {
   try {

@@ -92,27 +92,48 @@ const diagnoseMount = (root) => {
   const author = git("log", "-1", "--format=%an");
   const age = git("log", "-1", "--format=%cr");
 
-  // Only ask the forge when there is local work that must land somewhere.
+  // Only ask the forge when there is local work that cannot land as-is. A detached
+  // HEAD names no branch to ask about; an ahead-only mount fast-forwards fine and
+  // the answer would be discarded — neither is worth a network call.
   let pr;
-  if (branch && branch !== "master" && ahead > 0) {
+  if (branch && branch !== "master" && branch !== "HEAD" && ahead > 0 && behind > 0) {
     try {
       const raw = execFileSync(
         "gh",
         [
-          "pr", "list", "--head", branch, "--state", "open",
-          "--json", "number,statusCheckRollup",
+          "pr", "list", "--head", branch, "--state", "all", "--limit", "30",
+          "--json", "number,state,statusCheckRollup",
         ],
-        { cwd: root, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }
+        { cwd: root, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 10000 }
       );
-      const [open] = JSON.parse(raw);
-      pr = open
-        ? {
-            number: open.number,
-            failing: (open.statusCheckRollup || [])
-              .filter((c) => c.conclusion === "FAILURE")
-              .map((c) => c.name),
-          }
-        : { number: null, failing: [] };
+      const prs = JSON.parse(raw);
+      // A squash-merge leaves the old commits counted as "ahead", so a merged PR is
+      // the likeliest reason a parked mount diverges. Asking only for OPEN ones
+      // turns "already landed" into "no route to master" — a confident falsehood.
+      const open = prs.find((p) => p.state === "OPEN");
+      const merged = prs.find((p) => p.state === "MERGED");
+      if (open) {
+        const rollup = open.statusCheckRollup || [];
+        // A check that is not FAILURE is not therefore green: it may still be
+        // running, or have died in a way this repo has seen (runner OOM surfaces as
+        // TIMED_OUT / CANCELLED, never FAILURE).
+        const fatal = ["FAILURE", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP_FAILURE"];
+        pr = {
+          state: "OPEN",
+          number: open.number,
+          failing: rollup
+            .filter((c) => fatal.includes(c.conclusion) || ["FAILURE", "ERROR"].includes(c.state))
+            .map((c) => c.name || c.context),
+          pending: rollup.some((c) => (c.status && c.status !== "COMPLETED") || c.state === "PENDING"),
+          checks: rollup.length,
+        };
+      } else if (merged) {
+        pr = { state: "MERGED", number: merged.number };
+      } else if (prs.length) {
+        pr = { state: "CLOSED", number: prs[0].number };
+      } else {
+        pr = { state: "NONE", number: null };
+      }
     } catch {
       pr = null; // no CLI, not authenticated, or not a forge repo — say nothing rather than guess
     }
@@ -128,15 +149,25 @@ const renderDiagnosis = (d) => {
     lines.push(`${d.ahead} commit(s) ahead / ${d.behind} behind origin/master`);
   }
   if (d.author) lines.push(`last commit: ${d.author}${d.age ? ` (${d.age})` : ""}`);
-  if (d.pr === null) lines.push("open PR: not checked (no forge CLI, or not a forge repo)");
-  else if (d.pr && d.pr.number === null) {
-    lines.push("open PR: NONE — this work has no route to master");
+  if (d.pr === null) {
+    lines.push("PR: not checked (no forge CLI, not authenticated, or not a forge repo)");
   } else if (d.pr) {
-    lines.push(
-      d.pr.failing.length
-        ? `open PR #${d.pr.number}: RED — ${d.pr.failing.join(", ")} (it could never merge as-is)`
-        : `open PR #${d.pr.number}: checks green — merge it, then re-run`
-    );
+    const { state, number, failing, pending, checks } = d.pr;
+    if (state === "MERGED") {
+      lines.push(`PR #${number} already MERGED — the branch is stale; put the mount back on master`);
+    } else if (state === "CLOSED") {
+      lines.push(`PR #${number} was CLOSED without merging — this work has no route to master`);
+    } else if (state === "NONE") {
+      lines.push("PR: none open, closed or merged — this work has no route to master");
+    } else if (failing.length) {
+      lines.push(`PR #${number}: RED — ${failing.join(", ")} (it cannot merge as-is)`);
+    } else if (pending) {
+      lines.push(`PR #${number}: checks still running — wait for them, then merge`);
+    } else if (!checks) {
+      lines.push(`PR #${number}: no checks reported — verify it on the forge before merging`);
+    } else {
+      lines.push(`PR #${number}: checks green — merge it, then re-run`);
+    }
   }
   return lines;
 };
@@ -165,8 +196,17 @@ if (!NO_PULL) {
           note: `⚠ would NOT fast-forward — the mount has diverged`,
           diagnosis: renderDiagnosis(d),
         };
+      } else if (d.behind === null) {
+        // The counts did not resolve (shallow clone, single-branch clone, no
+        // upstream ref). Saying "0" here would be the same lie in a new place: a
+        // preview promising a fast-forward the apply cannot perform.
+        pull = {
+          done: false,
+          note: "⚠ cannot preview — origin/master is not resolvable in this mount",
+          diagnosis: renderDiagnosis(d),
+        };
       } else {
-        pull = { done: false, note: `would fast-forward ${d.behind ?? 0} commit(s)` };
+        pull = { done: false, note: `would fast-forward ${d.behind} commit(s)` };
       }
     } else {
       execFileSync("git", ["-C", KIT_ROOT, "merge", "--ff-only", "origin/master"], {
