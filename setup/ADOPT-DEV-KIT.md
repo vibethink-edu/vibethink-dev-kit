@@ -1481,6 +1481,37 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 ---
 
+### 54 — Soft-delete (deleting operational data is a state) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DATA-SOFT-DELETE-001.md`.
+
+- **Qué:** deleting an **operational** record marks it and keeps it; default reads exclude it; the
+  mechanism is shared rather than re-coded per entity. It owns **only the deleted state and how
+  reads treat it** — the who/what/when of a change stays with `CANON-DATA-CHANGE-AUDIT-001`
+  (including its ruling that per-table `*_by` columns are **not** an audit-trail), true erasure
+  stays with `CANON-DATA-LEGAL-COMPLIANCE-001` §2/§5, and migration carry-over stays with
+  `CANON-SYSTEM-MIGRATION-DISCIPLINE-001`. **Pre-production repos are out of scope** —
+  `CANON-DEV-MODE-DISCIPLINE` makes deletion the default there, deliberately.
+- **Cómo:** declare the concrete mechanism for your stores; reuse the operational-vs-excluded
+  judgment of the audit canon's §4/§10.2 instead of inventing a second entity list; decide the
+  parent/child semantics; and — where entities predate adoption — publish a **retrofit schedule**.
+  A legacy entity without the mechanism is a declared debt with a date, not a silent violation.
+  A repo whose stores are append-only or event-sourced satisfies the principle by construction and
+  declares `ADOPTED-NATIVE` (`INHERITANCE-CONTRACT` §2), naming where the deleted state lives;
+  `N-A(reason)` is for a repo with no mutable operational data at all.
+- **Verificar:**
+  - A delete leaves the record present and queryable-as-deleted, through the declared mechanism.
+  - Default reads exclude deleted records on **every** path — including pre-computed or
+    materialized views, which do not inherit a row-level policy.
+  - **Unique constraints handle the returning subject**: someone who re-enrolls or re-registers
+    does not collide with their own deleted record. One decision per repo (filtered unique index or
+    revive), named — not two implementers deciding differently.
+  - The entity set and the retrofit schedule are declared, not implied.
+  - The repo does not restate §2's ownership table.
+
+---
+
 ## Per-piece adoption status — declare in your `AGENTS.md`
 
 A consuming repo states explicitly which pieces it has adopted and which it
