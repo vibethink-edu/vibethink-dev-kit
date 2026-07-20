@@ -1195,7 +1195,7 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
 
 **Layer:** L1 (neutral).
 **Home:** `setup/RUNBOOK-LAUNCH-CODERS.md` + `setup/templates/coder-prompt/` +
-`setup/templates/coder-launch-readiness/` +
+`setup/templates/coder-launch-readiness/` + `setup/templates/goal/` +
 `knowledge/methodology/CANON-CHANGE-PATH-AND-DECISION-CLASSES-001.md` §3.1.
 
 - **Qué:** the **on-ramp** that turns the coder-dispatch machinery (Pieces #35/#36) from
@@ -1219,6 +1219,9 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     per-session settings, and bot-token env-var name. `devkit-doctor` then shows the
     **coder launch readiness** line (skip = conscious N-A for a repo that does not launch
     coders).
+  - **Fill the 8-field goal per dispatch** (`setup/templates/goal/GOAL-TEMPLATE.md`) —
+    objective/scope/done/borders/vocabulary/reuse/guardrails/mode. Rule #0: fully defined,
+    or no dispatch; run its two-axis readiness check (definition + size) before launching.
   - **Route from the gate:** your root rules cite `CHANGE-PATH-…` §3.1 — the decision gate
     names the executor and, for a coder, points at this on-ramp. The live forge state
     (bot is low-priv, branch protected) stays your L3 confirmation (`…SAFE-IDENTITY-001` §3).
@@ -1232,6 +1235,8 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - A recent coder dispatch was **routed by the gate** (the decision named the executor),
     used the prompt template, and the agent **self-verified readiness** instead of asking
     the human to check the infra.
+  - A recent dispatch carried a **filled 8-field goal** (or the repo declared where its
+    filled goals live — the goal→executor wiring is an L3 bind of the goal template).
 
 ---
 
@@ -1440,6 +1445,39 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
     output go RED.
   - The reference names no product, tenant, provider, package manager, runner, or
     concrete consuming repo.
+
+---
+
+### 53 — UX base (interaction principles, decided once) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/ui/CANON-UX-BASE-001.md`.
+
+- **Qué:** the interaction decisions a product makes **once** instead of screen by screen —
+  when a surface interrupts (inline vs modal), what it may hide, how it announces state, and the
+  reuse-before-build rule. It **points at** the mature external body (usability heuristics,
+  practical interface craft, accessibility) rather than paraphrasing it, and owns only the house
+  rules those sources do not decide: reuse-first · inline over modal for simple edits · show over
+  hide · progressive disclosure · loud active state · four declared states (loading/empty/error/
+  unauthorized) · user text from the localization system, storage names never surfacing.
+  **Explicitly NOT owned:** which component library, where components live, visual identity —
+  those are the repo's L3 binding, and a repo with its own component-sourcing doctrine keeps it
+  (this canon sits underneath as the interaction layer; the two must not restate each other).
+- **Cómo:** cite it from your repo's UI rules (the scoped `AGENTS.md` that governs interface work),
+  and declare the L3 side: your component catalog and its order of preference, your replaceable text
+  layer, your domain vocabulary (and the storage names that must never reach the interface), plus any
+  stricter house rule your product needs. **If your repo already has native UI doctrine, that is not
+  a conflict** — declare `ADOPTED-NATIVE` (`INHERITANCE-CONTRACT` §2) and name where the native rules
+  live. **Restatement means copying §3's rule text**; naming your concrete components, paths and
+  thresholds at L3 is expected.
+- **Verificar:**
+  - Your UI rules file cites this canon and binds it (or declares `ADOPTED-NATIVE` pointing at the
+    native doctrine) — §3's rule text is not copied.
+  - **Recent surfaces** show the rules alive — one named example per behaviour is enough, they need
+    not be the same screen: an edit of one-or-two fields done inline; a conflict/blocked state visible
+    without opening anything; a surface declaring its states (incl. unauthorized, or `N-A(reason)`);
+    no user-visible string hardcoded.
+  - A new house rule added at L3 names the scar that earned it (§3's entry condition).
 
 ---
 
