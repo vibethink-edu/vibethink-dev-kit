@@ -364,6 +364,20 @@ const runInMount = (mount, args = [], extraEnv = {}) => {
   return { code: r.status, out: `${r.stdout}${r.stderr}` };
 };
 
+/** The same run without --dry-run: exercises the failed-apply path, not the preview. */
+const applyInMount = (mount, extraEnv = {}) => {
+  const env = { ...process.env, ...extraEnv };
+  delete env.GH_REPO;
+  delete env.GH_HOST;
+  delete env.GH_TOKEN;
+  const r = spawnSync(
+    process.execPath,
+    [path.join(mount, "tools", "devkit-upgrade.mjs"), "--no-tools"],
+    { cwd: mount, encoding: "utf8", env }
+  );
+  return { code: r.status, out: `${r.stdout}${r.stderr}` };
+};
+
 /**
  * A fake forge CLI on PATH that answers `pr list` with canned JSON.
  * The three lines this feature exists for (RED / green / no-route) are otherwise
@@ -480,11 +494,44 @@ if (posixOnly) {
   //     is the likeliest divergence — and the one previously reported as "no route".
   test("diverged mount whose PR already merged → says the branch is stale, not 'no route'", () => {
     const mount = scaffoldGitMount({ diverge: true });
-    const env = withForgeShim('[{"number":268,"state":"MERGED"}]');
+    const head = spawnSync("git", ["-C", mount, "rev-parse", "HEAD"], { encoding: "utf8" })
+      .stdout.trim();
+    const env = withForgeShim(`[{"number":268,"state":"MERGED","headRefOid":"${head}"}]`);
     const { out } = runInMount(mount, [], env);
     assert.match(out, /already MERGED/);
     assert.match(out, /put the mount back on master/);
     assert.doesNotMatch(out, /no route to master/);
+  });
+
+  // 22. …but only when the tip is what landed. Commits pushed after the merge live
+  //     nowhere else; "go back to master" would tell their author to abandon them,
+  //     and this repo has already lost late-pushed commits once.
+  test("merged PR but branch has newer commits → warns to review them, never says just go back", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const stale = "0".repeat(40); // the merged head is NOT this branch's tip
+    const env = withForgeShim(`[{"number":268,"state":"MERGED","headRefOid":"${stale}"}]`);
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /commits AFTER the merged head/);
+    assert.doesNotMatch(out, /put the mount back on master/);
+  });
+
+  // 23. The other check shape (classic statuses) carries state/context, not
+  //     conclusion/name. Without this, deleting that half of the filter is silent.
+  test("classic status check in FAILURE → read as red, by its context name", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const env = withForgeShim(
+      '[{"number":268,"state":"OPEN","statusCheckRollup":[{"context":"ci/legacy","state":"FAILURE"}]}]'
+    );
+    const { out } = runInMount(mount, [], env);
+    assert.match(out, /RED — ci\/legacy/);
+    assert.doesNotMatch(out, /checks green/);
+  });
+
+  // 24. A PR closed without merging is a dead end too — but a different one.
+  test("PR closed without merging → says so explicitly, not 'none at all'", () => {
+    const mount = scaffoldGitMount({ diverge: true });
+    const { out } = runInMount(mount, [], withForgeShim('[{"number":268,"state":"CLOSED"}]'));
+    assert.match(out, /CLOSED without merging/);
   });
 
   // 22. Only a genuinely empty answer earns the dead-end verdict.
@@ -494,7 +541,7 @@ if (posixOnly) {
     assert.match(out, /no route to master/);
   });
 
-  // 23. Green is asserted, never inferred from an empty rollup.
+  // 25. Green is asserted, never inferred from an empty rollup.
   test("diverged mount, zero checks reported → asks to verify, does not claim green", () => {
     const mount = scaffoldGitMount({ diverge: true });
     const env = withForgeShim('[{"number":268,"state":"OPEN","statusCheckRollup":[]}]');
@@ -503,6 +550,18 @@ if (posixOnly) {
     assert.doesNotMatch(out, /checks green/);
   });
 }
+
+// 26. The surface the whole feature exists for is the FAILED APPLY, not the preview —
+//     and every divergence test above runs --dry-run. Without this, the path the four
+//     readers actually hit has no net under it.
+test("apply on a diverged mount → the pull failure carries the diagnosis, not just the git error", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { code, out } = applyInMount(mount);
+  assert.equal(code, 0);
+  assert.match(out, /pull failed/);
+  assert.match(out, /mount is on 'someone\/parked-work'/);
+  assert.match(out, /last commit: Test Owner/);
+});
 
 for (const d of tmpdirs) {
   try {

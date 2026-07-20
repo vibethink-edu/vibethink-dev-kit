@@ -91,6 +91,7 @@ const diagnoseMount = (root) => {
   const behind = num(git("rev-list", "--count", "HEAD..origin/master"));
   const author = git("log", "-1", "--format=%an");
   const age = git("log", "-1", "--format=%cr");
+  const head = git("rev-parse", "HEAD");
 
   // Only ask the forge when there is local work that cannot land as-is. A detached
   // HEAD names no branch to ask about; an ahead-only mount fast-forwards fine and
@@ -102,7 +103,7 @@ const diagnoseMount = (root) => {
         "gh",
         [
           "pr", "list", "--head", branch, "--state", "all", "--limit", "30",
-          "--json", "number,state,statusCheckRollup",
+          "--json", "number,state,headRefOid,statusCheckRollup",
         ],
         { cwd: root, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 10000 }
       );
@@ -128,7 +129,15 @@ const diagnoseMount = (root) => {
           checks: rollup.length,
         };
       } else if (merged) {
-        pr = { state: "MERGED", number: merged.number };
+        // "Already merged" only licenses "go back to master" when the branch tip IS
+        // what merged. Commits pushed after the merge land nowhere — telling their
+        // author to switch away would abandon live work, and a wrong imperative is
+        // worse than a wrong description.
+        pr = {
+          state: "MERGED",
+          number: merged.number,
+          tipLanded: Boolean(head && merged.headRefOid && head === merged.headRefOid),
+        };
       } else if (prs.length) {
         pr = { state: "CLOSED", number: prs[0].number };
       } else {
@@ -152,9 +161,13 @@ const renderDiagnosis = (d) => {
   if (d.pr === null) {
     lines.push("PR: not checked (no forge CLI, not authenticated, or not a forge repo)");
   } else if (d.pr) {
-    const { state, number, failing, pending, checks } = d.pr;
+    const { state, number, failing, pending, checks, tipLanded } = d.pr;
     if (state === "MERGED") {
-      lines.push(`PR #${number} already MERGED — the branch is stale; put the mount back on master`);
+      lines.push(
+        tipLanded
+          ? `PR #${number} already MERGED — the branch is stale; put the mount back on master`
+          : `PR #${number} MERGED, but this branch has commits AFTER the merged head — review them before returning to master`
+      );
     } else if (state === "CLOSED") {
       lines.push(`PR #${number} was CLOSED without merging — this work has no route to master`);
     } else if (state === "NONE") {
