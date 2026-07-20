@@ -276,6 +276,98 @@ test("--with-graphtest <scope> (dry-run) → 'would run' scoped, never a default
   assert.match(out, /would run: graphtest update apps\/x/);
 });
 
+// ── Divergence diagnosis ─────────────────────────────────────────────────────
+// A mount that cannot fast-forward must say WHY in the same breath. "diverged"
+// alone sent four readers to git, where the cause was not (the cause was a PR that
+// could never merge). These guard both halves: the dry-run must not promise a
+// fast-forward the apply cannot perform, and the failure must name the owner.
+
+const DEFAULT_BRANCH = "master";
+
+/** A real git mount with an upstream default branch, optionally diverged from it. */
+function scaffoldGitMount({ diverge }) {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-git-"));
+  tmpdirs.push(root);
+  const remote = path.join(root, "remote.git");
+  const mount = path.join(root, "mount");
+  const other = path.join(root, "other");
+  const git = (cwd, ...args) => spawnSync("git", ["-C", cwd, ...args], { encoding: "utf8" });
+  const seed = (dir, name, email) => {
+    git(dir, "config", "user.email", email);
+    git(dir, "config", "user.name", name);
+  };
+  spawnSync("git", ["init", "--bare", "-b", DEFAULT_BRANCH, remote], { encoding: "utf8" });
+  spawnSync("git", ["clone", remote, mount], { encoding: "utf8" });
+  seed(mount, "Test Owner", "t@t.local");
+  writeFileSync(path.join(mount, "seed.md"), "seed\n");
+  git(mount, "add", "-A");
+  git(mount, "commit", "-m", "seed");
+  git(mount, "push", "-u", "origin", DEFAULT_BRANCH);
+
+  if (diverge) {
+    // someone else advances the default branch…
+    spawnSync("git", ["clone", remote, other], { encoding: "utf8" });
+    seed(other, "Other Person", "o@o.local");
+    writeFileSync(path.join(other, "theirs.md"), "theirs\n");
+    git(other, "add", "-A");
+    git(other, "commit", "-m", "theirs");
+    git(other, "push", "origin", DEFAULT_BRANCH);
+    // …while this mount parks work on a branch of its own
+    git(mount, "checkout", "-b", "someone/parked-work");
+    writeFileSync(path.join(mount, "mine.md"), "mine\n");
+    git(mount, "add", "-A");
+    git(mount, "commit", "-m", "mine");
+    git(mount, "fetch", "origin", "--quiet");
+  }
+  mkdirSync(path.join(mount, "tools"), { recursive: true });
+  writeFileSync(path.join(mount, "tools", "devkit-upgrade.mjs"), readFileSync(TOOL, "utf8"));
+  return mount;
+}
+
+const runInMount = (mount, args = []) => {
+  const r = spawnSync(
+    process.execPath,
+    [path.join(mount, "tools", "devkit-upgrade.mjs"), "--dry-run", "--no-tools", ...args],
+    { cwd: mount, encoding: "utf8" }
+  );
+  return { code: r.status, out: `${r.stdout}${r.stderr}` };
+};
+
+// 12. The dry-run must not promise a fast-forward the apply cannot perform.
+test("diverged mount (dry-run) → says it would NOT fast-forward, not a bogus commit count", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { code, out } = runInMount(mount);
+  assert.equal(code, 0);
+  assert.match(out, /would NOT fast-forward/);
+  assert.doesNotMatch(out, /would fast-forward \d+ commit/);
+});
+
+// 13. The missing half: who owns this, and can the work land at all.
+test("diverged mount → diagnosis names the branch, the ahead/behind split and the last author", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { out } = runInMount(mount);
+  assert.match(out, /mount is on 'someone\/parked-work'/);
+  assert.match(out, /1 commit\(s\) ahead \/ 1 behind/);
+  assert.match(out, /last commit: Test Owner/);
+});
+
+// 14. Degrade, never block: an unavailable forge is stated as unknown, never guessed.
+test("diverged mount with no forge behind it → says the PR was not checked, claims nothing", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { out } = runInMount(mount);
+  assert.match(out, /open PR: not checked/);
+  assert.doesNotMatch(out, /open PR #/);
+});
+
+// 15. No regression: an ordinary behind-mount still previews its fast-forward.
+test("clean mount, nothing local → still reports the ordinary fast-forward preview", () => {
+  const mount = scaffoldGitMount({ diverge: false });
+  const { code, out } = runInMount(mount);
+  assert.equal(code, 0);
+  assert.match(out, /would fast-forward 0 commit\(s\)/);
+  assert.doesNotMatch(out, /would NOT fast-forward/);
+});
+
 for (const d of tmpdirs) {
   try {
     rmSync(d, { recursive: true, force: true });

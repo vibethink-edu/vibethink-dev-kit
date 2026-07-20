@@ -62,6 +62,85 @@ const readMaybe = (p) => {
 };
 const abs = (root, p) => (isAbsolute(p) ? p : join(root, p));
 
+/**
+ * Diagnose a mount that cannot fast-forward.
+ *
+ * "diverged" alone is a half-truth: it sends the reader to git, where the cause
+ * usually is not. The cause is almost always one of two things this function
+ * surfaces instead — the branch belongs to someone (often the reader), or its work
+ * sits in a PR that cannot land. Both are one git/forge call away and neither was
+ * being reported.
+ *
+ * Degrades, never blocks: every lookup that fails yields null and the caller still
+ * prints what it has. The forge probe is skipped entirely when no CLI is present.
+ */
+const diagnoseMount = (root) => {
+  const git = (...args) => {
+    try {
+      return execFileSync("git", ["-C", root, ...args], {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      }).trim();
+    } catch {
+      return null;
+    }
+  };
+  const num = (v) => (v === null ? null : Number(v));
+  const branch = git("rev-parse", "--abbrev-ref", "HEAD");
+  const ahead = num(git("rev-list", "--count", "origin/master..HEAD"));
+  const behind = num(git("rev-list", "--count", "HEAD..origin/master"));
+  const author = git("log", "-1", "--format=%an");
+  const age = git("log", "-1", "--format=%cr");
+
+  // Only ask the forge when there is local work that must land somewhere.
+  let pr;
+  if (branch && branch !== "master" && ahead > 0) {
+    try {
+      const raw = execFileSync(
+        "gh",
+        [
+          "pr", "list", "--head", branch, "--state", "open",
+          "--json", "number,statusCheckRollup",
+        ],
+        { cwd: root, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }
+      );
+      const [open] = JSON.parse(raw);
+      pr = open
+        ? {
+            number: open.number,
+            failing: (open.statusCheckRollup || [])
+              .filter((c) => c.conclusion === "FAILURE")
+              .map((c) => c.name),
+          }
+        : { number: null, failing: [] };
+    } catch {
+      pr = null; // no CLI, not authenticated, or not a forge repo — say nothing rather than guess
+    }
+  }
+  return { branch, ahead, behind, author, age, pr };
+};
+
+/** One-line-per-fact rendering of a diagnosis — the half-truth's missing half. */
+const renderDiagnosis = (d) => {
+  const lines = [];
+  if (d.branch && d.branch !== "master") lines.push(`mount is on '${d.branch}', not master`);
+  if (d.ahead !== null && d.behind !== null) {
+    lines.push(`${d.ahead} commit(s) ahead / ${d.behind} behind origin/master`);
+  }
+  if (d.author) lines.push(`last commit: ${d.author}${d.age ? ` (${d.age})` : ""}`);
+  if (d.pr === null) lines.push("open PR: not checked (no forge CLI, or not a forge repo)");
+  else if (d.pr && d.pr.number === null) {
+    lines.push("open PR: NONE — this work has no route to master");
+  } else if (d.pr) {
+    lines.push(
+      d.pr.failing.length
+        ? `open PR #${d.pr.number}: RED — ${d.pr.failing.join(", ")} (it could never merge as-is)`
+        : `open PR #${d.pr.number}: checks green — merge it, then re-run`
+    );
+  }
+  return lines;
+};
+
 // ── 1. PULL the kit mount (canon is free by reference) ───────────────────────
 let pull = { done: false, note: "skipped (--no-pull)" };
 let oldHead = null; // the consumer's kit HEAD BEFORE this pull — anchors the canon-delta report
@@ -76,12 +155,19 @@ if (!NO_PULL) {
       /* no HEAD (shallow / detached) — canon-delta will skip */
     }
     if (DRY) {
-      const behind = execFileSync(
-        "git",
-        ["-C", KIT_ROOT, "rev-list", "--count", "HEAD..origin/master"],
-        { encoding: "utf8" }
-      ).trim();
-      pull = { done: false, note: `would fast-forward ${behind} commit(s)` };
+      // A dry-run that reports a fast-forward the real run cannot perform is worse
+      // than no preview: it hides the blocker until apply. Check divergence, not
+      // just distance.
+      const d = diagnoseMount(KIT_ROOT);
+      if (d.ahead > 0 && d.behind > 0) {
+        pull = {
+          done: false,
+          note: `⚠ would NOT fast-forward — the mount has diverged`,
+          diagnosis: renderDiagnosis(d),
+        };
+      } else {
+        pull = { done: false, note: `would fast-forward ${d.behind ?? 0} commit(s)` };
+      }
     } else {
       execFileSync("git", ["-C", KIT_ROOT, "merge", "--ff-only", "origin/master"], {
         stdio: "pipe",
@@ -96,6 +182,7 @@ if (!NO_PULL) {
     pull = {
       done: false,
       note: `⚠ pull failed (diverged or no upstream) — resolve by hand: ${msg}`,
+      diagnosis: renderDiagnosis(diagnoseMount(KIT_ROOT)),
     };
   }
 }
@@ -353,6 +440,7 @@ out.push(`  ${"─".repeat(52)}`);
 // ① INHERITANCE FRESHNESS — kit rules / canons / tools current in this repo
 out.push(`  ${bold("① INHERITANCE FRESHNESS")}   (kit rules / canons / tools current here)`);
 out.push(`  Canon / kit pull   ${pull.done ? green("✓") : "·"} ${pull.note}`);
+for (const line of pull.diagnosis || []) out.push(`        ${yellow("→")} ${line}`);
 const adaptedNote = resync.adapted.length
   ? ` · ${yellow(`${resync.adapted.length} adapted (preserved)`)}`
   : "";
