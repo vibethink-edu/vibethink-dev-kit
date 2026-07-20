@@ -62,6 +62,129 @@ const readMaybe = (p) => {
 };
 const abs = (root, p) => (isAbsolute(p) ? p : join(root, p));
 
+/**
+ * Diagnose a mount that cannot fast-forward.
+ *
+ * "diverged" alone is a half-truth: it sends the reader to git, where the cause
+ * usually is not. The cause is almost always one of two things this function
+ * surfaces instead — the branch belongs to someone (often the reader), or its work
+ * sits in a PR that cannot land. Both are one git/forge call away and neither was
+ * being reported.
+ *
+ * Degrades, never blocks: every lookup that fails yields null and the caller still
+ * prints what it has. The forge probe is skipped entirely when no CLI is present.
+ */
+const diagnoseMount = (root) => {
+  const git = (...args) => {
+    try {
+      return execFileSync("git", ["-C", root, ...args], {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      }).trim();
+    } catch {
+      return null;
+    }
+  };
+  const num = (v) => (v === null ? null : Number(v));
+  const branch = git("rev-parse", "--abbrev-ref", "HEAD");
+  const ahead = num(git("rev-list", "--count", "origin/master..HEAD"));
+  const behind = num(git("rev-list", "--count", "HEAD..origin/master"));
+  const author = git("log", "-1", "--format=%an");
+  const age = git("log", "-1", "--format=%cr");
+  const head = git("rev-parse", "HEAD");
+
+  // Only ask the forge when there is local work that cannot land as-is. A detached
+  // HEAD names no branch to ask about; an ahead-only mount fast-forwards fine and
+  // the answer would be discarded — neither is worth a network call.
+  let pr;
+  if (branch && branch !== "master" && branch !== "HEAD" && ahead > 0 && behind > 0) {
+    try {
+      const raw = execFileSync(
+        "gh",
+        [
+          "pr", "list", "--head", branch, "--state", "all", "--limit", "30",
+          "--json", "number,state,headRefOid,statusCheckRollup",
+        ],
+        { cwd: root, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 10000 }
+      );
+      const prs = JSON.parse(raw);
+      // A squash-merge leaves the old commits counted as "ahead", so a merged PR is
+      // the likeliest reason a parked mount diverges. Asking only for OPEN ones
+      // turns "already landed" into "no route to master" — a confident falsehood.
+      const open = prs.find((p) => p.state === "OPEN");
+      const merged = prs.find((p) => p.state === "MERGED");
+      if (open) {
+        const rollup = open.statusCheckRollup || [];
+        // A check that is not FAILURE is not therefore green: it may still be
+        // running, or have died in a way this repo has seen (runner OOM surfaces as
+        // TIMED_OUT / CANCELLED, never FAILURE).
+        const fatal = ["FAILURE", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP_FAILURE"];
+        pr = {
+          state: "OPEN",
+          number: open.number,
+          failing: rollup
+            .filter((c) => fatal.includes(c.conclusion) || ["FAILURE", "ERROR"].includes(c.state))
+            .map((c) => c.name || c.context),
+          pending: rollup.some((c) => (c.status && c.status !== "COMPLETED") || c.state === "PENDING"),
+          checks: rollup.length,
+        };
+      } else if (merged) {
+        // "Already merged" only licenses "go back to master" when the branch tip IS
+        // what merged. Commits pushed after the merge land nowhere — telling their
+        // author to switch away would abandon live work, and a wrong imperative is
+        // worse than a wrong description.
+        pr = {
+          state: "MERGED",
+          number: merged.number,
+          tipLanded: Boolean(head && merged.headRefOid && head === merged.headRefOid),
+        };
+      } else if (prs.length) {
+        pr = { state: "CLOSED", number: prs[0].number };
+      } else {
+        pr = { state: "NONE", number: null };
+      }
+    } catch {
+      pr = null; // no CLI, not authenticated, or not a forge repo — say nothing rather than guess
+    }
+  }
+  return { branch, ahead, behind, author, age, pr };
+};
+
+/** One-line-per-fact rendering of a diagnosis — the half-truth's missing half. */
+const renderDiagnosis = (d) => {
+  const lines = [];
+  if (d.branch && d.branch !== "master") lines.push(`mount is on '${d.branch}', not master`);
+  if (d.ahead !== null && d.behind !== null) {
+    lines.push(`${d.ahead} commit(s) ahead / ${d.behind} behind origin/master`);
+  }
+  if (d.author) lines.push(`last commit: ${d.author}${d.age ? ` (${d.age})` : ""}`);
+  if (d.pr === null) {
+    lines.push("PR: not checked (no forge CLI, not authenticated, or not a forge repo)");
+  } else if (d.pr) {
+    const { state, number, failing, pending, checks, tipLanded } = d.pr;
+    if (state === "MERGED") {
+      lines.push(
+        tipLanded
+          ? `PR #${number} already MERGED — the branch is stale; put the mount back on master`
+          : `PR #${number} MERGED, but this branch has commits AFTER the merged head — review them before returning to master`
+      );
+    } else if (state === "CLOSED") {
+      lines.push(`PR #${number} was CLOSED without merging — this work has no route to master`);
+    } else if (state === "NONE") {
+      lines.push("PR: none open, closed or merged — this work has no route to master");
+    } else if (failing.length) {
+      lines.push(`PR #${number}: RED — ${failing.join(", ")} (it cannot merge as-is)`);
+    } else if (pending) {
+      lines.push(`PR #${number}: checks still running — wait for them, then merge`);
+    } else if (!checks) {
+      lines.push(`PR #${number}: no checks reported — verify it on the forge before merging`);
+    } else {
+      lines.push(`PR #${number}: checks green — merge it, then re-run`);
+    }
+  }
+  return lines;
+};
+
 // ── 1. PULL the kit mount (canon is free by reference) ───────────────────────
 let pull = { done: false, note: "skipped (--no-pull)" };
 let oldHead = null; // the consumer's kit HEAD BEFORE this pull — anchors the canon-delta report
@@ -76,12 +199,28 @@ if (!NO_PULL) {
       /* no HEAD (shallow / detached) — canon-delta will skip */
     }
     if (DRY) {
-      const behind = execFileSync(
-        "git",
-        ["-C", KIT_ROOT, "rev-list", "--count", "HEAD..origin/master"],
-        { encoding: "utf8" }
-      ).trim();
-      pull = { done: false, note: `would fast-forward ${behind} commit(s)` };
+      // A dry-run that reports a fast-forward the real run cannot perform is worse
+      // than no preview: it hides the blocker until apply. Check divergence, not
+      // just distance.
+      const d = diagnoseMount(KIT_ROOT);
+      if (d.ahead > 0 && d.behind > 0) {
+        pull = {
+          done: false,
+          note: `⚠ would NOT fast-forward — the mount has diverged`,
+          diagnosis: renderDiagnosis(d),
+        };
+      } else if (d.behind === null) {
+        // The counts did not resolve (shallow clone, single-branch clone, no
+        // upstream ref). Saying "0" here would be the same lie in a new place: a
+        // preview promising a fast-forward the apply cannot perform.
+        pull = {
+          done: false,
+          note: "⚠ cannot preview — origin/master is not resolvable in this mount",
+          diagnosis: renderDiagnosis(d),
+        };
+      } else {
+        pull = { done: false, note: `would fast-forward ${d.behind} commit(s)` };
+      }
     } else {
       execFileSync("git", ["-C", KIT_ROOT, "merge", "--ff-only", "origin/master"], {
         stdio: "pipe",
@@ -96,6 +235,7 @@ if (!NO_PULL) {
     pull = {
       done: false,
       note: `⚠ pull failed (diverged or no upstream) — resolve by hand: ${msg}`,
+      diagnosis: renderDiagnosis(diagnoseMount(KIT_ROOT)),
     };
   }
 }
@@ -353,6 +493,7 @@ out.push(`  ${"─".repeat(52)}`);
 // ① INHERITANCE FRESHNESS — kit rules / canons / tools current in this repo
 out.push(`  ${bold("① INHERITANCE FRESHNESS")}   (kit rules / canons / tools current here)`);
 out.push(`  Canon / kit pull   ${pull.done ? green("✓") : "·"} ${pull.note}`);
+for (const line of pull.diagnosis || []) out.push(`        ${yellow("→")} ${line}`);
 const adaptedNote = resync.adapted.length
   ? ` · ${yellow(`${resync.adapted.length} adapted (preserved)`)}`
   : "";
