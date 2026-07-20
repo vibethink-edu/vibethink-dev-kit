@@ -5,9 +5,7 @@
 > decides which entities are operational; this one does not restate the list.
 > **Out of scope:** pre-production repos. `CANON-DEV-MODE-DISCIPLINE` §2-§3 makes deletion the
 > default there, deliberately, and that canon governs.
-> **Status:** proposed — **seal-within-PR**: on the Principal Architect's GO this line is stamped
-> `SEALED <date>` before merge; if no seal is given, the canon does not merge and its catalog piece
-> is withdrawn with it (the precedent set by D-071).
+> **Status:** SEALED 2026-07-20 by the Principal Architect (seal-within-PR, D-071 precedent).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** data-governance discipline. Binds with `CANON-DATA-CHANGE-AUDIT-001` (who/what/when of
 > a change), `CANON-DATA-LEGAL-COMPLIANCE-001` (retention, lawful basis, erasure) and
@@ -54,6 +52,10 @@ declares it a non-record (test, corrupt, duplicate — `CANON-SYSTEM-MIGRATION-D
 A migration does not launder legal status.
 
 ## §5 — Operational notes (not normative — correctness traps this shape creates)
+
+*These are **anticipated**, not scarred: they were reasoned out at review, not learned from a
+failure. They stay because a repo that hits one silently ends up with a wrong data model — but
+the distinction is recorded so a later reader does not mistake foresight for evidence.*
 
 - **Uniqueness for the returning subject.** A deleted record still occupies its uniqueness
   constraint. When the same subject is created again, it collides with its own deleted record. The
