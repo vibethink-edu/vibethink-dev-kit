@@ -88,6 +88,15 @@ chat — the mode belongs to the **dispatch surface**, not the runtime name.)*
   A committed slice or a real question is a valid return; "I'll continue" is not. (§8.1 still
   governs — the yield changes delivery granularity, not the terminal conditions.)
 
+**Preparation is not a deliverable** (applies to both modes). Verifying, rebasing, reading,
+re-confirming a resolution — these are *preparation for* a unit of the SCOPE, not the unit *(unless a
+SCOPE unit names such an artifact — an audit, a verification harness, a plan — as its deliverable;
+then the artifact, not the activity, is the unit)*. An executor that returns having only prepared has
+**yielded idle while sounding productive**, and the preparation loop can repeat indefinitely because
+each round is real work. **Return with a SCOPE unit done, or with a §8.1 terminal.** *(This narrows
+what counts as progress; it does not narrow the terminals — **any** §8.1 terminal discovered
+**during** preparation is a legitimate return, and stopping there is required, not discouraged.)*
+
 ## What the consuming repo binds (L3 — this template is the spine)
 
 - The **concrete runtime names** and which execution mode each **dispatch surface** falls in.
