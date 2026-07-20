@@ -125,7 +125,7 @@ Medí con `robocopy /L` (§1). En esta máquina el ~1 TB estaba así:
 
 | Dónde | Qué es | Cómo se libera |
 |---|---|---|
-| **`C:\tmp` (worktrees `vito-wt-*`)** | worktrees no limpiados post-merge | `git worktree remove` + `prune` — **NUNCA `rm -rf` crudo** (política del dueño) |
+| **`C:\tmp` (worktrees de agentes, p. ej. `<repo>-wt-*`)** | worktrees no limpiados post-merge | `git worktree remove` + `prune` — **NUNCA `rm -rf` crudo** (política del dueño) |
 | **`AppData\Local\wsl`** | disco de Ubuntu (inflado) | Compactar (§3) |
 | **`AppData\Local\Docker`** | imágenes/volúmenes | prune (§4) + compactar |
 | **`AppData\Local\Google`** | caché de Chrome/Drive | se regenera; limpiar caché del navegador |
