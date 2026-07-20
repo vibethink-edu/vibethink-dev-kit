@@ -1504,9 +1504,9 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - A delete leaves the record present and queryable-as-deleted, through the declared mechanism.
   - Default reads exclude deleted records on **every** path — including pre-computed or
     materialized views, which do not inherit a row-level policy.
-  - **Unique constraints handle the returning subject**: someone who re-enrolls or re-registers
-    does not collide with their own deleted record. One decision per repo (filtered unique index or
-    revive), named — not two implementers deciding differently.
+  - **Uniqueness handles the returning subject**: creating the same subject again does not collide
+    with its own deleted record. One decision per repo, named — not two implementers deciding
+    differently.
   - The entity set and the retrofit schedule are declared, not implied.
   - The repo does not restate §2's ownership table.
 

@@ -56,11 +56,11 @@ A migration does not launder legal status.
 ## §5 — Operational notes (not normative — correctness traps this shape creates)
 
 - **Uniqueness for the returning subject.** A deleted record still occupies its uniqueness
-  constraint. A subject who returns — re-enrolls, re-registers, re-opens — collides with their own
-  deleted record. The remedies are store-dependent (e.g. a filtered unique index where the store
-  offers one, a uniqueness key that incorporates the deleted marker, or reviving the record); what
-  matters is that the repo picks one and names it (§6). Two implementers who decide differently
-  produce incompatible data models.
+  constraint. When the same subject is created again, it collides with its own deleted record. The
+  remedies are store-dependent (e.g. a filtered unique index where the store offers one, a
+  uniqueness key that incorporates the deleted marker, or reviving the record); what matters is that
+  the repo picks one and names it (§6). Two implementers who decide differently produce
+  incompatible data models.
 - **Views that bypass row-level policy.** A materialized or pre-computed view built before the
   active filter will serve deleted records. The exclusion is a property of every read path, not of
   one query.
