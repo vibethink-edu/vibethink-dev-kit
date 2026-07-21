@@ -1510,6 +1510,38 @@ the reusable workflow's `copy-parity` job (`.github/workflows/agent-context.yml`
   - The entity set and the retrofit schedule are declared, not implied.
   - The repo does not restate §2's ownership table.
 
+### 55 — Jurisdiction resolution (by operating location, versioned in time) (universal L1)
+
+**Layer:** L1 (neutral).
+**Home:** `knowledge/methodology/CANON-DATA-JURISDICTION-RESOLUTION-001.md`.
+
+- **Qué:** the law governing an operating unit is set by **where that unit operates**, not by where
+  its parent account is registered — so effective jurisdiction resolves
+  `coalesce(unit, account default)`, most-specific-wins. A jurisdiction is a **versioned policy
+  bundle held as data** with an explicit validity window, and anything already emitted stays
+  **pinned to the bundle version in force when it was produced**. It owns **only** the resolution
+  and the validity model: the account-level declaration and every personal-data obligation stay
+  with `CANON-DATA-LEGAL-COMPLIANCE-001` §6/§2–§5, policy-as-data + layered resolution + the
+  no-branching rule stay with `CANON-CONFIGURATION-DISCIPLINE` §1/§3/§5, and artifact versioning
+  stays with `CANON-VERSIONING-001`.
+- **Cómo:** name the concrete level that carries a unit's jurisdiction (column/table/entity) and
+  the bundle engine + storage; hold the per-territory obligation matrices — oversight bodies,
+  statutory identifier formats, classification schemes, calendars — as **L3 data in your own repo**,
+  never in the canon; publish a **retrofit schedule** where units predate adoption. A repo whose
+  operating units cannot span jurisdictions declares `N-A(single-jurisdiction)`; one that already
+  resolves a law-bearing attribute below the account by another mechanism declares
+  `ADOPTED-NATIVE` (`INHERITANCE-CONTRACT` §2).
+- **Verificar:**
+  - Changing a unit's jurisdiction changes behaviour **without a code change** — the lookup key is
+    the effective jurisdiction, and no `if jurisdiction == …` branch exists.
+  - A normative change ships as a **new bundle version with its own start date**; the switch
+    happens on that date and not before.
+  - A document re-opened after a norm change still renders under the version in force when it was
+    emitted — historical output is never silently re-derived.
+  - The territory **data-catalogue** (e.g. a person's nationality) and the **legal jurisdiction** of
+    a unit are separate fields, not one.
+  - The repo does not restate §7's ownership table.
+
 ---
 
 ## Per-piece adoption status — declare in your `AGENTS.md`
