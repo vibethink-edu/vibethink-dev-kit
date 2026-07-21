@@ -1,6 +1,7 @@
 # CANON-DATA-LEGAL-COMPLIANCE-001 — Data-protection legal compliance (universal · agent-agnostic)
 
 > **Status:** SEALED 2026-06-18 by the Principal Architect ("sella") — D-018. Seals the agnostic *mechanics* of data-protection compliance; the concrete laws, jurisdictions, and retention **numbers are L3 by design** (each repo binds them — the canon never holds a number). The consent-canon separation review is done (relay sent to the consumer architect); per-repo legal numbers are an L3/legal-research concern, not a seal blocker. Fire-test passed (no specific law named as *the* law; regimes appear only as illustration).
+> **Amended 2026-07-21 §6:** one-line pointer added — where operating units within a tenant span jurisdictions, resolution below the tenant level follows `CANON-DATA-JURISDICTION-RESOLUTION-001`. §6's own substance (the tenant-level declaration) is unchanged; the resolution rule has a single owner. (D-075.)
 > **Scope:** every repo that stores or processes **personal data**.
 > **Home:** the dev-kit (supra-repo). On promotion, inherited by every repo as upstream → fork.
 > **Family:** data-governance discipline · binds with `CANON-DATA-CHANGE-AUDIT-001.md` (the audit-trail is itself subject to §2 retention) · sibling of `CANON-DB-SECURITY-BASELINE-001.md`. A consumer's product-specific consent/capture canon (e.g. a friendship/capture model) is its **L3 binding**, not a replacement for this neutral core.
@@ -38,6 +39,8 @@ Every system can fulfil a **data-subject request** over the personal data it hol
 ## §6 — Applicable jurisdiction
 
 Each tenant/system **declares its governing jurisdiction(s)**; that declaration is what binds the concrete laws, windows, and DSR timelines (L3). A multi-tenant system may carry different jurisdictions per tenant.
+
+Where **operating units within a tenant span jurisdictions**, effective-jurisdiction resolution below the tenant level follows `CANON-DATA-JURISDICTION-RESOLUTION-001` (that canon owns the resolution rule and its validity model; this section keeps the tenant-level declaration).
 
 ## §7 — Per-repo binding (L3)
 

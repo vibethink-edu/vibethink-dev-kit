@@ -4,7 +4,7 @@
 > adding or changing a canon: `node tools/graph-canon.mjs`. Nodes are canon spines
 > (labelled with their ADOPT piece number); edges are the **companion/sibling
 > relationships each canon declares in its header** (curated, not every mention).
-> 44 spines · 104 declared relationships.
+> 45 spines · 105 declared relationships.
 
 ```mermaid
 flowchart LR
@@ -28,6 +28,7 @@ flowchart LR
     CANON_CHANGE_PATH_AND_DECISION_CLASSES_001["#37 change path and decision classes"]
     CANON_CONFIGURATION_DISCIPLINE["#32 configuration discipline"]
     CANON_DATA_CHANGE_AUDIT_001["#43 data change audit"]
+    CANON_DATA_JURISDICTION_RESOLUTION_001["#55 data jurisdiction resolution"]
     CANON_DATA_LEGAL_COMPLIANCE_001["#44 data legal compliance"]
     CANON_DATA_SOFT_DELETE_001["#54 data soft delete"]
     CANON_DB_SECURITY_BASELINE_001["#38 db security baseline"]
@@ -109,6 +110,7 @@ flowchart LR
   CANON_CONFIGURATION_DISCIPLINE --- CANON_PRODUCTION_SAFETY
   CANON_DATA_CHANGE_AUDIT_001 --- CANON_DB_SECURITY_BASELINE_001
   CANON_DATA_CHANGE_AUDIT_001 --- CANON_STATE_MIRROR_AND_DECISION_REGISTER_001
+  CANON_DATA_LEGAL_COMPLIANCE_001 --- CANON_DATA_JURISDICTION_RESOLUTION_001
   CANON_DATA_LEGAL_COMPLIANCE_001 --- CANON_DATA_CHANGE_AUDIT_001
   CANON_DATA_LEGAL_COMPLIANCE_001 --- CANON_DB_SECURITY_BASELINE_001
   CANON_DATA_SOFT_DELETE_001 --- CANON_DATA_CHANGE_AUDIT_001

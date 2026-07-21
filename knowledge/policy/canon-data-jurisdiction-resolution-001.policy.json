@@ -1,0 +1,60 @@
+{
+  "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
+  "id": "CANON-DATA-JURISDICTION-RESOLUTION-001",
+  "source": "knowledge/methodology/CANON-DATA-JURISDICTION-RESOLUTION-001.md",
+  "status": "SEALED",
+  "layer": "L1",
+  "summary": "The law governing an operating unit is set by where that unit operates, not by where its parent account is registered: effective jurisdiction resolves most-specific-first from the unit to the account default, and a jurisdiction is a versioned policy bundle held as data whose already-emitted output stays pinned to the version in force when it was produced.",
+  "rules": [
+    {
+      "id": "JURISDICTION-MUST-RESOLVE-FROM-OPERATING-UNIT",
+      "level": "MUST",
+      "cite": "§1, §2",
+      "rule": "Resolve effective jurisdiction as coalesce(the operating unit's own jurisdiction, the account's default jurisdiction) — most specific wins, absent levels inherit upward. A repo whose operating units cannot span jurisdictions declares N-A(single-jurisdiction) instead, or declares ADOPTED-NATIVE per §2 where it already resolves a law-bearing attribute below the account by another mechanism.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "JURISDICTION-NEVER-ACCOUNT-AS-ONLY-LEVEL",
+      "level": "NEVER",
+      "cite": "§6",
+      "rule": "Bind jurisdiction at the account level as the only level when operating units within that account span jurisdictions. (A repo whose units cannot span them is not in violation — see the §2 landing.)",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "JURISDICTION-MUST-BE-VERSIONED-BUNDLE",
+      "level": "MUST",
+      "cite": "§3, §4",
+      "rule": "Hold a jurisdiction as a versioned bundle of rules-as-data with an explicit validity window; a normative change ships as a new version bearing its own start date and the system switches on that date, never earlier and never retroactively.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "JURISDICTION-NEVER-REWRITE-EMITTED-OUTPUT",
+      "level": "NEVER",
+      "cite": "§4, §6",
+      "rule": "Re-derive or rewrite already-emitted output under a later bundle version — emitted output is pinned to the version in force when it was produced.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    },
+    {
+      "id": "JURISDICTION-NEVER-COLLAPSE-REFERENCE-DATA",
+      "level": "NEVER",
+      "cite": "§5, §6",
+      "rule": "Collapse the territory data-catalogue (a value such as a person's nationality) and the legal jurisdiction governing an operating unit into one field — they are separate concerns.",
+      "watch": {
+        "kind": "none",
+        "note": "declared unwatched — no gate cites this canon yet; growth candidate"
+      }
+    }
+  ]
+}
