@@ -28,7 +28,12 @@
  * Usage:
  *   node <kit>/tools/devkit-upgrade.mjs [--dry-run] [--no-pull] [--no-tools] [--json]
  *     [--parity-config tools/copy-parity.config.json] [--upstream-root <path>]
- * Exit: 0 ok · 1 a re-sync or pull step failed. Pure Node, zero deps.
+ * Exit: 0 ok · 1 hard fail (a copied runnable's upstream is missing) · 2 degraded
+ *   (an APPLIED kit pull genuinely failed — diverged mount / no upstream / fetch error —
+ *   but the tool continued its remaining steps per degrade-not-block). 1 takes precedence
+ *   over 2. The D-073/#269 scar: a failed pull must not read as success to a script/hook/
+ *   agent. A `--no-pull` skip and a `--dry-run` preview never set the pull flag (a dry-run
+ *   still exits 1 on a missing upstream). Pure Node, zero deps.
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -232,11 +237,23 @@ if (!NO_PULL) {
     }
   } catch (e) {
     const msg = String(e?.stderr || e?.message || e).split("\n")[0];
-    pull = {
-      done: false,
-      note: `⚠ pull failed (diverged or no upstream) — resolve by hand: ${msg}`,
-      diagnosis: renderDiagnosis(diagnoseMount(KIT_ROOT)),
-    };
+    // The fetch (above) sits inside this try, so in DRY mode a dead remote reaches here
+    // too — but no merge was attempted, so a dry-run is "cannot preview" (exit 0), matching
+    // the other unresolvable-preview branches. Only an APPLIED failure (a dead fetch OR the
+    // ff-merge) sets `failed` → exit 2 (degraded): the D-073/#269 scar, a failed real pull
+    // must not read as success. A --no-pull skip sets no flag either.
+    pull = DRY
+      ? {
+          done: false,
+          note: `⚠ cannot preview — fetch failed (offline or remote unreachable): ${msg}`,
+          diagnosis: renderDiagnosis(diagnoseMount(KIT_ROOT)),
+        }
+      : {
+          done: false,
+          failed: true,
+          note: `⚠ pull failed (diverged, no upstream, or fetch) — resolve by hand: ${msg}`,
+          diagnosis: renderDiagnosis(diagnoseMount(KIT_ROOT)),
+        };
   }
 }
 
@@ -466,6 +483,13 @@ if (existsSync(tplDir)) {
   }
 }
 
+// Exit contract (see the header): 0 clean · 1 hard fail (a copied runnable's upstream is
+// missing) · 2 degraded (an APPLIED pull genuinely failed but the tool continued). One
+// source of truth so the --json and text paths can never disagree. A degraded exit does
+// NOT block — the remaining steps ran — it only stops a failed pull from reading as
+// success (the D-073/#269 scar). A --no-pull skip / a --dry-run preview set no failed flag.
+const exitCode = resync.missingUpstream.length ? 1 : pull.failed ? 2 : 0;
+
 const result = {
   repo: basename(CWD),
   mode: DRY ? "dry-run" : "applied",
@@ -477,11 +501,12 @@ const result = {
   withRefreshes,
   canonDelta,
   templates,
+  exitCode,
 };
 
 if (JSON_OUT) {
   console.log(JSON.stringify(result, null, 2));
-  process.exit(resync.missingUpstream.length ? 1 : 0);
+  process.exit(exitCode);
 }
 
 const out = [];
@@ -574,4 +599,4 @@ out.push(
 );
 out.push("");
 console.log(out.join("\n"));
-process.exit(resync.missingUpstream.length ? 1 : 0);
+process.exit(exitCode);
