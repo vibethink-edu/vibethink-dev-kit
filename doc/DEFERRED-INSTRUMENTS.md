@@ -136,6 +136,41 @@ workflow improved without weakening the kit's authority model.
   as foresight rather than evidence (D-073's rule: do not sell foresight as evidence).
 - **Status:** DEFERRED — 2026-07-21.
 
+### goal-template v2 operator-layer candidates (the 7 gates)
+- **What:** the seven candidate additions to the sealed `GOAL-TEMPLATE` that came from a consumer's
+  **operator layer**, not from the kit: cold-start inline · **source verification** · NO-DO list ·
+  owner+blocks on asks · reversibility · **GO-with-gate** (a fourth readiness verdict) · the
+  **per-runtime counterweights**. Plus, from the same layer, a **verified front header**
+  (repo · branch · worktree, re-verified each turn rather than remembered) and a **two-state return
+  format** (stopped / finished, with the outcome marked item-by-item).
+- **Origin:** D-072 deferred the first seven **by name** — *"deliberately NOT elevated here — they
+  have not yet run on real goals"*. The devkit-arq closing handoff of 2026-07-20 quarantined the
+  operator layer with an explicit bar: *"they go up to the kit only after 2-3 real goals. NOT on a
+  hunch."* Re-proposed 2026-07-21 as a forced canon gate (kit PR #276) and **declined** — see below.
+- **Why deferred:** the bar is evidence, and the bar was set deliberately. The 2026-07-21 proposal
+  also mis-located the fix: the mandate it wanted **already exists** at the dispatch surface
+  (`setup/RUNBOOK-LAUNCH-CODERS.md` §2, *"a goal definition per dispatch … Rule #0: fully defined,
+  or no dispatch"*), so the canon's silence is **routing discipline, not a gap**; and its proposed
+  text **restated the template's rules in a second file**, the exact drift class D-069 §6a, D-070
+  (defect A) and D-072 each had to fix. Two further blockers: it would have made the readiness
+  **verdict** mandatory pre-dispatch, inverting the template's sealed *advisory* design
+  (`GOAL-TEMPLATE.md:21,39`), and it would have converted a **PULL** artifact (D-070) into a
+  push-mandate for every inheriting repo — a governance-model change, not a section amendment.
+- **EVIDENCE COUNTER — 1 of the 2-3 required.** (1) 2026-07-21, a consumer dispatch (route-selector
+  front): the **verified front header** forced a `git` check and **caught a real defect** — the local
+  HEAD sat on a foreign branch. Genuine catch, recorded. *Add the next one here; do not restart the
+  count.* Nothing about the **advisory verdict** failing has been observed — that gate needs its own
+  evidence before it can escalate advisory → forced (`CANON-CODER-ORCHESTRATION-001` §9.1's
+  escalation pattern: force it when the floor demonstrably fails).
+- **TRIGGER to build:** the counter reaches **2-3 real goals**, *and* the elevation lands where the
+  contract already lives (the template and/or the runbook) — **not** as a restatement inside the
+  canon.
+- **KILL / DROP trigger:** drop a candidate if the operator abandons it in practice, or if it proves
+  to be runtime-specific rather than a property of goal definition (the counterweights are the most
+  likely to fail this test). Any candidate elevated must arrive **language-neutral** — D-065 already
+  recorded Spanish operator strings reaching an L1 format string as a defect, corrected then.
+- **Status:** DEFERRED — 2026-07-21 (evidence 1 of 2-3).
+
 ### external-tools pin integrity check
 - **What:** a check that each pin in `setup/external-tools.lock.json` is **internally consistent
   and resolvable** — the `package` field **matches what `EXTERNAL-TOOLS.md` declares**, and (online)

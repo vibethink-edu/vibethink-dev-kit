@@ -1,6 +1,7 @@
 # CANON-CODER-ORCHESTRATION-001 — Running an autonomous executor without stalling and without crossing the gates
 
 **Status:** SEALED 2026-06-15 by the Principal Architect — fire-tested across a vertical's executor waves (sequential identity/access waves + a fan-out wiring wave), command-hygiene evolved over five iterations from watching real executor sessions.
+**Amended 2026-07-21 §2:** one **routing row** added to the boundary table — the goal-definition contract (`GOAL-TEMPLATE.md` + `RUNBOOK-LAUNCH-CODERS` §2) is named as an owner this canon does **not** restate, closing a one-way cross-reference (the template cited this canon twice; this canon never cited back, so an agent entering here could not discover the contract). **No normative substance added** — the mandate already lives at the dispatch surface. (D-076.)
 **Date:** 2026-06-15
 **Scope:** Every repo where AI agents ("coders"/executors) run long autonomous sessions under a harness with a **per-command permission gate**. Vendor-neutral, product-neutral, harness-neutral, forge-neutral.
 **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
@@ -31,6 +32,7 @@ Two consequences shape this canon:
 | **Worktree** isolation, one-branch-per-worker, shared-foundation order | **`CANON-BRANCH-WORKTREE-LIFECYCLE`** §5/§7 | does **not** restate; §6's `git -C` rule and §9's wave shape build on it |
 | Clean working floor, **all-via-PR**, pre-push preflight | **`CANON-GIT-HYGIENE`** §2/§4 | does **not** restate; the executor's exit states (§8) resolve to it |
 | The **present-mirror / log / decision register** the executor reports to | **`CANON-STATE-MIRROR-AND-DECISION-REGISTER-001`** | does **not** restate; §8 names what the executor may **not** touch (the architect's instruments) |
+| The **goal-definition contract** a unit is dispatched with (the 8 fields; Rule #0 *fully defined, or no dispatch*) | **`setup/templates/goal/GOAL-TEMPLATE.md`** (the contract) + **`RUNBOOK-LAUNCH-CODERS` §2** (the dispatch surface that requires one per dispatch) | does **not** restate the fields, the readiness verdict, or the mode rules; the filled goal's MODE cites §8.1 |
 
 This canon **owns** what had no agnostic home: the **command-hygiene model** (why the prompt fires + the trigger→fix table paired with clean forms + worked examples), the **design gate** (stop-and-present vs autonomous), the **wave shape** (sequential vs fan-out), and the **expectation-of-use vs gate-of-correction** distinction.
 
