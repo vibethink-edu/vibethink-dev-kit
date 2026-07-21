@@ -2,7 +2,7 @@
   "$schema": "VIBETHINK_POLICY_MANIFEST_V1",
   "id": "CANON-DATA-JURISDICTION-RESOLUTION-001",
   "source": "knowledge/methodology/CANON-DATA-JURISDICTION-RESOLUTION-001.md",
-  "status": "DRAFT",
+  "status": "SEALED",
   "layer": "L1",
   "summary": "The law governing an operating unit is set by where that unit operates, not by where its parent account is registered: effective jurisdiction resolves most-specific-first from the unit to the account default, and a jurisdiction is a versioned policy bundle held as data whose already-emitted output stays pinned to the version in force when it was produced.",
   "rules": [

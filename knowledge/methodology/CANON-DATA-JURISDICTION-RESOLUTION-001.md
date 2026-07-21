@@ -2,7 +2,7 @@
 
 > **Scope:** every repo whose account (tenant) can span more than one legal jurisdiction, and whose operating units must each satisfy obligations that differ by territory.
 > Vendor-neutral, product-neutral, domain-neutral, tool-neutral.
-> **Status:** DRAFT — pending Principal Architect seal (seal-within-PR: stamped SEALED before merge on the authority's GO, else this canon and its catalog piece are withdrawn together; D-071/D-073 precedent).
+> **Status:** SEALED 2026-07-21 by the Principal Architect (chat: "sella") — D-075. Adopted as a **rewrite** of a consumer proposal (kit PR #273) after two independent architecture-advisor rounds; the proposal's restatements of `CANON-CONFIGURATION-DISCIPLINE`, its two citations of canons absent from this kit, and its conflict with sealed `CANON-DATA-LEGAL-COMPLIANCE-001` §6 were resolved before seal. Fire-test passed (l1-neutrality gate GREEN — no territory, oversight body, product or vendor named).
 > **Home:** the dev-kit (supra-repo). Inherited by every repo as upstream → fork.
 > **Family:** data-governance discipline. This canon owns **only** (a) which jurisdiction governs an operating unit and (b) how that binding is versioned in time. It does not restate its neighbours — see §7.
 
