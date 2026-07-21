@@ -20,7 +20,7 @@ The **account/tenant** is the data boundary and the commercial relationship, and
 
 The most specific declared level wins; absent levels inherit upward. The account carries a **default** jurisdiction (the single-jurisdiction case, which is the common one); a unit **overrides** it only where it differs. This is the same most-specific-wins shape as `CANON-CONFIGURATION-DISCIPLINE` §3, applied along the **operating-location axis** rather than the deployment axis; that canon owns the general rule and it is not restated here.
 
-**Landing (declare one):** a repo whose operating units cannot span jurisdictions declares `N-A(single-jurisdiction)` — the account-level declaration of `CANON-DATA-LEGAL-COMPLIANCE-001` §6 already satisfies it. A repo that already resolves a law-bearing attribute below the account by another mechanism declares `ADOPTED-NATIVE`.
+**Landing (declare one):** a repo whose operating units cannot span jurisdictions declares `N-A(single-jurisdiction)` — the account-level declaration of `CANON-DATA-LEGAL-COMPLIANCE-001` §6 already satisfies it **where that canon applies** (a repo with no personal data carries no §6 declaration to lean on, and simply declares its single jurisdiction here). A repo that already resolves a law-bearing attribute below the account by another mechanism declares `ADOPTED-NATIVE`.
 
 ## §3 — A jurisdiction is a versioned policy bundle, not a label
 

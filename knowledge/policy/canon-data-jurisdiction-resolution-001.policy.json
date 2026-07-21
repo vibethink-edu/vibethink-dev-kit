@@ -10,7 +10,7 @@
       "id": "JURISDICTION-MUST-RESOLVE-FROM-OPERATING-UNIT",
       "level": "MUST",
       "cite": "§1, §2",
-      "rule": "Resolve effective jurisdiction as coalesce(the operating unit's own jurisdiction, the account's default jurisdiction) — most specific wins, absent levels inherit upward. A repo whose operating units cannot span jurisdictions declares N-A(single-jurisdiction) instead.",
+      "rule": "Resolve effective jurisdiction as coalesce(the operating unit's own jurisdiction, the account's default jurisdiction) — most specific wins, absent levels inherit upward. A repo whose operating units cannot span jurisdictions declares N-A(single-jurisdiction) instead, or declares ADOPTED-NATIVE per §2 where it already resolves a law-bearing attribute below the account by another mechanism.",
       "watch": {
         "kind": "none",
         "note": "declared unwatched — no gate cites this canon yet; growth candidate"
