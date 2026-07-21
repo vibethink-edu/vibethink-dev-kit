@@ -553,14 +553,128 @@ if (posixOnly) {
 
 // 26. The surface the whole feature exists for is the FAILED APPLY, not the preview —
 //     and every divergence test above runs --dry-run. Without this, the path the four
-//     readers actually hit has no net under it.
-test("apply on a diverged mount → the pull failure carries the diagnosis, not just the git error", () => {
+//     readers actually hit has no net under it. The exit code is the OTHER half of the
+//     same scar (D-073/#269): four agents ran the real refresh, the pull failed, and each
+//     got exit 0 — a script/hook/agent reading only $? saw "all good". A failed apply is
+//     exit 2 (degraded), never 0.
+test("apply on a diverged mount → exit 2 (degraded) + the failure carries the diagnosis", () => {
   const mount = scaffoldGitMount({ diverge: true });
   const { code, out } = applyInMount(mount);
-  assert.equal(code, 0);
+  assert.equal(code, 2, `a failed apply-pull must exit 2 (degraded), not 0\n${out}`);
   assert.match(out, /pull failed/);
   assert.match(out, /mount is on 'someone\/parked-work'/);
   assert.match(out, /last commit: Test Owner/);
+});
+
+// 27. Degraded is not blocked: exit 2 signals the failed pull, but the tool still RAN its
+//     remaining steps (the degrade-not-block design the finding was careful to preserve).
+test("apply on a diverged mount → still runs the remaining steps (degrade, not block)", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { code, out } = applyInMount(mount);
+  assert.equal(code, 2, `expected degraded exit 2\n${out}`);
+  assert.match(out, /TOOL AVAILABILITY/, "the pull failure must not abort the rest of the run");
+  assert.match(out, /Next .*devkit-doctor/, "the run reaches its normal end, degraded not aborted");
+});
+
+// 28. The mechanical channel: a reader parsing --json (not text) must see the failure —
+//     result.exitCode is the machine-readable contract, result.pull.failed the cause.
+test("apply --json on a diverged mount → exitCode 2 + pull.failed true (machine-readable)", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const env = { ...process.env };
+  delete env.GH_REPO;
+  delete env.GH_HOST;
+  delete env.GH_TOKEN;
+  const r = spawnSync(
+    process.execPath,
+    [path.join(mount, "tools", "devkit-upgrade.mjs"), "--no-tools", "--json"],
+    { cwd: mount, encoding: "utf8", env }
+  );
+  assert.equal(r.status, 2, `--json apply failure must exit 2\n${r.stdout}${r.stderr}`);
+  const parsed = JSON.parse(r.stdout);
+  assert.equal(parsed.exitCode, 2, "the JSON must carry the exit code for a script that pipes it");
+  assert.equal(parsed.pull.failed, true, "the JSON must name the pull as the failed step");
+  assert.equal(parsed.mode, "applied");
+});
+
+// 29. Scope boundary (deliberate): a --dry-run preview that correctly reports divergence
+//     has SUCCEEDED — it is not a failure. Only the APPLIED pull path exits 2. Locks the
+//     finding's scope so a later change does not silently turn previews into failures.
+test("dry-run on a diverged mount → exit 0 (a preview that reports divergence is not a failure)", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  const { code, out } = runInMount(mount); // runInMount passes --dry-run
+  assert.equal(code, 0, `a dry-run preview must stay exit 0, never 2\n${out}`);
+  assert.match(out, /would NOT fast-forward/);
+});
+
+/** Kill the remote so the tool's `git fetch` throws — the fetch sits inside the same try
+ *  as the merge, so this is the path that separates "cannot preview" (dry) from "pull
+ *  failed" (apply). */
+const killRemote = (mount) =>
+  spawnSync("git", ["-C", mount, "remote", "set-url", "origin", path.join(mount, "..", "gone.git")],
+    { encoding: "utf8" });
+
+// 30. A --dry-run whose FETCH fails (offline / remote gone) is "cannot preview", NOT a
+//     failure — it stays exit 0. Regression guard for the shared catch: the fetch is inside
+//     the try, so without gating on DRY a dead remote would wrongly exit 2 (the bug Fable hit).
+test("dry-run with an unreachable remote → exit 0 (cannot preview, not a failure)", () => {
+  const mount = scaffoldGitMount({ diverge: false });
+  killRemote(mount);
+  const { code, out } = runInMount(mount); // --dry-run
+  assert.equal(code, 0, `a dry-run over a dead remote must stay 0, never 2\n${out}`);
+  assert.match(out, /cannot preview/);
+  assert.doesNotMatch(out, /pull failed/, "no merge was attempted — must not claim a pull failed");
+});
+
+// 31. …but the same dead remote on APPLY is a real failure → exit 2. The apply-side
+//     fetch-fail cause was previously untested; the suite only exercised the ff-merge fail.
+test("apply with an unreachable remote → exit 2 (degraded)", () => {
+  const mount = scaffoldGitMount({ diverge: false });
+  killRemote(mount);
+  const { code, out } = applyInMount(mount);
+  assert.equal(code, 2, `a failed apply-fetch must exit 2\n${out}`);
+  assert.match(out, /pull failed/);
+});
+
+// 33. Dry-run is not blanket exit 0: a missing-upstream copied runnable is a hard fail in
+//     EITHER mode. Locks the header's "not a *pull* failure" wording against a
+//     "dry-run always 0" misread (Fable R2 residual).
+test("dry-run + missing upstream → exit 1 (mode-agnostic hard fail)", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "upgrade-test-"));
+  tmpdirs.push(root);
+  const consumer = path.join(root, "consumer");
+  const upstream = path.join(root, "upstream");
+  mkdirSync(path.join(consumer, "tools"), { recursive: true });
+  mkdirSync(upstream, { recursive: true });
+  writeFileSync(
+    path.join(consumer, "tools", "copy-parity.config.json"),
+    JSON.stringify({ copies: [{ local: "tools/x.mjs", upstream: "tools/gone.mjs" }] })
+  );
+  const { code, out } = run(consumer, upstream, ["--dry-run"]);
+  assert.equal(code, 1, `missing upstream must exit 1 even in dry-run\n${out}`);
+  assert.match(out, /upstream missing/i);
+});
+
+// 32. Precedence: a hard fail (missingUpstream) and a degraded pull at once → exit 1 wins
+//     (the more severe); --json still records the pull as failed so nothing is hidden.
+test("missingUpstream + diverged pull → exit 1 (hard fail wins over degraded)", () => {
+  const mount = scaffoldGitMount({ diverge: true });
+  writeFileSync(
+    path.join(mount, "tools", "copy-parity.config.json"),
+    JSON.stringify({ copies: [{ local: "tools/x.mjs", upstream: "tools/gone.mjs" }] })
+  );
+  const env = { ...process.env };
+  delete env.GH_REPO;
+  delete env.GH_HOST;
+  delete env.GH_TOKEN;
+  const r = spawnSync(
+    process.execPath,
+    [path.join(mount, "tools", "devkit-upgrade.mjs"), "--no-tools", "--json"],
+    { cwd: mount, encoding: "utf8", env }
+  );
+  assert.equal(r.status, 1, `hard fail must win over degraded\n${r.stdout}${r.stderr}`);
+  const parsed = JSON.parse(r.stdout);
+  assert.equal(parsed.exitCode, 1);
+  assert.equal(parsed.pull.failed, true, "the pull still records its failure even when 1 wins");
 });
 
 for (const d of tmpdirs) {

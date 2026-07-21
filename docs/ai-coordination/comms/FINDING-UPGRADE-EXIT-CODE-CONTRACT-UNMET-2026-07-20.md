@@ -4,12 +4,14 @@ from: claude
 to_agent: dev-kit
 to: agent
 repo: vibethink-dev-kit
-status: open
-needs: review
+status: closed
+needs: none
 priority: normal
 date: 2026-07-20
 re: devkit-upgrade declara "exit 1 si el pull falla" pero un pull fallido sale 0 — los cuatro lectores de la cicatriz D-073/#269 recibieron éxito
 ---
+
+> **CLOSED 2026-07-20 — D-074, kit PR #272.** Resuelto con opción C (exit **2** degradado en pull fallido, `1`>`2`, `--dry-run`/`--no-pull` no son fallo, `--json` expone `exitCode`+`pull.failed`). Validado por Fable (2 rondas: R1 APPROVE-WITH-FIXES → R2 APPROVE). 25 tests. Ver `DELIVERY-DEVKIT-UPGRADE-EXIT-CODE-D074-2026-07-20.md`.
 
 # FINDING — el contrato de código de salida de `devkit-upgrade` no se cumple
 
