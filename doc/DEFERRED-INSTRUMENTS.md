@@ -101,6 +101,41 @@ workflow improved without weakening the kit's authority model.
   + the structured-`surface` field.
 - **Status:** DEFERRED — 2026-06-19.
 
+### executable asset-discoverability search ("search before you build")
+- **What:** a generic engine + consumer config that makes a repo's *reuse-before-build* search
+  **executable at the point of need** — the agent asks "do we already have X?" and the tool answers
+  from the repo's **declared** sources in its **declared** order, cutting at the first level with
+  results instead of letting the agent keep descending and install what it already had. Includes the
+  **declared-available-but-not-reachable** signal (an asset the docs list as available that the
+  packaging does not actually export, so importing it breaks the build).
+- **Origin:** consumer TASK `TASK-DEVKIT-LIFT-UI-FIND-DISCOVERABILITY-2026-07-21` (consumer PR
+  #5239), which asked whether to lift its `ui:find` tool. Reference implementation:
+  `scripts/ui-find.mjs` + 19 co-located tests — already engine+config shaped, so a lift would be
+  cheap. The consumer's evidence: an audit found **eight** already-existing pieces being rewritten,
+  with the search order **already documented** in a repo `AGENTS.md` — *"a doc nobody opens does not
+  stop a rewrite."*
+- **Why deferred:** the **principle is already sealed** — `CANON-UX-BASE-001` §3.1 (*reuse > adapt >
+  build*, D-071) carries **this same scar**, and §5 **already assigns** *"component catalog **and
+  order of preference**"* to **L3**. So the consumer's 4-level sequence is its own topology, not an
+  agnostic taxonomy; lifting it would freeze N=1 as "the pattern". The rule did not stop *applying* —
+  it stopped *biting*, and the bite belongs to the repo (`UX-BASE` §4/§5). `CANON-MULTI-AGENT-
+  ORCHESTRATION` §3.1 (*learn before you automate*) applies: the kit does not yet know what varies
+  between consumers, and generalizing from one would reproduce a misunderstanding at machine speed.
+  Evidence ladder: **E4** (observed demand, one consumer), not E5. The ⚠️ signal is a **new substrate**
+  (package exports) of an **already-named class** — *written-but-not-biting* / `INHERITANCE-CONTRACT`
+  §2 — not a canon gap.
+- **TRIGGER to build:** either (a) a **second consumer** asks for executable asset discoverability, or
+  (b) **post-fix recurrence** in the originating consumer — a piece is rewritten **despite** its own
+  search tool being operational (which would show the L3 mechanization is not the answer either).
+- **KILL / DROP trigger:** drop if a **generic structural-search operator tool** already in the kit
+  covers the need before the trigger fires, or if the originating consumer abandons its tool through
+  disuse (the demand was never real).
+- **Note on the real generalization:** if this ever graduates, the agnostic surface is **"asset
+  discoverability at the point of need"** across asset kinds (components, scripts, services, docs) —
+  **not** a UI-only search. That broader form is **ANTICIPATED, not scarred**, and is recorded here
+  as foresight rather than evidence (D-073's rule: do not sell foresight as evidence).
+- **Status:** DEFERRED — 2026-07-21.
+
 ### external-tools pin integrity check
 - **What:** a check that each pin in `setup/external-tools.lock.json` is **internally consistent
   and resolvable** — the `package` field **matches what `EXTERNAL-TOOLS.md` declares**, and (online)
