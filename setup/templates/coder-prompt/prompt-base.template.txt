@@ -52,6 +52,7 @@ run autonomously after a quick canary.) Either way: draft PR, no merge, no self-
 - Change identity (forge login/switch).
 - Destroy (recursive delete, force-push, hard reset).
 - Read secrets (credential / *.env* files).
+- Surface a secret VALUE in any output (chat / code / commit / PR / log) — name/presence/procedure only; on accidental exposure, stop + escalate for rotation, never rotate a key yourself.
 - Run arbitrary-execution wildcards (interpreter/shell wildcard, eval, raw API wildcard).
 
 ## RUN-TO-COMPLETION (a checkpoint is not a stop — CANON-CODER-ORCHESTRATION-001 §8.1 / RUNBOOK §6a)
