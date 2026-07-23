@@ -363,9 +363,13 @@ project-root/
 - **ALWAYS** scope every data query by its tenant key (multi-tenant isolation).
 - **NEVER** query a shared table without a tenant filter.
 - **NEVER** expose provider API keys or secrets to the client.
+- **NEVER** surface the **value** of a secret in ANY output — chat, docs, commits, PRs, logs, or comms. Refer only to its **name, presence/absence, permissions/scope, and the procedure**; a diagnostic reports `present`/`absent`, never the value.
+- **If a tool or file exposes a secret value:** stop, do not re-quote or echo it, treat it as a **security incident** (see the incident table below), **escalate for rotation** — the runbook runs under its owner, never the agent; the agent never rotates or invents a key itself (`REFERENCE-OPERATOR-COMMAND-CATALOG` rule 11) — and record the incident **without** the secret.
 
 > Concrete client/ORM snippets and the tenant-key field name are org/product-specific
 > — see the **methodology layer (level 2)** and the product repo.
+
+> The secret-handling **mechanics** live with their owners — the coder deny-list, the comms secret-scan gate, the audit-trail exclusion (`CANON-DATA-CHANGE-AUDIT-001` §10.1), and post-exposure fix scoping (`CANON-AGENT-COLLABORATION` §10). These two rules are the universal floor those instruments inherit; they do not restate them. Concrete secret stores and runbooks are L3.
 
 ### Branding / methodology layer
 

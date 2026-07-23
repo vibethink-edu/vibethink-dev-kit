@@ -1,6 +1,6 @@
 # REFERENCE-AGENT-TOOL-CATALOG-CONTRACT — portable catalog of agent-callable capability tools
 
-**Status:** **PROPOSED 2026-07-09** — the contract and gate are intended as an adoptable kit instrument; seal occurs through the normal authority + PR path.
+**Status:** **SEALED 2026-07-23** by the Principal Architect (chat: "SELLA") — D-078. Adopted as the surface-independent capability gateway with two additions vs the 2026-07-09 proposal (§3.2 identical-verdict corollary + §3 bullet 6 no-simulation), after two architecture-advisor rounds. Fire-test passed (l1-neutrality GREEN). *(Original proposal 2026-07-09; seal deferred to the normal authority + PR path.)*
 **Date:** 2026-07-09
 **Scope:** Any repo where more than one agent surface (assistant, in-context advisor, twin/avatar, coder, orchestrator) needs to invoke the same governed capabilities on domain/business data.
 **Home:** the dev-kit (supra-repo). Inherited by consuming repos as upstream contract → local binding.
@@ -87,10 +87,11 @@ The schema lives at `setup/templates/agent-tool-catalog/agent-tool-catalog.schem
 A consuming repo that adopts this contract SHOULD provide:
 
 1. A registration path where each capability/surface declares its agent tools **once** into the governed catalog (not inline per route, not copied per agent surface).
-2. A single governed engine/broker that every agent surface calls to invoke a catalogued tool — so the advisor, the assistant, the twin, and coders all traverse the same catalog, not private loops.
+2. A single governed engine/broker that every agent surface calls to invoke a catalogued tool — so the advisor, the assistant, the twin, and coders all traverse the same catalog, not private loops. The **same actor + tenant + capability resolves to the same authorization verdict from any surface**; a surface is context and audit, **never authority** — neither a UI nor a prompt grants permission; actor/tenant/scope derivation belongs to the delegated actor handle (`REFERENCE-AGENT-NATIVE-SURFACE-CONTRACT-001` §4), not to this catalog.
 3. A gate that validates the exported catalog against this contract, and a drift check tying local tool implementations to their catalog entries.
 4. A **responsible surface** recorded for every tool (§2 `surface`) — the domain accountable for the tool's contract. This is domain accountability, not agent ownership.
 5. **Consumption governance the catalog defers to, not defines:** authorization per verb/tenant/actor (§8.1), and an **entitlement/plan authority** deciding whether a tenant's plan enables the capability and **how many actors (seats) are enabled** — deny-by-default. The catalog carries the `permission` and `capability` handles; the repo's entitlement authority resolves them. Metering/quota per §8.1 applies.
+6. **No-simulation enforcement:** the engine offers only tools present in the catalog and passing conformance; an absent or failing tool is **never simulated** — an unavailable capability is answered with the truth, not a pretended result or a promise.
 
 The kit does not prescribe the storage of the registry, the entitlement model, the seat/plan vocabulary, or the engine implementation. Those are local bindings.
 
